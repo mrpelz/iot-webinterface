@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>wurstsalat IoT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="./main.js" type="module"></script>
+  <style>
+    :root:not(.ready) {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <x-abcde>
+    Text as Child
+    <div class="testA">
+      Text in Child
+    </div>
+  </x-abcde>
+  <x-efghi>
+      Text as Child
+      <div class="testB">
+        Text in Child
+      </div>
+      <x-abcde>
+        <x-abcde>
+          <x-abcde></x-abcde>
+        </x-abcde>
+      </x-abcde>
+  </x-efghi>
+</body>
+</html>
