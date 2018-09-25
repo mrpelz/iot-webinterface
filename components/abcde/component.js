@@ -1,9 +1,9 @@
 /* eslint-disable import/extensions */
 import {
-  ShadowTemplatedComponent
+  BaseComponent
 } from '../../dom.js';
 
-export class Abcde extends ShadowTemplatedComponent {
+export class Abcde extends BaseComponent {
   constructor(template) {
     super(template);
     console.log(this);

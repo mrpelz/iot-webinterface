@@ -3,28 +3,20 @@ export class BaseComponent extends HTMLElement {
     return template.cloneNode(true);
   }
 
-  attachTemplate(template) {
-    const templateContents = BaseComponent.getTemplate(template);
-
-    if (this.firstChild) {
-      this.insertBefore(templateContents, this.firstChild);
-    } else {
-      this.appendChild(templateContents);
-    }
+  constructor(template) {
+    super();
+    this.template = template;
   }
 
-  shadowTemplate(template) {
+  render() {
+    this.attachTemplate(this.template);
+    this.moveChildNodes();
+  }
+
+  attachTemplate(template) {
     this.attachShadow({ mode: 'open' }).appendChild(
       BaseComponent.getTemplate(template)
     );
-  }
-}
-
-export class ShadowTemplatedComponent extends BaseComponent {
-  constructor(template) {
-    super();
-    this.shadowTemplate(template);
-    this.moveChildNodes();
   }
 
   moveChildNodes() {
@@ -32,27 +24,20 @@ export class ShadowTemplatedComponent extends BaseComponent {
       shadowRoot
     } = this;
 
-    const children = shadowRoot.querySelector('x-children');
+    const childrenDrop = shadowRoot.querySelector('x-children');
     const target = document.createDocumentFragment();
-    const targetElement = (children && children.parentElement) || shadowRoot;
+    const targetElement = (childrenDrop && childrenDrop.parentElement) || shadowRoot;
 
     while (this.firstChild) {
       target.appendChild(this.firstChild);
     }
 
-    if (children) {
-      targetElement.insertBefore(target, children);
-      children.parentElement.removeChild(children);
+    if (childrenDrop) {
+      targetElement.insertBefore(target, childrenDrop);
+      childrenDrop.parentElement.removeChild(childrenDrop);
     } else {
       targetElement.appendChild(target);
     }
-  }
-}
-
-export class TemplatedComponent extends BaseComponent {
-  constructor(template) {
-    super();
-    this.attachTemplate(template);
   }
 }
 
@@ -89,8 +74,12 @@ export async function defineComponent(slug, componentClass, hasStyle = false) {
   customElements.define(
     `x-${slug}`,
     class extends componentClass {
-      constructor() {
+      constructor(deferRender = false) {
         super(template);
+
+        if (deferRender) return;
+
+        this.render();
       }
     }
   );
@@ -99,5 +88,8 @@ export async function defineComponent(slug, componentClass, hasStyle = false) {
 }
 
 export function getComponent(slug) {
-  return document.createElement(`x-${slug}`);
+  const constructor = customElements.get(`x-${slug}`);
+  if (!constructor) return null;
+
+  return new constructor(true);
 }
