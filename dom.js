@@ -17,8 +17,6 @@ export class BaseComponent extends HTMLElement {
   render() {
     this.attachTemplate(this.template);
     this.moveChildNodes();
-
-    console.log(this.props);
   }
 
   delete() {
@@ -45,14 +43,13 @@ export class BaseComponent extends HTMLElement {
     if (childrenDrop) {
       const target = document.createDocumentFragment();
 
-      const children = [...this.querySelectorAll(':scope > *:not([slot])')];
+      const children = this.querySelectorAll(':scope > *:not([slot])');
 
-      while (children.length) {
-        target.appendChild(children.shift());
-      }
+      children.forEach((child) => {
+        target.appendChild(child);
+      });
 
-      const parent = childrenDrop.parentNode || shadowRoot;
-      parent.replaceChild(target, childrenDrop);
+      childrenDrop.parentNode.replaceChild(target, childrenDrop);
     }
   }
 }
