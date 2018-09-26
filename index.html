@@ -5,17 +5,36 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>wurstsalat IoT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <script src="./main.js" type="module"></script>
   <style>
+    @keyframes spinner {
+      to {transform: rotate(360deg);}
+    }
+
     :root:not(.ready) {
-      display: none;
+      background: #333;
+    }
+    
+    :root:not(.ready)::before {
+      content: '';
+      box-sizing: border-box;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin-top: -10px;
+      margin-left: -10px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      border-top-color: transparent;
+      animation: spinner .6s linear infinite;
     }
   </style>
 </head>
 <body>
-  <x-app>
-    <x-page></x-page>
-    <x-menu></x-menu>
-  </x-app>
+  <x-app></x-app>
 </body>
 </html>

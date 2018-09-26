@@ -36,8 +36,7 @@ export class BaseComponent extends HTMLElement {
       }
 
       const parent = childrenDrop.parentElement || shadowRoot;
-      parent.insertBefore(target, childrenDrop);
-      parent.removeChild(childrenDrop);
+      parent.replaceChild(target, childrenDrop);
     }
   }
 }
