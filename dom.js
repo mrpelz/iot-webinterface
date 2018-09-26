@@ -11,6 +11,8 @@ export class BaseComponent extends HTMLElement {
   render() {
     this.attachTemplate(this.template);
     this.moveChildNodes();
+
+    console.log(this.props);
   }
 
   attachTemplate(template) {
@@ -74,11 +76,12 @@ export async function defineComponent(slug, componentClass, hasStyle = false) {
   customElements.define(
     `x-${slug}`,
     class extends componentClass {
-      constructor(deferRender = false) {
+      constructor(deferRender = false, props = {}) {
         super(template);
 
-        if (deferRender) return;
+        this.props = props;
 
+        if (deferRender) return;
         this.render();
       }
     }
@@ -87,9 +90,9 @@ export async function defineComponent(slug, componentClass, hasStyle = false) {
   return slug;
 }
 
-export function getComponent(slug) {
+export function getComponent(slug, props = {}) {
   const constructor = customElements.get(`x-${slug}`);
   if (!constructor) return null;
 
-  return new constructor(true);
+  return new constructor(true, props);
 }
