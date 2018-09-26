@@ -4,6 +4,16 @@ const componentsDir = './components';
 const templateFileName = 'template.html';
 const styleFileName = 'style.css';
 
+function deter() {
+  return new Promise((resolve) => {
+    window.requestAnimationFrame(() => {
+      window.setTimeout(() => {
+        resolve();
+      });
+    });
+  });
+}
+
 export class BaseComponent extends HTMLElement {
   static getTemplate(template) {
     return template.cloneNode(true);
@@ -86,17 +96,19 @@ async function fetchStyle(slug) {
   return style;
 }
 
-export function defineComponent(slug, componentClass, hasStyle = false) {
+export async function defineComponent(slug, componentClass, hasStyle = false) {
   const fetchingTemplate = fetchTemplate(slug);
   const fetchingStyle = hasStyle ? fetchStyle(slug) : Promise.resolve(null);
 
-  Promise.all([fetchingTemplate, fetchingStyle]).then(([template, style]) => {
-    if (!template) return;
+  const [template, style] = await Promise.all([fetchingTemplate, fetchingStyle]);
 
-    if (style) {
-      template.insertBefore(style, template.firstChild);
-    }
+  if (!template) return;
 
+  if (style) {
+    template.insertBefore(style, template.firstChild);
+  }
+
+  const define = () => {
     customElements.define(
       `${tagPrefix}${slug}`,
       class extends componentClass {
@@ -110,9 +122,11 @@ export function defineComponent(slug, componentClass, hasStyle = false) {
         }
       }
     );
-  });
+  };
 
-  return slug;
+  // work around firefox (and chrome?) render bug
+  await deter();
+  define();
 }
 
 export function getComponent(slug, props = {}) {

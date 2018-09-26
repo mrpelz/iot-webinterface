@@ -35,15 +35,12 @@
       ]);
 
       document.documentElement.classList.add('ready');
-      document.documentElement.dispatchEvent(ready);
-      console.log('ready');
     }
 
     if (window.customElements && document.body.attachShadow) {
       document.addEventListener('DOMContentLoaded', main);
     } else {
       console.log('not supported');
-      document.documentElement.classList.add('unsupported');
     }
   </script>
   <style>
