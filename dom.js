@@ -27,18 +27,17 @@ export class BaseComponent extends HTMLElement {
     } = this;
 
     const childrenDrop = shadowRoot.querySelector('x-children');
-    const target = document.createDocumentFragment();
-    const targetElement = (childrenDrop && childrenDrop.parentElement) || shadowRoot;
-
-    while (this.firstChild) {
-      target.appendChild(this.firstChild);
-    }
 
     if (childrenDrop) {
-      targetElement.insertBefore(target, childrenDrop);
-      childrenDrop.parentElement.removeChild(childrenDrop);
-    } else {
-      targetElement.appendChild(target);
+      const target = document.createDocumentFragment();
+
+      while (this.firstChild) {
+        target.appendChild(this.firstChild);
+      }
+
+      const parent = childrenDrop.parentElement || shadowRoot;
+      parent.insertBefore(target, childrenDrop);
+      parent.removeChild(childrenDrop);
     }
   }
 }

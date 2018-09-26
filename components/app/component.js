@@ -3,4 +3,4 @@ import {
   BaseComponent
 } from '../../dom.js';
 
-export class Efghi extends BaseComponent {}
+export class App extends BaseComponent {}

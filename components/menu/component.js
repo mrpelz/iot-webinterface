@@ -3,4 +3,4 @@ import {
   BaseComponent
 } from '../../dom.js';
 
-export class Abcde extends BaseComponent {}
+export class Menu extends BaseComponent {}
