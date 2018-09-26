@@ -7,7 +7,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <script src="./main.js" type="module"></script>
+  <script type="module">
+    /* eslint-disable import/extensions */
+    import {
+      defineComponent
+    } from './dom.js';
+
+    import {
+      App
+    } from './components/app/index.js';
+
+    import {
+      Page
+    } from './components/page/index.js';
+
+    import {
+      Menu
+    } from './components/menu/index.js';
+
+    async function main() {
+      const ready = new Event('webComponentsLoaded');
+
+      await Promise.all([
+        defineComponent('app', App, true),
+        defineComponent('page', Page, true),
+        defineComponent('menu', Menu, true)
+      ]);
+
+      document.documentElement.classList.add('ready');
+      document.documentElement.dispatchEvent(ready);
+      console.log('ready');
+    }
+
+    if (window.customElements && document.body.attachShadow) {
+      document.addEventListener('DOMContentLoaded', main);
+    } else {
+      console.log('not supported');
+      document.documentElement.classList.add('unsupported');
+    }
+  </script>
   <style>
     @keyframes spinner {
       to {transform: rotate(360deg);}
