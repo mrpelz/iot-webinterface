@@ -13,7 +13,6 @@ export class App extends BaseComponent {
     window.setInterval(() => {
       const component = getComponent('page');
       component.dataset.count = this.count;
-      component.render();
 
       this.shadowRoot.firstChild.nextSibling.replace(component);
       this.count += 1;

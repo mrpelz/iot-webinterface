@@ -4,27 +4,13 @@ const componentsDir = './components';
 const templateFileName = 'template.html';
 const styleFileName = 'style.css';
 
-function deter() {
-  return new Promise((resolve) => {
-    window.requestAnimationFrame(() => {
-      window.setTimeout(() => {
-        resolve();
-      });
-    });
-  });
-}
-
 export class BaseComponent extends HTMLElement {
-  static getTemplate(template) {
-    return template.cloneNode(true);
-  }
-
   constructor(template) {
     super();
     this.template = template;
   }
 
-  render() {
+  connectedCallback() {
     this.attachTemplate(this.template);
     this.moveChildNodes();
   }
@@ -39,7 +25,7 @@ export class BaseComponent extends HTMLElement {
 
   attachTemplate(template) {
     this.attachShadow({ mode: 'open' }).appendChild(
-      BaseComponent.getTemplate(template)
+      template.cloneNode(true)
     );
   }
 
@@ -108,30 +94,21 @@ export async function defineComponent(slug, componentClass, hasStyle = false) {
     template.insertBefore(style, template.firstChild);
   }
 
-  const define = () => {
-    customElements.define(
-      `${tagPrefix}${slug}`,
-      class extends componentClass {
-        constructor(deferRender = false, props = {}) {
-          super(template);
+  customElements.define(
+    `${tagPrefix}${slug}`,
+    class extends componentClass {
+      constructor(props = {}) {
+        super(template);
 
-          this.props = props;
-
-          if (deferRender) return;
-          this.render();
-        }
+        this.props = props;
       }
-    );
-  };
-
-  // work around firefox (and chrome?) render bug
-  await deter();
-  define();
+    }
+  );
 }
 
 export function getComponent(slug, props = {}) {
   const constructor = customElements.get(`${tagPrefix}${slug}`);
   if (!constructor) return null;
 
-  return new constructor(true, props);
+  return new constructor(props);
 }
