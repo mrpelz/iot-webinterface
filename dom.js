@@ -11,8 +11,14 @@ export class BaseComponent extends HTMLElement {
   }
 
   connectedCallback() {
-    this.attachTemplate(this.template);
+    console.log(`${this.tagName} attach start`, this);
+    this.attachTemplate();
     this.moveChildNodes();
+
+    if (this.render) {
+      this.render();
+    }
+    console.log(`${this.tagName} attach end`, this);
   }
 
   delete() {
@@ -23,10 +29,18 @@ export class BaseComponent extends HTMLElement {
     this.parentNode.replaceChild(newChild, this);
   }
 
-  attachTemplate(template) {
-    this.attachShadow({ mode: 'open' }).appendChild(
-      template.cloneNode(true)
-    );
+  get(selector) {
+    return this.shadowRoot.querySelector(selector);
+  }
+
+  attachTemplate() {
+    this.attachShadow({ mode: 'open' });
+
+    if (this.template) {
+      this.shadowRoot.appendChild(
+        this.template.cloneNode(true)
+      );
+    }
   }
 
   moveChildNodes() {
@@ -58,7 +72,7 @@ async function fetchTemplate(slug) {
   }).catch(() => {
     return null;
   });
-  if (!templateString) return null;
+  if (templateString === null) return null;
 
   const templateContainer = document.createRange();
   templateContainer.selectNode(document.body);
@@ -82,33 +96,64 @@ async function fetchStyle(slug) {
   return style;
 }
 
-export async function defineComponent(slug, componentClass, hasStyle = false) {
-  const fetchingTemplate = fetchTemplate(slug);
-  const fetchingStyle = hasStyle ? fetchStyle(slug) : Promise.resolve(null);
+async function fetchComponent({
+  slug,
+  component,
+  template: hasTemplate = false,
+  style: hasStyle = false
+}) {
+  const fetchingTemplate = hasTemplate
+    ? fetchTemplate(slug)
+    : Promise.resolve(new DocumentFragment());
+  const fetchingStyle = hasStyle ? fetchStyle(slug) : Promise.resolve(undefined);
 
   const [template, style] = await Promise.all([fetchingTemplate, fetchingStyle]);
 
-  if (!template) return;
-
-  if (style) {
-    template.insertBefore(style, template.firstChild);
+  if (template === null || style === null) {
+    const error = `cannot fetch data for component "${slug}"`;
+    alert(error);
+    throw new Error(error);
   }
 
-  customElements.define(
-    `${tagPrefix}${slug}`,
-    class extends componentClass {
-      constructor(props = {}) {
-        super(template);
-
-        this.props = props;
-      }
+  if (style) {
+    if (template.firstChild) {
+      template.insertBefore(style, template.firstChild);
+    } else {
+      template.appendChild(style);
     }
-  );
+  }
+
+  return () => {
+    customElements.define(
+      `${tagPrefix}${slug}`,
+      class extends component {
+        constructor(props = {}) {
+          super(template);
+          this.props = props;
+        }
+      }
+    );
+  };
 }
 
-export function getComponent(slug, props = {}) {
-  const constructor = customElements.get(`${tagPrefix}${slug}`);
+export function defineComponents(components = []) {
+  return Promise.all(components.map((component) => {
+    return fetchComponent(component);
+  })).then((mounters) => {
+    window.requestAnimationFrame(() => {
+      mounters.filter(Boolean).forEach((mounter) => {
+        mounter();
+      });
+    });
+  });
+}
+
+export async function getComponent(slug) {
+  const elementName = `${tagPrefix}${slug}`;
+  await customElements.whenDefined(elementName);
+
+  const constructor = customElements.get(elementName);
   if (!constructor) return null;
 
-  return new constructor(props);
+  return constructor;
 }

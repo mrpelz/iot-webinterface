@@ -9,29 +9,37 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <script type="module">
     /* eslint-disable import/extensions */
-    import {
-      defineComponent
-    } from './dom.js';
-
-    import {
-      App
-    } from './components/app/index.js';
-
-    import {
-      Page
-    } from './components/page/index.js';
-
-    import {
-      Menu
-    } from './components/menu/index.js';
+    import { defineComponents } from './dom.js';
+    import { App } from './components/app/index.js';
+    import { TitleBar } from './components/titlebar/index.js';
+    import { Page } from './components/page/index.js';
+    import { Menu } from './components/menu/index.js';
 
     async function main() {
       const ready = new Event('webComponentsLoaded');
 
-      await Promise.all([
-        defineComponent('app', App, true),
-        defineComponent('page', Page, true),
-        defineComponent('menu', Menu, true)
+      await defineComponents([
+        {
+          slug: 'app',
+          component: App,
+          style: true
+        },
+        {
+          slug: 'menu',
+          component: Menu,
+          style: true
+        },
+        {
+          slug: 'titlebar',
+          component: TitleBar,
+          template: true,
+          style: true
+        },
+        {
+          slug: 'page',
+          component: Page,
+          style: true
+        }
       ]);
 
       document.documentElement.classList.add('ready');
@@ -40,17 +48,14 @@
     if (window.customElements && document.body.attachShadow) {
       document.addEventListener('DOMContentLoaded', main);
     } else {
-      console.log('not supported');
+      alert('your browser doesn\'t support custom elements and/or shadow dom');
     }
   </script>
   <style>
-    @keyframes spinner {
-      to {transform: rotate(360deg);}
-    }
+    * { margin: 0; padding: 0 }
+    @keyframes spinner { to {transform: rotate(360deg)} }
 
-    :root:not(.ready) {
-      background: #333;
-    }
+    :root:not(.ready) { background: #000 }
     
     :root:not(.ready)::before {
       content: '';
@@ -63,7 +68,7 @@
       margin-top: -10px;
       margin-left: -10px;
       border-radius: 50%;
-      border: 2px solid #ccc;
+      border: 2px solid #fff;
       border-top-color: transparent;
       animation: spinner .6s linear infinite;
     }

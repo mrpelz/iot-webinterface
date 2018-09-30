@@ -5,17 +5,17 @@ import {
 } from '../../dom.js';
 
 export class App extends BaseComponent {
-  constructor(template) {
-    super(template);
+  async render() {
+    const [Menu, TitleBar, Page] = await Promise.all([
+      getComponent('menu'),
+      getComponent('titlebar'),
+      getComponent('page')
+    ]);
 
-    this.count = 0;
-
-    window.setInterval(() => {
-      const component = getComponent('page');
-      component.dataset.count = this.count;
-
-      this.shadowRoot.firstChild.nextSibling.replace(component);
-      this.count += 1;
-    }, 5000);
+    this.shadowRoot.appendChild(new Menu());
+    this.shadowRoot.appendChild(new TitleBar({
+      room: 'Wohnzimmer'
+    }));
+    this.shadowRoot.appendChild(new Page());
   }
 }

@@ -1,7 +1,5 @@
 :host {
-  width: 100%;
+  display: block;
+  background: #000;
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  padding-bottom: 49pt;
 }
