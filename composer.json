@@ -1,0 +1,18 @@
+{
+    "require-dev": {
+        "kint-php/kint": "^2.2"
+    },
+    "authors": [
+        {
+            "name": "Thomas Tsiakalakis",
+            "email": "mail@tsia.de"
+        },
+        {
+            "name": "Lennart Pelz",
+            "email": "mail@mrpelz.de"
+        }
+    ],
+    "require": {
+        "twig/twig": "^2.4"
+    }
+}
