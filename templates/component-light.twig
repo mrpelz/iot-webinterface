@@ -1,5 +1,10 @@
-<x-{{ item.attributes.type }}>
+<div class="component {{ item.attributes.type }}"><a href="?action=set&id={{ item.name }}&value={{ not item.value }}">
 {{ item.attributes.displayName }}
-{{ item.attributes.location }}
-{{ item.value }}
-</x-{{ item.attributes.type }}>
+{% if item.value is same as(true) %}
+    on
+{% elseif item.value is same as(false) %}
+    off
+{% else %}
+    ???
+{% endif %}
+</a></div>

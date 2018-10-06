@@ -17,20 +17,39 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <style>
     * { margin: 0; padding: 0 }
+    .items {
+      display: flex;
+    }
+    .component {
+      border: 1px solid black;
+      border-radius: 5px;
+      margin: 10px;
+      width: 100px;
+      height: 100px;
+    }
   </style>
 </head>
 <body>
-  <x-app>
-    {% for room in rooms %}
+  <div class="root">
+    <div class="rooms">
+      {% for room in rooms %}
         <div class="room {{ room.name }}">
+          <div class="headline">
+            <h1>{{ room.name }}</h1>
+          </div>
+          <div class="items">
             {% for item in room.items %}
-                {% include 'component-'~item.attributes.type~'.twig' with {'item': item} %}
+              {% include 'component-'~item.attributes.type~'.twig' with {'item': item} %}
             {% endfor %}
+          </div>
         </div>
-    {% endfor %}
-    {% for room in rooms %}
-        <div class="roomnav">{{ room.name }}</div>
-    {% endfor %}
-  </x-app>
+      {% endfor %}
+    <div class="rooms">
+    <div class="nav">
+      {% for room in rooms %}
+        <div class="room">{{ room.name }}</div>
+      {% endfor %}
+    </div>
+  </div>
 </body>
 </html>
