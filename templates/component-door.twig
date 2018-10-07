@@ -1,5 +1,10 @@
 <div class="component {{ item.attributes.type }}">
-D
 {{ item.attributes.displayName }}
-{{ item.value }}
+{% if item.value is same as(true) %}
+    open
+{% elseif item.value is same as(false) %}
+    closed
+{% else %}
+    ???
+{% endif %}
 </div>
