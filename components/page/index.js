@@ -23,7 +23,6 @@ export class Page extends BaseComponent {
         setElement({ name: 'testLicht', value: false });
       }
 
-      this.scrollTop = 0;
       this.classList.add(activeClass);
     } else {
       this.classList.remove(activeClass);
