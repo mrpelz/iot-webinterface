@@ -1,0 +1,26 @@
+:host {
+  align-items: center;
+  color: #929292;
+  cursor: pointer;
+  display: flex;
+  font-family: -apple-system,SF UI Text,Helvetica Neue,Helvetica,Arial,sans-serif;
+  font-size: 17px;
+  padding: 0 10px;
+  touch-action: none;
+}
+
+:host(.menu--element-active) {
+  color: #007aff;
+}
+
+:host(:first-of-type) {
+  padding-left: 15px;
+}
+
+:host(:last-of-type) {
+  padding-right: 15px;
+}
+
+::slotted(span) {
+  pointer-events: none;
+}

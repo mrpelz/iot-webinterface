@@ -1,0 +1,15 @@
+:host {
+  -webkit-overflow-scrolling: touch;
+  background: #f7f7f8;
+  border-top: 0.5px solid #c4c4c4;
+  bottom: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  height: 44px;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  overflow: auto;
+  width: 100%;
+}

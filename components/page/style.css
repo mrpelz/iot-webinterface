@@ -1,0 +1,9 @@
+:host {
+  background: #fff;
+  display: none;
+  min-height: 100%;
+}
+
+:host(.page-active) {
+  display: block;
+}

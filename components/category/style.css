@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  font-family: -apple-system,SF UI Text,Helvetica Neue,Helvetica,Arial,sans-serif;
+}
+
+:host([data-category-name])::before {
+  background: #f7f7f8;
+  content: attr(data-category-name);
+  display: block;
+  font-weight: 600;
+  height: 22px;
+  left: 0;
+  line-height: 22px;
+  padding: 0 15px;
+  position: -webkit-sticky;
+  position: sticky;
+  right: 0;
+  top: 0;
+}
+
+::slotted(pre) {
+  margin: 0;
+}
