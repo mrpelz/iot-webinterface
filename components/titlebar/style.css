@@ -14,7 +14,7 @@
   z-index: 1;
 }
 
-:host h1 {
+h1 {
   color: #000;
   font-family: -apple-system,SF UI Text,Helvetica Neue,Helvetica,Arial,sans-serif;
   font-size: 17px;

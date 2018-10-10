@@ -3,8 +3,10 @@
   color: #929292;
   cursor: pointer;
   display: flex;
+  flex-shrink: 0;
   font-family: -apple-system,SF UI Text,Helvetica Neue,Helvetica,Arial,sans-serif;
   font-size: 17px;
+  height: 44px;
   padding: 0 10px;
   touch-action: pan-x;
 }
@@ -23,4 +25,23 @@
 
 ::slotted(span) {
   pointer-events: none;
+}
+
+@media screen and (min-width: 769px) {
+  :host {
+    border-bottom: 0.5px solid #c4c4c4;
+  }
+
+  :host(.menu--element-active) {
+    background: #007aff;
+    color: #fff;
+  }
+
+  :host(:first-of-type) {
+    padding-left: 10px;
+  }
+
+  :host(:last-of-type) {
+    padding-right: 10px;
+  }
 }

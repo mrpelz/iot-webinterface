@@ -8,3 +8,9 @@
 :host(.page-active) {
   display: block;
 }
+
+@media screen and (min-width: 769px) {
+  :host {
+    margin-left: 280px;
+  }
+}
