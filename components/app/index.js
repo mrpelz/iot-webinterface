@@ -6,6 +6,10 @@ import {
 } from '../../dom.js';
 
 export class App extends BaseComponent {
+  static handleRoomChange() {
+    window.scrollTo(0, 0);
+  }
+
   create() {
     const app = [
       c('titlebar'),
@@ -16,5 +20,14 @@ export class App extends BaseComponent {
     this.appendChild(
       render(...app)
     );
+
+    this.subscription = window.componentState.subscribe(
+      '_selectedRoom',
+      App.handleRoomChange
+    );
+  }
+
+  destroy() {
+    this.subscription.unsubscribe();
   }
 }
