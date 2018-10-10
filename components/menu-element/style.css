@@ -6,7 +6,7 @@
   font-family: -apple-system,SF UI Text,Helvetica Neue,Helvetica,Arial,sans-serif;
   font-size: 17px;
   padding: 0 10px;
-  touch-action: none;
+  touch-action: pan-x;
 }
 
 :host(.menu--element-active) {
