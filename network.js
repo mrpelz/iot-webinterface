@@ -1,4 +1,4 @@
-const apiBaseUrl = 'http://hermes.net.wurstsalat.cloud/';
+const apiBaseUrl = `${window.location.protocol}//hermes.net.wurstsalat.cloud/`;
 
 function fetchElements() {
   const url = new URL('/list', apiBaseUrl);
