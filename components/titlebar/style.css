@@ -9,8 +9,9 @@
   justify-content: center;
   overflow: hidden;
   padding: 0 8px;
-  top: 0;
+  position: fixed;
   width: 100%;
+  z-index: 1;
 }
 
 :host h1 {

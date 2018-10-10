@@ -2,6 +2,7 @@
   background: #fff;
   display: none;
   min-height: 100%;
+  padding: 44px 0;
 }
 
 :host(.page-active) {

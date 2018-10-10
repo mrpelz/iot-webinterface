@@ -15,7 +15,7 @@
   position: -webkit-sticky;
   position: sticky;
   right: 0;
-  top: 0;
+  top: 44px;
 }
 
 ::slotted(pre) {

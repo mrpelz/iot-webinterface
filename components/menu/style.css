@@ -9,5 +9,7 @@
   flex-wrap: nowrap;
   height: 44px;
   overflow: scroll;
+  position: fixed;
   width: 100%;
+  z-index: 1;
 }

@@ -38,8 +38,7 @@ async function main() {
       },
       {
         slug: 'page-container',
-        component: PageContainer,
-        style: true
+        component: PageContainer
       },
       {
         slug: 'page',
