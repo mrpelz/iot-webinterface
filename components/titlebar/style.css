@@ -1,22 +1,35 @@
 :host {
   align-items: center;
-  background: #f7f7f8;
-  border-bottom: 0.5px solid #c4c4c4;
+  background: var(--background-secondary);
+  border-bottom: 0.5px solid var(--hairline);
   box-sizing: border-box;
   display: flex;
   flex-shrink: 0;
-  height: 44px;
+  height: var(--titlebar-height);
   justify-content: center;
   overflow: hidden;
   padding: 0 8px;
   position: fixed;
   width: 100%;
   z-index: 1;
+  font-family: var(--font);
 }
 
-h1 {
-  color: #000;
-  font-family: -apple-system,SF UI Text,Helvetica Neue,Helvetica,Arial,sans-serif;
+#room {
+  color: var(--font-primary);
   font-size: 17px;
   font-weight: 600;
+}
+
+#dark {
+  align-items: center;
+  background: #35353F;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  font-size: 14px;
+  font-weight: 600;
+  left: 8px;
+  padding: 4px 8px;
+  position: fixed;
 }

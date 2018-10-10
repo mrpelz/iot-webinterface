@@ -1,7 +1,7 @@
 :host {
   -webkit-overflow-scrolling: touch;
-  background: #f7f7f8;
-  border-top: 0.5px solid #c4c4c4;
+  background: var(--background-secondary);
+  border-top: 0.5px solid var(--hairline);
   bottom: 0;
   box-sizing: border-box;
   display: flex;
@@ -24,22 +24,32 @@
 }
 
 :host::before {
-  background: linear-gradient(to right, #f7f7f8, rgba(247, 247, 248, 0));
+  background: linear-gradient(
+    to right,
+    var(--background-secondary),
+    var(--background-secondary-transparent)
+  );
+  left: -1px;
 }
 
 :host::after {
-  background: linear-gradient(to left, #f7f7f8, rgba(247, 247, 248, 0));
-  right: 0;
+  background: linear-gradient(
+    to left,
+    var(--background-secondary),
+    var(--background-secondary-transparent)
+  );
+  right: -1px;
 }
 
 @media screen and (min-width: 769px) {
   :host {
-    border-right: 0.5px solid #c4c4c4;
+    border-right: 0.5px solid var(--hairline);
     border-top: none;
     flex-direction: column;
     height: 100%;
-    top: 44px;
-    width: 280px;
+    padding-top: var(--menu-height);
+    top: var(--titlebar-height);
+    width: var(--menu-width-tablet);
   }
 
   :host::before,

@@ -6,6 +6,16 @@ import {
 } from '../../dom.js';
 
 export class TitleBar extends BaseComponent {
+  static handleDarkClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    window.componentState.set(
+      '_darkMode',
+      !window.componentState.get('_darkMode')
+    );
+  }
+
   _handleTitleChange(id) {
     this.setProps({
       id
@@ -20,6 +30,11 @@ export class TitleBar extends BaseComponent {
 
     this.shadowRoot.appendChild(
       render(...[
+        h(
+          'span',
+          { id: 'dark' },
+          '💡'
+        ),
         h('h1', { id: 'room' }),
         h('section', { id: 'flags' }),
       ])
@@ -31,10 +46,12 @@ export class TitleBar extends BaseComponent {
     if (id === undefined) return;
 
     const { rooms } = window.componentState.get('_hierarchy');
-    this.shadowRoot.getElementById('room').textContent = rooms[id].name;
+    this.get('#room').textContent = rooms[id].name;
+    this.get('#dark').addEventListener('click', TitleBar.handleDarkClick);
   }
 
   destroy() {
     this.subscription.unsubscribe();
+    this.get('#dark').removeEventListener('click', TitleBar.handleDarkClick);
   }
 }

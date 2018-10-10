@@ -158,13 +158,19 @@ export async function setUpApi() {
   const values = getValues(apiResponse);
 
   window.componentState.set('_hierarchy', hierarchy);
-  window.componentState.set('_selectedRoom', 0);
 
   values.forEach(({ name, value }) => {
     window.componentState.set(name, value);
   });
 
-  startStream(({ name, value }) => {
+  startStream((data) => {
+    const { isSystem = false, name, value } = data;
+
+    if (isSystem) {
+      /* eslint-disable-next-line no-console */
+      console.log(data);
+    }
+
     if (!name) return;
     window.componentState.set(name, value);
   });

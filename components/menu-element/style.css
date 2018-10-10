@@ -1,18 +1,18 @@
 :host {
   align-items: center;
-  color: #929292;
+  color: var(--font-secondary);
   cursor: pointer;
   display: flex;
   flex-shrink: 0;
-  font-family: -apple-system,SF UI Text,Helvetica Neue,Helvetica,Arial,sans-serif;
+  font-family: var(--font);
   font-size: 17px;
-  height: 44px;
+  height: var(--menu-height);
   padding: 0 10px;
   touch-action: pan-x;
 }
 
 :host(.menu--element-active) {
-  color: #007aff;
+  color: var(--selection);
 }
 
 :host(:first-of-type) {
@@ -29,12 +29,15 @@
 
 @media screen and (min-width: 769px) {
   :host {
-    border-bottom: 0.5px solid #c4c4c4;
+    background: var(--background-primary);
+    border-top: 0.5px solid var(--hairline);
+    color: var(--font-primary);
   }
 
   :host(.menu--element-active) {
-    background: #007aff;
-    color: #fff;
+    background: var(--selection);
+    border-top-color: var(--selection);
+    color: var(--background-primary);
   }
 
   :host(:first-of-type) {
@@ -42,6 +45,11 @@
   }
 
   :host(:last-of-type) {
+    border-bottom: 0.5px solid var(--hairline);
     padding-right: 10px;
+  }
+
+  :host(:last-of-type.menu--element-active) {
+    border-bottom-color: var(--selection);
   }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,17 +11,42 @@
   <link rel="apple-touch-icon" sizes="180x180" href="images/favicon-167.png">
   <link rel="apple-touch-icon" sizes="167x167" href="images/favicon-167.png">
   <link rel="apple-touch-icon" sizes="152x152" href="images/favicon-167.png">
+  <link href="images/black.png" rel="apple-touch-startup-image">
   <title>wurstsalat IoT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <script type="module" src="./index.js"></script>
   <style>
+    html {
+      --font: -apple-system,SF UI Text,Helvetica Neue,Helvetica,Arial,sans-serif;
+      --background-primary: #fff;
+      --background-secondary: #f7f7f8;
+      --background-secondary-transparent: rgba(247, 247, 248, 0);
+      --hairline: #c4c4c4;
+      --selection: #007aff;
+      --font-primary: #000;
+      --font-secondary: #929292;
+      --titlebar-height: 44px;
+      --menu-height: 44px;
+      --menu-width-tablet: 280px;
+    }
+
+    html.dark {
+      --background-primary: #000;
+      --background-secondary: #14141C;
+      --background-secondary-transparent: rgba(20, 20, 28, 0);
+      --hairline: #35353F;
+      --selection: #FF9500;
+      --font-primary: #fff;
+      --font-secondary: #929292;
+    }
+
     html,
     body {
       margin: 0;
       padding: 0;
-      background: #fff;
+      background: var(--background-primary);
     }
 
     @keyframes spinner { to {transform: rotate(360deg)} }

@@ -233,7 +233,7 @@ export class BaseComponent extends HTMLElement {
 
   get(selector) {
     return (
-      this.shadowRoot.querySelector(selector)
+      (this.shadowRoot && this.shadowRoot.querySelector(selector))
       || this.querySelector(selector)
     );
   }

@@ -1,10 +1,11 @@
 :host {
+  color: var(--font-primary);
   display: block;
-  font-family: -apple-system,SF UI Text,Helvetica Neue,Helvetica,Arial,sans-serif;
+  font-family: var(--font);
 }
 
 :host([data-category-name])::before {
-  background: #f7f7f8;
+  background: var(--background-secondary);
   content: attr(data-category-name);
   display: block;
   font-weight: 600;
@@ -15,7 +16,7 @@
   position: -webkit-sticky;
   position: sticky;
   right: 0;
-  top: 44px;
+  top: var(--titlebar-height);
 }
 
 ::slotted(pre) {

@@ -1,5 +1,5 @@
 :host {
-  background: #fff;
+  background: var(--background-primary);
   display: none;
   min-height: 100%;
   padding: 44px 0;
