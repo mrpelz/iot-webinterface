@@ -13,8 +13,9 @@ function fetchElements() {
 }
 
 function startStream(callback) {
-  const eventSource = new EventSource(new URL('/stream', apiBaseUrl));
-  eventSource.addEventListener('message', ({ data }) => {
+  let eventSource = null;
+
+  const handleData = ({ data }) => {
     if (!callback) return;
 
     try {
@@ -24,7 +25,23 @@ function startStream(callback) {
       /* eslint-disable-next-line no-console */
       console.error(`error parsing message from  "/stream": ${e}`);
     }
-  });
+  };
+
+  const init = () => {
+    if (eventSource) {
+      /* eslint-disable-next-line no-console */
+      console.log('eventSource disconnected, reconnecting…');
+      eventSource.close();
+      eventSource.removeEventListener('message', handleData);
+      eventSource.removeEventListener('error', init);
+    }
+
+    eventSource = new EventSource(new URL('/stream', apiBaseUrl));
+    eventSource.addEventListener('error', init);
+    eventSource.addEventListener('message', handleData);
+  };
+
+  init();
 }
 
 function roomNames(elements) {
