@@ -8,8 +8,6 @@ function createChildSlot() {
   const result = new DocumentFragment();
 
   const slot = document.createElement('slot');
-  slot.setAttribute('name', 'child');
-
   result.appendChild(slot);
 
   return result;
@@ -271,10 +269,10 @@ export class BaseComponent extends HTMLElement {
         const span = document.createElement('span');
         span.textContent = child.textContent;
         span.dataset.textNode = true;
-        span.slot = 'child';
+        span.slot = '';
         this.replaceChild(span, child);
       } else if (!child.slot) {
-        child.slot = 'child';
+        child.slot = '';
       }
     });
   }

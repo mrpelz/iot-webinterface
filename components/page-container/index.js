@@ -8,11 +8,12 @@ import {
 export class PageContainer extends BaseComponent {
   create() {
     const { rooms = [] } = window.componentState.get('_hierarchy');
-    const elementNodes = rooms.map(({ categories }, id) => {
+    const elementNodes = rooms.map(({ name, categories }, id) => {
       return c(
         'page',
         {
           id,
+          name,
           categories
         }
       );

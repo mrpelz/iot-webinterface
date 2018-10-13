@@ -1,5 +1,8 @@
 :host {
-  background: var(--background-primary);
+  background-attachment: fixed;
+  background-color: var(--background-primary);
+  background-image: none;
+  background-size: cover;
   display: none;
   min-height: 100%;
   padding: 44px 0;
@@ -7,6 +10,40 @@
 
 :host(.page-active) {
   display: block;
+}
+
+:host([data-room-name="Abstellraum"]) {
+  background-image: url('images/background/abstellraum.png');
+}
+:host([data-room-name="Arbeitszimmer"]) {
+  background-image: url('images/background/arbeitszimmer.png');
+}
+:host([data-room-name="Duschbad"]) {
+  background-image: url('images/background/duschbad.png');
+}
+:host([data-room-name="Esszimmer"]) {
+  background-image: url('images/background/esszimmer.png');
+}
+:host([data-room-name="Flur"]) {
+  background-image: url('images/background/flur.png');
+}
+:host([data-room-name="Global"]) {
+  background-image: url('images/background/global.png');
+}
+:host([data-room-name="Küche"]) {
+  background-image: url('images/background/kueche.png');
+}
+:host([data-room-name="Schlafzimmer"]) {
+  background-image: url('images/background/schlafzimmer.png');
+}
+:host([data-room-name="Testraum"]) {
+  background-image: url('images/background/testraum.png');
+}
+:host([data-room-name="Wannenbad"]) {
+  background-image: url('images/background/wannenbad.png');
+}
+:host([data-room-name="Wohnzimmer"]) {
+  background-image: url('images/background/wohnzimmer.png');
 }
 
 @media screen and (min-width: 769px) {
