@@ -5,8 +5,8 @@
   background-position: center;
   background-size: cover;
   display: none;
-  min-height: 100%;
-  padding: 44px 0;
+  min-height: calc(100vh - var(--titlebar-height) - var(--menu-height));
+  padding: var(--titlebar-height) 0 var(--menu-height);
 }
 
 :host(.page-active) {
@@ -50,5 +50,7 @@
 @media screen and (min-width: 769px) {
   :host {
     margin-left: 280px;
+    min-height: calc(100vh - var(--titlebar-height));
+    padding: var(--titlebar-height) 0 0;
   }
 }
