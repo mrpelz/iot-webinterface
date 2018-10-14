@@ -2,6 +2,7 @@
   background-attachment: fixed;
   background-color: var(--background-primary);
   background-image: none;
+  background-position: center;
   background-size: cover;
   display: none;
   min-height: 100%;
