@@ -1,0 +1,80 @@
+:host {
+  display: block;
+}
+
+:host::before {
+  background-attachment: fixed;
+  background-color: var(--background-primary);
+  background-image: none;
+  background-position: center;
+  background-size: cover;
+  bottom: var(--menu-height);
+  content: '';
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: var(--titlebar-height);
+  z-index: -1;
+}
+
+@media screen and (min-width: 769px) {
+  :host::before {
+    bottom: 0;
+    left: var(--menu-width-tablet);
+  }
+}
+
+:host([data-room-name="Abstellraum"])::before {
+  background-image: url('images/background/abstellraum.png');
+}
+:host([data-room-name="Arbeitszimmer"])::before {
+  background-image: url('images/background/arbeitszimmer.png');
+}
+:host([data-room-name="Duschbad"])::before {
+  background-image: url('images/background/duschbad.png');
+}
+:host([data-room-name="Esszimmer"])::before {
+  background-image: url('images/background/esszimmer.png');
+}
+:host([data-room-name="Flur"])::before {
+  background-image: url('images/background/flur.png');
+}
+:host([data-room-name="Global"])::before {
+  background-image: url('images/background/global.png');
+}
+:host([data-room-name="Küche"])::before {
+  background-image: url('images/background/kueche.png');
+}
+:host([data-room-name="Schlafzimmer"])::before {
+  background-image: url('images/background/schlafzimmer.png');
+}
+:host([data-room-name="Testraum"])::before {
+  background-image: url('images/background/testraum.png');
+}
+:host([data-room-name="Wannenbad"])::before {
+  background-image: url('images/background/wannenbad.png');
+}
+:host([data-room-name="Wohnzimmer"])::before {
+  background-image: url('images/background/wohnzimmer.png');
+}
+
+:host::after {
+  content:
+    url('images/background/abstellraum.png')
+    url('images/background/arbeitszimmer.png')
+    url('images/background/duschbad.png')
+    url('images/background/esszimmer.png')
+    url('images/background/flur.png')
+    url('images/background/global.png')
+    url('images/background/kueche.png')
+    url('images/background/kueche.png')
+    url('images/background/schlafzimmer.png')
+    url('images/background/testraum.png')
+    url('images/background/wannenbad.png')
+    url('images/background/wohnzimmer.png')
+  ;
+  height: 0;
+  overflow: hidden;
+  position: fixed;
+  width: 0;
+}

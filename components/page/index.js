@@ -30,7 +30,7 @@ export class Page extends BaseComponent {
   }
 
   create() {
-    const { name: roomName, categories = [] } = this.props;
+    const { categories = [] } = this.props;
 
     const elementNodes = categories.map(({ name, controls }, id) => {
       return c(
@@ -42,8 +42,6 @@ export class Page extends BaseComponent {
         }
       );
     });
-
-    this.dataset.roomName = roomName;
 
     this.appendChild(
       render(...elementNodes)

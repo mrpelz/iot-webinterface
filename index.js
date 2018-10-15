@@ -74,7 +74,8 @@ async function main() {
       },
       {
         slug: 'page-container',
-        component: PageContainer
+        component: PageContainer,
+        style: true
       },
       {
         slug: 'page',
