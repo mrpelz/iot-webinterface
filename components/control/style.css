@@ -15,7 +15,7 @@
   width: var(--dimension);
 }
 
-@media screen and (min-width: 415px) {
+@media screen and (min-width: 433px) {
   :host {
     --dimension: calc((100vw - 10px - (4 * 10px)) / 4);
   }
