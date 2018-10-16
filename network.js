@@ -44,6 +44,34 @@ function startStream(callback) {
   init();
 }
 
+function sumElementWeight(input) {
+  return input.reduce((
+    acc,
+    {
+      attributes: {
+        weight = 0
+      } = {}
+    }
+  ) => {
+    return acc + weight;
+  }, 0);
+}
+
+function sumWeight(input) {
+  return input.reduce((
+    acc,
+    {
+      weight = 0
+    }
+  ) => {
+    return acc + weight;
+  }, 0);
+}
+
+function sortByWeight(a, b) {
+  return a.weight - b.weight;
+}
+
 function roomNames(elements) {
   const result = new Set();
 
@@ -120,30 +148,41 @@ function getHierarchy(elements = []) {
 
         if (controlName === null) {
           return controlElements.map((controlElement) => {
+            const {
+              attributes: {
+                displayName = null,
+                weight = 0
+              } = {}
+            } = controlElement;
+
             return {
-              name: controlName,
-              elements: [controlElement]
+              name: displayName,
+              elements: [controlElement],
+              weight
             };
           });
         }
 
         return [{
           name: controlName,
-          elements: controlElements
+          elements: controlElements,
+          weight: sumElementWeight(controlElements)
         }];
-      }));
+      })).sort(sortByWeight);
 
       return {
         name: categoryName,
-        controls: controlMap
+        controls: controlMap,
+        weight: sumWeight(controlMap)
       };
-    });
+    }).sort(sortByWeight);
 
     return {
       name: roomName,
-      categories: categoryMap
+      categories: categoryMap,
+      weight: sumWeight(categoryMap)
     };
-  });
+  }).sort(sortByWeight);
 
   return {
     rooms: roomMap
