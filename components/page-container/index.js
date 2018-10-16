@@ -7,20 +7,57 @@ import {
 } from '../../dom.js';
 
 const backgroundClass = bem('page-container', null, 'background');
+const backgroundImageUrl = (room) => {
+  return `images/background/${
+    room
+      .replace('ä', 'ae')
+      .replace('ö', 'oe')
+      .replace('ü', 'ue')
+      .replace('ß', 'ss')
+      .toLowerCase()
+  }.png`;
+};
 
 export class PageContainer extends BaseComponent {
   _handleRoomChange(value) {
     const { rooms } = window.componentState.get('_hierarchy');
     const roomName = rooms[value].name;
 
-    this.timeout = window.setTimeout(() => {
-      window.clearTimeout(this.timeout);
+    this.roomName = roomName;
+
+    const backgroundUrl = backgroundImageUrl(roomName);
+    const backgroundImage = new Image();
+
+    const handleBgRemove = ({ target, pseudoElement }) => {
+      if (
+        target !== this
+        || pseudoElement !== '::before'
+        || roomName !== this.roomName
+      ) return;
+
+      this.removeEventListener('transitionend', handleBgRemove);
+
+      this.backgroundStyle.innerHTML = (
+        `:host::before{background-image:url(${backgroundUrl})}`
+      );
+
+      this.classList.add(backgroundClass);
+    };
+
+    backgroundImage.addEventListener('load', () => {
+      if (this.classList.contains(backgroundClass)) {
+        this.classList.remove(backgroundClass);
+        this.addEventListener('transitionend', handleBgRemove);
+      } else {
+        handleBgRemove({ target: this, pseudoElement: '::before' });
+      }
+    });
+
+    backgroundImage.addEventListener('error', () => {
       this.classList.remove(backgroundClass);
-      this.timeout = window.setTimeout(() => {
-        this.dataset.roomName = roomName;
-        this.classList.add(backgroundClass);
-      }, 1300);
-    }, 200);
+    });
+
+    backgroundImage.src = backgroundUrl;
   }
 
   create() {
@@ -39,6 +76,9 @@ export class PageContainer extends BaseComponent {
     this.appendChild(
       render(...elementNodes)
     );
+
+    this.backgroundStyle = document.createElement('style');
+    this.shadowRoot.appendChild(this.backgroundStyle);
 
     this.subscription = window.componentState.subscribe(
       '_selectedRoom',
