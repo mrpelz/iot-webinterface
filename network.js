@@ -145,6 +145,7 @@ function getHierarchy(
 
             return {
               name: displayName,
+              single: true,
               elements: [controlElement]
             };
           });
@@ -152,6 +153,7 @@ function getHierarchy(
 
         return [{
           name: controlName,
+          single: controlElements.length <= 1,
           elements: controlElements
         }];
       })), controls);

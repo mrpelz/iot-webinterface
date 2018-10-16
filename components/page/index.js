@@ -6,10 +6,6 @@ import {
   render
 } from '../../dom.js';
 
-import {
-  setElement
-} from '../../network.js';
-
 const activeClass = bem('page', null, 'active');
 
 export class Page extends BaseComponent {
@@ -17,12 +13,6 @@ export class Page extends BaseComponent {
     const { id } = this.props;
 
     if (id === value) {
-      if (id === 9) {
-        setElement({ name: 'testLicht', value: true });
-      } else if (id === 10) {
-        setElement({ name: 'testLicht', value: false });
-      }
-
       this.classList.add(activeClass);
     } else {
       this.classList.remove(activeClass);

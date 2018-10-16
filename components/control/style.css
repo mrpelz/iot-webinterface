@@ -1,0 +1,28 @@
+:host {
+  --dimension: calc((100vw - 10px - (3 * 10px)) / 3);
+
+  align-items: center;
+  background: var(--background-tertiary);
+  border-radius: 15px;
+  color: var(--font-primary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font);
+  height: calc(var(--dimension) * 0.8);
+  justify-content: center;
+  margin: 5px;
+  width: var(--dimension);
+}
+
+@media screen and (min-width: 415px) {
+  :host {
+    --dimension: calc((100vw - 10px - (4 * 10px)) / 4);
+  }
+}
+
+@media screen and (min-width: 769px) {
+  :host {
+    --dimension: calc((100vw - var(--menu-width-tablet) - 10px - (4 * 10px)) / 4);
+  }
+}

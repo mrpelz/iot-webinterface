@@ -7,6 +7,7 @@ import { TitleBar } from './components/titlebar/index.js';
 import { PageContainer } from './components/page-container/index.js';
 import { Page } from './components/page/index.js';
 import { Category } from './components/category/index.js';
+import { Control } from './components/control/index.js';
 import { Menu } from './components/menu/index.js';
 import { MenuElement } from './components/menu-element/index.js';
 
@@ -85,6 +86,11 @@ async function main() {
       {
         slug: 'category',
         component: Category,
+        style: true
+      },
+      {
+        slug: 'control',
+        component: Control,
         style: true
       }
     ])

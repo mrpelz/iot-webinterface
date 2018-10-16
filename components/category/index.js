@@ -1,6 +1,8 @@
 /* eslint-disable import/extensions */
 import {
   BaseComponent,
+  bem,
+  c,
   h,
   render
 } from '../../dom.js';
@@ -8,17 +10,21 @@ import {
 export class Category extends BaseComponent {
   create() {
     const { name, controls } = this.props;
-
     this.dataset.categoryName = name || '[none]';
 
-    const content = JSON.stringify(controls, null, 2);
+    const itemNodes = controls.map((control) => {
+      return c(
+        'control',
+        control
+      );
+    });
 
     this.appendChild(
       render(
         h(
-          'pre',
-          {},
-          content
+          'section',
+          { className: [bem('category', 'content')] },
+          itemNodes
         )
       )
     );

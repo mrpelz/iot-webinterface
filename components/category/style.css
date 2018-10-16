@@ -19,6 +19,8 @@
   top: var(--titlebar-height);
 }
 
-::slotted(pre) {
-  margin: 0;
+::slotted(.category--content) {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 5px;
 }
