@@ -2,6 +2,7 @@
   display: none;
   min-height: calc(100vh - var(--titlebar-height) - var(--menu-height));
   padding: var(--titlebar-height) 0 var(--menu-height);
+  z-index: 2;
 }
 
 :host(.page-active) {
