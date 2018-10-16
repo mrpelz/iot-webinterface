@@ -28,14 +28,14 @@ export class PageContainer extends BaseComponent {
     const backgroundUrl = backgroundImageUrl(roomName);
     const backgroundImage = new Image();
 
-    const handleBgRemove = ({ target, pseudoElement }) => {
+    const handleBgReplace = ({ target, pseudoElement }) => {
       if (
         target !== this
         || pseudoElement !== '::before'
         || roomName !== this.roomName
       ) return;
 
-      this.removeEventListener('transitionend', handleBgRemove);
+      this.removeEventListener('transitionend', handleBgReplace);
 
       this.backgroundStyle.innerHTML = (
         `:host::before{background-image:url(${backgroundUrl})}`
@@ -44,18 +44,17 @@ export class PageContainer extends BaseComponent {
       this.classList.add(backgroundClass);
     };
 
-    backgroundImage.addEventListener('load', () => {
+    const handleImageLoad = () => {
       if (this.classList.contains(backgroundClass)) {
+        this.addEventListener('transitionend', handleBgReplace);
         this.classList.remove(backgroundClass);
-        this.addEventListener('transitionend', handleBgRemove);
       } else {
-        handleBgRemove({ target: this, pseudoElement: '::before' });
+        handleBgReplace({ target: this, pseudoElement: '::before' });
       }
-    });
+    };
 
-    backgroundImage.addEventListener('error', () => {
-      this.classList.remove(backgroundClass);
-    });
+    backgroundImage.addEventListener('load', handleImageLoad);
+    backgroundImage.addEventListener('error', handleImageLoad);
 
     backgroundImage.src = backgroundUrl;
   }
