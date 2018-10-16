@@ -1,6 +1,6 @@
 const apiBaseUrl = `${window.location.protocol}//hermes.net.wurstsalat.cloud/`;
 
-function fetchElements() {
+function fetchList() {
   const url = new URL('/list', apiBaseUrl);
   url.searchParams.append('values', true);
 
@@ -44,35 +44,21 @@ function startStream(callback) {
   init();
 }
 
-function sumElementWeight(input) {
-  return input.reduce((
-    acc,
-    {
-      attributes: {
-        weight = 0
-      } = {}
-    }
-  ) => {
-    return acc + weight;
-  }, 0);
+function sort(input = [], list = []) {
+  const unsorted = input.filter(({ name }) => {
+    return !list.includes(name);
+  });
+
+  const sorted = list.map((sortKey) => {
+    return input.find(({ name }) => {
+      return name === sortKey;
+    });
+  }).filter(Boolean);
+
+  return [].concat(sorted, unsorted);
 }
 
-function sumWeight(input) {
-  return input.reduce((
-    acc,
-    {
-      weight = 0
-    }
-  ) => {
-    return acc + weight;
-  }, 0);
-}
-
-function sortByWeight(a, b) {
-  return a.weight - b.weight;
-}
-
-function roomNames(elements) {
+function getRoomNames(elements) {
   const result = new Set();
 
   elements.forEach(({
@@ -84,7 +70,7 @@ function roomNames(elements) {
   return [...result].sort();
 }
 
-function categoryNames(elements) {
+function getCategoryNames(elements) {
   const result = new Set();
 
   elements.forEach(({
@@ -96,7 +82,7 @@ function categoryNames(elements) {
   return [...result].sort();
 }
 
-function controlNames(elements) {
+function getControlNames(elements) {
   const result = new Set();
 
   elements.forEach(({
@@ -132,64 +118,62 @@ function elementsForControl(elements, con) {
   });
 }
 
-function getHierarchy(elements = []) {
-  const rooms = roomNames(elements);
+function getHierarchy(
+  elements = [],
+  { rooms, categories, controls } = {}
+) {
+  const roomNames = getRoomNames(elements);
 
-  const roomMap = rooms.map((roomName) => {
+  const roomMap = sort(roomNames.map((roomName) => {
     const roomElements = elementsForRoom(elements, roomName);
-    const categories = categoryNames(roomElements);
+    const categoryNames = getCategoryNames(roomElements);
 
-    const categoryMap = categories.map((categoryName) => {
+    const categoryMap = sort(categoryNames.map((categoryName) => {
       const categoryElements = elementsForCategory(roomElements, categoryName);
-      const controls = controlNames(categoryElements);
+      const controlNames = getControlNames(categoryElements);
 
-      const controlMap = [].concat(...controls.map((controlName) => {
+      const controlMap = sort([].concat(...controlNames.map((controlName) => {
         const controlElements = elementsForControl(categoryElements, controlName);
 
         if (controlName === null) {
           return controlElements.map((controlElement) => {
             const {
               attributes: {
-                displayName = null,
-                weight = 0
+                displayName = null
               } = {}
             } = controlElement;
 
             return {
               name: displayName,
-              elements: [controlElement],
-              weight
+              elements: [controlElement]
             };
           });
         }
 
         return [{
           name: controlName,
-          elements: controlElements,
-          weight: sumElementWeight(controlElements)
+          elements: controlElements
         }];
-      })).sort(sortByWeight);
+      })), controls);
 
       return {
         name: categoryName,
-        controls: controlMap,
-        weight: sumWeight(controlMap)
+        controls: controlMap
       };
-    }).sort(sortByWeight);
+    }), categories);
 
     return {
       name: roomName,
-      categories: categoryMap,
-      weight: sumWeight(categoryMap)
+      categories: categoryMap
     };
-  }).sort(sortByWeight);
+  }), rooms);
 
   return {
     rooms: roomMap
   };
 }
 
-function getElements(elements) {
+function getElements(elements = []) {
   return elements.map((element) => {
     const result = Object.assign({}, element);
     delete result.value;
@@ -198,7 +182,7 @@ function getElements(elements) {
   });
 }
 
-function getValues(elements) {
+function getValues(elements = []) {
   return elements.map(({ name, value }) => {
     return {
       name,
@@ -208,10 +192,13 @@ function getValues(elements) {
 }
 
 export async function setUpApi() {
-  const apiResponse = await fetchElements();
+  const apiResponse = await fetchList();
 
-  const hierarchy = getHierarchy(getElements(apiResponse));
-  const values = getValues(apiResponse);
+  const hierarchy = getHierarchy(
+    getElements(apiResponse.elements),
+    (apiResponse.meta || {}).sort
+  );
+  const values = getValues(apiResponse.elements);
 
   window.componentState.set('_hierarchy', hierarchy);
 
