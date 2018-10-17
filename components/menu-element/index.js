@@ -27,7 +27,7 @@ export class MenuElement extends BaseComponent {
 
   create() {
     const { id } = this.props;
-    const { rooms } = window.componentState.get('_hierarchy');
+    const { rooms } = window.componentHierarchy;
     this.textContent = rooms[id].name;
 
     this._handleClick = this._handleClick.bind(this);

@@ -57,10 +57,5 @@ export class State {
 
     this.state[key] = value;
     this._update(key);
-
-    /* eslint-disable-next-line no-console */
-    console.log('set', {
-      [key]: value
-    });
   }
 }

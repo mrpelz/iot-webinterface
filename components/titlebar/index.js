@@ -45,7 +45,7 @@ export class TitleBar extends BaseComponent {
     const { id } = this.props;
     if (id === undefined) return;
 
-    const { rooms } = window.componentState.get('_hierarchy');
+    const { rooms } = window.componentHierarchy;
     this.get('#room').textContent = rooms[id].name;
     this.get('#dark').addEventListener('click', TitleBar.handleDarkClick);
   }

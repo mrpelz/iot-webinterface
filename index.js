@@ -1,7 +1,7 @@
 /* eslint-disable import/extensions */
 import { defineComponents, c, render } from './dom.js';
 import { State } from './state.js';
-import { setUpApi } from './network.js';
+import { setUpElements, setUpValues } from './network.js';
 import { App } from './components/app/index.js';
 import { TitleBar } from './components/titlebar/index.js';
 import { PageContainer } from './components/page-container/index.js';
@@ -51,7 +51,7 @@ async function main() {
   getDarkMode();
 
   await Promise.all([
-    setUpApi(),
+    setUpElements(),
     defineComponents([
       {
         slug: 'app',
@@ -99,8 +99,10 @@ async function main() {
   document.body.appendChild(
     render(c('app'))
   );
-
   document.documentElement.classList.add('ready');
+
+  await setUpValues();
+  document.documentElement.classList.add('values');
 }
 
 if (

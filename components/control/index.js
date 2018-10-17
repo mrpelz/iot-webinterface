@@ -28,7 +28,9 @@ export class Control extends BaseComponent {
   }
 
   _handleChange(value) {
-    this.get('#value').textContent = value;
+    if (value !== null) {
+      this.get('#value').textContent = value;
+    }
   }
 
   create() {
@@ -42,10 +44,11 @@ export class Control extends BaseComponent {
         displayLabel
       ),
       h(
-        'div', {
+        'div',
+        {
           id: 'value'
         },
-        window.componentState.get(name)
+        '--'
       )
     ];
 

@@ -5,7 +5,7 @@
 }
 
 :host([data-category-name])::before {
-  background: var(--background-secondary);
+  background: var(--background-secondary-translucent);
   content: attr(data-category-name);
   display: block;
   font-weight: 600;
@@ -22,5 +22,5 @@
 ::slotted(.category--content) {
   display: flex;
   flex-wrap: wrap;
-  padding: 5px;
+  padding: 5px 5px 27px;
 }

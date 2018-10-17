@@ -50,7 +50,7 @@ export class Menu extends BaseComponent {
   }
 
   create() {
-    const { rooms = [] } = window.componentState.get('_hierarchy');
+    const { rooms = [] } = window.componentHierarchy;
     const itemNodes = rooms.map((_, id) => {
       return c(
         'menu-element',

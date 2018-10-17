@@ -2,7 +2,7 @@
   --dimension: calc((100vw - 10px - (3 * 10px)) / 3);
 
   align-items: center;
-  background: var(--background-tertiary);
+  background: var(--background-tertiary-translucent);
   border-radius: 15px;
   color: var(--font-primary);
   cursor: pointer;

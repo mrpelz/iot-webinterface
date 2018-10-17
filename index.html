@@ -50,24 +50,29 @@
   <style>
     html {
       --font: -apple-system,SF UI Text,Helvetica Neue,Helvetica,Arial,sans-serif;
+      --titlebar-height: 44px;
+      --menu-height: 44px;
+      --menu-width-tablet: 200px;
+
       --background-primary: #fff;
       --background-secondary: #f7f7f8;
-      --background-tertiary: #666666;
       --background-secondary-transparent: rgba(247, 247, 248, 0);
+      --background-secondary-translucent: rgba(247, 247, 248, 0.9);
+      --background-tertiary: #C1C2C4;
+      --background-tertiary-translucent: rgba(193, 194, 196, 0.9);
       --hairline: #c4c4c4;
       --selection: #007aff;
       --font-primary: #000;
       --font-secondary: #929292;
-      --titlebar-height: 44px;
-      --menu-height: 44px;
-      --menu-width-tablet: 200px;
     }
 
     html.dark {
       --background-primary: #000;
       --background-secondary: #14141C;
-      --background-tertiary: #333333;
       --background-secondary-transparent: rgba(20, 20, 28, 0);
+      --background-secondary-translucent: rgba(20, 20, 28, 0.8);
+      --background-tertiary: #424242;
+      --background-tertiary-translucent: rgba(66, 66, 66, 0.8);
       --hairline: #35353F;
       --selection: #FF9500;
       --font-primary: #fff;
@@ -81,23 +86,49 @@
     }
 
     @keyframes spinner { to {transform: rotate(360deg)} }
-
-    :root:not(.ready) { background: #000 }
     
-    :root:not(.ready)::before {
-      content: '';
-      box-sizing: border-box;
-      position: absolute;
-      top: 50vh;
-      left: 50vw;
-      width: 20px;
-      height: 20px;
-      margin-top: -10px;
-      margin-left: -10px;
+    :root::before {
+      animation: spinner 0.5s linear infinite;
       border-radius: 50%;
       border: 2px solid #fff;
       border-top-color: transparent;
-      animation: spinner .6s linear infinite;
+      box-sizing: border-box;
+      content: '';
+      height: 20px;
+      left: 50vw;
+      margin-left: -10px;
+      margin-top: -10px;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      top: 50vh;
+      width: 20px;
+      transition: opacity 0.2s ease-out;
+      z-index: 11;
+    }
+
+    :root::after {
+      background: #000;
+      bottom: 0;
+      content: '';
+      left: 0;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      right: 0;
+      top: 0;
+      transition: opacity 0.2s ease-out;
+      z-index: 10;
+    }
+
+    :root:not(.ready)::before,
+    :root:not(.ready)::after {
+      opacity: 1;
+    }
+
+    :root.values::before,
+    :root.values::after {
+      display: none;
     }
   </style>
 </head>
