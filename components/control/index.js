@@ -27,7 +27,7 @@ export class Control extends BaseComponent {
     });
   }
 
-  _handleChange(value) {
+  _handleValueChange(value) {
     if (value !== null) {
       this.get('#value').textContent = value;
     }
@@ -70,7 +70,7 @@ export class Control extends BaseComponent {
 
     this.subscription = window.componentState.subscribe(
       name,
-      this._handleChange.bind(this)
+      this._handleValueChange.bind(this)
     );
   }
 

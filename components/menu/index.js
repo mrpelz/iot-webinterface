@@ -32,7 +32,7 @@ export class Menu extends BaseComponent {
     tick();
   }
 
-  _handleChange(index) {
+  _handleSelectedChange(index) {
     if (!this.mediaQuery || this.mediaQuery.matches) return;
 
     window.setTimeout(() => {
@@ -45,11 +45,20 @@ export class Menu extends BaseComponent {
           - (this.offsetWidth / 2))
       );
 
+      if (!this.wasScrolled) {
+        this.wasScrolled = true;
+        this.scrollLeft = scrollLeft;
+
+        return;
+      }
+
       this._animateScroll(scrollLeft);
     }, 0);
   }
 
   create() {
+    this.wasScrolled = false;
+
     const { rooms = [] } = window.componentHierarchy;
     const itemNodes = rooms.map((_, id) => {
       return c(
@@ -64,12 +73,12 @@ export class Menu extends BaseComponent {
 
     this.subscription = window.componentState.subscribe(
       '_selectedRoom',
-      this._handleChange.bind(this)
+      this._handleSelectedChange.bind(this)
     );
 
     this.mediaQuery = window.matchMedia('screen and (min-width: 769px)');
 
-    this._handleChange(
+    this._handleSelectedChange(
       window.componentState.get('_selectedRoom')
     );
   }

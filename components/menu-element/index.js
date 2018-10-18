@@ -15,7 +15,7 @@ export class MenuElement extends BaseComponent {
     window.componentState.set('_selectedRoom', id);
   }
 
-  _handleChange(value) {
+  _handleSelectedChange(value) {
     const { id } = this.props;
 
     if (id === value) {
@@ -31,13 +31,13 @@ export class MenuElement extends BaseComponent {
     this.textContent = rooms[id].name;
 
     this._handleClick = this._handleClick.bind(this);
-    this._handleChange = this._handleChange.bind(this);
+    this._handleSelectedChange = this._handleSelectedChange.bind(this);
 
     this.addEventListener('click', this._handleClick);
 
     this.subscription = window.componentState.subscribe(
       '_selectedRoom',
-      this._handleChange
+      this._handleSelectedChange
     );
   }
 
