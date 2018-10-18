@@ -23,6 +23,10 @@ export class PageContainer extends BaseComponent {
     const { rooms } = window.componentHierarchy;
     const roomName = rooms[value].name;
 
+    if (this.deferred) {
+      this.deferred.unsubscribe();
+    }
+
     this.roomName = roomName;
 
     const backgroundUrl = backgroundImageUrl(roomName);
@@ -56,7 +60,16 @@ export class PageContainer extends BaseComponent {
     backgroundImage.addEventListener('load', handleImageLoad);
     backgroundImage.addEventListener('error', handleImageLoad);
 
-    backgroundImage.src = backgroundUrl;
+    if (window.componentState.get('_hasValues')) {
+      backgroundImage.src = backgroundUrl;
+    } else {
+      this.deferred = window.componentState.subscribe('_hasValues', (is) => {
+        if (!is) return;
+
+        backgroundImage.src = backgroundUrl;
+        this.deferred = null;
+      });
+    }
   }
 
   create() {

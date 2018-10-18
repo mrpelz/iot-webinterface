@@ -47,6 +47,18 @@ function getDarkMode() {
 async function main() {
   window.componentState = new State();
 
+  window.componentState.set('_isReady', false);
+  window.componentState.set('_hasValues', false);
+
+  window.componentState.subscribe('_isReady', (value) => {
+    if (!value) return;
+    document.documentElement.classList.add('ready');
+  });
+  window.componentState.subscribe('_hasValues', (value) => {
+    if (!value) return;
+    document.documentElement.classList.add('values');
+  });
+
   getSavedPage();
   getDarkMode();
 
@@ -99,10 +111,10 @@ async function main() {
   document.body.appendChild(
     render(c('app'))
   );
-  document.documentElement.classList.add('ready');
+  window.componentState.set('_isReady', true);
 
   await setUpValues();
-  document.documentElement.classList.add('values');
+  window.componentState.set('_hasValues', true);
 }
 
 if (
