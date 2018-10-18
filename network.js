@@ -1,6 +1,6 @@
 const apiBaseUrl = `${window.location.protocol}//hermes.net.wurstsalat.cloud/`;
 
-function fetchListWithoutValues() {
+function fetchList() {
   const url = new URL('/list', apiBaseUrl);
 
   return fetch(url).then((response) => {
@@ -11,15 +11,14 @@ function fetchListWithoutValues() {
   });
 }
 
-function fetchListWithValues() {
-  const url = new URL('/list', apiBaseUrl);
-  url.searchParams.append('values', true);
+function fetchValues() {
+  const url = new URL('/values', apiBaseUrl);
 
   return fetch(url).then((response) => {
     return response.json();
   }).catch((reason) => {
     /* eslint-disable-next-line no-console */
-    console.error(`error fetching "/list": ${reason}`);
+    console.error(`error fetching "/values": ${reason}`);
   });
 }
 
@@ -186,17 +185,8 @@ function getHierarchy(
   };
 }
 
-function getValues(elements = []) {
-  return elements.map(({ name, value }) => {
-    return {
-      name,
-      value
-    };
-  });
-}
-
 export async function setUpElements() {
-  const apiResponse = await fetchListWithoutValues();
+  const apiResponse = await fetchList();
 
   const hierarchy = getHierarchy(
     apiResponse.elements,
@@ -207,10 +197,11 @@ export async function setUpElements() {
 }
 
 export async function setUpValues() {
-  const apiResponse = await fetchListWithValues();
+  const apiResponse = await fetchValues();
 
-  const values = getValues(apiResponse.elements);
-  values.forEach(({ name, value }) => {
+  apiResponse.forEach(({ name = null, value = null }) => {
+    if (!name || value === null) return;
+
     window.componentState.set(name, value);
   });
 
