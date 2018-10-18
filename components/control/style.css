@@ -1,5 +1,6 @@
 :host {
-  --dimension: calc((100vw - 10px - (3 * 10px)) / 3);
+  --horizontal-count: 3;
+  --dimension: calc((100vw - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
 
   align-items: center;
   background: hsla(var(--background-tertiary), var(--translucent));
@@ -17,12 +18,18 @@
 
 @media screen and (min-width: 433px) {
   :host {
-    --dimension: calc((100vw - 10px - (4 * 10px)) / 4);
+    --horizontal-count: 5;
   }
 }
 
 @media screen and (min-width: 769px) {
   :host {
-    --dimension: calc((100vw - var(--menu-width-tablet) - 10px - (4 * 10px)) / 4);
+    --dimension: calc((100vw - var(--menu-width-tablet) - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
+  }
+}
+
+@media screen and (min-width: 1025px) {
+  :host {
+    --horizontal-count: 7;
   }
 }
