@@ -1,11 +1,11 @@
 :host {
-  color: var(--font-primary);
+  color: hsl(var(--font-primary));
   display: block;
   font-family: var(--font);
 }
 
 :host([data-category-name])::before {
-  background: var(--background-secondary-translucent);
+  background: hsla(var(--background-secondary), var(--translucent));
   content: attr(data-category-name);
   display: block;
   font-weight: 600;

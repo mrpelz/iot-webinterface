@@ -1,6 +1,6 @@
 :host {
   align-items: center;
-  color: var(--font-secondary);
+  color: hsl(var(--font-secondary));
   cursor: pointer;
   display: flex;
   flex-shrink: 0;
@@ -12,7 +12,7 @@
 }
 
 :host(.menu--element-active) {
-  color: var(--selection);
+  color: hsl(var(--selection));
 }
 
 :host(:first-of-type) {
@@ -29,15 +29,15 @@
 
 @media screen and (min-width: 769px) {
   :host {
-    background: var(--background-primary);
-    border-top: 0.5px solid var(--hairline);
-    color: var(--font-primary);
+    background: hsl(var(--background-primary));
+    border-top: 0.5px solid hsl(var(--font-tertiary));
+    color: hsl(var(--font-primary));
   }
 
   :host(.menu--element-active) {
-    background: var(--selection);
-    border-top-color: var(--selection);
-    color: var(--background-primary);
+    background: hsl(var(--selection));
+    border-top-color: hsl(var(--selection));
+    color: hsl(var(--background-primary));
   }
 
   :host(:first-of-type) {
@@ -45,11 +45,11 @@
   }
 
   :host(:last-of-type) {
-    border-bottom: 0.5px solid var(--hairline);
+    border-bottom: 0.5px solid hsl(var(--font-tertiary));
     padding-right: 10px;
   }
 
   :host(:last-of-type.menu--element-active) {
-    border-bottom-color: var(--selection);
+    border-bottom-color: hsl(var(--selection));
   }
 }

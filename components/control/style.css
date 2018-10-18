@@ -2,9 +2,9 @@
   --dimension: calc((100vw - 10px - (3 * 10px)) / 3);
 
   align-items: center;
-  background: var(--background-tertiary-translucent);
+  background: hsla(var(--background-tertiary), var(--translucent));
   border-radius: 15px;
-  color: var(--font-primary);
+  color: hsl(var(--font-primary));
   cursor: pointer;
   display: flex;
   flex-direction: column;

@@ -23,7 +23,7 @@
 }
 
 :host::after {
-  background-color: #000;
+  background-color: hsl(var(--black));
   content: '';
   height: calc(100vh - var(--menu-height) - var(--titlebar-height));
   left: 0;

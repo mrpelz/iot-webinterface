@@ -1,7 +1,7 @@
 :host {
   align-items: center;
-  background: var(--background-secondary);
-  border-bottom: 0.5px solid var(--hairline);
+  background: hsl(var(--background-secondary));
+  border-bottom: 0.5px solid hsl(var(--font-tertiary));
   box-sizing: border-box;
   display: flex;
   flex-shrink: 0;
@@ -16,14 +16,14 @@
 }
 
 #room {
-  color: var(--font-primary);
+  color: hsl(var(--font-primary));
   font-size: 17px;
   font-weight: 600;
 }
 
 #dark {
   align-items: center;
-  background: #35353F;
+  background: hsl(var(--grey-glow));
   border-radius: 5px;
   cursor: pointer;
   display: flex;

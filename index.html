@@ -53,30 +53,37 @@
       --titlebar-height: 44px;
       --menu-height: 44px;
       --menu-width-tablet: 200px;
+      --translucent: 0.8;
 
-      --background-primary: #fff;
-      --background-secondary: #f7f7f8;
-      --background-secondary-transparent: rgba(247, 247, 248, 0);
-      --background-secondary-translucent: rgba(247, 247, 248, 0.9);
-      --background-tertiary: #C1C2C4;
-      --background-tertiary-translucent: rgba(193, 194, 196, 0.9);
-      --hairline: #c4c4c4;
-      --selection: #007aff;
-      --font-primary: #000;
-      --font-secondary: #929292;
+      --black: 0, 0%, 0%;
+      --white: 0, 100%, 100%;
+      --white-shaded: 240, 7%, 97%;
+      --grey-light: 220, 2%, 76%;
+      --grey-mid: 0, 0%, 77%;
+      --grey-low: 0, 0%, 57%;
+      --blue: 211, 100%, 50%;
+
+      --black-shaded: 240, 17%, 9%;
+      --grey-dark: 0, 0%, 26%;
+      --grey-glow: 240, 9%, 23%;
+      --organge: 35, 100%, 50%;
+
+      --background-primary: var(--white);
+      --background-secondary: var(--white-shaded);
+      --background-tertiary: var(--grey-light);
+      --font-primary: var(--black);
+      --font-secondary: var(--grey-low);
+      --font-tertiary: var(--grey-mid);
+      --selection: var(--blue);
     }
 
     html.dark {
-      --background-primary: #000;
-      --background-secondary: #14141C;
-      --background-secondary-transparent: rgba(20, 20, 28, 0);
-      --background-secondary-translucent: rgba(20, 20, 28, 0.8);
-      --background-tertiary: #424242;
-      --background-tertiary-translucent: rgba(66, 66, 66, 0.8);
-      --hairline: #35353F;
-      --selection: #FF9500;
-      --font-primary: #fff;
-      --font-secondary: #929292;
+      --background-primary: var(--black);
+      --background-secondary: var(--black-shaded);
+      --background-tertiary: var(--grey-dark);
+      --font-primary: var(--white);
+      --font-tertiary: var(--grey-glow);
+      --selection: var(--organge);
     }
 
     html,
@@ -90,7 +97,7 @@
     :root::before {
       animation: spinner 0.5s linear infinite;
       border-radius: 50%;
-      border: 2px solid #fff;
+      border: 2px solid hsl(var(--white));
       border-top-color: transparent;
       box-sizing: border-box;
       content: '';
@@ -108,7 +115,7 @@
     }
 
     :root::after {
-      background: #000;
+      background: hsl(var(--black));
       bottom: 0;
       content: '';
       left: 0;

@@ -1,7 +1,7 @@
 :host {
   -webkit-overflow-scrolling: touch;
-  background: var(--background-secondary);
-  border-top: 0.5px solid var(--hairline);
+  background: hsl(var(--background-secondary));
+  border-top: 0.5px solid hsl(var(--font-tertiary));
   bottom: 0;
   box-sizing: border-box;
   display: flex;
@@ -32,8 +32,8 @@
 :host::before {
   background: linear-gradient(
     to right,
-    var(--background-secondary),
-    var(--background-secondary-transparent)
+    hsl(var(--background-secondary)),
+    hsla(var(--background-secondary), 0)
   );
   left: -1px;
 }
@@ -41,15 +41,15 @@
 :host::after {
   background: linear-gradient(
     to left,
-    var(--background-secondary),
-    var(--background-secondary-transparent)
+    hsl(var(--background-secondary)),
+    hsla(var(--background-secondary), 0)
   );
   right: -1px;
 }
 
 @media screen and (min-width: 769px) {
   :host {
-    border-right: 0.5px solid var(--hairline);
+    border-right: 0.5px solid hsl(var(--font-tertiary));
     border-top: none;
     flex-direction: column;
     height: 100%;
