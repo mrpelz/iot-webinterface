@@ -225,7 +225,6 @@ export async function setElement(...sets) {
   const url = new URL('/set', apiBaseUrl);
 
   sets.forEach(({ name, value }) => {
-    if (window.componentState.get(name) === value) return;
     url.searchParams.append(name, value);
   });
 

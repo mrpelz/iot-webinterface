@@ -15,16 +15,19 @@ export class Control extends BaseComponent {
     e.stopPropagation();
 
     const { group: { elements: [element] } } = this.props;
-    const { name } = element;
+    const { attributes: { set = false, setType = null }, name } = element;
 
-    const value = window.componentState.get(name);
+    if (!set || !setType) return;
 
-    if (!(value === true || value === false)) return;
-
-    setElement({
-      name,
-      value: !value
-    });
+    switch (setType) {
+      case 'trigger':
+        setElement({
+          name,
+          value: true
+        });
+        break;
+      default:
+    }
   }
 
   _handleValueChange(value) {
@@ -35,7 +38,7 @@ export class Control extends BaseComponent {
 
   create() {
     const { group: { name, elements: [element] } } = this.props;
-    const { name: id } = element;
+    const { attributes: { set }, name: id } = element;
 
     const {
       controls: {
@@ -50,7 +53,7 @@ export class Control extends BaseComponent {
       h(
         'div',
         {},
-        displayLabel
+        `${displayLabel}${set ? '⁺' : ''}`
       ),
       h(
         'div',
