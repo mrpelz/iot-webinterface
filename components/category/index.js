@@ -9,13 +9,19 @@ import {
 
 export class Category extends BaseComponent {
   create() {
-    const { name, controls } = this.props;
-    this.dataset.categoryName = name || '[none]';
+    const { category: { name, groups } } = this.props;
+    const {
+      categories: {
+        [name]: displayName = '[none]'
+      }
+    } = window.componentStrings;
 
-    const itemNodes = controls.map((control) => {
+    this.dataset.categoryName = displayName;
+
+    const itemNodes = groups.map((group) => {
       return c(
         'control',
-        control
+        { group }
       );
     });
 

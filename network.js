@@ -68,7 +68,7 @@ function sort(input = [], list = []) {
   return [].concat(sorted, unsorted);
 }
 
-function getRoomNames(elements) {
+function getLocationNames(elements) {
   const result = new Set();
 
   elements.forEach(({
@@ -92,23 +92,23 @@ function getCategoryNames(elements) {
   return [...result].sort();
 }
 
-function getControlNames(elements) {
+function getGroupNames(elements) {
   const result = new Set();
 
   elements.forEach(({
-    attributes: { control = null } = {}
+    attributes: { group = null } = {}
   }) => {
-    result.add(control);
+    result.add(group);
   });
 
   return [...result].sort();
 }
 
-function elementsForRoom(elements, room) {
+function elementsForLocation(elements, location) {
   return elements.filter(({
-    attributes: { sortLocation = null, location = null } = {}
+    attributes: { sortLocation = null, location: loc = null } = {}
   }) => {
-    return (sortLocation || location) === room;
+    return (sortLocation || loc) === location;
   });
 }
 
@@ -120,41 +120,41 @@ function elementsForCategory(elements, cat) {
   });
 }
 
-function elementsForControl(elements, con) {
+function elementsForGroup(elements, grp) {
   return elements.filter(({
-    attributes: { control = null } = {}
+    attributes: { group = null } = {}
   }) => {
-    return control === con;
+    return group === grp;
   });
 }
 
 function getHierarchy(
   elements = [],
-  { rooms, categories, controls } = {}
+  { locations, categories, controls } = {}
 ) {
-  const roomNames = getRoomNames(elements);
+  const locationNames = getLocationNames(elements);
 
-  const roomMap = sort(roomNames.map((roomName) => {
-    const roomElements = elementsForRoom(elements, roomName);
-    const categoryNames = getCategoryNames(roomElements);
+  const locationMap = sort(locationNames.map((locationName) => {
+    const locationElements = elementsForLocation(elements, locationName);
+    const categoryNames = getCategoryNames(locationElements);
 
     const categoryMap = sort(categoryNames.map((categoryName) => {
-      const categoryElements = elementsForCategory(roomElements, categoryName);
-      const controlNames = getControlNames(categoryElements);
+      const categoryElements = elementsForCategory(locationElements, categoryName);
+      const groupNames = getGroupNames(categoryElements);
 
-      const controlMap = sort([].concat(...controlNames.map((controlName) => {
-        const controlElements = elementsForControl(categoryElements, controlName);
+      const groupMap = sort([].concat(...groupNames.map((groupName) => {
+        const groupElements = elementsForGroup(categoryElements, groupName);
 
-        if (controlName === null) {
-          return controlElements.map((controlElement) => {
+        if (groupName === null) {
+          return groupElements.map((controlElement) => {
             const {
               attributes: {
-                displayName = null
+                control = null
               } = {}
             } = controlElement;
 
             return {
-              name: displayName,
+              name: control,
               single: true,
               elements: [controlElement]
             };
@@ -162,26 +162,26 @@ function getHierarchy(
         }
 
         return [{
-          name: controlName,
-          single: controlElements.length <= 1,
-          elements: controlElements
+          name: groupName,
+          single: groupElements.length <= 1,
+          elements: groupElements
         }];
       })), controls);
 
       return {
         name: categoryName,
-        controls: controlMap
+        groups: groupMap
       };
     }), categories);
 
     return {
-      name: roomName,
+      name: locationName,
       categories: categoryMap
     };
-  }), rooms);
+  }), locations);
 
   return {
-    rooms: roomMap
+    locations: locationMap
   };
 }
 
@@ -193,7 +193,10 @@ export async function setUpElements() {
     (apiResponse.meta || {}).sort
   );
 
+  const strings = (apiResponse.meta || {}).strings || {};
+
   window.componentHierarchy = hierarchy;
+  window.componentStrings = strings;
 }
 
 export async function setUpValues() {

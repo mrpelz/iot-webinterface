@@ -14,7 +14,7 @@ export class Control extends BaseComponent {
     e.preventDefault();
     e.stopPropagation();
 
-    const { elements: [element] } = this.props;
+    const { group: { elements: [element] } } = this.props;
     const { name } = element;
 
     const value = window.componentState.get(name);
@@ -34,8 +34,17 @@ export class Control extends BaseComponent {
   }
 
   create() {
-    const { name: displayLabel, elements: [element] } = this.props;
-    const { name, attributes: { displayUnit } } = element;
+    const { group: { name, elements: [element] } } = this.props;
+    const { name: id } = element;
+
+    const {
+      controls: {
+        [name]: displayLabel = '[none]'
+      },
+      units: {
+        [name]: displayUnit
+      }
+    } = window.componentStrings;
 
     const nodes = [
       h(
@@ -69,7 +78,7 @@ export class Control extends BaseComponent {
     this.addEventListener('click', this._handleClick);
 
     this.subscription = window.componentState.subscribe(
-      name,
+      id,
       this._handleValueChange.bind(this)
     );
   }

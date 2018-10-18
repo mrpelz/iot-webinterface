@@ -20,8 +20,8 @@ const backgroundImageUrl = (room) => {
 
 export class PageContainer extends BaseComponent {
   _handleRoomChange(value) {
-    const { rooms } = window.componentHierarchy;
-    const roomName = rooms[value].name;
+    const { locations } = window.componentHierarchy;
+    const roomName = locations[value].name;
 
     if (this.deferred) {
       this.deferred.unsubscribe();
@@ -73,8 +73,8 @@ export class PageContainer extends BaseComponent {
   }
 
   create() {
-    const { rooms = [] } = window.componentHierarchy;
-    const elementNodes = rooms.map(({ name, categories }, id) => {
+    const { locations = [] } = window.componentHierarchy;
+    const elementNodes = locations.map(({ name, categories }, id) => {
       return c(
         'page',
         {

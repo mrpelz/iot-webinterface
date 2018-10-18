@@ -22,14 +22,10 @@ export class Page extends BaseComponent {
   create() {
     const { categories = [] } = this.props;
 
-    const elementNodes = categories.map(({ name, controls }, id) => {
+    const elementNodes = categories.map((category) => {
       return c(
         'category',
-        {
-          id,
-          name,
-          controls
-        }
+        { category }
       );
     });
 
