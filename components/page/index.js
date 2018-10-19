@@ -20,7 +20,11 @@ export class Page extends BaseComponent {
   }
 
   create() {
-    const { categories = [] } = this.props;
+    const {
+      location: {
+        categories = []
+      }
+    } = this.props;
 
     const elementNodes = categories.map((category) => {
       return c(

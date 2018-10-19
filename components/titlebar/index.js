@@ -47,12 +47,15 @@ export class TitleBar extends BaseComponent {
 
     const {
       locations: {
-        [id]: location
+        [id]: {
+          location = null
+        } = {}
       }
     } = window.componentHierarchy;
+
     const {
       locations: {
-        [location.name]: displayName
+        [location]: displayName
       }
     } = window.componentStrings;
 

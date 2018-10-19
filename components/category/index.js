@@ -9,10 +9,10 @@ import {
 
 export class Category extends BaseComponent {
   create() {
-    const { category: { name, groups } } = this.props;
+    const { category: { category, groups } } = this.props;
     const {
       categories: {
-        [name]: displayName = '[none]'
+        [category]: displayName = '[none]'
       }
     } = window.componentStrings;
 

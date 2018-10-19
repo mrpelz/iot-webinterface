@@ -19,24 +19,24 @@ const backgroundImageUrl = (room) => {
 };
 
 export class PageContainer extends BaseComponent {
-  _handleRoomChange(value) {
+  _handleRoomChange(index) {
     const { locations } = window.componentHierarchy;
-    const roomName = locations[value].name;
+    const { location = null } = locations[index] || {};
 
     if (this.deferred) {
       this.deferred.unsubscribe();
     }
 
-    this.roomName = roomName;
+    this.locationName = location;
 
-    const backgroundUrl = backgroundImageUrl(roomName);
+    const backgroundUrl = backgroundImageUrl(location);
     const backgroundImage = new Image();
 
     const handleBgReplace = ({ target, pseudoElement }) => {
       if (
         target !== this
         || pseudoElement !== '::before'
-        || roomName !== this.roomName
+        || location !== this.locationName
       ) return;
 
       this.removeEventListener('transitionend', handleBgReplace);
@@ -74,13 +74,12 @@ export class PageContainer extends BaseComponent {
 
   create() {
     const { locations = [] } = window.componentHierarchy;
-    const elementNodes = locations.map(({ name, categories }, id) => {
+    const elementNodes = locations.map((location, id) => {
       return c(
         'page',
         {
           id,
-          name,
-          categories
+          location
         }
       );
     });

@@ -37,15 +37,27 @@ export class Control extends BaseComponent {
   }
 
   create() {
-    const { group: { name, elements: [element] } } = this.props;
-    const { attributes: { set }, name: id } = element;
+    const {
+      group: {
+        attributes: { control },
+        elements: [element],
+        group
+      }
+    } = this.props;
+
+    const {
+      attributes: { set },
+      name
+    } = element;
+
+    const key = group || control;
 
     const {
       controls: {
-        [name]: displayLabel = '[none]'
+        [key]: displayLabel = '[none]'
       },
       units: {
-        [name]: displayUnit
+        [key]: displayUnit = null
       }
     } = window.componentStrings;
 
@@ -81,7 +93,7 @@ export class Control extends BaseComponent {
     this.addEventListener('click', this._handleClick);
 
     this.subscription = window.componentState.subscribe(
-      id,
+      name,
       this._handleValueChange.bind(this)
     );
   }

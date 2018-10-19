@@ -128,6 +128,16 @@ function elementsForGroup(elements, grp) {
   });
 }
 
+function combineAttributes(elements) {
+  return Object.assign(
+    {},
+    ...elements.map((element) => {
+      const { attributes = {} } = element;
+      return attributes;
+    })
+  );
+}
+
 function getHierarchy(
   elements = [],
   { locations, categories, controls } = {}
@@ -146,36 +156,36 @@ function getHierarchy(
         const groupElements = elementsForGroup(categoryElements, groupName);
 
         if (groupName === null) {
-          return groupElements.map((controlElement) => {
+          return groupElements.map((groupElement) => {
             const {
-              attributes: {
-                control = null
-              } = {}
-            } = controlElement;
+              attributes
+            } = groupElement;
 
             return {
-              name: control,
+              group: null,
               single: true,
-              elements: [controlElement]
+              attributes,
+              elements: [groupElement]
             };
           });
         }
 
         return [{
-          name: groupName,
+          group: groupName,
           single: groupElements.length <= 1,
+          attributes: combineAttributes(groupElements),
           elements: groupElements
         }];
       })), controls);
 
       return {
-        name: categoryName,
+        category: categoryName,
         groups: groupMap
       };
     }), categories);
 
     return {
-      name: locationName,
+      location: locationName,
       categories: categoryMap
     };
   }), locations);
@@ -197,6 +207,8 @@ export async function setUpElements() {
 
   window.componentHierarchy = hierarchy;
   window.componentStrings = strings;
+
+  console.log(hierarchy);
 }
 
 export async function setUpValues() {

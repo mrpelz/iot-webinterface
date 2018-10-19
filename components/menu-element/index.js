@@ -15,10 +15,10 @@ export class MenuElement extends BaseComponent {
     window.componentState.set('_selectedRoom', id);
   }
 
-  _handleSelectedChange(value) {
+  _handleSelectedChange(index) {
     const { id } = this.props;
 
-    if (id === value) {
+    if (id === index) {
       this.classList.add(activeClass);
     } else {
       this.classList.remove(activeClass);
@@ -26,10 +26,13 @@ export class MenuElement extends BaseComponent {
   }
 
   create() {
-    const { location: { name } = {} } = this.props;
+    const {
+      location: { location } = {}
+    } = this.props;
+
     const {
       locations: {
-        [name]: displayName
+        [location]: displayName
       }
     } = window.componentStrings;
 
