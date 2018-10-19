@@ -196,11 +196,14 @@ function getHierarchy(
         if (groupName === null) {
           return groupElements.map((groupElement) => {
             const {
-              attributes
+              attributes,
+              attributes: {
+                control = null
+              }
             } = groupElement;
 
             return {
-              group: null,
+              group: control,
               single: true,
               attributes,
               elements: [groupElement]
