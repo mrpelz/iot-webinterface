@@ -36,3 +36,9 @@
     --horizontal-count: 7;
   }
 }
+
+@media screen and (min-width: 1441px) {
+  :host {
+    --horizontal-count: 10;
+  }
+}
