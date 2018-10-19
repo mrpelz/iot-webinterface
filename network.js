@@ -54,13 +54,13 @@ function startStream(callback) {
   init();
 }
 
-function sort(input = [], list = []) {
-  const unsorted = input.filter(({ name }) => {
+function sort(input = [], list = [], key = 'name') {
+  const unsorted = input.filter(({ [key]: name }) => {
     return !list.includes(name);
   });
 
   const sorted = list.map((sortKey) => {
-    return input.find(({ name }) => {
+    return input.find(({ [key]: name }) => {
       return name === sortKey;
     });
   }).filter(Boolean);
@@ -138,6 +138,42 @@ function combineAttributes(elements) {
   );
 }
 
+function showSublocation(elements) {
+  const controls = new Set();
+  const doubled = new Set();
+
+  elements.forEach((element) => {
+    const {
+      attributes: {
+        control = null
+      } = {}
+    } = element;
+
+    if (!control) return;
+
+    if (controls.has(control)) {
+      doubled.add(control);
+    }
+
+    controls.add(control);
+  });
+
+  return elements.map((element) => {
+    const {
+      attributes,
+      attributes: {
+        control
+      } = {}
+    } = element;
+
+    if (doubled.has(control)) {
+      attributes.showSublocation = true;
+    }
+
+    return element;
+  });
+}
+
 function getHierarchy(
   elements = [],
   { locations, categories, controls } = {}
@@ -149,7 +185,9 @@ function getHierarchy(
     const categoryNames = getCategoryNames(locationElements);
 
     const categoryMap = sort(categoryNames.map((categoryName) => {
-      const categoryElements = elementsForCategory(locationElements, categoryName);
+      const categoryElements = showSublocation(
+        elementsForCategory(locationElements, categoryName)
+      );
       const groupNames = getGroupNames(categoryElements);
 
       const groupMap = sort([].concat(...groupNames.map((groupName) => {
@@ -176,19 +214,19 @@ function getHierarchy(
           attributes: combineAttributes(groupElements),
           elements: groupElements
         }];
-      })), controls);
+      })), controls, 'group');
 
       return {
         category: categoryName,
         groups: groupMap
       };
-    }), categories);
+    }), categories, 'category');
 
     return {
       location: locationName,
       categories: categoryMap
     };
-  }), locations);
+  }), locations, 'location');
 
   return {
     locations: locationMap
@@ -207,8 +245,6 @@ export async function setUpElements() {
 
   window.componentHierarchy = hierarchy;
   window.componentStrings = strings;
-
-  console.log(hierarchy);
 }
 
 export async function setUpValues() {

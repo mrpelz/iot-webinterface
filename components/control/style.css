@@ -6,7 +6,6 @@
   background: hsla(var(--background-tertiary), var(--translucent));
   border-radius: 15px;
   color: hsl(var(--font-primary));
-  cursor: pointer;
   display: flex;
   flex-direction: column;
   font-family: var(--font);
@@ -14,6 +13,10 @@
   justify-content: center;
   margin: 5px;
   width: var(--dimension);
+}
+
+:host(.control-click) {
+  cursor: pointer;
 }
 
 @media screen and (min-width: 433px) {

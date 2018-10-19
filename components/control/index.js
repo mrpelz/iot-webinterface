@@ -1,6 +1,7 @@
 /* eslint-disable import/extensions */
 import {
   BaseComponent,
+  bem,
   h,
   render
 } from '../../dom.js';
@@ -8,6 +9,8 @@ import {
 import {
   setElement
 } from '../../network.js';
+
+const clickableClass = bem('control', null, 'click');
 
 export class Control extends BaseComponent {
   _handleClick(e) {
@@ -39,7 +42,11 @@ export class Control extends BaseComponent {
   create() {
     const {
       group: {
-        attributes: { control },
+        attributes: {
+          control,
+          showSublocation,
+          sublocation
+        },
         elements: [element],
         group
       }
@@ -56,6 +63,9 @@ export class Control extends BaseComponent {
       controls: {
         [key]: displayLabel = '[none]'
       },
+      locations: {
+        [sublocation]: displaySublocation = null
+      },
       units: {
         [key]: displayUnit = null
       }
@@ -65,7 +75,17 @@ export class Control extends BaseComponent {
       h(
         'div',
         {},
-        `${displayLabel}${set ? '⁺' : ''}`
+        `${
+          displayLabel
+        }${
+          set
+            ? '⁺'
+            : ''
+        }${
+          showSublocation && sublocation
+            ? ` (${displaySublocation})`
+            : ''
+        }`
       ),
       h(
         'div',
@@ -90,7 +110,10 @@ export class Control extends BaseComponent {
       render(...nodes)
     );
 
-    this.addEventListener('click', this._handleClick);
+    if (set) {
+      this.classList.add(clickableClass);
+      this.addEventListener('click', this._handleClick);
+    }
 
     this.subscription = window.componentState.subscribe(
       name,
