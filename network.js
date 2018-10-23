@@ -68,63 +68,23 @@ function sort(input = [], list = [], key = 'name') {
   return [].concat(sorted, unsorted);
 }
 
-function getLocationNames(elements) {
+function getNames(elements, key = 'name') {
   const result = new Set();
 
   elements.forEach(({
-    attributes: { sortLocation = null, location = null } = {}
+    attributes: { [key]: value = null } = {}
   }) => {
-    result.add(sortLocation || location);
+    result.add(value);
   });
 
   return [...result].sort();
 }
 
-function getCategoryNames(elements) {
-  const result = new Set();
-
-  elements.forEach(({
-    attributes: { category = null } = {}
-  }) => {
-    result.add(category);
-  });
-
-  return [...result].sort();
-}
-
-function getGroupNames(elements) {
-  const result = new Set();
-
-  elements.forEach(({
-    attributes: { group = null } = {}
-  }) => {
-    result.add(group);
-  });
-
-  return [...result].sort();
-}
-
-function elementsForLocation(elements, location) {
+function elementsInHierarchy(elements, value, key = 'name') {
   return elements.filter(({
-    attributes: { sortLocation = null, location: loc = null } = {}
+    attributes: { [key]: is = null } = {}
   }) => {
-    return (sortLocation || loc) === location;
-  });
-}
-
-function elementsForCategory(elements, cat) {
-  return elements.filter(({
-    attributes: { category = null } = {}
-  }) => {
-    return category === cat;
-  });
-}
-
-function elementsForGroup(elements, grp) {
-  return elements.filter(({
-    attributes: { group = null } = {}
-  }) => {
-    return group === grp;
+    return is === value;
   });
 }
 
@@ -138,36 +98,36 @@ function combineAttributes(elements) {
   );
 }
 
-function showSublocation(elements) {
+function showSubLabel(elements) {
   const controls = new Set();
   const doubled = new Set();
 
   elements.forEach((element) => {
     const {
       attributes: {
-        control = null
+        label = null
       } = {}
     } = element;
 
-    if (!control) return;
+    if (!label) return;
 
-    if (controls.has(control)) {
-      doubled.add(control);
+    if (controls.has(label)) {
+      doubled.add(label);
     }
 
-    controls.add(control);
+    controls.add(label);
   });
 
   return elements.map((element) => {
     const {
       attributes,
       attributes: {
-        control
+        label
       } = {}
     } = element;
 
-    if (doubled.has(control)) {
-      attributes.showSublocation = true;
+    if (doubled.has(label)) {
+      attributes.showSubLabel = true;
     }
 
     return element;
@@ -176,34 +136,33 @@ function showSublocation(elements) {
 
 function getHierarchy(
   elements = [],
-  { locations, categories, controls } = {}
+  { sections, categories, labels } = {}
 ) {
-  const locationNames = getLocationNames(elements);
+  const sectionNames = getNames(elements, 'section');
+  const sectionMap = sort(sectionNames.map((sectionName) => {
+    const sectionElements = elementsInHierarchy(elements, sectionName, 'section');
 
-  const locationMap = sort(locationNames.map((locationName) => {
-    const locationElements = elementsForLocation(elements, locationName);
-    const categoryNames = getCategoryNames(locationElements);
-
+    const categoryNames = getNames(sectionElements, 'category');
     const categoryMap = sort(categoryNames.map((categoryName) => {
-      const categoryElements = showSublocation(
-        elementsForCategory(locationElements, categoryName)
+      const categoryElements = showSubLabel(
+        elementsInHierarchy(sectionElements, categoryName, 'category')
       );
-      const groupNames = getGroupNames(categoryElements);
 
+      const groupNames = getNames(categoryElements, 'group');
       const groupMap = sort([].concat(...groupNames.map((groupName) => {
-        const groupElements = elementsForGroup(categoryElements, groupName);
+        const groupElements = elementsInHierarchy(categoryElements, groupName, 'group');
 
         if (groupName === null) {
           return groupElements.map((groupElement) => {
             const {
               attributes,
               attributes: {
-                control = null
+                label = null
               }
             } = groupElement;
 
             return {
-              group: control,
+              group: label,
               single: true,
               attributes,
               elements: [groupElement]
@@ -217,7 +176,7 @@ function getHierarchy(
           attributes: combineAttributes(groupElements),
           elements: groupElements
         }];
-      })), controls, 'group');
+      })), labels, 'group');
 
       return {
         category: categoryName,
@@ -226,13 +185,13 @@ function getHierarchy(
     }), categories, 'category');
 
     return {
-      location: locationName,
+      section: sectionName,
       categories: categoryMap
     };
-  }), locations, 'location');
+  }), sections, 'section');
 
   return {
-    locations: locationMap
+    sections: sectionMap
   };
 }
 

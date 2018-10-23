@@ -59,13 +59,13 @@ export class Menu extends BaseComponent {
   create() {
     this.wasScrolled = false;
 
-    const { locations = [] } = window.componentHierarchy;
-    const itemNodes = locations.map((location, id) => {
+    const { sections = [] } = window.componentHierarchy;
+    const itemNodes = sections.map((section, id) => {
       return c(
         'menu-element',
         {
           id,
-          location
+          section
         }
       );
     });

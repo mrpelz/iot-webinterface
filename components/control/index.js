@@ -43,9 +43,7 @@ export class Control extends BaseComponent {
     const {
       group: {
         attributes: {
-          control,
-          showSublocation,
-          sublocation
+          label
         },
         elements: [element],
         group
@@ -57,14 +55,11 @@ export class Control extends BaseComponent {
       name
     } = element;
 
-    const key = group || control;
+    const key = group || label;
 
     const {
-      controls: {
+      labels: {
         [key]: displayLabel = '[none]'
-      },
-      locations: {
-        [sublocation]: displaySublocation = null
       },
       units: {
         [key]: displayUnit = null
@@ -80,10 +75,6 @@ export class Control extends BaseComponent {
         }${
           set
             ? '⁺'
-            : ''
-        }${
-          showSublocation && sublocation
-            ? ` (${displaySublocation})`
             : ''
         }`
       ),

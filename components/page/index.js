@@ -21,7 +21,7 @@ export class Page extends BaseComponent {
 
   create() {
     const {
-      location: {
+      section: {
         categories = []
       }
     } = this.props;

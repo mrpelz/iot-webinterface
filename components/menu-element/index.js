@@ -27,12 +27,12 @@ export class MenuElement extends BaseComponent {
 
   create() {
     const {
-      location: { location } = {}
+      section: { section } = {}
     } = this.props;
 
     const {
-      locations: {
-        [location]: displayName
+      sections: {
+        [section]: displayName
       }
     } = window.componentStrings;
 

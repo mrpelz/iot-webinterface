@@ -46,16 +46,16 @@ export class TitleBar extends BaseComponent {
     if (id === undefined) return;
 
     const {
-      locations: {
+      sections: {
         [id]: {
-          location = null
+          section = null
         } = {}
       }
     } = window.componentHierarchy;
 
     const {
-      locations: {
-        [location]: displayName
+      sections: {
+        [section]: displayName
       }
     } = window.componentStrings;
 
