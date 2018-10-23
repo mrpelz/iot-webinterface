@@ -42,28 +42,25 @@ export class Control extends BaseComponent {
   create() {
     const {
       group: {
-        attributes: {
-          label
-        },
         elements: [element],
         group
       }
     } = this.props;
 
     const {
-      attributes: { set },
+      attributes: {
+        label,
+        set,
+        unit
+      },
       name
     } = element;
 
     const key = group || label;
 
     const {
-      labels: {
-        [key]: displayLabel = '[none]'
-      },
-      units: {
-        [key]: displayUnit = null
-      }
+      [key]: displayLabel = '[none]',
+      [unit]: displayUnit = null
     } = window.componentStrings;
 
     const nodes = [

@@ -21,7 +21,7 @@ const backgroundImageUrl = (room) => {
 export class PageContainer extends BaseComponent {
   _handleRoomChange(index) {
     const { sections } = window.componentHierarchy;
-    const { section = null } = sections[index] || {};
+    const { section = null } = [].concat(...sections)[index] || {};
 
     if (this.deferred) {
       this.deferred.unsubscribe();
@@ -74,7 +74,7 @@ export class PageContainer extends BaseComponent {
 
   create() {
     const { sections = [] } = window.componentHierarchy;
-    const elementNodes = sections.map((section, id) => {
+    const elementNodes = [].concat(...sections).map((section, id) => {
       return c(
         'page',
         {

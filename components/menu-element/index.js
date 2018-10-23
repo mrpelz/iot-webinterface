@@ -31,9 +31,7 @@ export class MenuElement extends BaseComponent {
     } = this.props;
 
     const {
-      sections: {
-        [section]: displayName
-      }
+      [section]: displayName
     } = window.componentStrings;
 
     this.textContent = displayName;

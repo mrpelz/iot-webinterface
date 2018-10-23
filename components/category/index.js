@@ -11,9 +11,7 @@ export class Category extends BaseComponent {
   create() {
     const { category: { category, groups } } = this.props;
     const {
-      categories: {
-        [category]: displayName = '[none]'
-      }
+      [category]: displayName = '[none]'
     } = window.componentStrings;
 
     this.dataset.categoryName = displayName;

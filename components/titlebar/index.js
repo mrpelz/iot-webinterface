@@ -45,18 +45,15 @@ export class TitleBar extends BaseComponent {
     const { id } = this.props;
     if (id === undefined) return;
 
+    const { sections = [] } = window.componentHierarchy;
     const {
-      sections: {
-        [id]: {
-          section = null
-        } = {}
-      }
-    } = window.componentHierarchy;
+      [id]: {
+        section = null
+      } = {}
+    } = [].concat(...sections);
 
     const {
-      sections: {
-        [section]: displayName
-      }
+      [section]: displayName = ''
     } = window.componentStrings;
 
     this.get('#room').textContent = displayName;
