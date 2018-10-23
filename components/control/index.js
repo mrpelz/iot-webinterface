@@ -51,6 +51,8 @@ export class Control extends BaseComponent {
       attributes: {
         label,
         set,
+        showSubLabel,
+        subLabel,
         unit
       },
       name
@@ -60,6 +62,7 @@ export class Control extends BaseComponent {
 
     const {
       [key]: displayLabel = '[none]',
+      [subLabel]: displaySubLabel = '[none]',
       [unit]: displayUnit = null
     } = window.componentStrings;
 
@@ -72,6 +75,10 @@ export class Control extends BaseComponent {
         }${
           set
             ? '⁺'
+            : ''
+        }${
+          (showSubLabel && subLabel)
+            ? ` (${displaySubLabel})`
             : ''
         }`
       ),
