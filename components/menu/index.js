@@ -60,12 +60,20 @@ export class Menu extends BaseComponent {
     this.wasScrolled = false;
 
     const { sections = [] } = window.componentHierarchy;
-    const itemNodes = [].concat(...sections).map((section, id) => {
+    const itemNodes = [].concat(...sections.map((sectionGroup, groupIndex) => {
+      return [].concat(...sectionGroup.map((section, itemIndex) => {
+        return {
+          section,
+          separated: (groupIndex && !itemIndex)
+        };
+      }));
+    })).map(({ section, separated }, id) => {
       return c(
         'menu-element',
         {
-          id,
-          section
+          section,
+          separated,
+          id
         }
       );
     });

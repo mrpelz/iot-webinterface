@@ -5,6 +5,7 @@ import {
 } from '../../dom.js';
 
 const activeClass = bem('menu', 'element', 'active');
+const separatedClass = bem('menu', 'element', 'separated');
 
 export class MenuElement extends BaseComponent {
   _handleClick(e) {
@@ -27,7 +28,8 @@ export class MenuElement extends BaseComponent {
 
   create() {
     const {
-      section: { section } = {}
+      section: { section } = {},
+      separated
     } = this.props;
 
     const {
@@ -35,6 +37,10 @@ export class MenuElement extends BaseComponent {
     } = window.componentStrings;
 
     this.textContent = displayName;
+
+    if (separated) {
+      this.classList.add(separatedClass);
+    }
 
     this._handleClick = this._handleClick.bind(this);
     this._handleSelectedChange = this._handleSelectedChange.bind(this);
