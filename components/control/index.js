@@ -1,16 +1,13 @@
 /* eslint-disable import/extensions */
 import {
   BaseComponent,
-  bem,
-  h,
+  c,
   render
 } from '../../dom.js';
 
 import {
   setElement
 } from '../../network.js';
-
-const clickableClass = bem('control', null, 'click');
 
 export class Control extends BaseComponent {
   _handleClick(e) {
@@ -35,78 +32,51 @@ export class Control extends BaseComponent {
 
   _handleValueChange(value) {
     if (value !== null) {
-      this.get('#value').textContent = value;
+      const targetElement = this.get('#value');
+      if (!targetElement) return;
+
+      targetElement.textContent = (
+        typeof value === 'number'
+          ? window.componentNumberFormat.format(value)
+          : value
+      );
     }
   }
 
   create() {
     const {
+      group,
       group: {
-        elements: [element],
-        group
+        elements: [element]
       }
     } = this.props;
 
     const {
       attributes: {
         get,
-        label,
         set,
-        showSubLabel,
-        subLabel,
-        unit
+        type
       },
       name
     } = element;
 
-    const key = group || label;
+    let node = 'simple-switch';
 
-    const {
-      [key]: displayLabel = '[none]',
-      [subLabel]: displaySubLabel = '[none]',
-      [unit]: displayUnit = null
-    } = window.componentStrings;
-
-    const nodes = [h(
-      'div',
-      {},
-      `${
-        displayLabel
-      }${
-        set
-          ? '⁺'
-          : ''
-      }${
-        (showSubLabel && subLabel)
-          ? ` (${displaySubLabel})`
-          : ''
-      }`
-    )];
-
-    if (get) {
-      nodes.push(h(
-        'div',
-        {
-          id: 'value'
-        },
-        '--'
-      ));
-    }
-
-    if (displayUnit) {
-      nodes.push(h(
-        'div',
-        {},
-        displayUnit
-      ));
+    switch (type) {
+      case 'environmental-sensor':
+        node = 'metric';
+        break;
+      default:
     }
 
     this.appendChild(
-      render(...nodes)
+      render(c(
+        node,
+        { group }
+      ))
     );
 
     if (set) {
-      this.classList.add(clickableClass);
       this.addEventListener('click', this._handleClick);
     }
 

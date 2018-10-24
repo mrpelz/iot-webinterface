@@ -17,6 +17,7 @@
   position: sticky;
   right: 0;
   top: var(--titlebar-height);
+  z-index: 1;
 }
 
 ::slotted(.category--content) {

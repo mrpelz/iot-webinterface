@@ -8,6 +8,8 @@ import { PageContainer } from './components/page-container/index.js';
 import { Page } from './components/page/index.js';
 import { Category } from './components/category/index.js';
 import { Control } from './components/control/index.js';
+import { SimpleSwitch } from './components/simple-switch/index.js';
+import { Metric } from './components/metric/index.js';
 import { Menu } from './components/menu/index.js';
 import { MenuElement } from './components/menu-element/index.js';
 
@@ -45,6 +47,7 @@ function getDarkMode() {
 }
 
 async function main() {
+  window.componentNumberFormat = new Intl.NumberFormat('de-DE');
   window.componentState = new State();
 
   window.componentState.set('_isReady', false);
@@ -102,7 +105,16 @@ async function main() {
       },
       {
         slug: 'control',
-        component: Control,
+        component: Control
+      },
+      {
+        slug: 'simple-switch',
+        component: SimpleSwitch,
+        style: true
+      },
+      {
+        slug: 'metric',
+        component: Metric,
         style: true
       }
     ])
@@ -121,10 +133,11 @@ if (
   window.customElements
   && document.body.attachShadow
   && typeof EventSource !== 'undefined'
+  && typeof Intl !== 'undefined'
 ) {
   document.addEventListener('DOMContentLoaded', main);
   document.addEventListener('touchstart', () => {}, true);
 } else {
   /* eslint-disable-next-line no-alert */
-  alert('your browser doesn\'t support custom elements, shadow dom and/or EventSource');
+  alert('your browser doesn\'t support custom elements, shadow dom, EventSource and/or Intl-API');
 }

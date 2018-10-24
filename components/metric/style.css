@@ -1,0 +1,76 @@
+:host {
+  --horizontal-count: 3;
+  --dimension: calc((100vw - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
+  --margin: 8px;
+
+  align-items: center;
+  background: hsla(var(--background-tertiary), var(--translucent));
+  border-radius: 15px;
+  color: hsl(var(--font-primary));
+  display: flex;
+  font-family: var(--font);
+  font-size: 12px;
+  height: calc(var(--dimension) * 0.8);
+  justify-content: flex-end;
+  margin: 5px;
+  position: relative;
+  width: var(--dimension);
+}
+
+::slotted(#value) {
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  margin: var(--margin);
+}
+
+::slotted(#label),
+::slotted(#unit),
+::slotted(#sublabel) {
+  margin: var(--margin);
+  max-width: calc(50% - (var(--margin) * 1.5));
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+::slotted(#label) {
+  left: 0;
+  max-width: calc(100% - (var(--margin) * 2));
+  top: 0;
+}
+
+::slotted(#unit) {
+  bottom: 0;
+  right: 0;
+}
+
+::slotted(#sublabel) {
+  bottom: 0;
+  left: 0;
+}
+
+@media screen and (min-width: 433px) {
+  :host {
+    --horizontal-count: 5;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  :host {
+    --dimension: calc((100vw - var(--menu-width-tablet) - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
+  }
+}
+
+@media screen and (min-width: 1025px) {
+  :host {
+    --horizontal-count: 7;
+  }
+}
+
+@media screen and (min-width: 1441px) {
+  :host {
+    --horizontal-count: 10;
+  }
+}
