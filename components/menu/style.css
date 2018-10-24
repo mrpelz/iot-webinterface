@@ -8,7 +8,7 @@
   flex-shrink: 0;
   flex-wrap: nowrap;
   margin-bottom: -20px;
-  overflow: auto;
+  overflow: scroll;
   padding-bottom: 20px;
   position: fixed;
   width: 100%;
@@ -32,21 +32,21 @@
 :host::before {
   background: linear-gradient(
     to right,
-    hsl(var(--background-secondary)) 51px,
+    hsl(var(--background-secondary)) 1px,
     hsla(var(--background-secondary), 0) 100%
   );
-  padding-left: 50px;
-  left: -50px;
+  padding-left: 1px;
+  left: -1px;
 }
 
 :host::after {
   background: linear-gradient(
     to left,
-    hsl(var(--background-secondary)) 51px,
+    hsl(var(--background-secondary)) 1px,
     hsla(var(--background-secondary), 0) 100%
   );
-  padding-right: 50px;
-  right: -50px;
+  padding-right: 1px;
+  right: -1px;
 }
 
 @media screen and (min-width: 769px) {
@@ -55,6 +55,7 @@
     border-top: none;
     flex-direction: column;
     height: 100%;
+    overflow: auto;
     padding-top: var(--menu-height);
     top: var(--titlebar-height);
     width: var(--menu-width-tablet);
