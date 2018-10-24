@@ -19,13 +19,14 @@
   display: none;
 }
 
-:host::before,
+/* :host::before,
 :host::after {
   bottom: 0;
   content: '';
   display: block;
   height: 44px;
   position: fixed;
+  transform: translate3d(0, 0, 0, 0);
   width: 15px;
 }
 
@@ -47,7 +48,7 @@
   );
   padding-right: 1px;
   right: -1px;
-}
+} */
 
 @media screen and (min-width: 769px) {
   :host {
@@ -61,8 +62,8 @@
     width: var(--menu-width-tablet);
   }
 
-  :host::before,
+  /* :host::before,
   :host::after {
     display: none;
-  }
+  } */
 }
