@@ -123,6 +123,7 @@ if (
   && typeof EventSource !== 'undefined'
 ) {
   document.addEventListener('DOMContentLoaded', main);
+  document.addEventListener('touchstart', () => {}, true);
 } else {
   /* eslint-disable-next-line no-alert */
   alert('your browser doesn\'t support custom elements, shadow dom and/or EventSource');

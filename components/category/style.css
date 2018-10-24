@@ -5,6 +5,10 @@
 }
 
 :host([data-category-name])::before {
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
   background: hsla(var(--background-secondary), var(--translucent));
   content: attr(data-category-name);
   display: block;
@@ -17,6 +21,7 @@
   position: sticky;
   right: 0;
   top: var(--titlebar-height);
+  user-select: none;
 }
 
 ::slotted(.category--content) {
