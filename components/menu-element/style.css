@@ -1,8 +1,4 @@
 :host {
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
   align-items: center;
   color: hsl(var(--font-secondary));
   cursor: pointer;
@@ -13,7 +9,6 @@
   height: var(--menu-height);
   padding: 0 10px;
   touch-action: pan-x;
-  user-select: none;
 }
 
 :host(.menu--element-active) {
@@ -45,12 +40,7 @@
 }
 
 ::slotted(span) {
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
   pointer-events: none;
-  user-select: none;
 }
 
 @media screen and (min-width: 769px) {
