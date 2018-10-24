@@ -19,51 +19,21 @@
   display: none;
 }
 
-/* :host::before,
-:host::after {
-  bottom: 0;
-  content: '';
-  display: block;
-  height: 44px;
-  position: fixed;
-  transform: translate3d(0, 0, 0, 0);
-  width: 15px;
-}
-
-:host::before {
-  background: linear-gradient(
-    to right,
-    hsl(var(--background-secondary)) 1px,
-    hsla(var(--background-secondary), 0) 100%
-  );
-  padding-left: 1px;
-  left: -1px;
-}
-
-:host::after {
-  background: linear-gradient(
-    to left,
-    hsl(var(--background-secondary)) 1px,
-    hsla(var(--background-secondary), 0) 100%
-  );
-  padding-right: 1px;
-  right: -1px;
-} */
-
 @media screen and (min-width: 769px) {
   :host {
     border-right: 0.5px solid hsl(var(--font-tertiary));
     border-top: none;
     flex-direction: column;
-    height: 100%;
+    margin-bottom: 0;
     overflow: auto;
-    padding-top: var(--menu-height);
+    padding-bottom: 0;
     top: var(--titlebar-height);
     width: var(--menu-width-tablet);
   }
 
-  /* :host::before,
+  :host::before,
   :host::after {
-    display: none;
-  } */
+    content: '';
+    min-height: var(--menu-height);
+  }
 }

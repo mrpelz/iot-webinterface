@@ -49,6 +49,7 @@ export class Control extends BaseComponent {
 
     const {
       attributes: {
+        get,
         label,
         set,
         showSubLabel,
@@ -66,39 +67,38 @@ export class Control extends BaseComponent {
       [unit]: displayUnit = null
     } = window.componentStrings;
 
-    const nodes = [
-      h(
-        'div',
-        {},
-        `${
-          displayLabel
-        }${
-          set
-            ? '⁺'
-            : ''
-        }${
-          (showSubLabel && subLabel)
-            ? ` (${displaySubLabel})`
-            : ''
-        }`
-      ),
-      h(
+    const nodes = [h(
+      'div',
+      {},
+      `${
+        displayLabel
+      }${
+        set
+          ? '⁺'
+          : ''
+      }${
+        (showSubLabel && subLabel)
+          ? ` (${displaySubLabel})`
+          : ''
+      }`
+    )];
+
+    if (get) {
+      nodes.push(h(
         'div',
         {
           id: 'value'
         },
         '--'
-      )
-    ];
+      ));
+    }
 
     if (displayUnit) {
-      nodes.push(
-        h(
-          'div',
-          {},
-          displayUnit
-        )
-      );
+      nodes.push(h(
+        'div',
+        {},
+        displayUnit
+      ));
     }
 
     this.appendChild(
@@ -110,14 +110,33 @@ export class Control extends BaseComponent {
       this.addEventListener('click', this._handleClick);
     }
 
-    this.subscription = window.componentState.subscribe(
-      name,
-      this._handleValueChange.bind(this)
-    );
+    if (get) {
+      this.subscription = window.componentState.subscribe(
+        name,
+        this._handleValueChange.bind(this)
+      );
+    }
   }
 
   destroy() {
-    this.removeEventListener('click', this._handleClick);
-    this.subscription.unsubscribe();
+    const {
+      group: {
+        elements: [element]
+      }
+    } = this.props;
+
+    const {
+      attributes: {
+        get,
+        set
+      }
+    } = element;
+
+    if (set) {
+      this.removeEventListener('click', this._handleClick);
+    }
+    if (get) {
+      this.subscription.unsubscribe();
+    }
   }
 }
