@@ -32,10 +32,7 @@ export class MenuElement extends BaseComponent {
       separated
     } = this.props;
 
-    const {
-      [section]: displayName
-    } = window.componentStrings;
-
+    const displayName = window.xExpand(section) || '';
     this.textContent = displayName;
 
     if (separated) {

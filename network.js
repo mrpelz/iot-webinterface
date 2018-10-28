@@ -1,5 +1,42 @@
 const apiBaseUrl = `${window.location.protocol}//hermes.net.wurstsalat.cloud/`;
 
+function expandTemplate(map) {
+  const expression = '§(?:(\\d+)|\\{([^${}:]+)(?::([^§{}:]+))?\\})';
+
+  return (string, ...subKeys) => {
+    if (!string) return null;
+    if (!string.includes('§')) {
+      return map[string] || null;
+    }
+
+    const regex = new RegExp(expression, 'g');
+    let match;
+    let result = string;
+
+    do {
+      match = regex.exec(string);
+      if (!match) break;
+
+      const sub = match[0];
+      const idx = match[1] && Number.parseInt(match[1], 10);
+      const key = match[2];
+      const def = match[3];
+
+      result = result.replace(
+        sub,
+        (
+          (idx && map[subKeys[idx]])
+          || map[key]
+          || def
+          || ''
+        )
+      );
+    } while (match);
+
+    return result.length ? result : null;
+  };
+}
+
 function fetchList() {
   const url = new URL('/list', apiBaseUrl);
 
@@ -59,8 +96,8 @@ function startStream(callback) {
 export async function setUpElements() {
   const { hierarchy, strings } = await fetchList() || {};
 
-  window.componentHierarchy = hierarchy;
-  window.componentStrings = strings;
+  window.xHierarchy = hierarchy;
+  window.xExpand = expandTemplate(strings);
 }
 
 export async function setUpValues() {

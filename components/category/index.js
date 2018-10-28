@@ -10,9 +10,7 @@ import {
 export class Category extends BaseComponent {
   create() {
     const { category: { category, groups } } = this.props;
-    const {
-      [category]: displayName = '[none]'
-    } = window.componentStrings;
+    const displayName = window.xExpand(category) || '[none]';
 
     this.dataset.categoryName = displayName;
 

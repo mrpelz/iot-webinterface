@@ -19,6 +19,7 @@
   color: hsl(var(--font-primary));
   font-size: 17px;
   font-weight: 600;
+  text-transform: capitalize;
 }
 
 #dark {

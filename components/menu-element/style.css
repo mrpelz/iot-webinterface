@@ -41,6 +41,7 @@
 
 ::slotted(span) {
   pointer-events: none;
+  text-transform: capitalize;
 }
 
 @media screen and (min-width: 769px) {

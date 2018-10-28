@@ -47,7 +47,6 @@ function getDarkMode() {
 }
 
 async function main() {
-  window.componentNumberFormat = new Intl.NumberFormat('de-DE');
   window.componentState = new State();
 
   window.componentState.set('_isReady', false);
