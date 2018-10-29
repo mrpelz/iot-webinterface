@@ -6,6 +6,12 @@ import {
 } from '../../dom.js';
 
 const valueLoadingString = '…';
+const digits = {
+  brightness: 2,
+  pressure: 0,
+  eco2: 0,
+  tvoc: 0
+};
 
 export class Metric extends BaseComponent {
   _handleValueChange(value) {
@@ -20,9 +26,9 @@ export class Metric extends BaseComponent {
       );
 
       if (newValue === this._value) return;
-      this._value = newValue;
 
-      targetElement.textContent = this._value;
+      this._value = newValue;
+      targetElement.textContent = newValue;
     }
   }
 
@@ -45,7 +51,15 @@ export class Metric extends BaseComponent {
     } = element;
 
     this._value = null;
-    this._valueFormat = new Intl.NumberFormat('de-DE');
+
+    const formatDigits = digits[label] === undefined ? 1 : digits[label];
+    this._valueFormat = new Intl.NumberFormat(
+      'de-DE',
+      {
+        minimumFractionDigits: formatDigits,
+        maximumFractionDigits: formatDigits
+      }
+    );
 
     const displayLabel = window.xExpand(label) || '[none]';
     const displaySubLabel = window.xExpand(subLabel) || '[none]';
