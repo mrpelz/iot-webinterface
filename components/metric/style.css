@@ -22,6 +22,14 @@
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   margin: var(--margin);
+  margin-left: 0;
+}
+
+::slotted(#trend) {
+  font-variant-numeric: tabular-nums;
+  margin: var(--margin);
+  margin-right: calc(var(--margin) / 2);
+  transform: translateY(2px);
 }
 
 ::slotted(#label),

@@ -22,7 +22,7 @@ export class Metric extends BaseComponent {
       const newValue = (
         typeof value === 'number'
           ? this._valueFormat.format(value)
-          : value
+          : value.toString()
       );
 
       if (newValue === this._value) return;
@@ -32,12 +32,36 @@ export class Metric extends BaseComponent {
     }
   }
 
+  _handleTrendChange(trend) {
+    if (trend !== null) {
+      const targetElement = this.get('#trend');
+      if (!targetElement) return;
+
+      targetElement.textContent = {
+        [-1]: '↘',
+        1: '↗'
+      }[trend] || '';
+    }
+  }
+
   create() {
     const {
       group: {
-        elements: [element]
+        elements
       }
     } = this.props;
+
+    const metricElement = elements.find((element) => {
+      return (
+        element.attributes.subType === 'single-sensor'
+        || element.attributes.subType === 'aggregate-value'
+      );
+    });
+    const trendElement = elements.find((element) => {
+      return element.attributes.subType === 'trend';
+    });
+
+    if (!metricElement) return;
 
     const {
       attributes: {
@@ -48,7 +72,7 @@ export class Metric extends BaseComponent {
         unit
       },
       name
-    } = element;
+    } = metricElement;
 
     this._value = null;
 
@@ -99,21 +123,50 @@ export class Metric extends BaseComponent {
       ));
     }
 
+    if (trendElement) {
+      nodes.unshift(h(
+        'div',
+        {
+          id: 'trend'
+        }
+      ));
+    }
+
     this.appendChild(
       render(...nodes)
     );
 
     if (get) {
-      this.subscription = window.componentState.subscribe(
+      this.subscriptions = [window.componentState.subscribe(
         name,
         this._handleValueChange.bind(this)
-      );
+      )];
+    }
+
+    if (trendElement) {
+      const {
+        attributes: {
+          get: tGet
+        },
+        name: tName
+      } = trendElement;
+
+      if (tGet) {
+        this.subscriptions.push(
+          window.componentState.subscribe(
+            tName,
+            this._handleTrendChange.bind(this)
+          )
+        );
+      }
     }
   }
 
   destroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
+    if (this.subscriptions) {
+      this.subscriptions.forEach((subscription) => {
+        subscription.unsubscribe();
+      });
     }
   }
 }
