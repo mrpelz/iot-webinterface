@@ -22,17 +22,30 @@
   text-transform: capitalize;
 }
 
-#dark {
+#dark,
+#wait {
   align-items: center;
-  background: hsl(var(--grey-glow));
   border-radius: 5px;
-  cursor: pointer;
   display: flex;
   font-size: 14px;
-  font-weight: 600;
+  position: fixed;
+}
+
+#dark {
+  background: hsl(var(--grey-glow));
+  cursor: pointer;
   left: 10px;
   padding: 4px 10px;
-  position: fixed;
+}
+
+#wait {
+  padding-top: 1px;
+  right: 10px;
+  visibility: hidden;
+}
+
+#wait.active {
+  visibility: visible;
 }
 
 #dark:active {

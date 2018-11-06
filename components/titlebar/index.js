@@ -22,11 +22,23 @@ export class TitleBar extends BaseComponent {
     });
   }
 
+  _handleStream(stream) {
+    this.setProps({
+      stream
+    });
+  }
+
   create() {
-    this.subscription = window.componentState.subscribe(
-      '_selectedRoom',
-      this._handleTitleChange.bind(this)
-    );
+    this.subscriptions = [
+      window.componentState.subscribe(
+        '_selectedRoom',
+        this._handleTitleChange.bind(this)
+      ),
+      window.componentState.subscribe(
+        '_stream',
+        this._handleStream.bind(this)
+      )
+    ];
 
     this.shadowRoot.appendChild(
       render(...[
@@ -37,12 +49,19 @@ export class TitleBar extends BaseComponent {
         ),
         h('h1', { id: 'room' }),
         h('section', { id: 'flags' }),
+        h(
+          'span',
+          { id: 'wait' },
+          '⚪️'
+        )
       ])
     );
+
+    this.get('#dark').addEventListener('click', TitleBar.handleDarkClick);
   }
 
   render() {
-    const { id } = this.props;
+    const { id, stream = false } = this.props;
     if (id === undefined) return;
 
     const { sections = [] } = window.xHierarchy;
@@ -55,11 +74,13 @@ export class TitleBar extends BaseComponent {
     const displayName = window.xExpand(section) || '';
 
     this.get('#room').textContent = displayName;
-    this.get('#dark').addEventListener('click', TitleBar.handleDarkClick);
+    this.get('#wait').classList.toggle('active', !stream);
   }
 
   destroy() {
-    this.subscription.unsubscribe();
+    this.subscriptions.forEach((subscription) => {
+      subscription.unsubscribe();
+    });
     this.get('#dark').removeEventListener('click', TitleBar.handleDarkClick);
   }
 }

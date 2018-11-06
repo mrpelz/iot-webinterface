@@ -1,7 +1,12 @@
 /* eslint-disable import/extensions */
 import { defineComponents, c, render } from './dom.js';
 import { State } from './state.js';
-import { setUpElements, setUpValues } from './network.js';
+import {
+  getSavedPage,
+  getDarkMode,
+  setUpElements,
+  setUpValues
+} from './network.js';
 import { App } from './components/app/index.js';
 import { TitleBar } from './components/titlebar/index.js';
 import { PageContainer } from './components/page-container/index.js';
@@ -12,39 +17,6 @@ import { SimpleSwitch } from './components/simple-switch/index.js';
 import { Metric } from './components/metric/index.js';
 import { Menu } from './components/menu/index.js';
 import { MenuElement } from './components/menu-element/index.js';
-
-function getSavedPage() {
-  const savedPage = Number.parseInt(window.localStorage.getItem('page'), 10);
-  window.componentState.set(
-    '_selectedRoom',
-    Number.isNaN(savedPage) ? 0 : savedPage
-  );
-
-  window.componentState.subscribe(
-    '_selectedRoom',
-    (index) => {
-      window.localStorage.setItem('page', index.toString(10));
-    }
-  );
-}
-
-function getDarkMode() {
-  const dark = window.localStorage.getItem('dark') !== null;
-  window.componentState.set('_darkMode', dark);
-
-  window.componentState.subscribe(
-    '_darkMode',
-    (isDark) => {
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-        window.localStorage.setItem('dark', '1');
-      } else {
-        document.documentElement.classList.remove('dark');
-        window.localStorage.removeItem('dark');
-      }
-    }
-  );
-}
 
 async function main() {
   window.componentState = new State();

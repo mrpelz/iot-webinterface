@@ -37,9 +37,10 @@ export class Metric extends BaseComponent {
       const targetElement = this.get('#trend');
       if (!targetElement) return;
 
+      targetElement.classList.toggle('active', trend !== 0);
       targetElement.textContent = {
-        [-1]: '↘',
-        1: '↗'
+        [-1]: '▼',
+        1: '▲'
       }[trend] || '';
     }
   }

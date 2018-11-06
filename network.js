@@ -61,12 +61,10 @@ function fetchValues() {
   });
 }
 
-function startStream(callback) {
+function startStream(callback, onOpen, onClose) {
   let eventSource = null;
 
   const handleData = ({ data }) => {
-    if (!callback) return;
-
     try {
       const payload = JSON.parse(data);
       callback(payload);
@@ -80,19 +78,55 @@ function startStream(callback) {
     if (event) {
       /* eslint-disable-next-line no-console */
       console.log('eventSource disconnected, reconnecting…');
+      onClose();
       eventSource.close();
       eventSource.removeEventListener('message', handleData);
       eventSource.removeEventListener('error', init);
+      eventSource.removeEventListener('open', onOpen);
     }
 
     window.setTimeout(() => {
       eventSource = new EventSource(new URL('/stream', apiBaseUrl));
       eventSource.addEventListener('error', init);
       eventSource.addEventListener('message', handleData);
+      eventSource.addEventListener('open', onOpen);
     }, (event ? 2000 : 0));
   };
 
   init();
+}
+
+export function getSavedPage() {
+  const savedPage = Number.parseInt(window.localStorage.getItem('page'), 10);
+  window.componentState.set(
+    '_selectedRoom',
+    Number.isNaN(savedPage) ? 0 : savedPage
+  );
+
+  window.componentState.subscribe(
+    '_selectedRoom',
+    (index) => {
+      window.localStorage.setItem('page', index.toString(10));
+    }
+  );
+}
+
+export function getDarkMode() {
+  const dark = window.localStorage.getItem('dark') !== null;
+  window.componentState.set('_darkMode', dark);
+
+  window.componentState.subscribe(
+    '_darkMode',
+    (isDark) => {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        window.localStorage.setItem('dark', '1');
+      } else {
+        document.documentElement.classList.remove('dark');
+        window.localStorage.removeItem('dark');
+      }
+    }
+  );
 }
 
 export async function setUpElements() {
@@ -121,6 +155,10 @@ export async function setUpValues() {
 
     if (!name) return;
     window.componentState.set(name, value);
+  }, () => {
+    window.componentState.set('_stream', true);
+  }, () => {
+    window.componentState.set('_stream', false);
   });
 }
 

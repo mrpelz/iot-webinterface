@@ -29,7 +29,11 @@
   font-variant-numeric: tabular-nums;
   margin: var(--margin);
   margin-right: calc(var(--margin) / 2);
-  transform: translateY(2px);
+  visibility: hidden;
+}
+
+::slotted(#trend.active) {
+  visibility: visible;
 }
 
 ::slotted(#label),
