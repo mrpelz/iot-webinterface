@@ -76,8 +76,8 @@ function startStream(callback) {
     }
   };
 
-  const init = () => {
-    if (eventSource) {
+  const init = (event) => {
+    if (event) {
       /* eslint-disable-next-line no-console */
       console.log('eventSource disconnected, reconnecting…');
       eventSource.close();
@@ -85,9 +85,11 @@ function startStream(callback) {
       eventSource.removeEventListener('error', init);
     }
 
-    eventSource = new EventSource(new URL('/stream', apiBaseUrl));
-    eventSource.addEventListener('error', init);
-    eventSource.addEventListener('message', handleData);
+    window.setTimeout(() => {
+      eventSource = new EventSource(new URL('/stream', apiBaseUrl));
+      eventSource.addEventListener('error', init);
+      eventSource.addEventListener('message', handleData);
+    }, (event ? 2000 : 0));
   };
 
   init();
