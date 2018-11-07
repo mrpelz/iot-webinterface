@@ -8,16 +8,17 @@ import {
   setUpValues
 } from './network.js';
 import { App } from './components/app/index.js';
-import { TitleBar } from './components/titlebar/index.js';
-import { PageContainer } from './components/page-container/index.js';
-import { Page } from './components/page/index.js';
+import { BinaryLight } from './components/binary-light/index.js';
 import { Category } from './components/category/index.js';
 import { Control } from './components/control/index.js';
-import { SimpleSwitch } from './components/simple-switch/index.js';
-import { Metric } from './components/metric/index.js';
-import { BinaryLight } from './components/binary-light/index.js';
+import { Door } from './components/door/index.js';
 import { Menu } from './components/menu/index.js';
 import { MenuElement } from './components/menu-element/index.js';
+import { Metric } from './components/metric/index.js';
+import { Page } from './components/page/index.js';
+import { PageContainer } from './components/page-container/index.js';
+import { SimpleSwitch } from './components/simple-switch/index.js';
+import { TitleBar } from './components/titlebar/index.js';
 
 async function main() {
   window.componentState = new State();
@@ -92,6 +93,11 @@ async function main() {
       {
         slug: 'binary-light',
         component: BinaryLight,
+        style: true
+      },
+      {
+        slug: 'door',
+        component: Door,
         style: true
       }
     ])
