@@ -60,6 +60,9 @@ export class Control extends BaseComponent {
           default:
         }
         break;
+      case 'door-sensor':
+        node = 'door';
+        break;
       default:
     }
 

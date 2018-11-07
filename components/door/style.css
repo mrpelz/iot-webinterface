@@ -2,7 +2,7 @@
   --horizontal-count: 3;
   --dimension: calc((100vw - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
   --height: calc(var(--dimension) * 0.8);
-  --font-size-primary: calc(var(--height) * 0.25);
+  --font-size-primary: calc(var(--height) * 0.18);
   --font-size-secondary: calc(var(--height) * 0.13);
   --margin: 8px;
 
@@ -14,7 +14,7 @@
   font-family: var(--font);
   font-size: var(--font-size-secondary);
   height: var(--height);
-  justify-content: flex-end;
+  justify-content: center;
   margin: 5px;
   position: relative;
   width: var(--dimension);
@@ -22,25 +22,11 @@
 
 ::slotted(#value) {
   font-size: var(--font-size-primary);
-  font-variant-numeric: tabular-nums;
   font-weight: 700;
   margin: var(--margin);
-  margin-left: 0;
-}
-
-::slotted(#trend) {
-  font-variant-numeric: tabular-nums;
-  margin: var(--margin);
-  margin-right: calc(var(--margin) / 2);
-  visibility: hidden;
-}
-
-::slotted(#trend.active) {
-  visibility: visible;
 }
 
 ::slotted(#label),
-::slotted(#unit),
 ::slotted(#sublabel) {
   margin: var(--margin);
   max-width: calc(50% - (var(--margin) * 1.5));
@@ -54,11 +40,6 @@
   left: 0;
   max-width: calc(100% - (var(--margin) * 2));
   top: 0;
-}
-
-::slotted(#unit) {
-  bottom: 0;
-  right: 0;
 }
 
 ::slotted(#sublabel) {

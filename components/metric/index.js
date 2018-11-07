@@ -82,7 +82,8 @@ export class Metric extends BaseComponent {
       'de-DE',
       {
         minimumFractionDigits: formatDigits,
-        maximumFractionDigits: formatDigits
+        maximumFractionDigits: formatDigits,
+        useGrouping: false
       }
     );
 

@@ -25,6 +25,12 @@
 
 @media screen and (min-width: 433px) {
   :host {
+    --horizontal-count: 4;
+  }
+}
+
+@media screen and (min-width: 550px) {
+  :host {
     --horizontal-count: 5;
   }
 }
@@ -38,6 +44,12 @@
 @media screen and (min-width: 1025px) {
   :host {
     --horizontal-count: 7;
+  }
+}
+
+@media screen and (min-width: 1250px) {
+  :host {
+    --horizontal-count: 8;
   }
 }
 
