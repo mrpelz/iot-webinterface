@@ -15,6 +15,7 @@ import { Category } from './components/category/index.js';
 import { Control } from './components/control/index.js';
 import { SimpleSwitch } from './components/simple-switch/index.js';
 import { Metric } from './components/metric/index.js';
+import { BinaryLight } from './components/binary-light/index.js';
 import { Menu } from './components/menu/index.js';
 import { MenuElement } from './components/menu-element/index.js';
 
@@ -86,6 +87,11 @@ async function main() {
       {
         slug: 'metric',
         component: Metric,
+        style: true
+      },
+      {
+        slug: 'binary-light',
+        component: BinaryLight,
         style: true
       }
     ])

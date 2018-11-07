@@ -41,7 +41,8 @@ export class Control extends BaseComponent {
     const {
       attributes: {
         set,
-        type
+        type,
+        subType
       }
     } = element;
 
@@ -50,6 +51,14 @@ export class Control extends BaseComponent {
     switch (type) {
       case 'environmental-sensor':
         node = 'metric';
+        break;
+      case 'lighting':
+        switch (subType) {
+          case 'binary-light':
+            node = 'binary-light';
+            break;
+          default:
+        }
         break;
       default:
     }

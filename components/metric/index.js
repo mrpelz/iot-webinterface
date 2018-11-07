@@ -15,34 +15,34 @@ const digits = {
 
 export class Metric extends BaseComponent {
   _handleValueChange(value) {
-    if (value !== null) {
-      const targetElement = this.get('#value');
-      if (!targetElement) return;
+    if (value === null) return;
 
-      const newValue = (
-        typeof value === 'number'
-          ? this._valueFormat.format(value)
-          : value.toString()
-      );
+    const targetElement = this.get('#value');
+    if (!targetElement) return;
 
-      if (newValue === this._value) return;
+    const newValue = (
+      typeof value === 'number'
+        ? this._valueFormat.format(value)
+        : value.toString()
+    );
 
-      this._value = newValue;
-      targetElement.textContent = newValue;
-    }
+    if (newValue === this._value) return;
+
+    this._value = newValue;
+    targetElement.textContent = newValue;
   }
 
   _handleTrendChange(trend) {
-    if (trend !== null) {
-      const targetElement = this.get('#trend');
-      if (!targetElement) return;
+    if (trend === null) return;
 
-      targetElement.classList.toggle('active', trend !== 0);
-      targetElement.textContent = {
-        [-1]: '▼',
-        1: '▲'
-      }[trend] || '';
-    }
+    const targetElement = this.get('#trend');
+    if (!targetElement) return;
+
+    targetElement.classList.toggle('active', trend !== 0);
+    targetElement.textContent = {
+      [-1]: '▼',
+      1: '▲'
+    }[trend] || '';
   }
 
   create() {
@@ -146,20 +146,15 @@ export class Metric extends BaseComponent {
 
     if (trendElement) {
       const {
-        attributes: {
-          get: tGet
-        },
         name: tName
       } = trendElement;
 
-      if (tGet) {
-        this.subscriptions.push(
-          window.componentState.subscribe(
-            tName,
-            this._handleTrendChange.bind(this)
-          )
-        );
-      }
+      this.subscriptions.push(
+        window.componentState.subscribe(
+          tName,
+          this._handleTrendChange.bind(this)
+        )
+      );
     }
   }
 
