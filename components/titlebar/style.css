@@ -39,7 +39,9 @@
 }
 
 #wait {
-  padding-top: 1px;
+  color: hsl(var(--font-primary));
+  font-size: calc(var(--titlebar-height) - 20px);
+  padding-bottom: 2px;
   right: 10px;
   visibility: hidden;
 }

@@ -52,7 +52,7 @@ export class TitleBar extends BaseComponent {
         h(
           'span',
           { id: 'wait' },
-          '⚪️'
+          '■'
         )
       ])
     );

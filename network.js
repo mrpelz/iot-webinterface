@@ -137,13 +137,15 @@ export async function setUpElements() {
 }
 
 export async function setUpValues() {
-  const apiResponse = await fetchValues() || [];
+  const values = async () => {
+    const apiResponse = await fetchValues() || [];
 
-  apiResponse.forEach(({ name = null, value = null }) => {
-    if (!name || value === null) return;
+    apiResponse.forEach(({ name = null, value = null }) => {
+      if (!name || value === null) return;
 
-    window.componentState.set(name, value);
-  });
+      window.componentState.set(name, value);
+    });
+  };
 
   startStream((data) => {
     const { isSystem = false, name, value } = data;
@@ -155,7 +157,8 @@ export async function setUpValues() {
 
     if (!name) return;
     window.componentState.set(name, value);
-  }, () => {
+  }, async () => {
+    await values();
     window.componentState.set('_stream', true);
   }, () => {
     window.componentState.set('_stream', false);
