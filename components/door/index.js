@@ -1,14 +1,13 @@
 /* eslint-disable import/extensions */
 import {
   BaseComponent,
-  fontAutoSize,
   h,
   render
 } from '../../dom.js';
 
 const valueLoadingString = '…';
-const openString = 'geöffnet';
-const closedString = 'geschlossen';
+const openKey = 'open';
+const closeKey = 'close';
 
 export class Door extends BaseComponent {
   _handleValueChange(value) {
@@ -17,31 +16,11 @@ export class Door extends BaseComponent {
     const targetElement = this.get('#value');
     if (!targetElement) return;
 
-    const newValue = value ? openString : closedString;
+    const newValue = value ? window.xExpand(openKey) : window.xExpand(closeKey);
 
     if (newValue === this._value) return;
 
     this._value = newValue;
-
-    const {
-      fontFamily,
-      fontSize,
-      marginLeft,
-      marginRight
-    } = window.getComputedStyle(targetElement);
-
-    const size = fontAutoSize(
-      newValue,
-      fontFamily,
-      Number.parseFloat(fontSize.replace('px', '')),
-      (
-        Number.parseFloat(this.computedStyle.width.replace('px', ''))
-        - Number.parseFloat(marginLeft.replace('px', ''))
-        - Number.parseFloat(marginRight.replace('px', ''))
-      )
-    );
-
-    targetElement.style.fontSize = `${size}px`;
     targetElement.textContent = newValue;
   }
 

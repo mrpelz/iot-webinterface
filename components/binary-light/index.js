@@ -7,8 +7,8 @@ import {
 
 const valueLoadingString = '…';
 const onClass = 'on';
-const onString = 'ein';
-const offString = 'aus';
+const onKey = 'on';
+const offKey = 'off';
 
 export class BinaryLight extends BaseComponent {
   _handleValueChange(value) {
@@ -17,7 +17,7 @@ export class BinaryLight extends BaseComponent {
     const targetElement = this.get('#value');
     if (!targetElement) return;
 
-    const newValue = value ? onString : offString;
+    const newValue = value ? window.xExpand(onKey) : window.xExpand(offKey);
 
     if (newValue === this._value) return;
 
