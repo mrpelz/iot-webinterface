@@ -6,7 +6,11 @@ import {
 } from '../../dom.js';
 
 const valueLoadingString = '…';
+<<<<<<< HEAD
 const openString = 'offen';
+=======
+const openString = 'geöffnet';
+>>>>>>> 3ef59cbf28e9526f958f26247171db3eafb5743f
 const closedString = 'geschlossen';
 
 export class Door extends BaseComponent {
