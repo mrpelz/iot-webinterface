@@ -1,16 +1,13 @@
 /* eslint-disable import/extensions */
 import {
   BaseComponent,
+  fontAutoSize,
   h,
   render
 } from '../../dom.js';
 
 const valueLoadingString = '…';
-<<<<<<< HEAD
-const openString = 'offen';
-=======
 const openString = 'geöffnet';
->>>>>>> 3ef59cbf28e9526f958f26247171db3eafb5743f
 const closedString = 'geschlossen';
 
 export class Door extends BaseComponent {
@@ -25,6 +22,26 @@ export class Door extends BaseComponent {
     if (newValue === this._value) return;
 
     this._value = newValue;
+
+    const {
+      fontFamily,
+      fontSize,
+      marginLeft,
+      marginRight
+    } = window.getComputedStyle(targetElement);
+
+    const size = fontAutoSize(
+      newValue,
+      fontFamily,
+      Number.parseFloat(fontSize.replace('px', '')),
+      (
+        Number.parseFloat(this.computedStyle.width.replace('px', ''))
+        - Number.parseFloat(marginLeft.replace('px', ''))
+        - Number.parseFloat(marginRight.replace('px', ''))
+      )
+    );
+
+    targetElement.style.fontSize = `${size}px`;
     targetElement.textContent = newValue;
   }
 

@@ -93,6 +93,25 @@ async function fetchComponent({
   };
 }
 
+export function fontAutoSize(text, font, startSize, maxWidth) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  let size = startSize;
+
+  const check = () => {
+    ctx.font = `${size}px ${font}`;
+    const { width } = ctx.measureText(text);
+
+    return width > maxWidth;
+  };
+
+  while (check()) {
+    size -= 0.125;
+  }
+
+  return size;
+}
+
 export function defineComponents(components = []) {
   return Promise.all(components.map((component) => {
     return fetchComponent(component);
@@ -205,6 +224,8 @@ export class BaseComponent extends HTMLElement {
   }
 
   connectedCallback() {
+    this.computedStyle = window.getComputedStyle(this);
+
     this.attachTemplate();
 
     if (this.create) {

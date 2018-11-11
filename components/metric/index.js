@@ -1,6 +1,7 @@
 /* eslint-disable import/extensions */
 import {
   BaseComponent,
+  fontAutoSize,
   h,
   render
 } from '../../dom.js';
@@ -29,6 +30,26 @@ export class Metric extends BaseComponent {
     if (newValue === this._value) return;
 
     this._value = newValue;
+
+    const {
+      fontFamily,
+      fontSize,
+      marginLeft,
+      marginRight
+    } = window.getComputedStyle(targetElement);
+
+    const size = fontAutoSize(
+      newValue,
+      fontFamily,
+      Number.parseFloat(fontSize.replace('px', '')),
+      (
+        Number.parseFloat(this.computedStyle.width.replace('px', ''))
+        - Number.parseFloat(marginLeft.replace('px', ''))
+        - Number.parseFloat(marginRight.replace('px', ''))
+      )
+    );
+
+    targetElement.style.fontSize = `${size}px`;
     targetElement.textContent = newValue;
   }
 
