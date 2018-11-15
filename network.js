@@ -78,7 +78,7 @@ function startStream(callback, onOpen, onClose) {
     if (event) {
       /* eslint-disable-next-line no-console */
       console.log('eventSource disconnected, reconnecting…');
-      onClose();
+      onClose(true);
       eventSource.close();
       eventSource.removeEventListener('message', handleData);
       eventSource.removeEventListener('error', init);
@@ -147,21 +147,27 @@ export async function setUpValues() {
     });
   };
 
-  startStream((data) => {
-    const { isSystem = false, name, value } = data;
+  return new Promise((resolve) => {
+    startStream((data) => {
+      const { isSystem = false, name, value } = data;
 
-    if (isSystem) {
-      /* eslint-disable-next-line no-console */
-      console.log(data);
-    }
+      if (isSystem) {
+        /* eslint-disable-next-line no-console */
+        console.log(data);
+      }
 
-    if (!name) return;
-    window.componentState.set(name, value);
-  }, async () => {
-    await values();
-    window.componentState.set('_stream', true);
-  }, () => {
-    window.componentState.set('_stream', false);
+      if (!name) return;
+      window.componentState.set(name, value);
+    }, async () => {
+      await values();
+      window.componentState.set('_stream', true);
+      resolve();
+    }, (init) => {
+      window.componentState.set('_stream', false);
+
+      if (init) return;
+      resolve();
+    });
   });
 }
 
