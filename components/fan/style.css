@@ -1,0 +1,92 @@
+:host {
+  --horizontal-count: 3;
+  --dimension: calc((100vw - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
+  --height: calc(var(--dimension) * 0.8);
+  --font-size-primary: calc(var(--height) * 0.25);
+  --font-size-secondary: calc(var(--height) * 0.13);
+  --margin: 8px;
+
+  align-items: center;
+  background: hsla(var(--background-tertiary), var(--translucent));
+  border-radius: 15px;
+  color: hsl(var(--font-primary));
+  cursor: pointer;
+  display: flex;
+  font-family: var(--font);
+  font-size: var(--font-size-secondary);
+  height: var(--height);
+  justify-content: center;
+  margin: 5px;
+  position: relative;
+  width: var(--dimension);
+}
+
+:host(.on) {
+  background: hsla(205, 100%, 50%, var(--translucent));
+  color: hsl(var(--black));
+}
+
+:host(:active) {
+  background: hsl(var(--background-tertiary));
+}
+
+:host(.on:active) {
+  background: hsl(205, 100%, 50%);
+}
+
+::slotted(#value) {
+  font-size: var(--font-size-primary);
+  font-weight: 700;
+  margin: var(--margin);
+}
+
+::slotted(#label),
+::slotted(#sublabel) {
+  margin: var(--margin);
+  max-width: calc(50% - (var(--margin) * 1.5));
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+::slotted(#label) {
+  left: 0;
+  max-width: calc(100% - (var(--margin) * 2));
+  top: 0;
+}
+
+::slotted(#sublabel) {
+  bottom: 0;
+  left: 0;
+}
+
+@media screen and (min-width: 433px) {
+  :host {
+    --horizontal-count: 4;
+  }
+}
+
+@media screen and (min-width: 550px) {
+  :host {
+    --horizontal-count: 5;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  :host {
+    --dimension: calc((100vw - var(--menu-width-tablet) - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
+  }
+}
+
+@media screen and (min-width: 1025px) {
+  :host {
+    --horizontal-count: 8;
+  }
+}
+
+@media screen and (min-width: 1441px) {
+  :host {
+    --horizontal-count: 10;
+  }
+}

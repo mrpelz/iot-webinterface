@@ -12,6 +12,8 @@ import { BinaryLight } from './components/binary-light/index.js';
 import { Category } from './components/category/index.js';
 import { Control } from './components/control/index.js';
 import { Door } from './components/door/index.js';
+import { Fan } from './components/fan/index.js';
+import { Security } from './components/security/index.js';
 import { Menu } from './components/menu/index.js';
 import { MenuElement } from './components/menu-element/index.js';
 import { Metric } from './components/metric/index.js';
@@ -98,6 +100,16 @@ async function main() {
       {
         slug: 'door',
         component: Door,
+        style: true
+      },
+      {
+        slug: 'fan',
+        component: Fan,
+        style: true
+      },
+      {
+        slug: 'security',
+        component: Security,
         style: true
       }
     ])

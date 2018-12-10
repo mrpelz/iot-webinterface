@@ -63,6 +63,12 @@ export class Control extends BaseComponent {
       case 'door-sensor':
         node = 'door';
         break;
+      case 'fan':
+        node = 'fan';
+        break;
+      case 'security':
+        node = 'security';
+        break;
       default:
     }
 
