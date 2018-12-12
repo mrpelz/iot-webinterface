@@ -1,26 +1,52 @@
 :host {
   --horizontal-count: 3;
   --dimension: calc((100vw - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
+  --height: calc(var(--dimension) * 0.8);
+  --font-size-primary: calc(var(--height) * 0.25);
+  --font-size-secondary: calc(var(--height) * 0.13);
+  --margin: 8px;
 
   align-items: center;
   background: hsla(var(--background-tertiary), var(--translucent));
   border-radius: 15px;
   color: hsl(var(--font-primary));
   display: flex;
-  flex-direction: column;
   font-family: var(--font);
-  height: calc(var(--dimension) * 0.8);
+  font-size: var(--font-size-secondary);
+  height: var(--height);
   justify-content: center;
   margin: 5px;
+  position: relative;
   width: var(--dimension);
 }
 
-:host(.control-click) {
+:host(.clickable) {
   cursor: pointer;
 }
 
-:host(.control-click:active) {
+:host(:active) {
   background: hsl(var(--background-tertiary));
+}
+
+::slotted(#label),
+::slotted(#sublabel) {
+  margin: var(--margin);
+  max-width: calc(50% - (var(--margin) * 1.5));
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+::slotted(#label) {
+  left: 0;
+  max-width: calc(100% - (var(--margin) * 2));
+  top: 0;
+}
+
+::slotted(#sublabel) {
+  bottom: 0;
+  left: 0;
 }
 
 @media screen and (min-width: 433px) {

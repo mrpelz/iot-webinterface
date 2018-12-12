@@ -130,7 +130,7 @@ export function getDarkMode() {
 }
 
 export async function setUpElements() {
-  const { hierarchy, strings } = await fetchList() || {};
+  const { hierarchy, strings = {} } = await fetchList() || {};
 
   window.xHierarchy = hierarchy;
   window.xExpand = expandTemplate(strings);

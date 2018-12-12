@@ -66,6 +66,7 @@
   :host(.menu--element-separated) {
     border-top: 0.5px solid hsl(var(--font-tertiary));
     margin-top: var(--menu-height);
+    padding-left: 10px;
   }
 
   :host(.menu--element-separated)::before {

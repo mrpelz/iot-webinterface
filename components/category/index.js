@@ -15,8 +15,31 @@ export class Category extends BaseComponent {
     this.dataset.categoryName = displayName;
 
     const itemNodes = groups.map((group) => {
+      const { type } = group;
+
+      let node = 'switch';
+
+      switch (type) {
+        case 'environmental-sensor':
+          node = 'metric';
+          break;
+        case 'binary-light':
+          node = 'binary-light';
+          break;
+        case 'door-sensor':
+          node = 'door';
+          break;
+        case 'fan':
+          node = 'fan';
+          break;
+        case 'security':
+          node = 'security';
+          break;
+        default:
+      }
+
       return c(
-        'control',
+        node,
         { group }
       );
     });

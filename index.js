@@ -8,18 +8,13 @@ import {
   setUpValues
 } from './network.js';
 import { App } from './components/app/index.js';
-import { BinaryLight } from './components/binary-light/index.js';
 import { Category } from './components/category/index.js';
-import { Control } from './components/control/index.js';
-import { Door } from './components/door/index.js';
-import { Fan } from './components/fan/index.js';
-import { Security } from './components/security/index.js';
 import { Menu } from './components/menu/index.js';
 import { MenuElement } from './components/menu-element/index.js';
 import { Metric } from './components/metric/index.js';
 import { Page } from './components/page/index.js';
 import { PageContainer } from './components/page-container/index.js';
-import { SimpleSwitch } from './components/simple-switch/index.js';
+import { Switch, ClickableSwitch } from './components/switch/index.js';
 import { TitleBar } from './components/titlebar/index.js';
 
 async function main() {
@@ -46,71 +41,67 @@ async function main() {
       {
         slug: 'app',
         component: App,
-        style: true
+        styles: ['app']
       },
       {
-        slug: 'menu',
-        component: Menu,
-        style: true
-      },
-      {
-        slug: 'menu-element',
-        component: MenuElement,
-        style: true
-      },
-      {
-        slug: 'titlebar',
-        component: TitleBar,
-        style: true
-      },
-      {
-        slug: 'page-container',
-        component: PageContainer,
-        style: true
-      },
-      {
-        slug: 'page',
-        component: Page,
-        style: true
+        slug: 'binary-light',
+        component: ClickableSwitch,
+        styles: ['switch', 'binary-light']
       },
       {
         slug: 'category',
         component: Category,
-        style: true
+        styles: ['category']
       },
       {
-        slug: 'control',
-        component: Control
+        slug: 'door',
+        component: Switch,
+        styles: ['switch', 'door']
       },
       {
-        slug: 'simple-switch',
-        component: SimpleSwitch,
-        style: true
+        slug: 'fan',
+        component: ClickableSwitch,
+        styles: ['switch', 'fan']
+      },
+      {
+        slug: 'menu',
+        component: Menu,
+        styles: ['menu']
+      },
+      {
+        slug: 'menu-element',
+        component: MenuElement,
+        styles: ['menu-element']
       },
       {
         slug: 'metric',
         component: Metric,
-        style: true
+        styles: ['switch', 'metric']
       },
       {
-        slug: 'binary-light',
-        component: BinaryLight,
-        style: true
+        slug: 'page',
+        component: Page,
+        styles: ['page']
       },
       {
-        slug: 'door',
-        component: Door,
-        style: true
-      },
-      {
-        slug: 'fan',
-        component: Fan,
-        style: true
+        slug: 'page-container',
+        component: PageContainer,
+        styles: ['page-container']
       },
       {
         slug: 'security',
-        component: Security,
-        style: true
+        component: ClickableSwitch,
+        styles: ['switch', 'security']
+      },
+      {
+        slug: 'switch',
+        component: Switch,
+        styles: ['switch']
+      },
+      {
+        slug: 'titlebar',
+        component: TitleBar,
+        styles: ['titlebar']
       }
     ])
   ]);

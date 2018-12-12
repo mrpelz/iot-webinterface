@@ -56,29 +56,35 @@ async function fetchComponent({
   slug,
   component,
   template: hasTemplate = false,
-  style: hasStyle = false
+  styles: styleDefinitions = []
 }) {
   const fetchingTemplate = hasTemplate
     ? fetchTemplate(slug)
     : Promise.resolve(createChildSlot());
-  const fetchingStyle = hasStyle
-    ? fetchStyle(slug)
+  const fetchingStyles = styleDefinitions.length
+    ? Promise.all(styleDefinitions.map((styleSlug) => {
+      return fetchStyle(styleSlug);
+    }))
     : Promise.resolve(createDefaultStyle());
 
-  const [template, style] = await Promise.all([fetchingTemplate, fetchingStyle]);
+  const [template, styles] = await Promise.all([
+    fetchingTemplate,
+    fetchingStyles
+  ]);
 
-  if (template === null || style === null) {
+  if (template === null) {
     const error = `cannot fetch data for component "${slug}"`;
     /* eslint-disable-next-line no-alert */
     alert(error);
     throw new Error(error);
   }
 
-  if (template.firstChild) {
-    template.insertBefore(style, template.firstChild);
-  } else {
-    template.appendChild(style);
-  }
+  const styleElements = document.createDocumentFragment();
+  styles.forEach((addStyle) => {
+    styleElements.appendChild(addStyle);
+  });
+
+  template.prepend(styleElements);
 
   return () => {
     customElements.define(

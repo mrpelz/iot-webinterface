@@ -1,50 +1,20 @@
 /* eslint-disable import/extensions */
 import {
-  BaseComponent,
   h,
   render
 } from '../../dom.js';
 
-const valueLoadingString = '…';
+import {
+  Switch
+} from '../switch/index.js';
+
 const digits = {
-  brightness: 2,
-  pressure: 0,
-  eco2: 0,
-  tvoc: 0
+  lux: 2,
+  hpa: 0,
+  ppm: 0
 };
 
-export class Metric extends BaseComponent {
-  _handleValueChange(value) {
-    if (value === null) return;
-
-    const targetElement = this.get('#value');
-    if (!targetElement) return;
-
-    const newValue = (
-      typeof value === 'number'
-        ? this._valueFormat.format(value)
-        : value.toString()
-    );
-
-    if (newValue === this._value) return;
-
-    this._value = newValue;
-    targetElement.textContent = newValue;
-  }
-
-  _handleTrendChange(trend) {
-    if (trend === null) return;
-
-    const targetElement = this.get('#trend');
-    if (!targetElement) return;
-
-    targetElement.classList.toggle('active', trend !== 0);
-    targetElement.textContent = {
-      [-1]: '▼',
-      1: '▲'
-    }[trend] || '';
-  }
-
+export class Metric extends Switch {
   create() {
     const {
       group: {
@@ -58,27 +28,21 @@ export class Metric extends BaseComponent {
         || element.attributes.subType === 'aggregate-value'
       );
     });
-    const trendElement = elements.find((element) => {
-      return element.attributes.subType === 'trend';
-    });
 
     if (!metricElement) return;
 
     const {
       attributes: {
-        get,
         label,
-        showSubLabel,
-        subLabel,
+        subType,
         unit
-      },
-      name
+      }
     } = metricElement;
 
-    this._value = null;
+    const subKey = label || subType || 'value';
 
-    const formatDigits = digits[label] === undefined ? 1 : digits[label];
-    this._valueFormat = new Intl.NumberFormat(
+    const formatDigits = digits[unit] === undefined ? 1 : digits[unit];
+    const { format } = new Intl.NumberFormat(
       'de-DE',
       {
         minimumFractionDigits: formatDigits,
@@ -87,83 +51,19 @@ export class Metric extends BaseComponent {
       }
     );
 
-    const displayLabel = window.xExpand(label) || '[none]';
-    const displaySubLabel = window.xExpand(subLabel) || '[none]';
+    this.props.formatter = {
+      [subKey]: format
+    };
+
+    super.create();
+
     const displayUnit = window.xExpand(unit);
-
-    const nodes = [
-      h(
-        'div',
-        {
-          id: 'value'
-        },
-        valueLoadingString
-      ),
-      h(
-        'div',
-        {
-          id: 'label'
-        },
-        displayLabel
-      ),
-      h(
-        'div',
-        {
-          id: 'unit'
-        },
-        displayUnit
-      )
-    ];
-
-    if (showSubLabel && subLabel) {
-      nodes.push(h(
-        'div',
-        {
-          id: 'sublabel'
-        },
-        displaySubLabel
-      ));
-    }
-
-    if (trendElement) {
-      nodes.unshift(h(
-        'div',
-        {
-          id: 'trend'
-        }
-      ));
-    }
-
-    this.appendChild(
-      render(...nodes)
-    );
-
-    if (get) {
-      this.subscriptions = [window.componentState.subscribe(
-        name,
-        this._handleValueChange.bind(this)
-      )];
-    }
-
-    if (trendElement) {
-      const {
-        name: tName
-      } = trendElement;
-
-      this.subscriptions.push(
-        window.componentState.subscribe(
-          tName,
-          this._handleTrendChange.bind(this)
-        )
-      );
-    }
-  }
-
-  destroy() {
-    if (this.subscriptions) {
-      this.subscriptions.forEach((subscription) => {
-        subscription.unsubscribe();
-      });
-    }
+    this.appendChild(render(h(
+      'div',
+      {
+        id: 'unit'
+      },
+      displayUnit
+    )));
   }
 }
