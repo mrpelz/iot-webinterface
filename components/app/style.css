@@ -34,3 +34,14 @@
   padding-right: 1px;
   right: -1px;
 }
+
+@media screen and (min-width: 769px) {
+  :host::before {
+    background: none;
+  }
+  
+  :host::after {
+    background: none;
+  }
+}
+
