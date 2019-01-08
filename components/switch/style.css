@@ -24,7 +24,7 @@
   cursor: pointer;
 }
 
-:host(:active) {
+:host(.clickable:active) {
   background: hsl(var(--background-tertiary));
 }
 

@@ -79,6 +79,11 @@ async function main() {
         styles: ['switch', 'metric']
       },
       {
+        slug: 'pir',
+        component: Switch,
+        styles: ['switch', 'pir']
+      },
+      {
         slug: 'page',
         component: Page,
         styles: ['page']

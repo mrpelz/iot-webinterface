@@ -35,6 +35,9 @@ export class Category extends BaseComponent {
         case 'security':
           node = 'security';
           break;
+        case 'pir':
+          node = 'pir';
+          break;
         default:
       }
 

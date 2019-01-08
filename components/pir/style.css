@@ -1,0 +1,6 @@
+::slotted(#value),
+::slotted(#single-sensor) {
+  font-size: var(--font-size-primary);
+  font-weight: 700;
+  margin: var(--margin);
+}
