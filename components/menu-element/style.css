@@ -8,6 +8,7 @@
   font-size: 17px;
   height: var(--menu-height);
   padding: 0 10px;
+  text-transform: capitalize;
   touch-action: pan-x;
 }
 
@@ -37,11 +38,6 @@
 
 :host(:last-of-type) {
   padding-right: 15px;
-}
-
-::slotted(span) {
-  pointer-events: none;
-  text-transform: capitalize;
 }
 
 @media screen and (min-width: 769px) {

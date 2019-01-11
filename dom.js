@@ -208,10 +208,6 @@ export function render(...vnodes) {
   return result;
 }
 
-function isFilledTextNode(child) {
-  return Boolean(child.nodeType === 3 && child.textContent.trim());
-}
-
 export class BaseComponent extends HTMLElement {
   constructor(template) {
     super();
@@ -225,8 +221,6 @@ export class BaseComponent extends HTMLElement {
     if (this.render) {
       this.render();
     }
-
-    this.slotChildNodes();
   }
 
   connectedCallback() {
@@ -286,21 +280,5 @@ export class BaseComponent extends HTMLElement {
         this.template.cloneNode(true)
       );
     }
-  }
-
-  slotChildNodes() {
-    this.normalize();
-
-    this.childNodes.forEach((child) => {
-      if (isFilledTextNode(child)) {
-        const span = document.createElement('span');
-        span.textContent = child.textContent;
-        span.dataset.textNode = true;
-        span.slot = '';
-        this.replaceChild(span, child);
-      } else if (!child.slot) {
-        child.slot = '';
-      }
-    });
   }
 }
