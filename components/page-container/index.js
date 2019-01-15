@@ -18,6 +18,25 @@ const backgroundImageUrl = (room) => {
   }.png`;
 };
 
+function getSectionExtension(section = {}) {
+  const { categories = [] } = section;
+  if (categories.length > 1) return false;
+
+  const [category = {}] = categories;
+  const { groups = [] } = category;
+  if (groups.length > 1) return false;
+
+  const [group = {}] = groups;
+  const { elements = [] } = group;
+  if (elements.length > 1) return false;
+
+  const [element = {}] = elements;
+  const { name, attributes: { isExtension } = {} } = element;
+  if (!isExtension) return false;
+
+  return name;
+}
+
 export class PageContainer extends BaseComponent {
   _handleRoomChange(index) {
     const { sections } = window.xHierarchy;
@@ -75,6 +94,11 @@ export class PageContainer extends BaseComponent {
   create() {
     const { sections = [] } = window.xHierarchy;
     const elementNodes = [].concat(...sections).map((section, id) => {
+      const extension = getSectionExtension(section);
+      if (extension) {
+        return c(extension, { section });
+      }
+
       return c(
         'page',
         {

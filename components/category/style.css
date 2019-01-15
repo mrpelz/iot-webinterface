@@ -1,4 +1,6 @@
 :host {
+  --padding-side: 5px;
+  --padding-bottom: 27px;
   color: hsl(var(--font-primary));
   display: block;
   font-family: var(--font);
@@ -23,5 +25,5 @@
 ::slotted(.category--content) {
   display: flex;
   flex-wrap: wrap;
-  padding: 5px 5px 27px;
+  padding: var(--padding-side) var(--padding-side) var(--padding-bottom);
 }
