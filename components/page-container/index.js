@@ -79,10 +79,10 @@ export class PageContainer extends BaseComponent {
     backgroundImage.addEventListener('load', handleImageLoad);
     backgroundImage.addEventListener('error', handleImageLoad);
 
-    if (window.componentState.get('_hasValues')) {
+    if (window.xState.get('_values')) {
       backgroundImage.src = backgroundUrl;
     } else {
-      this.deferred = window.componentState.subscribe('_hasValues', (is) => {
+      this.deferred = window.xState.subscribe('_values', (is) => {
         if (!is) return;
 
         backgroundImage.src = backgroundUrl;
@@ -96,7 +96,10 @@ export class PageContainer extends BaseComponent {
     const elementNodes = [].concat(...sections).map((section, id) => {
       const extension = getSectionExtension(section);
       if (extension) {
-        return c(extension, { section });
+        return c(extension, {
+          id,
+          section
+        });
       }
 
       return c(
@@ -115,7 +118,7 @@ export class PageContainer extends BaseComponent {
     this.backgroundStyle = document.createElement('style');
     this.shadowRoot.appendChild(this.backgroundStyle);
 
-    this.subscription = window.componentState.subscribe(
+    this.subscription = window.xState.subscribe(
       '_selectedRoom',
       this._handleRoomChange.bind(this)
     );

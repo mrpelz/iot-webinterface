@@ -98,12 +98,12 @@ function startStream(callback, onOpen, onClose) {
 
 export function getSavedPage() {
   const savedPage = Number.parseInt(window.localStorage.getItem('page'), 10);
-  window.componentState.set(
+  window.xState.set(
     '_selectedRoom',
     Number.isNaN(savedPage) ? 0 : savedPage
   );
 
-  window.componentState.subscribe(
+  window.xState.subscribe(
     '_selectedRoom',
     (index) => {
       window.localStorage.setItem('page', index.toString(10));
@@ -113,9 +113,9 @@ export function getSavedPage() {
 
 export function getDarkMode() {
   const dark = window.localStorage.getItem('dark') !== null;
-  window.componentState.set('_darkMode', dark);
+  window.xState.set('_darkMode', dark);
 
-  window.componentState.subscribe(
+  window.xState.subscribe(
     '_darkMode',
     (isDark) => {
       if (isDark) {
@@ -143,7 +143,7 @@ export async function setUpValues() {
     apiResponse.forEach(({ name = null, value = null }) => {
       if (!name || value === null) return;
 
-      window.componentState.set(name, value);
+      window.xState.set(name, value);
     });
   };
 
@@ -157,13 +157,13 @@ export async function setUpValues() {
       }
 
       if (!name) return;
-      window.componentState.set(name, value);
+      window.xState.set(name, value);
     }, async () => {
       await values();
-      window.componentState.set('_stream', true);
+      window.xState.set('_stream', true);
       resolve();
     }, (init) => {
-      window.componentState.set('_stream', false);
+      window.xState.set('_stream', false);
 
       if (init) return;
       resolve();

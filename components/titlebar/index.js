@@ -10,9 +10,9 @@ export class TitleBar extends BaseComponent {
     e.preventDefault();
     e.stopPropagation();
 
-    window.componentState.set(
+    window.xState.set(
       '_darkMode',
-      !window.componentState.get('_darkMode')
+      !window.xState.get('_darkMode')
     );
   }
 
@@ -30,11 +30,11 @@ export class TitleBar extends BaseComponent {
 
   create() {
     this.subscriptions = [
-      window.componentState.subscribe(
+      window.xState.subscribe(
         '_selectedRoom',
         this._handleTitleChange.bind(this)
       ),
-      window.componentState.subscribe(
+      window.xState.subscribe(
         '_stream',
         this._handleStream.bind(this)
       )

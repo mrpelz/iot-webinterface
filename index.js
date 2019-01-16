@@ -9,6 +9,7 @@ import {
 } from './network.js';
 import { App } from './components/app/index.js';
 import { Category } from './components/category/index.js';
+import { MapComponent } from './components/map/index.js';
 import { Menu } from './components/menu/index.js';
 import { MenuElement } from './components/menu-element/index.js';
 import { Metric } from './components/metric/index.js';
@@ -18,16 +19,16 @@ import { Switch, ClickableSwitch } from './components/switch/index.js';
 import { TitleBar } from './components/titlebar/index.js';
 
 async function main() {
-  window.componentState = new State();
+  window.xState = new State();
 
-  window.componentState.set('_isReady', false);
-  window.componentState.set('_hasValues', false);
+  window.xState.set('_ready', false);
+  window.xState.set('_values', false);
 
-  window.componentState.subscribe('_isReady', (value) => {
+  window.xState.subscribe('_ready', (value) => {
     if (!value) return;
     document.documentElement.classList.add('ready');
   });
-  window.componentState.subscribe('_hasValues', (value) => {
+  window.xState.subscribe('_values', (value) => {
     if (!value) return;
     document.documentElement.classList.add('values');
   });
@@ -62,6 +63,11 @@ async function main() {
         slug: 'fan',
         component: ClickableSwitch,
         styles: ['switch', 'fan']
+      },
+      {
+        slug: 'map',
+        component: MapComponent,
+        styles: ['map']
       },
       {
         slug: 'menu',
@@ -114,10 +120,10 @@ async function main() {
   document.body.appendChild(
     render(c('app'))
   );
-  window.componentState.set('_isReady', true);
+  window.xState.set('_ready', true);
 
   await setUpValues();
-  window.componentState.set('_hasValues', true);
+  window.xState.set('_values', true);
 }
 
 if (

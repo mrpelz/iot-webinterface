@@ -100,7 +100,7 @@ export class Switch extends BaseComponent {
       }
 
       if (get) {
-        window.componentState.subscribe(
+        window.xState.subscribe(
           name,
           this._update(subKey).bind(this)
         );

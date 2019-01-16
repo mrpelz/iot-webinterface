@@ -13,7 +13,7 @@ export class MenuElement extends BaseComponent {
     e.stopPropagation();
 
     const { id } = this.props;
-    window.componentState.set('_selectedRoom', id);
+    window.xState.set('_selectedRoom', id);
   }
 
   _handleSelectedChange(index) {
@@ -44,7 +44,7 @@ export class MenuElement extends BaseComponent {
 
     this.addEventListener('click', this._handleClick);
 
-    this.subscription = window.componentState.subscribe(
+    this.subscription = window.xState.subscribe(
       '_selectedRoom',
       this._handleSelectedChange
     );

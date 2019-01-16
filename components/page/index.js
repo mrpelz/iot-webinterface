@@ -24,7 +24,7 @@ function getCategoryExtension(category = {}) {
 }
 
 export class Page extends BaseComponent {
-  _handleRoomChange(value) {
+  _handleSectionChange(value) {
     const { id } = this.props;
 
     if (id === value) {
@@ -57,9 +57,9 @@ export class Page extends BaseComponent {
       render(...elementNodes)
     );
 
-    this.subscription = window.componentState.subscribe(
+    this.subscription = window.xState.subscribe(
       '_selectedRoom',
-      this._handleRoomChange.bind(this)
+      this._handleSectionChange.bind(this)
     );
   }
 

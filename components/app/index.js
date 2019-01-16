@@ -21,7 +21,7 @@ export class App extends BaseComponent {
       render(...app)
     );
 
-    this.subscription = window.componentState.subscribe(
+    this.subscription = window.xState.subscribe(
       '_selectedRoom',
       App.handleRoomChange
     );

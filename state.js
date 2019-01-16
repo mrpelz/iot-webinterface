@@ -18,12 +18,20 @@ export class State {
   }
 
   _update(key) {
-    const { [key]: subscribers = [] } = this.subscribers;
+    if (key === '*') return undefined;
+
+    const {
+      [key]: subscribers = [],
+      '*': globalSubscribers = []
+    } = this.subscribers;
     const { [key]: state = null } = this.state;
 
     if (state !== null) {
       subscribers.forEach((sub) => {
-        sub(state);
+        sub(state, key);
+      });
+      globalSubscribers.forEach((sub) => {
+        sub(state, key);
       });
     }
 
@@ -32,7 +40,6 @@ export class State {
 
   subscribe(key, callback) {
     const { [key]: existingSubscribers } = this.subscribers;
-    const { [key]: state = null } = this.state;
 
     if (existingSubscribers) {
       existingSubscribers.push(callback);
@@ -40,7 +47,15 @@ export class State {
       this.subscribers[key] = [callback];
     }
 
-    callback(state);
+    if (key === '*') {
+      Object.keys(this.state).forEach((numKey) => {
+        const { [numKey]: state = null } = this.state;
+        callback(state, numKey);
+      });
+    } else {
+      const { [key]: state = null } = this.state;
+      callback(state, key);
+    }
 
     return {
       unsubscribe: this._makeUnsubscribe(key, callback)
@@ -48,11 +63,15 @@ export class State {
   }
 
   get(key) {
+    if (key === '*') return undefined;
+
     const { [key]: state = null } = this.state;
     return state;
   }
 
   set(key, value) {
+    if (key === '*') return;
+
     if (this.state[key] === value) return;
 
     this.state[key] = value;

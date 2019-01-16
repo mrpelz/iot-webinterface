@@ -82,7 +82,7 @@ export class Menu extends BaseComponent {
       render(...itemNodes)
     );
 
-    this.subscription = window.componentState.subscribe(
+    this.subscription = window.xState.subscribe(
       '_selectedRoom',
       this._handleSelectedChange.bind(this)
     );
@@ -90,7 +90,7 @@ export class Menu extends BaseComponent {
     this.mediaQuery = window.matchMedia('screen and (min-width: 769px)');
 
     this._handleSelectedChange(
-      window.componentState.get('_selectedRoom')
+      window.xState.get('_selectedRoom')
     );
   }
 
