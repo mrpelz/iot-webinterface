@@ -4,11 +4,17 @@
   padding: var(--titlebar-height) 0 var(--menu-height);
   z-index: 2;
 
-  background: hsl(var(--white));
+  background: hsl(var(--background-primary));
 }
 
 :host(.extension-active) {
-  display: block;
+  display: flex;
+}
+
+svg {
+  stroke: hsl(var(--font-primary));
+  height: calc(100vh - var(--titlebar-height) - var(--menu-height));
+  width: 100vw;
 }
 
 @media screen and (min-width: 769px) {
@@ -16,5 +22,10 @@
     margin-left: var(--menu-width-tablet);
     min-height: calc(100vh - var(--titlebar-height));
     padding: var(--titlebar-height) 0 0;
+  }
+
+  svg {
+    height: calc(100vh - var(--titlebar-height));
+    width: calc(100vw - var(--menu-width-tablet));
   }
 }

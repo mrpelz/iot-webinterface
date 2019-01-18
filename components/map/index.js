@@ -1,9 +1,7 @@
 /* eslint-disable import/extensions */
 import {
   BaseComponent,
-  bem,
-  h,
-  render
+  bem
 } from '../../dom.js';
 
 const activeClass = bem('extension', null, 'active');
@@ -21,24 +19,12 @@ export class MapComponent extends BaseComponent {
 
   create() {
     window.xState.subscribe('*', (value, key) => {
-      this.prepend(
-        render(
-          h(
-            'div',
-            {},
-            JSON.stringify({ [key]: value })
-          )
-        )
-      );
+      console.log({ [key]: value });
     });
 
     this.subscription = window.xState.subscribe(
       '_selectedRoom',
       this._handleSectionChange.bind(this)
     );
-  }
-
-  destroy() {
-    this.subscription.unsubscribe();
   }
 }

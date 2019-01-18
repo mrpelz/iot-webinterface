@@ -67,7 +67,8 @@ async function main() {
       {
         slug: 'map',
         component: MapComponent,
-        styles: ['map']
+        styles: ['map'],
+        template: true
       },
       {
         slug: 'menu',
