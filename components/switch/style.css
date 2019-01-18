@@ -24,6 +24,19 @@
   cursor: pointer;
 }
 
+:host(.clickable)::before {
+  border-bottom-right-radius: 15px;
+  border-bottom: 2px solid hsl(var(--font-primary));
+  border-right: 2px solid hsl(var(--font-primary));
+  bottom: 0;
+  content: '';
+  height: 13px;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  width: 13px;
+}
+
 :host(.clickable:active) {
   background: hsl(var(--background-tertiary));
 }
