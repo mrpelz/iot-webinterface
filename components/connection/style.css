@@ -8,14 +8,6 @@
   color: hsl(var(--black));
 }
 
-:host([value="connected"]:active) {
-  background: hsl(125, 100%, 50%);
-}
-
-:host([value="disconnected"]:active) {
-  background: hsl(0, 100%, 50%);
-}
-
 ::slotted(#value) {
   font-size: var(--font-size-secondary);
   font-weight: 700;

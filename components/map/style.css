@@ -12,9 +12,46 @@
 }
 
 svg {
-  stroke: hsl(var(--font-primary));
+  stroke: none;
   height: calc(100vh - var(--titlebar-height) - var(--menu-height));
   width: 100vw;
+}
+
+.map {
+  stroke: hsl(var(--font-primary));
+  stroke-width: 2px;
+}
+
+.door {
+  fill: transparent;
+}
+.door[state="close"] {
+  fill: hsl(125, 100%, 50%);
+}
+.door[state="open"] {
+  fill: hsl(0, 100%, 50%);
+}
+
+.fan {
+  fill: transparent;
+  stroke-width: 4px;
+}
+.fan[state="off"] {
+  stroke: hsl(205, 100%, 50%);
+}
+.fan[state="on"] {
+  fill: hsl(205, 100%, 50%);
+}
+
+.light {
+  fill: transparent;
+  stroke-width: 4px;
+}
+.light[state="off"] {
+  stroke: hsl(40, 100%, 50%);
+}
+.light[state="on"] {
+  fill: hsl(40, 100%, 50%);
 }
 
 @media screen and (min-width: 769px) {

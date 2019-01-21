@@ -19,7 +19,10 @@ export class MapComponent extends BaseComponent {
 
   create() {
     window.xState.subscribe('*', (value, key) => {
-      console.log({ [key]: value });
+      const element = this.shadowRoot.getElementById(key);
+      if (!element) return;
+
+      element.setAttribute('state', value);
     });
 
     this.subscription = window.xState.subscribe(
