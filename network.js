@@ -6,7 +6,7 @@ function expandTemplate(map) {
   return (string, ...subKeys) => {
     if (!string) return null;
     if (!string.includes('§')) {
-      return map[string] || null;
+      return map[string] || string;
     }
 
     const regex = new RegExp(expression, 'g');

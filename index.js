@@ -55,6 +55,11 @@ async function main() {
         styles: ['category']
       },
       {
+        slug: 'connection',
+        component: Switch,
+        styles: ['switch', 'connection']
+      },
+      {
         slug: 'door',
         component: Switch,
         styles: ['switch', 'door']

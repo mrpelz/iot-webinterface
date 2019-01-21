@@ -1,0 +1,28 @@
+:host([value="connected"]) {
+  background: hsla(125, 100%, 50%, var(--translucent));
+  color: hsl(var(--black));
+}
+
+:host([value="disconnected"]) {
+  background: hsla(0, 100%, 50%, var(--translucent));
+  color: hsl(var(--black));
+}
+
+:host([value="connected"]:active) {
+  background: hsl(125, 100%, 50%);
+}
+
+:host([value="disconnected"]:active) {
+  background: hsl(0, 100%, 50%);
+}
+
+::slotted(#value) {
+  font-size: var(--font-size-secondary);
+  font-weight: 700;
+  margin: var(--margin);
+}
+
+::slotted(#label),
+::slotted(#sublabel) {
+  font-size: calc(var(--height) * 0.1);
+}

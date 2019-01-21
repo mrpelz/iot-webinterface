@@ -44,6 +44,9 @@ export class Category extends BaseComponent {
         case 'binary-light':
           node = 'binary-light';
           break;
+        case 'connection':
+          node = 'connection';
+          break;
         case 'door-sensor':
           node = 'door';
           break;
