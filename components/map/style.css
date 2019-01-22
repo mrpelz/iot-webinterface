@@ -12,9 +12,14 @@
 }
 
 svg {
-  stroke: none;
   height: calc(100vh - var(--titlebar-height) - var(--menu-height));
   width: 100vw;
+  will-change: auto;
+}
+
+.all {
+  stroke: none;
+  /* transition: transform 0.15s ease-out; */
 }
 
 .map {
