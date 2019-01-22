@@ -44,7 +44,6 @@
 ::slotted(#label),
 ::slotted(#sublabel) {
   margin: var(--margin);
-  max-width: calc(50% - (var(--margin) * 1.5));
   overflow: hidden;
   position: absolute;
   text-overflow: ellipsis;
@@ -60,6 +59,7 @@
 ::slotted(#sublabel) {
   bottom: 0;
   left: 0;
+  max-width: calc(50% - (var(--margin) * 1.5));
 }
 
 @media screen and (min-width: 433px) {
