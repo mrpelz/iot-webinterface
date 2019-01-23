@@ -11,20 +11,75 @@
   display: flex;
 }
 
-svg {
+#svg {
+  cursor: zoom-out;
   height: calc(100vh - var(--titlebar-height) - var(--menu-height));
   width: 100vw;
-  will-change: auto;
 }
 
-.all {
+#all {
   stroke: none;
-  /* transition: transform 0.15s ease-out; */
+  transition: transform 0.75s ease-in-out;
+  transform-origin: center;
 }
 
-.map {
+#svg[x-zoom="kueche"] > #all {
+  transform: scale(2.5) translate(555px, 510px);
+}
+#svg[x-zoom="esszimmer"] > #all {
+  transform: scale(2.5) translate(155px, 460px);
+}
+#svg[x-zoom="wohnzimmer"] > #all {
+  transform: scale(2.5) translate(-315px, 460px);
+}
+#svg[x-zoom="balkon"] > #all {
+  transform: scale(2.5) translate(-635px, 460px);
+}
+#svg[x-zoom="schlafzimmer"] > #all {
+  transform: scale(2) translate(555px, 70px);
+}
+#svg[x-zoom="abstellraum"] > #all {
+  transform: scale(2.5) translate(145px, 160px);
+}
+#svg[x-zoom="duschbad"] > #all {
+  transform: scale(2.5) translate(145px, -60px);
+}
+#svg[x-zoom="arbeitszimmer"] > #all {
+  transform: scale(2.5) translate(555px, -430px);
+}
+#svg[x-zoom="wannenbad"] > #all {
+  transform: scale(2.5) translate(145px, -370px);
+}
+#svg[x-zoom="flur"] > #all {
+  transform: scale(1.5) translate(290px, -200px);
+}
+
+#map {
   stroke: hsl(var(--font-primary));
   stroke-width: 2px;
+}
+
+#click {
+  cursor: zoom-in;
+  fill: transparent;
+}
+#click > *[x-active] {
+  display: none;
+}
+
+#shade {
+  pointer-events: none;
+}
+#shade > * {
+  fill: hsla(var(--background-primary), 0%);
+  transition: fill 0.75s ease-in-out;
+}
+#shade > *[x-active] {
+  fill: hsla(var(--background-primary), 85%);
+}
+
+#control {
+  cursor: default;
 }
 
 .door {
@@ -38,6 +93,7 @@ svg {
 }
 
 .fan {
+  cursor: pointer;
   fill: transparent;
   stroke-width: 4px;
 }
@@ -49,6 +105,7 @@ svg {
 }
 
 .light {
+  cursor: pointer;
   fill: transparent;
   stroke-width: 4px;
 }

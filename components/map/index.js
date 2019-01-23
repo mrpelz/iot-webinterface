@@ -4,13 +4,9 @@ import {
   bem
 } from '../../dom.js';
 
-import { MobileZoom } from './mobile-zoom.js';
-
-const viewBox = {
-  x: 1578,
-  y: 1483
-};
 const activeClass = bem('extension', null, 'active');
+const svgShadeActiveAttribute = 'x-active';
+const svgShadeZoomAttribute = 'x-zoom';
 
 export class MapComponent extends BaseComponent {
   _handleSectionChange(value) {
@@ -27,47 +23,44 @@ export class MapComponent extends BaseComponent {
   }
 
   create() {
-    const svgGroup = this.shadowRoot.querySelector('.all');
-
-    this.mz = new MobileZoom(
-      this,
-      (translation, distance) => {
-        const { width, height } = svgGroup.getBoundingClientRect();
-
-        const size = Math.min(width, height);
-        const scale = Math.min(((distance * 2 / size) + 1) ** 2, 3);
-
-        const translate = {
-          x: Math.max(
-            Math.min(
-              (translation.x * 2 / width) * viewBox.x, viewBox.x / 2
-            ), -viewBox.x / 2
-          ),
-          y: Math.max(
-            Math.min(
-              (translation.y * 2 / height) * viewBox.y, viewBox.y / 2
-            ), -viewBox.y / 2
-          )
-        };
-
-        const origin = {
-          x: Math.max(Math.min((-translation.x * 2) + (width / 2), width), 0),
-          y: Math.max(Math.min((-translation.y * 2) + (height / 2), height), 0)
-        };
-
-        svgGroup.style.transformOrigin = `${origin.x}px ${origin.y}px`;
-        svgGroup.style.transform = [
-          `scale(${scale})`,
-          `translate(${translate.x}px, ${translate.y}px)`
-        ].join(' ');
-      }
-    );
-
     window.xState.subscribe('*', (value, key) => {
       const element = this.shadowRoot.getElementById(key);
       if (!element) return;
 
       element.setAttribute('state', value);
+    });
+
+    const svg = this.shadowRoot.getElementById('svg');
+    const shadeContainer = this.shadowRoot.getElementById('shade');
+    const clickContainer = this.shadowRoot.getElementById('click');
+
+    svg.addEventListener('click', ({ target } = {}) => {
+      if (!target) return;
+
+      const {
+        dataset: {
+          section
+        } = {}
+      } = target;
+
+      [
+        ...shadeContainer.children,
+        ...clickContainer.children
+      ].forEach((child) => {
+        child.removeAttribute(svgShadeActiveAttribute);
+      });
+
+      svg.removeAttribute(svgShadeZoomAttribute);
+
+      if (!section) return;
+
+      svg.setAttribute(svgShadeZoomAttribute, section);
+
+      const shade = this.shadowRoot.getElementById(`${section}_shade`);
+      if (shade) shade.setAttribute(svgShadeActiveAttribute, '');
+
+      const click = this.shadowRoot.getElementById(`${section}_click`);
+      if (click) click.setAttribute(svgShadeActiveAttribute, '');
     });
 
     this.subscription = window.xState.subscribe(
