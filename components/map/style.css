@@ -18,6 +18,7 @@
 }
 
 #all {
+  fill: transparent;
   stroke: none;
   transition: transform 0.75s ease-in-out;
   transform-origin: center;
@@ -71,48 +72,50 @@
   pointer-events: none;
 }
 #shade > * {
-  fill: hsla(var(--background-primary), 0%);
-  transition: fill 0.75s ease-in-out;
+  fill: hsla(var(--background-primary), 85%);
+  opacity: 0;
+  transition: opacity 0.75s ease-in-out;
 }
 #shade > *[x-active] {
-  fill: hsla(var(--background-primary), 85%);
+  opacity: 1;
 }
 
 #control {
   cursor: default;
 }
-
-.door {
-  fill: transparent;
+#control > * {
+  display: none;
 }
-.door[state="close"] {
+#control > *[x-state] {
+  display: block;
+}
+
+.door[x-state="close"] {
   fill: hsl(125, 100%, 50%);
 }
-.door[state="open"] {
+.door[x-state="open"] {
   fill: hsl(0, 100%, 50%);
 }
 
 .fan {
   cursor: pointer;
-  fill: transparent;
   stroke-width: 4px;
 }
-.fan[state="off"] {
+.fan[x-state="off"] {
   stroke: hsl(205, 100%, 50%);
 }
-.fan[state="on"] {
+.fan[x-state="on"] {
   fill: hsl(205, 100%, 50%);
 }
 
 .light {
   cursor: pointer;
-  fill: transparent;
   stroke-width: 4px;
 }
-.light[state="off"] {
+.light[x-state="off"] {
   stroke: hsl(40, 100%, 50%);
 }
-.light[state="on"] {
+.light[x-state="on"] {
   fill: hsl(40, 100%, 50%);
 }
 

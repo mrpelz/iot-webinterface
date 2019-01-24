@@ -4,9 +4,14 @@ import {
   bem
 } from '../../dom.js';
 
+import {
+  setElement
+} from '../../network.js';
+
 const activeClass = bem('extension', null, 'active');
 const svgShadeActiveAttribute = 'x-active';
 const svgShadeZoomAttribute = 'x-zoom';
+const svgControlStateAttribute = 'x-state';
 
 export class MapComponent extends BaseComponent {
   _handleSectionChange(value) {
@@ -27,12 +32,44 @@ export class MapComponent extends BaseComponent {
       const element = this.shadowRoot.getElementById(key);
       if (!element) return;
 
-      element.setAttribute('state', value);
+      if (value === null) {
+        element.removeAttribute(svgControlStateAttribute);
+      } else {
+        element.setAttribute(svgControlStateAttribute, value);
+      }
     });
 
     const svg = this.shadowRoot.getElementById('svg');
+    const controlContainer = this.shadowRoot.getElementById('control');
     const shadeContainer = this.shadowRoot.getElementById('shade');
     const clickContainer = this.shadowRoot.getElementById('click');
+
+    [...controlContainer.children].forEach((child) => {
+      if (!child) return;
+
+      const {
+        dataset: {
+          settype
+        } = {},
+        id: name
+      } = child;
+
+      if (!settype) return;
+
+      const handle = () => {
+        switch (settype) {
+          case 'trigger':
+            setElement({
+              name,
+              value: true
+            });
+            break;
+          default:
+        }
+      };
+
+      child.addEventListener('click', handle);
+    });
 
     svg.addEventListener('click', ({ target } = {}) => {
       if (!target) return;
