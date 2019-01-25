@@ -90,6 +90,10 @@
   display: block;
 }
 
+.grouped > * {
+  pointer-events: none;
+}
+
 .door[x-state="close"] {
   fill: hsl(125, 100%, 50%);
 }
@@ -101,7 +105,7 @@
   cursor: pointer;
   stroke-width: 4px;
 }
-.fan[x-state="off"] {
+.fan[x-state] {
   stroke: hsl(205, 100%, 50%);
 }
 .fan[x-state="on"] {
@@ -112,7 +116,7 @@
   cursor: pointer;
   stroke-width: 4px;
 }
-.light[x-state="off"] {
+.light[x-state] {
   stroke: hsl(40, 100%, 50%);
 }
 .light[x-state="on"] {

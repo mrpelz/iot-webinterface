@@ -29,14 +29,16 @@ export class MapComponent extends BaseComponent {
 
   create() {
     window.xState.subscribe('*', (value, key) => {
-      const element = this.shadowRoot.getElementById(key);
-      if (!element) return;
+      const elements = this.shadowRoot.querySelectorAll(`[data-element="${key}"]`);
+      if (!elements.length) return;
 
-      if (value === null) {
-        element.removeAttribute(svgControlStateAttribute);
-      } else {
-        element.setAttribute(svgControlStateAttribute, value);
-      }
+      [...elements].forEach((element) => {
+        if (value === null) {
+          element.removeAttribute(svgControlStateAttribute);
+        } else {
+          element.setAttribute(svgControlStateAttribute, value);
+        }
+      });
     });
 
     const svg = this.shadowRoot.getElementById('svg');
@@ -49,12 +51,12 @@ export class MapComponent extends BaseComponent {
 
       const {
         dataset: {
-          settype
-        } = {},
-        id: name
+          settype,
+          element: name
+        } = {}
       } = child;
 
-      if (!settype) return;
+      if (!settype || !name) return;
 
       const handle = () => {
         switch (settype) {
@@ -73,6 +75,7 @@ export class MapComponent extends BaseComponent {
 
     svg.addEventListener('click', ({ target } = {}) => {
       if (!target) return;
+      if (target.closest('#control')) return;
 
       const {
         dataset: {
