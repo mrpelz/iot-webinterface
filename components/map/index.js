@@ -19,11 +19,9 @@ export class MapComponent extends BaseComponent {
 
     if (id === value) {
       this.classList.add(activeClass);
-      if (this.mz) {
-        this.mz.reset();
-      }
     } else {
       this.classList.remove(activeClass);
+      this._resetZoom();
     }
   }
 
@@ -41,12 +39,39 @@ export class MapComponent extends BaseComponent {
       });
     });
 
-    const svg = this.shadowRoot.getElementById('svg');
-    const controlContainer = this.shadowRoot.getElementById('control');
-    const shadeContainer = this.shadowRoot.getElementById('shade');
-    const clickContainer = this.shadowRoot.getElementById('click');
+    this.svg = this.shadowRoot.getElementById('svg');
+    this.controlContainer = this.shadowRoot.getElementById('control');
+    this.shadeContainer = this.shadowRoot.getElementById('shade');
+    this.clickContainer = this.shadowRoot.getElementById('click');
 
-    [...controlContainer.children].forEach((child) => {
+    this._setUpElementClickHandlers();
+
+    this.svg.addEventListener('click', this._handleZoom.bind(this));
+
+    this.subscription = window.xState.subscribe(
+      '_selectedRoom',
+      this._handleSectionChange.bind(this)
+    );
+
+    this.addEventListener('scroll', (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    });
+  }
+
+  _resetZoom() {
+    [
+      ...this.shadeContainer.children,
+      ...this.clickContainer.children
+    ].forEach((child) => {
+      child.removeAttribute(svgShadeActiveAttribute);
+    });
+
+    this.svg.removeAttribute(svgShadeZoomAttribute);
+  }
+
+  _setUpElementClickHandlers() {
+    [...this.controlContainer.children].forEach((child) => {
       if (!child) return;
 
       const {
@@ -72,40 +97,28 @@ export class MapComponent extends BaseComponent {
 
       child.addEventListener('click', handle);
     });
+  }
 
-    svg.addEventListener('click', ({ target } = {}) => {
-      if (!target) return;
-      if (target.closest('#control')) return;
+  _handleZoom({ target } = {}) {
+    if (!target) return;
+    if (target.closest('#control')) return;
 
-      const {
-        dataset: {
-          section
-        } = {}
-      } = target;
+    const {
+      dataset: {
+        section
+      } = {}
+    } = target;
 
-      [
-        ...shadeContainer.children,
-        ...clickContainer.children
-      ].forEach((child) => {
-        child.removeAttribute(svgShadeActiveAttribute);
-      });
+    this._resetZoom();
 
-      svg.removeAttribute(svgShadeZoomAttribute);
+    if (!section) return;
 
-      if (!section) return;
+    this.svg.setAttribute(svgShadeZoomAttribute, section);
 
-      svg.setAttribute(svgShadeZoomAttribute, section);
+    const shade = this.shadowRoot.getElementById(`${section}_shade`);
+    if (shade) shade.setAttribute(svgShadeActiveAttribute, '');
 
-      const shade = this.shadowRoot.getElementById(`${section}_shade`);
-      if (shade) shade.setAttribute(svgShadeActiveAttribute, '');
-
-      const click = this.shadowRoot.getElementById(`${section}_click`);
-      if (click) click.setAttribute(svgShadeActiveAttribute, '');
-    });
-
-    this.subscription = window.xState.subscribe(
-      '_selectedRoom',
-      this._handleSectionChange.bind(this)
-    );
+    const click = this.shadowRoot.getElementById(`${section}_click`);
+    if (click) click.setAttribute(svgShadeActiveAttribute, '');
   }
 }
