@@ -53,10 +53,8 @@ export class MapComponent extends BaseComponent {
       this._handleSectionChange.bind(this)
     );
 
-    this.addEventListener('scroll', (event) => {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    });
+    this.addEventListener('scroll', MapComponent.eventPreventAndStop);
+    this.addEventListener('touchmove', MapComponent.eventPreventAndStop);
   }
 
   _resetZoom() {

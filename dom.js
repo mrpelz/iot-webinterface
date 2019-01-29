@@ -209,6 +209,15 @@ export function render(...vnodes) {
 }
 
 export class BaseComponent extends HTMLElement {
+  static eventPrevent(event) {
+    event.preventDefault();
+  }
+
+  static eventPreventAndStop(event) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+
   constructor(template) {
     super();
     this.template = template;
