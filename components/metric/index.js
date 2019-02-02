@@ -11,6 +11,7 @@ import {
 const digits = {
   lux: 2,
   hpa: 0,
+  ppb: 0,
   ppm: 0
 };
 
