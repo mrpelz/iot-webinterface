@@ -26,19 +26,17 @@ export class State {
     } = this.subscribers;
     const { [key]: state = null } = this.state;
 
-    if (state !== null) {
-      subscribers.forEach((sub) => {
-        sub(state, key);
-      });
-      globalSubscribers.forEach((sub) => {
-        sub(state, key);
-      });
-    }
+    subscribers.forEach((sub) => {
+      sub(state, key);
+    });
+    globalSubscribers.forEach((sub) => {
+      sub(state, key);
+    });
 
     return state;
   }
 
-  subscribe(key, callback) {
+  subscribe(key, callback, initialCall = true) {
     const { [key]: existingSubscribers } = this.subscribers;
 
     if (existingSubscribers) {
@@ -47,14 +45,16 @@ export class State {
       this.subscribers[key] = [callback];
     }
 
-    if (key === '*') {
-      Object.keys(this.state).forEach((numKey) => {
-        const { [numKey]: state = null } = this.state;
-        callback(state, numKey);
-      });
-    } else {
-      const { [key]: state = null } = this.state;
-      callback(state, key);
+    if (initialCall) {
+      if (key === '*') {
+        Object.keys(this.state).forEach((numKey) => {
+          const { [numKey]: state = null } = this.state;
+          callback(state, numKey);
+        });
+      } else {
+        const { [key]: state = null } = this.state;
+        callback(state, key);
+      }
     }
 
     return {
@@ -69,10 +69,10 @@ export class State {
     return state;
   }
 
-  set(key, value) {
+  set(key, value = null) {
     if (key === '*') return;
 
-    if (this.state[key] === value) return;
+    if (value !== null && this.state[key] === value) return;
 
     this.state[key] = value;
     this._update(key);

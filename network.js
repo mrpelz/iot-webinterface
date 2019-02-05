@@ -80,9 +80,9 @@ function startStream(callback, onOpen, onClose) {
       console.log('eventSource disconnected, reconnecting…');
       onClose(true);
       eventSource.close();
+      eventSource.removeEventListener('open', onOpen);
       eventSource.removeEventListener('message', handleData);
       eventSource.removeEventListener('error', init);
-      eventSource.removeEventListener('open', onOpen);
     }
 
     window.setTimeout(() => {
@@ -90,7 +90,7 @@ function startStream(callback, onOpen, onClose) {
       eventSource.addEventListener('error', init);
       eventSource.addEventListener('message', handleData);
       eventSource.addEventListener('open', onOpen);
-    }, (event ? 2000 : 0));
+    }, (event ? 50 : 0));
   };
 
   init();

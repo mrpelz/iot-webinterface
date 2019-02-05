@@ -7,8 +7,7 @@ import {
 
 export class TitleBar extends BaseComponent {
   static handleDarkClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
+    TitleBar.eventPreventAndStop(e);
 
     window.xState.set(
       '_darkMode',

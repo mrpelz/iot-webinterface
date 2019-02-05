@@ -11,6 +11,8 @@ export class App extends BaseComponent {
   }
 
   create() {
+    this.id = 'root';
+
     const app = [
       c('titlebar'),
       c('page-container'),
