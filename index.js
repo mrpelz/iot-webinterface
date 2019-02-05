@@ -32,6 +32,9 @@ async function main() {
     if (!value) return;
     document.documentElement.classList.add('values');
   });
+  window.xState.subscribe('_reload', () => {
+    window.location.reload(false);
+  }, false);
 
   getSavedPage();
   getDarkMode();

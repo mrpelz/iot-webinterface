@@ -15,6 +15,12 @@ export class TitleBar extends BaseComponent {
     );
   }
 
+  static handleReloadClick(e) {
+    TitleBar.eventPreventAndStop(e);
+
+    window.xState.set('_reload');
+  }
+
   _handleTitleChange(id) {
     this.setProps({
       id
@@ -50,6 +56,11 @@ export class TitleBar extends BaseComponent {
         h('section', { id: 'flags' }),
         h(
           'span',
+          { id: 'reload' },
+          '🔄'
+        ),
+        h(
+          'span',
           { id: 'wait' },
           '■'
         )
@@ -57,6 +68,7 @@ export class TitleBar extends BaseComponent {
     );
 
     this.get('#dark').addEventListener('click', TitleBar.handleDarkClick);
+    this.get('#reload').addEventListener('click', TitleBar.handleReloadClick);
   }
 
   render() {

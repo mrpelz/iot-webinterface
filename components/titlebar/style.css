@@ -23,6 +23,7 @@
 }
 
 #dark,
+#reload,
 #wait {
   align-items: center;
   border-radius: 5px;
@@ -31,19 +32,27 @@
   position: fixed;
 }
 
-#dark {
+#dark,
+#reload {
   background: hsl(var(--grey-glow));
   cursor: pointer;
-  left: 10px;
   padding: 4px 10px;
   color: hsl(var(--white));
+}
+
+#dark {
+  left: 10px;
+}
+
+#reload {
+  right: 10px;
 }
 
 #wait {
   color: hsl(var(--font-primary));
   font-size: calc(var(--titlebar-height) - 20px);
   padding-bottom: 2px;
-  right: 10px;
+  right: 20px;
   visibility: hidden;
 }
 
