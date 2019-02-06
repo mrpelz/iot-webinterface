@@ -44,8 +44,17 @@
   left: 10px;
 }
 
+#dark:active {
+  background: hsl(var(--grey-dark));
+}
+
 #reload {
   right: 10px;
+  visibility: visible;
+}
+
+#reload.active {
+  visibility: hidden;
 }
 
 #wait {
@@ -58,8 +67,4 @@
 
 #wait.active {
   visibility: visible;
-}
-
-#dark:active {
-  background: hsl(var(--grey-dark));
 }

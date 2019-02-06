@@ -85,6 +85,7 @@ export class TitleBar extends BaseComponent {
     const displayName = window.xExpand(section) || '';
 
     this.get('#room').textContent = displayName;
+    this.get('#reload').classList.toggle('active', !stream);
     this.get('#wait').classList.toggle('active', !stream);
   }
 
