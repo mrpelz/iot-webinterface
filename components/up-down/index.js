@@ -11,7 +11,19 @@ import {
 
 const valueLoadingString = '…';
 
-export class Switch extends BaseComponent {
+export class UpDown extends BaseComponent {
+  static findSubTypeElement(elements, subKey) {
+    return elements.find((element) => {
+      const {
+        attributes: {
+          subType
+        } = {}
+      } = element;
+
+      return subType === subKey;
+    });
+  }
+
   _update(name) {
     return (input) => {
       const target = this.get(`#${name}`);
@@ -41,6 +53,39 @@ export class Switch extends BaseComponent {
     };
   }
 
+  _addClickHandler(element) {
+    const {
+      attributes: {
+        set = false,
+        setType = null,
+        subType
+      },
+      name
+    } = element;
+
+    if (!subType) return;
+
+    const clickElement = this.get(`#${subType}`);
+    if (!clickElement) return;
+
+    clickElement.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!set || !setType) return;
+
+      switch (setType) {
+        case 'trigger':
+          setElement({
+            name,
+            value: true
+          });
+          break;
+        default:
+      }
+    });
+  }
+
   create() {
     const {
       group: {
@@ -56,6 +101,12 @@ export class Switch extends BaseComponent {
     const subGroupString = window.xExpand(subGroup) || subGroup;
 
     const nodes = [];
+
+    const readElement = UpDown.findSubTypeElement(elements, 'read');
+    const upElement = UpDown.findSubTypeElement(elements, 'increase');
+    const downElement = UpDown.findSubTypeElement(elements, 'decrease');
+
+    if (!readElement || !upElement || !downElement) return;
 
     if (group) {
       nodes.push(h(
@@ -77,7 +128,7 @@ export class Switch extends BaseComponent {
       ));
     }
 
-    elements.forEach((element) => {
+    [readElement, upElement, downElement].forEach((element) => {
       const {
         name,
         attributes: {
@@ -107,57 +158,28 @@ export class Switch extends BaseComponent {
       }
     });
 
+    nodes.push(h(
+      'div',
+      {
+        id: 'unit'
+      },
+      '%'
+    ));
+
     this.appendChild(
       render(...nodes)
     );
-  }
-}
 
-export class ClickableSwitch extends Switch {
-  _addClickHandler(element) {
-    this.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const { attributes: { set = false, setType = null }, name } = element;
-
-      if (!set || !setType) return;
-
-      switch (setType) {
-        case 'trigger':
-          setElement({
-            name,
-            value: true
-          });
-          break;
-        default:
-      }
-    });
-  }
-
-  create() {
-    this.classList.add('clickable');
-
-    super.create();
-
-    const {
-      group: {
-        elements
-      }
-    } = this.props;
-
-    const settableElement = elements.find((element) => {
+    elements.forEach((element) => {
       const {
         attributes: {
           set
         } = {}
       } = element;
 
-      return set;
+      if (set) {
+        this._addClickHandler(element);
+      }
     });
-
-    if (settableElement) {
-      this._addClickHandler(settableElement);
-    }
   }
 }

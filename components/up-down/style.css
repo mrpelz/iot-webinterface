@@ -1,0 +1,137 @@
+:host {
+  --horizontal-count: 3;
+  --dimension: calc((100vw - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
+  --width: calc((var(--dimension) * 2) + var(--margin));
+  --height: calc(var(--dimension) * 0.8);
+  --font-size-primary: calc(var(--height) * 0.25);
+  --font-size-secondary: calc(var(--height) * 0.13);
+  --margin: 8px;
+
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 15px;
+  color: hsl(var(--font-primary));
+  display: flex;
+  font-family: var(--font);
+  font-size: var(--font-size-secondary);
+  height: var(--height);
+  justify-content: center;
+  margin: 5px;
+  overflow: hidden;
+  position: relative;
+  width: var(--width);
+}
+
+:host::before {
+  border-bottom-right-radius: 15px;
+  border-bottom: 2px solid hsl(var(--font-primary));
+  border-right: 2px solid hsl(var(--font-primary));
+  bottom: 0;
+  content: '';
+  height: 13px;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  width: 13px;
+}
+
+::slotted(#label),
+::slotted(#sublabel) {
+  margin: var(--margin);
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+::slotted(#label) {
+  left: 0;
+  max-width: calc(100% - (var(--margin) * 2));
+  top: 0;
+}
+
+::slotted(#sublabel) {
+  bottom: 0;
+  left: 0;
+  max-width: calc(50% - (var(--margin) * 1.5));
+}
+
+::slotted(#read),
+::slotted(#decrease),
+::slotted(#increase) {
+  align-items: center;
+  background: hsla(var(--background-tertiary), var(--translucent));
+  display: flex;
+  font-size: var(--font-size-primary);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  height: 100%;
+  justify-content: center;
+}
+
+::slotted(#read) {
+  flex-grow: 1;
+  order: 2;
+}
+
+::slotted(#decrease),
+::slotted(#increase) {
+  cursor: pointer;
+  width: calc(50% - (var(--margin) * 5));
+}
+
+::slotted(#decrease:active),
+::slotted(#increase:active) {
+  background: hsl(var(--background-tertiary));
+}
+
+::slotted(#decrease) {
+  order: 1;
+  border-right: 1px solid transparent;
+}
+
+::slotted(#increase) {
+  order: 3;
+  border-left: 1px solid transparent;
+}
+
+::slotted(#unit) {
+  margin: var(--margin);
+  max-width: calc(50% - (var(--margin) * 1.5));
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  bottom: 0;
+  right: 0;
+}
+
+@media screen and (min-width: 433px) {
+  :host {
+    --horizontal-count: 4;
+  }
+}
+
+@media screen and (min-width: 550px) {
+  :host {
+    --horizontal-count: 5;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  :host {
+    --dimension: calc((100vw - var(--menu-width-tablet) - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
+  }
+}
+
+@media screen and (min-width: 1025px) {
+  :host {
+    --horizontal-count: 8;
+  }
+}
+
+@media screen and (min-width: 1441px) {
+  :host {
+    --horizontal-count: 10;
+  }
+}

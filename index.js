@@ -17,6 +17,7 @@ import { Page } from './components/page/index.js';
 import { PageContainer } from './components/page-container/index.js';
 import { Switch, ClickableSwitch } from './components/switch/index.js';
 import { TitleBar } from './components/titlebar/index.js';
+import { UpDown } from './components/up-down/index.js';
 
 async function main() {
   window.xState = new State();
@@ -122,6 +123,11 @@ async function main() {
         slug: 'titlebar',
         component: TitleBar,
         styles: ['titlebar']
+      },
+      {
+        slug: 'up-down',
+        component: UpDown,
+        styles: ['up-down']
       }
     ])
   ]);

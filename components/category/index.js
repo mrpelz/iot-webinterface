@@ -59,6 +59,9 @@ export class Category extends BaseComponent {
         case 'pir':
           node = 'pir';
           break;
+        case 'ahu':
+          node = 'up-down';
+          break;
         default:
       }
 
