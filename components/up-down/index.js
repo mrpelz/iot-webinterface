@@ -158,13 +158,23 @@ export class UpDown extends BaseComponent {
       }
     });
 
-    nodes.push(h(
-      'div',
-      {
-        id: 'unit'
-      },
-      '%'
-    ));
+    if (readElement) {
+      const {
+        attributes: {
+          unit
+        } = {}
+      } = readElement;
+
+      if (unit) {
+        nodes.push(h(
+          'div',
+          {
+            id: 'unit'
+          },
+          window.xExpand(unit)
+        ));
+      }
+    }
 
     this.appendChild(
       render(...nodes)
