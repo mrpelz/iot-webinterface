@@ -142,13 +142,27 @@ async function main() {
 }
 
 if (
-  window.customElements
+  'serviceWorker' in navigator
+  && window.customElements
   && document.body.attachShadow
   && typeof EventSource !== 'undefined'
   && typeof Intl !== 'undefined'
 ) {
-  document.addEventListener('DOMContentLoaded', main);
   document.addEventListener('touchstart', () => {}, true);
+
+  Promise.all([
+    new Promise((resolve) => {
+      document.addEventListener('DOMContentLoaded', () => {
+        resolve();
+      });
+    }),
+    navigator.serviceWorker.register(
+      '/sw.js',
+      { scope: '/' }
+    ).catch(() => {})
+  ]).then(() => {
+    main();
+  });
 } else {
   /* eslint-disable-next-line no-alert */
   alert('your browser doesn\'t support custom elements, shadow dom, EventSource and/or Intl-API');

@@ -8,17 +8,19 @@ $contenttypes = [
     'css' => 'text/css',
 ];
 
-if(substr($_SERVER['REQUEST_URI'], -1, 1) === '/'){
+if (substr($_SERVER['REQUEST_URI'], -1, 1) === '/') {
     $_SERVER['REQUEST_URI'] .= 'index.html';
 }
 
-if(file_exists(__DIR__ . $_SERVER['REQUEST_URI'])){
+file_put_contents('php://stderr', $_SERVER['REQUEST_URI'] . PHP_EOL);
+
+if (file_exists(__DIR__ . $_SERVER['REQUEST_URI'])) {
     $pathinfo = pathinfo(__DIR__ . $_SERVER['REQUEST_URI']);
     if(array_key_exists($pathinfo['extension'], $contenttypes)){
         header('Content-Type: ' . $contenttypes[$pathinfo['extension']]);
     }
     readfile(__DIR__ . $_SERVER['REQUEST_URI']);
-}else{
+} else {
     header('Not Found', true, 404);
     echo 'Not found';
 }
