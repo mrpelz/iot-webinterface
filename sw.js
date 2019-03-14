@@ -1,13 +1,13 @@
 /* eslint-disable no-restricted-globals */
 
-const version = '0.0.5';
+const version = '0.0.6';
 
 const networkPreferred = [
   'https://hermes.net.wurstsalat.cloud/list',
+  'https://hermes.net.wurstsalat.cloud/values'
 ];
 
 const networkOnly = [
-  'https://hermes.net.wurstsalat.cloud/values',
   'https://hermes.net.wurstsalat.cloud/stream',
   'https://hermes.net.wurstsalat.cloud/set'
 ];
