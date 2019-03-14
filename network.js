@@ -61,7 +61,7 @@ function fetchValues() {
   });
 }
 
-function startStream(callback, onOpen, onClose) {
+function startStream(callback, onChange) {
   let eventSource = null;
 
   const handleData = ({ data }) => {
@@ -74,11 +74,19 @@ function startStream(callback, onOpen, onClose) {
     }
   };
 
+  const onOpen = () => {
+    onChange(true);
+  };
+
+  const onClose = () => {
+    onChange(false);
+  };
+
   const init = (event) => {
     if (event) {
       /* eslint-disable-next-line no-console */
       console.log('eventSource disconnected, reconnecting…');
-      onClose(true);
+      onClose();
       eventSource.close();
       eventSource.removeEventListener('open', onOpen);
       eventSource.removeEventListener('message', handleData);
@@ -147,6 +155,8 @@ export async function setUpValues() {
     });
   };
 
+  let first = true;
+
   return new Promise((resolve) => {
     startStream((data) => {
       const { isSystem = false, name, value } = data;
@@ -158,14 +168,12 @@ export async function setUpValues() {
 
       if (!name) return;
       window.xState.set(name, value);
-    }, async () => {
-      await values();
-      window.xState.set('_stream', true);
-      resolve();
-    }, (init) => {
-      window.xState.set('_stream', false);
-
-      if (init) return;
+    }, async (connected) => {
+      if (first || connected) {
+        await values();
+        first = false;
+      }
+      window.xState.set('_stream', connected);
       resolve();
     });
   });
