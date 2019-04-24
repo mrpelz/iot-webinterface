@@ -53,8 +53,8 @@ export class MapComponent extends BaseComponent {
       this._handleSectionChange.bind(this)
     );
 
-    this.addEventListener('scroll', MapComponent.eventPreventAndStop);
-    this.addEventListener('touchmove', MapComponent.eventPreventAndStop);
+    this.addEventListener('scroll', BaseComponent.eventPreventAndStop);
+    this.addEventListener('touchmove', BaseComponent.eventPreventAndStop);
   }
 
   _resetZoom() {

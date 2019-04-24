@@ -1,64 +1,60 @@
 /* eslint-disable import/extensions */
 import {
   BaseComponent,
+  bem,
   c,
+  h,
   render
 } from '../../dom.js';
 
-const animationDuration = 150;
-
-function easing(t) {
-  return t < 0.5 ? 2 * t * t : -1 + ((4 - (2 * t)) * t);
-}
+const menuActiveClass = bem('menu', null, 'active');
 
 export class Menu extends BaseComponent {
-  _animateScroll(to) {
-    const start = Date.now();
-    const from = this.scrollLeft;
-    const distance = to - from;
-
-    if (!distance) return;
-
-    const tick = () => {
-      const progress = Math.min(1, Math.max(0, (Date.now() - start) / animationDuration));
-      const step = distance * easing(progress);
-
-      this.scrollLeft = Math.max(0, from + step);
-
-      if (progress >= 1) return;
-      window.requestAnimationFrame(tick);
-    };
-
-    tick();
+  static hide() {
+    window.xState.set('_menu', false);
   }
 
-  _handleSelectedChange(index) {
-    if (!this.mediaQuery || this.mediaQuery.matches) return;
+  static handleDarkClick(e) {
+    BaseComponent.eventPreventAndStop(e);
 
-    window.setTimeout(() => {
-      const { offsetLeft, scrollWidth } = this.childNodes[index];
+    window.xState.set(
+      '_darkMode',
+      !window.xState.get('_darkMode')
+    );
 
-      const scrollLeft = Math.min(
-        this.scrollWidth - this.offsetWidth,
-        Math.max(0, offsetLeft
-          + (scrollWidth / 2)
-          - (this.offsetWidth / 2))
-      );
+    Menu.hide();
+  }
 
-      if (!this.wasScrolled) {
-        this.wasScrolled = true;
-        this.scrollLeft = scrollLeft;
+  static handleReloadClick(e) {
+    BaseComponent.eventPreventAndStop(e);
 
-        return;
-      }
+    window.xState.set('_reload');
+  }
 
-      this._animateScroll(scrollLeft);
-    }, 0);
+  _handleMenu(menu) {
+    this.setProps({
+      menu
+    });
+
+    const listenerOpts = {
+      once: true,
+      passive: true
+    };
+
+    if (menu) {
+      window.addEventListener('resize', Menu.hide, listenerOpts);
+    } else {
+      window.removeEventListener('resize', Menu.hide, listenerOpts);
+    }
+  }
+
+  _handleStream(stream) {
+    this.setProps({
+      stream
+    });
   }
 
   create() {
-    this.wasScrolled = false;
-
     const { sections = [] } = window.xHierarchy;
     const itemNodes = [].concat(...sections.map((sectionGroup, groupIndex) => {
       return [].concat(...sectionGroup.map((section, itemIndex) => {
@@ -78,23 +74,58 @@ export class Menu extends BaseComponent {
       );
     });
 
+    this.subscriptions = [
+      window.xState.subscribe(
+        '_menu',
+        this._handleMenu.bind(this)
+      ),
+      window.xState.subscribe(
+        '_stream',
+        this._handleStream.bind(this)
+      )
+    ];
+
     this.appendChild(
       render(...itemNodes)
     );
 
-    this.subscription = window.xState.subscribe(
-      '_selectedRoom',
-      this._handleSelectedChange.bind(this)
+    this.shadowRoot.appendChild(
+      render(
+        h('div', { id: 'controls' }, [
+          h(
+            'div',
+            { id: 'dark' },
+            '💡'
+          ),
+          h(
+            'div',
+            { id: 'reload' },
+            '🔄'
+          ),
+          h(
+            'div',
+            { id: 'wait' }
+          )
+        ])
+      )
     );
 
-    this.mediaQuery = window.matchMedia('screen and (min-width: 769px)');
+    this.get('#dark').addEventListener('click', Menu.handleDarkClick);
+    this.get('#reload').addEventListener('click', Menu.handleReloadClick);
+  }
 
-    this._handleSelectedChange(
-      window.xState.get('_selectedRoom')
-    );
+  render() {
+    const { menu = false, stream = false } = this.props;
+    this.classList.toggle(menuActiveClass, menu);
+    this.get('#wait').innerText = stream ? '▶️' : '⏸';
   }
 
   destroy() {
-    this.subscription.unsubscribe();
+    this.subscriptions.forEach((subscription) => {
+      subscription.unsubscribe();
+    });
+
+    this.get('#dark').removeEventListener('click', Menu.handleDarkClick);
+    this.get('#reload').removeEventListener('click', Menu.handleReloadClick);
   }
 }

@@ -122,7 +122,7 @@
 
 @media screen and (min-width: 769px) {
   :host {
-    --dimension: calc((100vw - var(--menu-width-tablet) - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
+    --dimension: calc((100vw - var(--menu-width) - 10px - (var(--horizontal-count) * 10px)) / var(--horizontal-count));
   }
 }
 

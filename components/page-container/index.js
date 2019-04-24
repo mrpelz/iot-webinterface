@@ -38,6 +38,13 @@ function getSectionExtension(section = {}) {
 }
 
 export class PageContainer extends BaseComponent {
+  static handleStrayClick(e) {
+    if (!window.xState.get('_menu')) return;
+
+    BaseComponent.eventPreventAndStop(e);
+    window.xState.set('_menu', false);
+  }
+
   _handleRoomChange(index) {
     const { sections } = window.xHierarchy;
     const { section = null } = [].concat(...sections)[index] || {};
@@ -122,6 +129,13 @@ export class PageContainer extends BaseComponent {
       '_selectedRoom',
       this._handleRoomChange.bind(this)
     );
+
+    this.addEventListener('click', PageContainer.handleStrayClick, {
+      capture: true
+    });
+    this.addEventListener('touchend', PageContainer.handleStrayClick, {
+      capture: true
+    });
   }
 
   destroy() {

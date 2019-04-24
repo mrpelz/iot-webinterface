@@ -1,4 +1,6 @@
-const apiBaseUrl = `${window.location.protocol}//hermes.net.wurstsalat.cloud/`;
+const apiBaseUrl = window.location.protocol === 'http:'
+  ? 'http://hermes.net.wurstsalat.cloud/'
+  : 'https://hermes.net.wurstsalat.cloud/';
 
 function expandTemplate(map) {
   const expression = '§(?:(\\d+)|\\{([^${}:]+)(?::([^§{}:]+))?\\})';
@@ -158,6 +160,13 @@ export async function setUpValues() {
   let first = true;
 
   return new Promise((resolve) => {
+    const { stream } = window.xFlags;
+
+    if (!stream) {
+      resolve(values());
+      return;
+    }
+
     startStream((data) => {
       const { isSystem = false, name, value } = data;
 

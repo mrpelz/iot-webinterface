@@ -22,6 +22,7 @@ import { UpDown } from './components/up-down/index.js';
 async function main() {
   window.xState = new State();
 
+  window.xState.set('_menu', false);
   window.xState.set('_ready', false);
   window.xState.set('_values', false);
 
@@ -141,6 +142,62 @@ async function main() {
   window.xState.set('_values', true);
 }
 
+function readFlags() {
+  const read = (flag, fallback = false) => {
+    const storageValue = window.localStorage.getItem(flag);
+
+    if (storageValue === null) {
+      return fallback;
+    }
+
+    return Boolean(Number.parseInt(storageValue, 10));
+  };
+
+  window.xFlags = {
+    debug: read('debug', false),
+    serviceWorker: read('sw', true),
+    stream: read('stream', true)
+  };
+}
+
+async function handleSW() {
+  try {
+    const { serviceWorker } = window.xFlags;
+
+    if (serviceWorker) {
+      await navigator.serviceWorker.register(
+        '/sw.js', {
+          scope: '/'
+        }
+      );
+
+      return;
+    }
+
+    // eslint-disable-next-line no-console
+    console.log('lose ServiceWorker');
+    window.xDebug = true;
+
+    const keys = await caches.keys();
+    const registrations = await navigator.serviceWorker.getRegistrations();
+
+    await keys.forEach(async (key) => {
+      await caches.delete(key);
+    });
+
+    await registrations.forEach(async (registration) => {
+      await registration.unregister();
+    });
+  } catch (_) {
+    // empty
+  }
+}
+
+async function pre() {
+  readFlags();
+  await handleSW();
+}
+
 if (
   'serviceWorker' in navigator
   && window.customElements
@@ -156,10 +213,7 @@ if (
         resolve();
       });
     }),
-    navigator.serviceWorker.register(
-      '/sw.js',
-      { scope: '/' }
-    ).catch(() => {})
+    pre()
   ]).then(() => {
     main();
   });

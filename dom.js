@@ -213,6 +213,10 @@ export class BaseComponent extends HTMLElement {
     event.preventDefault();
   }
 
+  static eventStop(event) {
+    event.stopPropagation();
+  }
+
   static eventPreventAndStop(event) {
     event.preventDefault();
     event.stopImmediatePropagation();

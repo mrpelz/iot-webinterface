@@ -5,20 +5,20 @@ import {
   render
 } from '../../dom.js';
 
+const menuButtonSVG = `
+  <svg height="32" version="1" width="32" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M4 10h24a2 2 0 0 0 0-4H4a2 2 0 0 0 0 4zm24 4H4a2 2 0 0 0 0 4h24a2 2 0 0 0 0-4zm0 8H4a2 2 0 0 0 0 4h24a2 2 0 0 0 0-4z"/>
+  </svg>
+`;
+
 export class TitleBar extends BaseComponent {
-  static handleDarkClick(e) {
-    TitleBar.eventPreventAndStop(e);
+  static handleMenuButtonClick(e) {
+    BaseComponent.eventPreventAndStop(e);
 
     window.xState.set(
-      '_darkMode',
-      !window.xState.get('_darkMode')
+      '_menu',
+      !window.xState.get('_menu')
     );
-  }
-
-  static handleReloadClick(e) {
-    TitleBar.eventPreventAndStop(e);
-
-    window.xState.set('_reload');
   }
 
   _handleTitleChange(id) {
@@ -47,28 +47,15 @@ export class TitleBar extends BaseComponent {
 
     this.shadowRoot.appendChild(
       render(...[
-        h(
-          'span',
-          { id: 'dark' },
-          '💡'
-        ),
         h('h1', { id: 'room' }),
         h('section', { id: 'flags' }),
-        h(
-          'span',
-          { id: 'reload' },
-          '🔄'
-        ),
-        h(
-          'span',
-          { id: 'wait' },
-          '■'
-        )
+        h('div', { id: 'menubutton' }),
+        h('div', { id: 'wait' })
       ])
     );
 
-    this.get('#dark').addEventListener('click', TitleBar.handleDarkClick);
-    this.get('#reload').addEventListener('click', TitleBar.handleReloadClick);
+    this.get('#menubutton').innerHTML = menuButtonSVG;
+    this.get('#menubutton').addEventListener('click', TitleBar.handleMenuButtonClick);
   }
 
   render() {
@@ -85,14 +72,14 @@ export class TitleBar extends BaseComponent {
     const displayName = window.xExpand(section) || '';
 
     this.get('#room').textContent = displayName;
-    this.get('#reload').classList.toggle('active', !stream);
-    this.get('#wait').classList.toggle('active', !stream);
+    this.get('#wait').classList.toggle('active', stream);
   }
 
   destroy() {
     this.subscriptions.forEach((subscription) => {
       subscription.unsubscribe();
     });
-    this.get('#dark').removeEventListener('click', TitleBar.handleDarkClick);
+
+    this.get('#menubutton').removeEventListener('click', TitleBar.handleMenuButtonClick);
   }
 }

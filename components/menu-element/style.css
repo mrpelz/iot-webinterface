@@ -1,6 +1,8 @@
 :host {
   align-items: center;
-  color: hsl(var(--font-secondary));
+  background: hsl(var(--background-primary));
+  border-bottom: 0.5px solid hsl(var(--font-tertiary));
+  color: hsl(var(--font-primary));
   cursor: pointer;
   display: flex;
   flex-shrink: 0;
@@ -13,68 +15,22 @@
 }
 
 :host(.menu--element-active) {
-  color: hsl(var(--selection));
+  background: hsl(var(--selection));
+  border-top-color: hsl(var(--selection));
+  color: hsl(var(--background-primary));
 }
 
 :host(:active) {
-  color: hsl(var(--font-tertiary));
+  background: hsl(var(--font-tertiary));
+  border-top-color: hsl(var(--font-tertiary));
+  color: hsl(var(--font-primary));
 }
 
 :host(.menu--element-separated) {
-  padding-left: 5px;
-}
-
-:host(.menu--element-separated)::before {
-  content: '';
-  width: 0.5px;
-  height: 100%;
-  background: hsl(var(--font-tertiary));
-  margin-right: 15px;
+  border-top: 0.5px solid hsl(var(--font-tertiary));
+  margin-top: var(--menu-height);
 }
 
 :host(:first-of-type) {
-  padding-left: 15px;
-}
-
-:host(:last-of-type) {
-  padding-right: 15px;
-}
-
-@media screen and (min-width: 769px) {
-  :host {
-    background: hsl(var(--background-primary));
-    border-bottom: 0.5px solid hsl(var(--font-tertiary));
-    color: hsl(var(--font-primary));
-  }
-
-  :host(.menu--element-active) {
-    background: hsl(var(--selection));
-    border-top-color: hsl(var(--selection));
-    color: hsl(var(--background-primary));
-  }
-
-  :host(:active) {
-    background: hsl(var(--font-tertiary));
-    border-top-color: hsl(var(--font-tertiary));
-    color: hsl(var(--font-primary));
-  }
-
-  :host(.menu--element-separated) {
-    border-top: 0.5px solid hsl(var(--font-tertiary));
-    margin-top: var(--menu-height);
-    padding-left: 10px;
-  }
-
-  :host(.menu--element-separated)::before {
-    display: none;
-  }
-
-  :host(:first-of-type) {
-    border-top: 0.5px solid hsl(var(--font-tertiary));
-    padding-left: 10px;
-  }
-
-  :host(:last-of-type) {
-    padding-right: 10px;
-  }
+  border-top: 0.5px solid hsl(var(--font-tertiary));
 }

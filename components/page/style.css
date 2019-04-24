@@ -1,7 +1,7 @@
 :host {
   display: none;
-  min-height: calc(100vh - var(--titlebar-height) - var(--menu-height));
-  padding: var(--titlebar-height) 0 var(--menu-height);
+  min-height: calc(100vh - var(--titlebar-height));
+  padding: var(--titlebar-height) 0 0;
   z-index: 2;
 }
 
@@ -11,8 +11,6 @@
 
 @media screen and (min-width: 769px) {
   :host {
-    margin-left: var(--menu-width-tablet);
-    min-height: calc(100vh - var(--titlebar-height));
-    padding: var(--titlebar-height) 0 0;
+    margin-left: var(--menu-width);
   }
 }

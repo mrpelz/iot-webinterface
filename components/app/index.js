@@ -15,8 +15,8 @@ export class App extends BaseComponent {
 
     const app = [
       c('titlebar'),
-      c('page-container'),
-      c('menu')
+      c('menu'),
+      c('page-container')
     ];
 
     this.appendChild(

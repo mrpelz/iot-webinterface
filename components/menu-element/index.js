@@ -14,6 +14,7 @@ export class MenuElement extends BaseComponent {
 
     const { id } = this.props;
     window.xState.set('_selectedRoom', id);
+    window.xState.set('_menu', false);
   }
 
   _handleSelectedChange(index) {

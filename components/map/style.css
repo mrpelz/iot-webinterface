@@ -1,7 +1,7 @@
 :host {
   display: none;
-  min-height: calc(100vh - var(--titlebar-height) - var(--menu-height));
-  padding: var(--titlebar-height) 0 var(--menu-height);
+  min-height: calc(100vh - var(--titlebar-height));
+  padding: var(--titlebar-height) 0 0;
   z-index: 2;
 
   background: hsl(var(--background-primary));
@@ -13,7 +13,7 @@
 
 #svg {
   cursor: zoom-out;
-  height: calc(100vh - var(--titlebar-height) - var(--menu-height));
+  height: calc(100vh - var(--titlebar-height));
   width: 100vw;
 }
 
@@ -136,13 +136,10 @@
 
 @media screen and (min-width: 769px) {
   :host {
-    margin-left: var(--menu-width-tablet);
-    min-height: calc(100vh - var(--titlebar-height));
-    padding: var(--titlebar-height) 0 0;
+    margin-left: var(--menu-width);
   }
 
-  svg {
-    height: calc(100vh - var(--titlebar-height));
-    width: calc(100vw - var(--menu-width-tablet));
+  #svg {
+    width: calc(100vw - var(--menu-width));
   }
 }
