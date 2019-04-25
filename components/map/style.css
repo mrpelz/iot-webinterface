@@ -68,6 +68,21 @@
   display: none;
 }
 
+#room {
+  color: hsl(var(--font-primary));
+  cursor: pointer;
+  fill: currentColor;
+  font-family: var(--font);
+  font-size: 40px;
+  pointer-events: none;
+}
+#room > tspan {
+  pointer-events: none;
+}
+#svg[x-zoom] #room {
+  pointer-events: all;
+}
+
 #shade {
   pointer-events: none;
 }

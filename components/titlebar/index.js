@@ -6,8 +6,12 @@ import {
 } from '../../dom.js';
 
 const menuButtonSVG = `
-  <svg height="32" version="1" width="32" xmlns="http://www.w3.org/2000/svg">
-    <path fill="currentColor" d="M4 10h24a2 2 0 0 0 0-4H4a2 2 0 0 0 0 4zm24 4H4a2 2 0 0 0 0 4h24a2 2 0 0 0 0-4zm0 8H4a2 2 0 0 0 0 4h24a2 2 0 0 0 0-4z"/>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M10 12h30v4H10z"/><path d="M10 22h30v4H10z"/><path d="M10 32h30v4H10z"/></svg>
+`;
+
+const spinnerSVG = `
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="45"></circle>
   </svg>
 `;
 
@@ -54,7 +58,9 @@ export class TitleBar extends BaseComponent {
       ])
     );
 
+    this.get('#wait').innerHTML = spinnerSVG;
     this.get('#menubutton').innerHTML = menuButtonSVG;
+
     this.get('#menubutton').addEventListener('click', TitleBar.handleMenuButtonClick);
   }
 

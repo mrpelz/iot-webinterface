@@ -8,10 +8,7 @@ const activeClass = bem('menu', 'element', 'active');
 const separatedClass = bem('menu', 'element', 'separated');
 
 export class MenuElement extends BaseComponent {
-  _handleClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
+  _handleClick() {
     const { id } = this.props;
     window.xState.set('_selectedRoom', id);
     window.xState.set('_menu', false);
@@ -24,6 +21,17 @@ export class MenuElement extends BaseComponent {
       this.classList.add(activeClass);
     } else {
       this.classList.remove(activeClass);
+    }
+  }
+
+  _handleMenu(open) {
+    const { id } = this.props;
+    if (!open || window.xState.get('_selectedRoom') !== id) return;
+
+    if (typeof this.scrollIntoViewIfNeeded === 'function') {
+      this.scrollIntoViewIfNeeded();
+    } else {
+      this.scrollIntoView();
     }
   }
 
@@ -40,19 +48,24 @@ export class MenuElement extends BaseComponent {
       this.classList.add(separatedClass);
     }
 
-    this._handleClick = this._handleClick.bind(this);
-    this._handleSelectedChange = this._handleSelectedChange.bind(this);
 
-    this.addEventListener('click', this._handleClick);
+    this.subscriptions = [
+      window.xState.subscribe(
+        '_selectedRoom',
+        this._handleSelectedChange.bind(this)
+      ),
+      window.xState.subscribe(
+        '_menu',
+        this._handleMenu.bind(this)
+      )
+    ];
 
-    this.subscription = window.xState.subscribe(
-      '_selectedRoom',
-      this._handleSelectedChange
-    );
+    this.addEventListener('click', this._handleClick.bind(this));
   }
 
   destroy() {
-    this.removeEventListener('click', this._handleClick);
-    this.subscription.unsubscribe();
+    this.subscriptions.forEach((subscription) => {
+      subscription.unsubscribe();
+    });
   }
 }

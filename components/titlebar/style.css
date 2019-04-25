@@ -25,37 +25,68 @@
 #menubutton,
 #wait {
   --margin: calc((var(--titlebar-height) - var(--size)) / 2);
-  bottom: var(--margin);
+  bottom: 0;
   color: hsl(var(--font-primary));
   cursor: pointer;
   height: var(--size);
+  padding: var(--margin);
   position: fixed;
-  top: var(--margin);
+  top: 0;
   width: var(--size);
 }
 
 #menubutton {
-  --size: 32px;
-  left: var(--margin);
+  --size: 28px;
+  fill: currentColor;
+  left: 0;
 }
-
-@keyframes wait-animation { to {transform: rotate(315deg)} }
 
 #wait {
   --size: 22px;
-  animation: wait-animation 0.6s linear infinite;
-  backface-visibility: hidden;
-  border-radius: 50%;
-  border: 2px solid hsl(var(--font-primary));
-  border-top-color: transparent;
-  box-sizing: border-box;
-  content: '';
-  display: block;
-  pointer-events: none;
-  right: var(--margin);
-  transform: rotate(-45deg);
-  will-change: auto;
-  z-index: 10;
+  right: 0;
+}
+
+@keyframes wait-outer-animation {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  100% {
+    transform: rotateZ(360deg)
+  }
+}
+
+@keyframes wait-circle-animation {
+  0%,
+  25% {
+    stroke-dashoffset: 280;
+    transform: rotate(0);
+  }
+
+  50%,
+  75% {
+    stroke-dashoffset: 75;
+    transform: rotate(45deg);
+  }
+
+  100% {
+    stroke-dashoffset: 280;
+    transform: rotate(360deg);
+  }
+}
+
+#wait svg {
+  animation: 2s linear infinite wait-outer-animation;
+}
+
+#wait circle {
+  animation: 1.4s ease-in-out infinite both wait-circle-animation;
+  fill: transparent;
+  stroke-dasharray: 283;
+  stroke-dashoffset: 75;
+  stroke-linecap: round;
+  stroke-width: 10;
+  stroke: currentColor;
+  transform-origin: 50% 50%;
 }
 
 #wait.active {

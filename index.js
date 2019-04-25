@@ -19,6 +19,69 @@ import { Switch, ClickableSwitch } from './components/switch/index.js';
 import { TitleBar } from './components/titlebar/index.js';
 import { UpDown } from './components/up-down/index.js';
 
+function readFlags() {
+  const read = (flag, fallback = false) => {
+    const storageValue = window.localStorage.getItem(flag);
+
+    if (storageValue === null) {
+      return fallback;
+    }
+
+    return Boolean(Number.parseInt(storageValue, 10));
+  };
+
+  window.xFlags = {
+    debug: read('debug', false),
+    serviceWorker: read('sw', true),
+    stream: read('stream', true)
+  };
+}
+
+async function deleteSW() {
+  try {
+    // eslint-disable-next-line no-console
+    console.log('lose ServiceWorker');
+
+    const keys = await caches.keys();
+    const registrations = await navigator.serviceWorker.getRegistrations();
+
+    await keys.forEach(async (key) => {
+      await caches.delete(key);
+    });
+
+    await registrations.forEach(async (registration) => {
+      await registration.unregister();
+    });
+  } catch (_) {
+    // empty
+  }
+}
+
+async function handleSW() {
+  const { serviceWorker } = window.xFlags;
+
+  if (serviceWorker) {
+    try {
+      await navigator.serviceWorker.register(
+        '/sw.js', {
+          scope: '/'
+        }
+      );
+    } catch (_) {
+      // empty
+    }
+
+    return;
+  }
+
+  deleteSW();
+}
+
+async function pre() {
+  readFlags();
+  await handleSW();
+}
+
 async function main() {
   window.xState = new State();
 
@@ -35,7 +98,9 @@ async function main() {
     document.documentElement.classList.add('values');
   });
   window.xState.subscribe('_reload', () => {
-    window.location.reload(false);
+    deleteSW().then(() => {
+      window.location.reload(false);
+    });
   }, false);
 
   getSavedPage();
@@ -140,62 +205,6 @@ async function main() {
 
   await setUpValues();
   window.xState.set('_values', true);
-}
-
-function readFlags() {
-  const read = (flag, fallback = false) => {
-    const storageValue = window.localStorage.getItem(flag);
-
-    if (storageValue === null) {
-      return fallback;
-    }
-
-    return Boolean(Number.parseInt(storageValue, 10));
-  };
-
-  window.xFlags = {
-    debug: read('debug', false),
-    serviceWorker: read('sw', true),
-    stream: read('stream', true)
-  };
-}
-
-async function handleSW() {
-  try {
-    const { serviceWorker } = window.xFlags;
-
-    if (serviceWorker) {
-      await navigator.serviceWorker.register(
-        '/sw.js', {
-          scope: '/'
-        }
-      );
-
-      return;
-    }
-
-    // eslint-disable-next-line no-console
-    console.log('lose ServiceWorker');
-    window.xDebug = true;
-
-    const keys = await caches.keys();
-    const registrations = await navigator.serviceWorker.getRegistrations();
-
-    await keys.forEach(async (key) => {
-      await caches.delete(key);
-    });
-
-    await registrations.forEach(async (registration) => {
-      await registration.unregister();
-    });
-  } catch (_) {
-    // empty
-  }
-}
-
-async function pre() {
-  readFlags();
-  await handleSW();
 }
 
 if (

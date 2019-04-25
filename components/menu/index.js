@@ -48,12 +48,6 @@ export class Menu extends BaseComponent {
     }
   }
 
-  _handleStream(stream) {
-    this.setProps({
-      stream
-    });
-  }
-
   create() {
     const { sections = [] } = window.xHierarchy;
     const itemNodes = [].concat(...sections.map((sectionGroup, groupIndex) => {
@@ -78,10 +72,6 @@ export class Menu extends BaseComponent {
       window.xState.subscribe(
         '_menu',
         this._handleMenu.bind(this)
-      ),
-      window.xState.subscribe(
-        '_stream',
-        this._handleStream.bind(this)
       )
     ];
 
@@ -101,10 +91,6 @@ export class Menu extends BaseComponent {
             'div',
             { id: 'reload' },
             '🔄'
-          ),
-          h(
-            'div',
-            { id: 'wait' }
           )
         ])
       )
@@ -115,17 +101,13 @@ export class Menu extends BaseComponent {
   }
 
   render() {
-    const { menu = false, stream = false } = this.props;
+    const { menu = false } = this.props;
     this.classList.toggle(menuActiveClass, menu);
-    this.get('#wait').innerText = stream ? '▶️' : '⏸';
   }
 
   destroy() {
     this.subscriptions.forEach((subscription) => {
       subscription.unsubscribe();
     });
-
-    this.get('#dark').removeEventListener('click', Menu.handleDarkClick);
-    this.get('#reload').removeEventListener('click', Menu.handleReloadClick);
   }
 }

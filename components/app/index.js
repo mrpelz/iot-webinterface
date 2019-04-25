@@ -5,9 +5,16 @@ import {
   c
 } from '../../dom.js';
 
+const noScrollClass = 'no-scroll';
+
 export class App extends BaseComponent {
   static handleRoomChange() {
     window.scrollTo(0, 0);
+  }
+
+  static handleMenu() {
+    const open = window.xState.get('_menu');
+    document.documentElement.classList.toggle(noScrollClass, open);
   }
 
   create() {
@@ -23,13 +30,21 @@ export class App extends BaseComponent {
       render(...app)
     );
 
-    this.subscription = window.xState.subscribe(
-      '_selectedRoom',
-      App.handleRoomChange
-    );
+    this.subscriptions = [
+      window.xState.subscribe(
+        '_selectedRoom',
+        App.handleRoomChange
+      ),
+      window.xState.subscribe(
+        '_menu',
+        App.handleMenu
+      )
+    ];
   }
 
   destroy() {
-    this.subscription.unsubscribe();
+    this.subscriptions.forEach((subscription) => {
+      subscription.unsubscribe();
+    });
   }
 }

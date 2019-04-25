@@ -9,12 +9,12 @@
   flex-direction: column;
   flex-shrink: 0;
   flex-wrap: nowrap;
-  margin-bottom: 0;
-  max-width: 50vw;
   height: calc(100vh - var(--menu-height));
-  overflow: auto;
-  padding: 0;
+  max-width: 50vw;
+  overflow-x: hidden;
+  overflow-y: auto;
   position: fixed;
+  scrollbar-width: none;
   top: var(--titlebar-height);
   transform: translateX(-100%);
   transition: transform 0.15s ease-out;
@@ -23,7 +23,7 @@
 }
 
 :host(.menu-active) {
-  transform: translateX(0);
+  transform: none;
 }
 
 :host::before,
@@ -42,28 +42,26 @@
   display: flex;
   height: var(--menu-height);
   justify-content: space-around;
-  margin-top: var(--menu-height);
+  margin: var(--menu-height) calc(var(--menu-height) / 4) 0;
 }
 
 #dark,
-#reload,
-#wait {
+#reload {
   align-items: center;
   background: hsl(var(--background-primary));
   border-radius: 5px;
   border: 0.5px solid hsl(var(--font-tertiary));
   color: hsl(var(--font-primary));
+  cursor: pointer;
   display: flex;
+  flex-grow: 1;
   font-size: 14px;
   height: calc(var(--menu-height) / 1.5);
   justify-content: center;
-  width: 40px;
 }
 
-#dark,
-#reload {
-  cursor: pointer;
-  position: relative;
+#dark {
+  margin-right: calc(var(--menu-height) / 4);
 }
 
 #dark:active,
@@ -71,22 +69,7 @@
   background: hsl(var(--font-tertiary));
 }
 
-#dark::before,
-#reload::before {
-  border-bottom-right-radius: 5px;
-  border-bottom: 2px solid hsl(var(--font-primary));
-  border-right: 2px solid hsl(var(--font-primary));
-  bottom: 0;
-  content: '';
-  height: 5px;
-  pointer-events: none;
-  position: absolute;
-  right: 0;
-  width: 5px;
-}
-
 #overlay {
-  background: black;
   bottom: 0;
   left: 100%;
   position: fixed;
