@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 
-const version = '0.0.18';
+const version = '0.0.19';
 
 const networkPreferred = [
   'https://hermes.net.wurstsalat.cloud/list',

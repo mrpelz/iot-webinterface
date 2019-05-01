@@ -126,7 +126,7 @@ async function main() {
       },
       {
         slug: 'connection',
-        component: Switch,
+        component: ClickableSwitch,
         styles: ['switch', 'connection']
       },
       {

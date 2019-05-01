@@ -1,5 +1,5 @@
 const apiBaseUrl = window.location.protocol === 'http:'
-  ? 'http://hermes.net.wurstsalat.cloud/'
+  ? 'http://hermes.net.wurstsalat.cloud:8080/'
   : 'https://hermes.net.wurstsalat.cloud/';
 
 function expandTemplate(map) {
