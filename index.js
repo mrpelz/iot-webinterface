@@ -21,13 +21,18 @@ import { UpDown } from './components/up-down/index.js';
 
 function readFlags() {
   const read = (flag, fallback = false) => {
+    let value;
+
     const storageValue = window.localStorage.getItem(flag);
 
     if (storageValue === null) {
-      return fallback;
+      value = fallback;
+    } else {
+      value = Boolean(Number.parseInt(storageValue, 10));
     }
 
-    return Boolean(Number.parseInt(storageValue, 10));
+    console.table(`"${flag}": ${value}`);
+    return value;
   };
 
   window.xFlags = {
@@ -39,9 +44,6 @@ function readFlags() {
 
 async function deleteSW() {
   try {
-    // eslint-disable-next-line no-console
-    console.log('lose ServiceWorker');
-
     const keys = await caches.keys();
     const registrations = await navigator.serviceWorker.getRegistrations();
 

@@ -43,8 +43,10 @@ export class MapComponent extends BaseComponent {
     this.controlContainer = this.shadowRoot.getElementById('control');
     this.shadeContainer = this.shadowRoot.getElementById('shade');
     this.clickContainer = this.shadowRoot.getElementById('click');
+    this.roomContainer = this.shadowRoot.getElementById('room');
 
-    this._setUpElementClickHandlers();
+    this._setUpControlClickHandlers();
+    this._setUpRoomClickHandlers();
 
     this.svg.addEventListener('click', this._handleZoom.bind(this));
 
@@ -68,7 +70,7 @@ export class MapComponent extends BaseComponent {
     this.svg.removeAttribute(svgShadeZoomAttribute);
   }
 
-  _setUpElementClickHandlers() {
+  _setUpControlClickHandlers() {
     [...this.controlContainer.children].forEach((child) => {
       if (!child) return;
 
@@ -91,6 +93,26 @@ export class MapComponent extends BaseComponent {
             break;
           default:
         }
+      };
+
+      child.addEventListener('click', handle);
+    });
+  }
+
+  _setUpRoomClickHandlers() {
+    [...this.roomContainer.children].forEach((child) => {
+      if (!child) return;
+
+      const {
+        dataset: {
+          section
+        } = {}
+      } = child;
+
+      const id = Number.parseInt(section, 10);
+
+      const handle = () => {
+        window.xState.set('_selectedRoom', id);
       };
 
       child.addEventListener('click', handle);
