@@ -1,6 +1,4 @@
-const apiBaseUrl = window.location.protocol === 'http:'
-  ? 'http://hermes.net.wurstsalat.cloud:8080/'
-  : 'https://hermes.net.wurstsalat.cloud/';
+const apiBaseUrl = window.location.href;
 
 function expandTemplate(map) {
   const expression = '§(?:(\\d+)|\\{([^${}:]+)(?::([^§{}:]+))?\\})';

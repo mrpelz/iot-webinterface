@@ -1,41 +1,32 @@
 /* eslint-disable no-restricted-globals */
 
-const version = '0.0.20';
+const version = 'v0';
 
 const networkPreferred = [
-  'https://hermes.net.wurstsalat.cloud/list',
-  'https://hermes.net.wurstsalat.cloud/values'
+  new RegExp('^\\/list'),
+  new RegExp('^\\/values')
 ];
 
 const networkOnly = [
-  'https://hermes.net.wurstsalat.cloud/stream',
-  'https://hermes.net.wurstsalat.cloud/set'
+  new RegExp('^\\/stream'),
+  new RegExp('^\\/set')
 ];
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(keys.map((key) => {
-        if (key === version) return Promise.resolve();
-        return caches.delete(key).catch(() => {});
-      }));
-    })
-  );
-});
+function testUrl(url, list) {
+  const {
+    pathname: urlPath
+  } = new URL(url);
 
-function testUrl(input, list) {
-  return list.find((url) => {
-    return input.includes(url);
+  return list.find((listEntry) => {
+    return listEntry.test(urlPath);
   });
 }
 
-function doCachingRequest(event) {
-  return fetch(event.request).then((response) => {
-    return caches.open(version).then((cache) => {
-      cache.put(event.request, response.clone());
-      return response;
-    });
-  });
+async function doCachingRequest(event) {
+  const response = await fetch(event.request);
+  const cache = await caches.open(version);
+  cache.put(event.request, response.clone());
+  return response;
 }
 
 self.addEventListener('fetch', (event) => {
