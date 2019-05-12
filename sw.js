@@ -22,11 +22,15 @@ function testUrl(url, list) {
   });
 }
 
-async function doCachingRequest(event) {
-  const response = await fetch(event.request);
-  const cache = await caches.open(version);
-  cache.put(event.request, response.clone());
-  return response;
+function doCachingRequest(event) {
+  return fetch(event.request).then((response) => {
+    if (!response.ok || response.redirected) return response;
+
+    return caches.open(version).then((cache) => {
+      cache.put(event.request, response.clone());
+      return response;
+    });
+  });
 }
 
 self.addEventListener('fetch', (event) => {

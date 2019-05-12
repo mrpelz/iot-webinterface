@@ -40,7 +40,7 @@ function expandTemplate(map) {
 function fetchList() {
   const url = new URL('/list', apiBaseUrl);
 
-  return fetch(url).then((response) => {
+  return fetch(url, { credentials: 'include' }).then((response) => {
     return response.json();
   }).catch((reason) => {
     /* eslint-disable-next-line no-console */
@@ -52,7 +52,7 @@ function fetchList() {
 function fetchValues() {
   const url = new URL('/values', apiBaseUrl);
 
-  return fetch(url).then((response) => {
+  return fetch(url, { credentials: 'include' }).then((response) => {
     return response.json();
   }).catch((reason) => {
     /* eslint-disable-next-line no-console */
@@ -197,7 +197,7 @@ export async function setElement(...sets) {
     ![...url.searchParams.keys()].length
   ) return Promise.resolve();
 
-  return fetch(url).catch((reason) => {
+  return fetch(url, { credentials: 'include' }).catch((reason) => {
     /* eslint-disable-next-line no-console */
     console.error(`error fetching "/set": ${reason}`);
   });

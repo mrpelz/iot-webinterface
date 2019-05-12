@@ -22,7 +22,7 @@ function createDefaultStyle() {
 
 async function fetchTemplate(slug) {
   const templateUrl = new URL([componentsDir, slug, templateFileName].join('/'), window.location.origin);
-  const templateString = await fetch(templateUrl).then((response) => {
+  const templateString = await fetch(templateUrl, { credentials: 'include' }).then((response) => {
     if (!response.ok) return null;
     return response.text();
   }).catch(() => {
@@ -38,7 +38,7 @@ async function fetchTemplate(slug) {
 
 async function fetchStyle(slug) {
   const styleUrl = new URL([componentsDir, slug, styleFileName].join('/'), window.location.origin);
-  const styleString = await fetch(styleUrl).then((response) => {
+  const styleString = await fetch(styleUrl, { credentials: 'include' }).then((response) => {
     if (!response.ok) return null;
     return response.text();
   }).catch(() => {
