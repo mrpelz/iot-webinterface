@@ -30,6 +30,7 @@
   cursor: pointer;
   height: var(--size);
   padding: var(--margin);
+  padding-right: var(--size);
   position: fixed;
   top: 0;
   width: var(--size);

@@ -61,7 +61,8 @@ export class TitleBar extends BaseComponent {
     this.get('#wait').innerHTML = spinnerSVG;
     this.get('#menubutton').innerHTML = menuButtonSVG;
 
-    this.get('#menubutton').addEventListener('click', TitleBar.handleMenuButtonClick);
+    this.get('#menubutton').addEventListener('mousedown', TitleBar.handleMenuButtonClick);
+    this.get('#menubutton').addEventListener('touchstart', TitleBar.handleMenuButtonClick);
   }
 
   render() {

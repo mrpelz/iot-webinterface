@@ -60,12 +60,18 @@
   stroke-width: 2px;
 }
 
-#click {
+#click > * {
   cursor: zoom-in;
-  fill: transparent;
+  fill: red;
+  opacity: 0;
+  transition: opacity 1s ease-out;
 }
 #click > *[x-active] {
-  display: none;
+  pointer-events: none;
+}
+#click > *[x-state="yes"] {
+  opacity: 0.3;
+  transition: opacity 1s ease-out;
 }
 
 #room {
