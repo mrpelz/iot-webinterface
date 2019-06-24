@@ -30,7 +30,6 @@
   cursor: pointer;
   height: var(--size);
   padding: var(--margin);
-  padding-right: var(--size);
   position: fixed;
   top: 0;
   width: var(--size);
@@ -40,6 +39,7 @@
   --size: 28px;
   fill: currentColor;
   left: 0;
+  padding-right: var(--size);
 }
 
 #wait {
