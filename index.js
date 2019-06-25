@@ -28,7 +28,8 @@ function readFlags() {
     if (storageValue === null) {
       value = fallback;
     } else {
-      value = Boolean(Number.parseInt(storageValue, 10));
+      const numericValue = Number.parseInt(storageValue, 10);
+      value = Number.isNaN(numericValue) ? storageValue : Boolean(numericValue);
     }
 
     console.table(`"${flag}": ${value}`);
@@ -38,7 +39,8 @@ function readFlags() {
   window.xFlags = {
     debug: read('debug', false),
     serviceWorker: read('sw', true),
-    stream: read('stream', true)
+    stream: read('stream', true),
+    api: read('api', window.location.href)
   };
 }
 

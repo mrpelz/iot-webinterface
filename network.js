@@ -1,5 +1,3 @@
-const apiBaseUrl = window.location.href;
-
 function expandTemplate(map) {
   const expression = '§(?:(\\d+)|\\{([^${}:]+)(?::([^§{}:]+))?\\})';
 
@@ -38,9 +36,10 @@ function expandTemplate(map) {
 }
 
 function fetchList() {
-  const url = new URL('/list', apiBaseUrl);
+  const { api } = window.xFlags;
+  const url = new URL('/list', api);
 
-  return fetch(url, { credentials: 'include', redirect: 'follow' }).then((response) => {
+  return fetch(url, { credentials: 'same-origin', redirect: 'follow' }).then((response) => {
     return response.json();
   }).catch((reason) => {
     /* eslint-disable-next-line no-console */
@@ -50,9 +49,10 @@ function fetchList() {
 }
 
 function fetchValues() {
-  const url = new URL('/values', apiBaseUrl);
+  const { api } = window.xFlags;
+  const url = new URL('/values', api);
 
-  return fetch(url, { credentials: 'include', redirect: 'follow' }).then((response) => {
+  return fetch(url, { credentials: 'same-origin', redirect: 'follow' }).then((response) => {
     return response.json();
   }).catch((reason) => {
     /* eslint-disable-next-line no-console */
@@ -94,7 +94,8 @@ function startStream(callback, onChange) {
     }
 
     window.setTimeout(() => {
-      eventSource = new EventSource(new URL('/stream', apiBaseUrl));
+      const { api } = window.xFlags;
+      eventSource = new EventSource(new URL('/stream', api));
       eventSource.addEventListener('error', init);
       eventSource.addEventListener('message', handleData);
       eventSource.addEventListener('open', onOpen);
@@ -187,7 +188,8 @@ export async function setUpValues() {
 }
 
 export async function setElement(...sets) {
-  const url = new URL('/set', apiBaseUrl);
+  const { api } = window.xFlags;
+  const url = new URL('/set', api);
 
   sets.forEach(({ name, value }) => {
     url.searchParams.append(name, value);
@@ -197,7 +199,7 @@ export async function setElement(...sets) {
     ![...url.searchParams.keys()].length
   ) return Promise.resolve();
 
-  return fetch(url, { credentials: 'include', redirect: 'follow' }).catch((reason) => {
+  return fetch(url, { credentials: 'same-origin', redirect: 'follow' }).catch((reason) => {
     /* eslint-disable-next-line no-console */
     console.error(`error fetching "/set": ${reason}`);
   });
