@@ -124,10 +124,10 @@
   stroke-width: 50px;
 }
 .fan[x-state] {
-  fill: url(#gradientFan);
-}
-.fan[x-state="on"] {
   fill: hsl(205, 100%, 50%);
+}
+.fan[x-state="off"] {
+  fill: url(#gradientFan);
 }
 
 #gradientLight stop:nth-of-type(1) {
@@ -142,10 +142,56 @@
   stroke-width: 50px;
 }
 .light[x-state] {
+  fill: hsl(40, 100%, 50%);
+}
+.light[x-state="off"],
+.light[x-state="0"] {
   fill: url(#gradientLight);
 }
-.light[x-state="on"] {
-  fill: hsl(40, 100%, 50%);
+
+#gradientLightRed stop:nth-of-type(1) {
+  stop-color: hsl(0, 100%, 50%);
+  stop-opacity: 0;
+}
+#gradientLightRed stop:nth-of-type(2) {
+  stop-color: hsl(0, 100%, 50%);
+}
+.light.red[x-state] {
+  fill: hsl(0, 100%, 50%);
+}
+.light.red[x-state="off"],
+.light.red[x-state="0"] {
+  fill: url(#gradientLightRed);
+}
+
+#gradientLightGreen stop:nth-of-type(1) {
+  stop-color: hsl(125, 50%, 50%);
+  stop-opacity: 0;
+}
+#gradientLightGreen stop:nth-of-type(2) {
+  stop-color: hsl(125, 50%, 50%);
+}
+.light.green[x-state] {
+  fill: hsl(125, 50%, 50%);
+}
+.light.green[x-state="off"],
+.light.green[x-state="0"] {
+  fill: url(#gradientLightGreen);
+}
+
+#gradientLightBlue stop:nth-of-type(1) {
+  stop-color: hsl(200, 50%, 50%);
+  stop-opacity: 0;
+}
+#gradientLightBlue stop:nth-of-type(2) {
+  stop-color: hsl(200, 50%, 50%);
+}
+.light.blue[x-state] {
+  fill: hsl(200, 50%, 50%);
+}
+.light.blue[x-state="off"],
+.light.blue[x-state="0"] {
+  fill: url(#gradientLightBlue);
 }
 
 @media screen and (min-width: 769px) {
