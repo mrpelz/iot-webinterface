@@ -48,6 +48,14 @@
   <script type="module" src="./index.js" crossorigin="use-credentials"></script>
 
   <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      background: no-repeat center url('images/icons/favicon-192.png'), black;
+      width: 100vw;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
     :root {
       --font: -apple-system,SF UI Text,Helvetica Neue,Helvetica,Arial,sans-serif;
       --titlebar-height: 44px;
@@ -100,19 +108,13 @@
       padding: 0;
       scrollbar-width: none;
     }
-    
-    body {
-      -webkit-tap-highlight-color: transparent;
-      overflow-x: hidden;
-      display: none;
-    }
 
     body::-webkit-scrollbar { 
       display: none; 
     }
 
     :root.ready body {
-      display: block;
+      background: none;
     }
 
     :root.no-scroll {
@@ -121,53 +123,6 @@
 
     :root.no-scroll body {
       overflow-y: hidden;
-    }
-
-    @keyframes spinner { to {transform: rotate(315deg)} }
-
-    :root::before {
-      backface-visibility: hidden;
-      background: hsl(var(--black-shaded));
-      bottom: 0;
-      content: '';
-      left: 0;
-      opacity: 1;
-      pointer-events: none;
-      position: absolute;
-      right: 0;
-      top: 0;
-      transition: opacity 0.5s ease-out;
-      will-change: auto;
-    }
-    
-    :root::after {
-      animation: spinner 0.6s linear infinite;
-      backface-visibility: hidden;
-      border-radius: 50%;
-      border: 2px solid white;
-      border-top-color: transparent;
-      box-sizing: border-box;
-      content: '';
-      height: 20px;
-      left: 50vw;
-      margin-left: -10px;
-      margin-top: -10px;
-      pointer-events: none;
-      position: absolute;
-      top: 50vh;
-      width: 20px;
-      transform: rotate(-45deg);
-      will-change: auto;
-      z-index: 10;
-    }
-
-    :root.ready::before {
-      opacity: 0;
-    }
-
-    :root.values::before,
-    :root.values::after {
-      display: none;
     }
   </style>
 </head>
