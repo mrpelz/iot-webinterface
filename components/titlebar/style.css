@@ -22,8 +22,10 @@
   text-transform: capitalize;
 }
 
+#wait,
 #menubutton,
-#wait {
+#mapbutton,
+#backbutton {
   --margin: calc((var(--titlebar-height) - var(--size)) / 2);
   bottom: 0;
   color: hsl(var(--font-primary));
@@ -35,6 +37,11 @@
   width: var(--size);
 }
 
+#wait {
+  --size: 22px;
+  right: 0;
+}
+
 #menubutton {
   --size: 28px;
   fill: currentColor;
@@ -42,9 +49,13 @@
   padding-right: var(--size);
 }
 
-#wait {
-  --size: 22px;
+#mapbutton,
+#backbutton {
+  --size: 28px;
+  fill: currentColor;
+  margin-right: calc(var(--size) + var(--margin));
   right: 0;
+  padding-left: var(--size);
 }
 
 @keyframes wait-outer-animation {
@@ -90,7 +101,20 @@
   transform-origin: 50% 50%;
 }
 
-#wait.active {
+#wait.hide {
+  display: none;
+}
+
+#wait.hide ~ #mapbutton,
+#wait.hide ~ #backbutton {
+  margin-right: 0;
+}
+
+#mapbutton.hide {
+  display: none;
+}
+
+#backbutton.hide {
   display: none;
 }
 
