@@ -1,9 +1,9 @@
 /* eslint-disable import/extensions */
-import { defineComponents, c, render } from './dom.js';
-import { State } from './state.js';
+import { ClickableSwitch, Switch } from './components/switch/index.js';
+import { c, defineComponents, render } from './dom.js';
 import {
-  getSavedPage,
   getDarkMode,
+  getSavedPage,
   setUpElements,
   setUpValues
 } from './network.js';
@@ -15,7 +15,7 @@ import { MenuElement } from './components/menu-element/index.js';
 import { Metric } from './components/metric/index.js';
 import { Page } from './components/page/index.js';
 import { PageContainer } from './components/page-container/index.js';
-import { Switch, ClickableSwitch } from './components/switch/index.js';
+import { State } from './state.js';
 import { TitleBar } from './components/titlebar/index.js';
 import { UpDown } from './components/up-down/index.js';
 
@@ -32,6 +32,7 @@ function readFlags() {
       value = Number.isNaN(numericValue) ? storageValue : Boolean(numericValue);
     }
 
+    // eslint-disable-next-line no-console
     console.table(`"${flag}": ${value}`);
     return value;
   };

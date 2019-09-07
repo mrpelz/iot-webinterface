@@ -1,8 +1,8 @@
 /* eslint-disable import/extensions */
 import {
   BaseComponent,
-  render,
-  c
+  c,
+  render
 } from '../../dom.js';
 
 const noScrollClass = 'no-scroll';
