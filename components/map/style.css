@@ -194,6 +194,36 @@
   fill: url(#gradientLightBlue);
 }
 
+#gradientLightOrange stop:nth-of-type(1) {
+  stop-color: hsl(30, 100%, 50%);
+  stop-opacity: 0;
+}
+#gradientLightOrange stop:nth-of-type(2) {
+  stop-color: hsl(30, 100%, 50%);
+}
+.light.orange[x-state] {
+  fill: hsl(30, 100%, 50%);
+}
+.light.orange[x-state="off"],
+.light.orange[x-state="0"] {
+  fill: url(#gradientLightOrange);
+}
+
+#gradientLightCWhite stop:nth-of-type(1) {
+  stop-color: hsl(60, 100%, 70%);
+  stop-opacity: 0;
+}
+#gradientLightCWhite stop:nth-of-type(2) {
+  stop-color: hsl(60, 100%, 70%);
+}
+.light.c-white[x-state] {
+  fill: hsl(60, 100%, 70%);
+}
+.light.c-white[x-state="off"],
+.light.c-white[x-state="0"] {
+  fill: url(#gradientLightCWhite);
+}
+
 @media screen and (min-width: 769px) {
   :host {
     margin-left: var(--menu-width);
