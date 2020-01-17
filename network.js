@@ -62,7 +62,7 @@ function fetchValues() {
 }
 
 function startStream(callback, onChange) {
-  let eventSource = null;
+  const { api } = window.xFlags;
 
   const handleData = ({ data }) => {
     try {
@@ -79,30 +79,16 @@ function startStream(callback, onChange) {
   };
 
   const onClose = () => {
+    /* eslint-disable-next-line no-console */
+    console.log('eventSource disconnected, reconnecting…');
+
     onChange(false);
   };
 
-  const init = (event) => {
-    if (event) {
-      /* eslint-disable-next-line no-console */
-      console.log('eventSource disconnected, reconnecting…');
-      onClose();
-      eventSource.close();
-      eventSource.removeEventListener('open', onOpen);
-      eventSource.removeEventListener('message', handleData);
-      eventSource.removeEventListener('error', init);
-    }
-
-    window.setTimeout(() => {
-      const { api } = window.xFlags;
-      eventSource = new EventSource(new URL('/stream', api));
-      eventSource.addEventListener('error', init);
-      eventSource.addEventListener('message', handleData);
-      eventSource.addEventListener('open', onOpen);
-    }, (event ? 50 : 0));
-  };
-
-  init();
+  const eventSource = new EventSource(new URL('/stream', api));
+  eventSource.addEventListener('error', onClose);
+  eventSource.addEventListener('message', handleData);
+  eventSource.addEventListener('open', onOpen);
 }
 
 export function getSavedPage() {
@@ -156,8 +142,6 @@ export async function setUpValues() {
     });
   };
 
-  let first = true;
-
   return new Promise((resolve) => {
     const { stream } = window.xFlags;
 
@@ -177,9 +161,8 @@ export async function setUpValues() {
       if (!name) return;
       window.xState.set(name, value);
     }, async (connected) => {
-      if (first || connected) {
+      if (connected) {
         await values();
-        first = false;
       }
       window.xState.set('_stream', connected);
       resolve();

@@ -1,4 +1,3 @@
-/* eslint-disable import/extensions */
 import { ClickableSwitch, Switch } from './components/switch/index.js';
 import { c, defineComponents, render } from './dom.js';
 import {
