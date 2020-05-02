@@ -16,9 +16,10 @@
   position: fixed;
   scrollbar-width: none;
   top: var(--titlebar-height);
-  transform: translateX(-100%);
+  transform: translate3d(-100%, 0, 0);
   transition: transform 0.15s ease-out;
   width: var(--menu-width);
+  will-change: scroll-position;
   z-index: 2;
 }
 
