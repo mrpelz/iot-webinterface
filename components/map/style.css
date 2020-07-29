@@ -24,6 +24,12 @@
   transform-origin: center;
 }
 
+#svg[x-zoom] #room > * {
+  pointer-events: unset;
+}
+#svg[x-zoom] #control > * {
+  pointer-events: unset;
+}
 #svg[x-zoom="kueche"] > #all {
   transform: scale(2.5) translate(555px, 510px);
 }
@@ -81,6 +87,9 @@
   font-family: var(--font);
   font-size: 20px;
 }
+#room > * {
+  pointer-events: none;
+}
 
 #shade {
   pointer-events: none;
@@ -100,6 +109,7 @@
 }
 #control > * {
   display: none;
+  pointer-events: none;
 }
 #control > *[x-state] {
   display: block;
@@ -231,5 +241,12 @@
 
   #svg {
     width: calc(100vw - var(--menu-width));
+  }
+
+  #room > * {
+    pointer-events: unset;
+  }
+  #control > * {
+    pointer-events: unset;
   }
 }
