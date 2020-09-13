@@ -40,7 +40,7 @@ function readFlags() {
    * @returns {T}
    */
   const read = (flag, fallback, typeCast) => {
-    const storage = window.localStorage.getItem(flag);
+    const storage = localStorage.getItem(flag);
     const value = typeCast(storage === null ? fallback : storage);
 
     // eslint-disable-next-line no-console
@@ -52,7 +52,7 @@ function readFlags() {
     debug: read('debug', false, Boolean),
     serviceWorker: read('sw', true, Boolean),
     stream: read('stream', true, Boolean),
-    api: read('api', window.location.href, String)
+    api: read('api', location.href, String)
   };
 }
 
@@ -99,10 +99,6 @@ async function pre() {
 }
 
 async function main() {
-  Object.defineProperty(window, 'xState', {
-    value: new State()
-  });
-
   state.set('_menu', false);
   state.set('_ready', false);
   state.set('_values', false);
@@ -117,7 +113,7 @@ async function main() {
   });
   state.subscribe('_reload', () => {
     deleteSW().then(() => {
-      window.location.reload(false);
+      location.reload(false);
     });
   }, false);
 
@@ -227,13 +223,11 @@ async function main() {
 
 if (
   'serviceWorker' in navigator
-  && window.customElements
+  && customElements
   && document.body.attachShadow
   && typeof EventSource !== 'undefined'
   && typeof Intl !== 'undefined'
 ) {
-  document.addEventListener('touchstart', () => { }, true);
-
   Promise.all([
     new Promise((resolve) => {
       document.addEventListener('DOMContentLoaded', () => {

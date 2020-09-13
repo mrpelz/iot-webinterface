@@ -1,4 +1,6 @@
 :host {
-  min-height: 100vh;
+  display: block;
+  margin-top: var(--safe-area-inset-top);
+  min-height: calc(100vh - var(--safe-area-inset-top));
   width: 100vw;
 }

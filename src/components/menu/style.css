@@ -9,13 +9,13 @@
   flex-direction: column;
   flex-shrink: 0;
   flex-wrap: nowrap;
-  height: calc(100vh - var(--menu-height));
+  height: calc(100vh - var(--menu-height) - var(--safe-area-inset-top));
   max-width: 50vw;
   overflow-x: hidden;
   overflow-y: auto;
   position: fixed;
   scrollbar-width: none;
-  top: var(--titlebar-height);
+  top: calc(var(--titlebar-height) + var(--safe-area-inset-top));
   transform: translate3d(-100%, 0, 0);
   transition: transform 0.15s ease-out;
   width: var(--menu-width);
@@ -74,7 +74,7 @@
   bottom: 0;
   left: 100%;
   position: fixed;
-  top: 0;
+  top: var(--safe-area-inset-top);
   width: calc(100vw - var(--menu-width));
   z-index: 3;
 }

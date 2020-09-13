@@ -33,7 +33,7 @@
   height: var(--size);
   padding: var(--margin);
   position: fixed;
-  top: 0;
+  top: var(--safe-area-inset-top);
   width: var(--size);
 }
 

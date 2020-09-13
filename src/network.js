@@ -145,7 +145,7 @@ function startStream(callback, onChange) {
 }
 
 export function getSavedPage() {
-  const savedPage = Number.parseInt(window.localStorage.getItem('page'), 10);
+  const savedPage = Number.parseInt(localStorage.getItem('page'), 10);
   state.set(
     '_selectedRoom',
     Number.isNaN(savedPage) ? 0 : savedPage
@@ -154,13 +154,17 @@ export function getSavedPage() {
   state.subscribe(
     '_selectedRoom',
     (index) => {
-      window.localStorage.setItem('page', index.toString(10));
+      localStorage.setItem('page', index.toString(10));
     }
   );
 }
 
 export function getDarkMode() {
-  const dark = window.localStorage.getItem('dark') !== null;
+  const statusBar = document.head.querySelector(
+    'meta[name="apple-mobile-web-app-status-bar"]'
+  );
+
+  const dark = localStorage.getItem('dark') !== null;
   state.set('_darkMode', dark);
 
   state.subscribe(
@@ -168,10 +172,14 @@ export function getDarkMode() {
     (isDark) => {
       if (isDark) {
         document.documentElement.classList.add('dark');
-        window.localStorage.setItem('dark', '1');
+        localStorage.setItem('dark', '1');
+
+        if (statusBar) statusBar.setAttribute('content', '#131317');
       } else {
         document.documentElement.classList.remove('dark');
-        window.localStorage.removeItem('dark');
+        localStorage.removeItem('dark');
+
+        if (statusBar) statusBar.setAttribute('content', '#E6E6F7');
       }
     }
   );

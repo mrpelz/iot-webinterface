@@ -1,6 +1,6 @@
 :host {
   display: none;
-  min-height: calc(100vh - var(--titlebar-height));
+  min-height: calc(100vh - var(--titlebar-height) - var(--safe-area-inset-top));
   padding: var(--titlebar-height) 0 0;
   z-index: 2;
 
@@ -13,7 +13,7 @@
 
 #svg {
   cursor: zoom-out;
-  height: calc(100vh - var(--titlebar-height));
+  height: calc(100vh - var(--titlebar-height) - var(--safe-area-inset-top));
   width: 100vw;
 }
 

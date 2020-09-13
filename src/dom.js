@@ -21,7 +21,7 @@ function createDefaultStyle() {
 }
 
 async function fetchTemplate(slug) {
-  const templateUrl = new URL([componentsDir, slug, templateFileName].join('/'), window.location.origin);
+  const templateUrl = new URL([componentsDir, slug, templateFileName].join('/'), location.origin);
   const templateString = await fetch(templateUrl.href, { credentials: 'same-origin', redirect: 'follow' }).then((response) => {
     if (!response.ok) return null;
     return response.text();
@@ -37,7 +37,7 @@ async function fetchTemplate(slug) {
 }
 
 async function fetchStyle(slug) {
-  const styleUrl = new URL([componentsDir, slug, styleFileName].join('/'), window.location.origin);
+  const styleUrl = new URL([componentsDir, slug, styleFileName].join('/'), location.origin);
   const styleString = await fetch(styleUrl.href, { credentials: 'same-origin', redirect: 'follow' }).then((response) => {
     if (!response.ok) return null;
     return response.text();
@@ -261,7 +261,7 @@ export class BaseComponent extends HTMLElement {
   }
 
   connectedCallback() {
-    this.computedStyle = window.getComputedStyle(this);
+    this.computedStyle = getComputedStyle(this);
 
     this.attachTemplate();
 

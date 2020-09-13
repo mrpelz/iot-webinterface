@@ -9,7 +9,7 @@ const noScrollClass = 'no-scroll';
 
 export class App extends BaseComponent {
   static handleRoomChange() {
-    window.scrollTo(0, 0);
+    scrollTo(0, 0);
   }
 
   static handleMenu() {

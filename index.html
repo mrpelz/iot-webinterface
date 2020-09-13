@@ -6,7 +6,7 @@
 
   <title>wurstsalat IoT</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="manifest" href="./manifest.json">
@@ -18,7 +18,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="images/icons/favicon-180.png">
 
   <meta name="apple-mobile-web-app-title" content="wurstsalat IoT">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <!-- iPhone 5, 5s, SE -->
   <link rel="apple-touch-startup-image" href="./images/splash/launch-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
@@ -45,16 +45,15 @@
   <link rel="apple-touch-startup-image" href="./images/splash/launch-2048x2732.png" media="(min-device-width: 1024px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait)">
   <link rel="apple-touch-startup-image" href="./images/splash/launch-2732x2048.png" media="(min-device-width: 1024px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape)">
 
-  <script type="module" src="./src/index.js" crossorigin="use-credentials"></script>
+  <script type="module" src="src/index.js" crossorigin="use-credentials"></script>
 
   <style>
-    body {
-      -webkit-tap-highlight-color: transparent;
-      background: no-repeat center url('images/icons/favicon-192.png'), black;
-      width: 100vw;
-      height: 100vh;
-      overflow-x: hidden;
-      scroll-behavior: auto;
+    * {
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     :root {
@@ -75,7 +74,7 @@
       --black-shaded: 240, 17%, 9%;
       --grey-dark: 0, 0%, 26%;
       --grey-glow: 240, 9%, 23%;
-      --organge: 35, 100%, 50%;
+      --orange: 35, 100%, 50%;
 
       --background-primary: var(--white);
       --background-secondary: var(--white-shaded);
@@ -84,6 +83,10 @@
       --font-secondary: var(--grey-low);
       --font-tertiary: var(--grey-mid);
       --selection: var(--blue);
+      --status-bar-background: var(--black);
+
+      --safe-area-inset-top: env(safe-area-inset-top, 20px);
+      /* --safe-area-inset-top: 20px; */
     }
 
     :root.dark {
@@ -92,15 +95,22 @@
       --background-tertiary: var(--grey-dark);
       --font-primary: var(--white);
       --font-tertiary: var(--grey-glow);
-      --selection: var(--organge);
+      --selection: var(--orange);
+      --status-bar-background: var(--black-shaded);
     }
 
-    * {
-      -moz-user-select: none;
-      -ms-user-select: none;
+    body {
+      -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
+      background: no-repeat center url('images/icons/favicon-192.png'), hsl(var(--black-shaded));
+      height: 100vh;
+      overflow-x: hidden;
+      scroll-behavior: auto;
+      width: 100vw;
+    }
+
+    body::-webkit-scrollbar {
+      display: none;
     }
 
     :root,
@@ -110,14 +120,23 @@
       scrollbar-width: none;
     }
 
-    body::-webkit-scrollbar {
-      display: none;
+    :root.ready body {
+      background: hsl(var(--black-shaded));
+      height: unset;
+      width: unset;
     }
 
-    :root.ready body {
-      background: none;
+    :root.ready body::before {
+      background: hsl(var(--status-bar-background));
+      content: '';
+      height: var(--safe-area-inset-top);
+      left: 0;
+      position: fixed;
+      top: 0;
+      width: 100vw;
+      z-index: 4;
     }
   </style>
 </head>
-<body></body>
+<body ontouchstart=""></body>
 </html>

@@ -43,9 +43,9 @@ export class Menu extends BaseComponent {
     };
 
     if (menu) {
-      window.addEventListener('resize', Menu.hide, listenerOpts);
+      addEventListener('resize', Menu.hide, listenerOpts);
     } else {
-      window.removeEventListener('resize', Menu.hide);
+      removeEventListener('resize', Menu.hide);
     }
   }
 
