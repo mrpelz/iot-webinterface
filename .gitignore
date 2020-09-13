@@ -1,3 +1,8 @@
 .DS_Store
+epaper
+index.nginx-debian.html
+led.xml
 node_modules
+phonebutton.php
 secrets.txt
+videos/
