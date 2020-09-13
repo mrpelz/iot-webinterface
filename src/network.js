@@ -69,7 +69,14 @@ function fetchValues() {
 function startStream(callback, onChange) {
   const { api } = flags;
 
-  const handleData = ({ data }) => {
+  /**
+   * @type {EventSource | null}
+   */
+  let eventSource = null;
+
+  let wasOnceVisible = false;
+
+  const handleStreamData = ({ data }) => {
     try {
       const payload = JSON.parse(data);
       return callback(payload);
@@ -81,21 +88,60 @@ function startStream(callback, onChange) {
     return null;
   };
 
-  const onOpen = () => {
+  const onStreamOpen = () => {
+    /* eslint-disable-next-line no-console */
+    console.log('eventSource connected');
+
     onChange(true);
   };
 
-  const onClose = () => {
+  const onStreamClose = () => {
     /* eslint-disable-next-line no-console */
-    console.log('eventSource disconnected, reconnecting…');
+    console.log('eventSource disconnected');
 
     onChange(false);
   };
 
-  const eventSource = new EventSource(new URL('/stream', api).href);
-  eventSource.addEventListener('error', onClose);
-  eventSource.addEventListener('message', handleData);
-  eventSource.addEventListener('open', onOpen);
+  const onVisibilityChange = () => {
+    if (wasOnceVisible && document.visibilityState === 'hidden') {
+      /* eslint-disable-next-line no-console */
+      console.log('app invisible…');
+
+      if (!eventSource) return;
+
+      /* eslint-disable-next-line no-console */
+      console.log('…destorying EventSource');
+
+      eventSource.removeEventListener('error', onStreamClose);
+      eventSource.removeEventListener('message', handleStreamData);
+      eventSource.removeEventListener('open', onStreamOpen);
+
+      eventSource.close();
+
+      onChange(false);
+
+      eventSource = null;
+    } else {
+      wasOnceVisible = true;
+
+      /* eslint-disable-next-line no-console */
+      console.log('app visible…');
+
+      if (eventSource) return;
+
+      /* eslint-disable-next-line no-console */
+      console.log('…creating EventSource');
+
+      eventSource = new EventSource(new URL('/stream', api).href);
+
+      eventSource.addEventListener('error', onStreamClose);
+      eventSource.addEventListener('message', handleStreamData);
+      eventSource.addEventListener('open', onStreamOpen);
+    }
+  };
+
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  onVisibilityChange();
 }
 
 export function getSavedPage() {

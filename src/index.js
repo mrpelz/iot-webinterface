@@ -19,7 +19,16 @@ import { TitleBar } from './components/titlebar/index.js';
 import { UpDown } from './components/up-down/index.js';
 
 export const state = new State();
-export let flags = null;
+
+/**
+ * @type {undefined | {
+ *  debug: boolean,
+ *  serviceWorker: boolean,
+ *  stream: boolean,
+ *  api: string
+ * }}
+ */
+export let flags;
 
 function readFlags() {
 
@@ -27,19 +36,12 @@ function readFlags() {
    * @template T
    * @param {string} flag
    * @param {T} fallback
-   * @returns {T | string | boolean}
+   * @param {(...any) => T} typeCast
+   * @returns {T}
    */
-  const read = (flag, fallback) => {
-    let value;
-
-    const storageValue = window.localStorage.getItem(flag);
-
-    if (storageValue === null) {
-      value = fallback;
-    } else {
-      const numericValue = Number.parseInt(storageValue, 10);
-      value = Number.isNaN(numericValue) ? storageValue : Boolean(numericValue);
-    }
+  const read = (flag, fallback, typeCast) => {
+    const storage = window.localStorage.getItem(flag);
+    const value = typeCast(storage === null ? fallback : storage);
 
     // eslint-disable-next-line no-console
     console.table(`"${flag}": ${value}`);
@@ -47,10 +49,10 @@ function readFlags() {
   };
 
   flags = {
-    debug: read('debug', false),
-    serviceWorker: read('sw', true),
-    stream: read('stream', true),
-    api: read('api', window.location.href)
+    debug: read('debug', false, Boolean),
+    serviceWorker: read('sw', true, Boolean),
+    stream: read('stream', true, Boolean),
+    api: read('api', window.location.href, String)
   };
 }
 
