@@ -8,6 +8,13 @@ import { state } from '../../index.js';
 const activeClass = bem('menu', 'element', 'active');
 const separatedClass = bem('menu', 'element', 'separated');
 
+/**
+ * @typedef MenuElementExtension
+ * @type {MenuElement & {
+ *  scrollIntoViewIfNeeded: () => void
+ * }}
+ */
+
 export class MenuElement extends BaseComponent {
   _handleClick() {
     const { id } = this.props;
@@ -29,7 +36,19 @@ export class MenuElement extends BaseComponent {
     const { id } = this.props;
     if (!open || state.get('_selectedRoom') !== id) return;
 
-    this.scrollIntoView();
+    const thisInstance = (
+      /** @type {MenuElementExtension} */ (
+        /** @type {unknown} */ (this)
+      )
+    );
+
+    if (thisInstance.scrollIntoViewIfNeeded instanceof Function) {
+      thisInstance.scrollIntoViewIfNeeded();
+
+      return;
+    }
+
+    thisInstance.scrollIntoView();
   }
 
   create() {

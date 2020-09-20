@@ -102,15 +102,12 @@ export class TitleBar extends BaseComponent {
     this.get('#mapbutton').innerHTML = mapButtonSVG;
     this.get('#backbutton').innerHTML = backButtonSVG;
 
-    this.get('#menubutton').addEventListener('mousedown', TitleBar.handleMenuButtonClick);
-    this.get('#menubutton').addEventListener('touchstart', TitleBar.handleMenuButtonClick);
+    this.get('#menubutton').addEventListener('click', TitleBar.handleMenuButtonClick);
 
-    this.get('#mapbutton').addEventListener('mousedown', TitleBar.handleMapButtonClick);
-    this.get('#mapbutton').addEventListener('touchstart', TitleBar.handleMapButtonClick);
+    this.get('#mapbutton').addEventListener('click', TitleBar.handleMapButtonClick);
 
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
-    this.get('#backbutton').addEventListener('mousedown', this.handleBackButtonClick);
-    this.get('#backbutton').addEventListener('touchstart', this.handleBackButtonClick);
+    this.get('#backbutton').addEventListener('click', this.handleBackButtonClick);
   }
 
   render() {
