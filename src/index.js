@@ -20,6 +20,9 @@ import { UpDown } from './components/up-down/index.js';
 
 export const state = new State();
 
+// @ts-ignore
+window.state = state;
+
 /**
  * @type {undefined | {
  *  debug: boolean,

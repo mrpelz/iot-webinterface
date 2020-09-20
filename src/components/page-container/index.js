@@ -19,6 +19,10 @@ const backgroundImageUrl = (room) => {
     }.png`;
 };
 
+
+const menuSwipeInitWidth = 30;
+const menuSwipeCompleteWidth = 100;
+
 function getSectionExtension(section = {}) {
   const { categories = [] } = section;
   if (categories.length > 1) return false;
@@ -44,6 +48,58 @@ export class PageContainer extends BaseComponent {
 
     BaseComponent.eventPreventAndStop(e);
     state.set('_menu', false);
+  }
+
+  /**
+   * @param {TouchEvent} event
+   */
+  static handleTouchStart(event) {
+    if (state.get('_menu')) return;
+
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    const x = touch.clientX;
+
+    if (x > menuSwipeInitWidth) return;
+
+    event.preventDefault();
+
+    state.set('_menuSwipe', x);
+  }
+
+  /**
+   * @param {TouchEvent} event
+   */
+  static handleTouchMove(event) {
+    if (state.get('_menu') || !state.get('_menuSwipe')) return;
+
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    const x = touch.clientX;
+
+    event.preventDefault();
+
+    state.set('_menuSwipe', x);
+  }
+
+  static handleTouchEnd() {
+    if (state.get('_menu')) return;
+
+    const x = state.get('_menuSwipe');
+
+    state.set('_menuSwipe', null);
+
+    if (x && x > menuSwipeCompleteWidth) {
+      state.set('_menu', true);
+    }
+  }
+
+  static handleTouchCancel() {
+    if (state.get('_menu')) return;
+
+    state.set('_menuSwipe', null);
   }
 
   _handleRoomChange(index) {
@@ -137,6 +193,11 @@ export class PageContainer extends BaseComponent {
     this.addEventListener('touchend', PageContainer.handleStrayClick, {
       capture: true
     });
+
+    this.addEventListener('touchstart', PageContainer.handleTouchStart);
+    this.addEventListener('touchmove', PageContainer.handleTouchMove);
+    this.addEventListener('touchend', PageContainer.handleTouchEnd);
+    this.addEventListener('touchcancel', PageContainer.handleTouchCancel);
   }
 
   destroy() {

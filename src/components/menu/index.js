@@ -9,6 +9,8 @@ import { hierarchy } from '../../network.js';
 import { state } from '../../index.js';
 
 const menuActiveClass = bem('menu', null, 'active');
+const swipeActiveClass = bem('menu', null, 'swipe-active');
+const menuSwipeVar = '--menu-swipe';
 
 export class Menu extends BaseComponent {
   static hide() {
@@ -49,6 +51,18 @@ export class Menu extends BaseComponent {
     }
   }
 
+  _handleSwipe(value) {
+    this.setProps({
+      menuSwipe: (
+        !value
+        || typeof value !== 'number'
+        || value < 0
+      )
+        ? null
+        : Math.min(value, this.offsetWidth)
+    });
+  }
+
   create() {
     const { sections = [] } = hierarchy;
     const itemNodes = [].concat(...sections.map((sectionGroup, groupIndex) => {
@@ -73,6 +87,10 @@ export class Menu extends BaseComponent {
       state.subscribe(
         '_menu',
         this._handleMenu.bind(this)
+      ),
+      state.subscribe(
+        '_menuSwipe',
+        this._handleSwipe.bind(this)
       )
     ];
 
@@ -102,8 +120,15 @@ export class Menu extends BaseComponent {
   }
 
   render() {
-    const { menu = false } = this.props;
+    const { menu = false, menuSwipe = null } = this.props;
     this.classList.toggle(menuActiveClass, menu);
+    this.classList.toggle(swipeActiveClass, menuSwipe);
+
+    if (menuSwipe) {
+      this.style.setProperty(menuSwipeVar, `${menuSwipe}px`);
+    } else {
+      this.style.removeProperty(menuSwipeVar);
+    }
   }
 
   destroy() {
