@@ -65,7 +65,9 @@ export class PageContainer extends BaseComponent {
 
     event.preventDefault();
 
-    state.set('_menuSwipe', x);
+    requestAnimationFrame(() => {
+      state.set('_menuSwipe', x);
+    });
   }
 
   /**
@@ -81,7 +83,9 @@ export class PageContainer extends BaseComponent {
 
     event.preventDefault();
 
-    state.set('_menuSwipe', x);
+    requestAnimationFrame(() => {
+      state.set('_menuSwipe', x);
+    });
   }
 
   static handleTouchEnd() {
@@ -89,17 +93,21 @@ export class PageContainer extends BaseComponent {
 
     const x = state.get('_menuSwipe');
 
-    state.set('_menuSwipe', null);
+    requestAnimationFrame(() => {
+      state.set('_menuSwipe', null);
 
-    if (x && x > menuSwipeCompleteWidth) {
-      state.set('_menu', true);
-    }
+      if (x && x > menuSwipeCompleteWidth) {
+        state.set('_menu', true);
+      }
+    });
   }
 
   static handleTouchCancel() {
     if (state.get('_menu')) return;
 
-    state.set('_menuSwipe', null);
+    requestAnimationFrame(() => {
+      state.set('_menuSwipe', null);
+    });
   }
 
   _handleRoomChange(index) {

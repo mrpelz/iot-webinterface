@@ -123,6 +123,15 @@ async function main() {
   getSavedPage();
   getDarkMode();
 
+  document.body.addEventListener('click', ({ currentTarget }) => {
+    if (currentTarget) return;
+
+    scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+
   await Promise.all([
     setUpElements(),
     defineComponents([

@@ -36,19 +36,30 @@ export class MenuElement extends BaseComponent {
     const { id } = this.props;
     if (!open || state.get('_selectedRoom') !== id) return;
 
-    const thisInstance = (
-      /** @type {MenuElementExtension} */ (
-        /** @type {unknown} */ (this)
-      )
+    this._handleMenuScroll();
+  }
+
+  _handleMenuScroll() {
+    const cutoffTop = this.offsetParent.scrollTop > this.offsetTop;
+    const cutoffBottom = (
+      this.offsetParent.scrollTop + this.offsetParent.clientHeight
+    ) < (
+      this.offsetTop + this.offsetHeight
     );
 
-    if (thisInstance.scrollIntoViewIfNeeded instanceof Function) {
-      thisInstance.scrollIntoViewIfNeeded();
-
-      return;
+    if (cutoffTop) {
+      this.offsetParent.scrollTo({
+        top: this.offsetTop,
+        behavior: 'smooth'
+      });
     }
 
-    thisInstance.scrollIntoView();
+    if (cutoffBottom) {
+      this.offsetParent.scrollTo({
+        top: this.offsetTop + this.offsetHeight,
+        behavior: 'smooth'
+      });
+    }
   }
 
   create() {
