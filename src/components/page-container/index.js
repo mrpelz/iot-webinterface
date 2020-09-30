@@ -9,19 +9,19 @@ import { state } from '../../index.js';
 
 const backgroundClass = bem('page-container', null, 'background');
 const backgroundImageUrl = (room) => {
-  return `images/background/${
-    room
-      .replace('ä', 'ae')
-      .replace('ö', 'oe')
-      .replace('ü', 'ue')
-      .replace('ß', 'ss')
-      .toLowerCase()
+  return `images/background/${room
+    .replace('ä', 'ae')
+    .replace('ö', 'oe')
+    .replace('ü', 'ue')
+    .replace('ß', 'ss')
+    .toLowerCase()
     }.png`;
 };
 
 
 const menuSwipeInitWidth = 30;
 const menuSwipeCompleteWidth = 100;
+const menuSwipeAccelerationThreshold = 0.5;
 
 function getSectionExtension(section = {}) {
   const { categories = [] } = section;
@@ -53,26 +53,6 @@ export class PageContainer extends BaseComponent {
   /**
    * @param {TouchEvent} event
    */
-  static handleTouchStart(event) {
-    if (state.get('_menu')) return;
-
-    const touch = event.touches[0];
-    if (!touch) return;
-
-    const x = touch.clientX;
-
-    if (x > menuSwipeInitWidth) return;
-
-    event.preventDefault();
-
-    requestAnimationFrame(() => {
-      state.set('_menuSwipe', x);
-    });
-  }
-
-  /**
-   * @param {TouchEvent} event
-   */
   static handleTouchMove(event) {
     if (state.get('_menu') || !state.get('_menuSwipe')) return;
 
@@ -88,7 +68,38 @@ export class PageContainer extends BaseComponent {
     });
   }
 
-  static handleTouchEnd() {
+  static handleTouchCancel() {
+    if (state.get('_menu')) return;
+
+    requestAnimationFrame(() => {
+      state.set('_menuSwipe', null);
+    });
+  }
+
+  /**
+   * @param {TouchEvent} event
+   */
+  _handleTouchStart(event) {
+    if (state.get('_menu')) return;
+
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    const x = touch.clientX;
+
+    if (x > menuSwipeInitWidth) return;
+
+    event.preventDefault();
+
+    this.swipeInitTime = Date.now();
+    this.swipeInitX = x;
+
+    requestAnimationFrame(() => {
+      state.set('_menuSwipe', x);
+    });
+  }
+
+  _handleTouchEnd() {
     if (state.get('_menu')) return;
 
     const x = state.get('_menuSwipe');
@@ -96,17 +107,22 @@ export class PageContainer extends BaseComponent {
     requestAnimationFrame(() => {
       state.set('_menuSwipe', null);
 
-      if (x && x > menuSwipeCompleteWidth) {
+      if (!x) return;
+
+      const swipeTime = Math.abs(Date.now() - this.swipeInitTime);
+      const swipeDistance = Math.abs(x - this.swipeInitX);
+
+      this.swipeInitX = 0;
+      this.swipeInitTime = 0;
+
+      const acceleration = swipeDistance / swipeTime;
+
+      if (
+        x > menuSwipeCompleteWidth
+        || acceleration > menuSwipeAccelerationThreshold
+      ) {
         state.set('_menu', true);
       }
-    });
-  }
-
-  static handleTouchCancel() {
-    if (state.get('_menu')) return;
-
-    requestAnimationFrame(() => {
-      state.set('_menuSwipe', null);
     });
   }
 
@@ -187,6 +203,16 @@ export class PageContainer extends BaseComponent {
       render(...elementNodes)
     );
 
+    /**
+     * @type {number}
+     */
+    this.swipeInitX = 0;
+
+    /**
+     * @type {number}
+     */
+    this.swipeInitTime = 0;
+
     this.backgroundStyle = document.createElement('style');
     this.shadowRoot.appendChild(this.backgroundStyle);
 
@@ -202,9 +228,10 @@ export class PageContainer extends BaseComponent {
       capture: true
     });
 
-    this.addEventListener('touchstart', PageContainer.handleTouchStart);
+    this.addEventListener('touchstart', this._handleTouchStart.bind(this));
+    this.addEventListener('touchend', this._handleTouchEnd.bind(this));
+
     this.addEventListener('touchmove', PageContainer.handleTouchMove);
-    this.addEventListener('touchend', PageContainer.handleTouchEnd);
     this.addEventListener('touchcancel', PageContainer.handleTouchCancel);
   }
 
