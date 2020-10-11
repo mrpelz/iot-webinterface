@@ -211,6 +211,8 @@ export async function setUpValues() {
       return;
     }
 
+    values();
+
     startStream((data) => {
       const { isSystem = false, name, value } = data;
 
