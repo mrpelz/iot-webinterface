@@ -102,10 +102,18 @@ function startStream(callback, onChange) {
     onChange(false);
   };
 
-  const onVisibilityChange = () => {
-    if (wasOnceVisible && document.visibilityState === 'hidden') {
+  /**
+   * @param {boolean} visible
+   */
+  const onVisibilityChange = (visible) => {
+    if (wasOnceVisible && !visible) {
       /* eslint-disable-next-line no-console */
       console.log('app invisible…');
+
+      const overridePage = flags.pageOverride;
+      if (overridePage !== null) {
+        state.set('_selectedRoom', overridePage);
+      }
 
       if (!eventSource) return;
 
@@ -132,7 +140,12 @@ function startStream(callback, onChange) {
       /* eslint-disable-next-line no-console */
       console.log('…creating EventSource');
 
-      eventSource = new EventSource(new URL('/stream', api).href);
+      const eventSourceUrl = new URL('/stream', api);
+      if (flags.lowPriorityStream) {
+        eventSourceUrl.searchParams.set('lp', '1');
+      }
+
+      eventSource = new EventSource(eventSourceUrl.href);
 
       eventSource.addEventListener('error', onStreamClose);
       eventSource.addEventListener('message', handleStreamData);
@@ -140,16 +153,31 @@ function startStream(callback, onChange) {
     }
   };
 
-  document.addEventListener('visibilitychange', onVisibilityChange);
-  onVisibilityChange();
+  const documentIsVisible = () => document.visibilityState !== 'hidden';
+  document.addEventListener('visibilitychange', () => onVisibilityChange(documentIsVisible()));
+  onVisibilityChange(documentIsVisible());
+
+  addEventListener('blur', () => {
+    if (!flags.invisibleOnBlur) return;
+    onVisibilityChange(false);
+  });
+  addEventListener('focus', () => {
+    if (!flags.invisibleOnBlur) return;
+    onVisibilityChange(true);
+  });
 }
 
 export function getSavedPage() {
-  const savedPage = Number.parseInt(localStorage.getItem('page'), 10);
-  state.set(
-    '_selectedRoom',
-    Number.isNaN(savedPage) ? 0 : savedPage
-  );
+  const overridePage = flags.pageOverride;
+  const savedPage = localStorage.getItem('page');
+
+  if (overridePage !== null) {
+    state.set('_selectedRoom', overridePage);
+  } else if (savedPage === null) {
+    state.set('_selectedRoom', 0);
+  } else {
+    state.set('_selectedRoom', Number.parseInt(savedPage, 10));
+  }
 
   state.subscribe(
     '_selectedRoom',
@@ -164,7 +192,9 @@ export function getDarkMode() {
     'meta[name="apple-mobile-web-app-status-bar"]'
   );
 
-  const dark = localStorage.getItem('dark') !== null;
+  const dark = flags.darkOverride === null
+    ? localStorage.getItem('dark') !== null
+    : flags.darkOverride;
   state.set('_darkMode', dark);
 
   state.subscribe(

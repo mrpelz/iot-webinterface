@@ -25,15 +25,20 @@ window.state = state;
 
 /**
  * @type {undefined | {
+ *  api: string,
+ *  darkOverride: boolean,
  *  debug: boolean,
+ *  invisibleOnBlur: boolean,
+ *  lowPriorityStream: boolean,
+ *  pageOverride: number,
  *  serviceWorker: boolean,
- *  stream: boolean,
- *  api: string
+ *  stream: boolean
  * }}
  */
 export let flags;
 
 function readFlags() {
+  const hashFlags = new URLSearchParams(location.hash.slice(1));
 
   /**
    * @template T
@@ -43,8 +48,8 @@ function readFlags() {
    * @returns {T}
    */
   const read = (flag, fallback, typeCast) => {
-    const storage = localStorage.getItem(flag);
-    const value = typeCast(storage === null ? fallback : storage);
+    const storage = localStorage.getItem(`f_${flag}`) || hashFlags.get(flag);
+    const value = (storage === null) ? fallback : typeCast(storage);
 
     // eslint-disable-next-line no-console
     console.table(`"${flag}": ${value}`);
@@ -52,10 +57,14 @@ function readFlags() {
   };
 
   flags = {
-    debug: read('debug', false, Boolean),
-    serviceWorker: read('sw', true, Boolean),
-    stream: read('stream', true, Boolean),
-    api: read('api', location.href, String)
+    api: read('api', location.href, String),
+    darkOverride: read('dao', null, (v) => Boolean(Number.parseInt(v, 10))),
+    debug: read('dbg', false, (v) => Boolean(Number.parseInt(v, 10))),
+    invisibleOnBlur: read('iob', false, (v) => Boolean(Number.parseInt(v, 10))),
+    lowPriorityStream: read('lps', false, (v) => Boolean(Number.parseInt(v, 10))),
+    pageOverride: read('pao', null, (v) => Number.parseInt(v, 10)),
+    serviceWorker: read('swo', true, (v) => Boolean(Number.parseInt(v, 10))),
+    stream: read('str', true, (v) => Boolean(Number.parseInt(v, 10)))
   };
 }
 
