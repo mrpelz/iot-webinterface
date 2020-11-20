@@ -4,7 +4,7 @@ import {
   render
 } from '../../dom.js';
 import { expand, hierarchy } from '../../network.js';
-import { state } from '../../index.js';
+import { flags, state } from '../../index.js';
 
 const mapId = 2;
 
@@ -108,6 +108,10 @@ export class TitleBar extends BaseComponent {
 
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     this.get('#backbutton').addEventListener('click', this.handleBackButtonClick);
+
+    if (flags.oledOptimizations) {
+      this.get('#wait').classList.add('oled');
+    }
   }
 
   render() {

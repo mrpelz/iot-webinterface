@@ -17,7 +17,7 @@
   scrollbar-width: none;
   top: calc(var(--titlebar-height) + var(--safe-area-inset-top));
   transform: translate3d(calc(-100% + var(--menu-swipe, 0px)), 0, 0);
-  transition: transform 0.15s ease-out;
+  transition: transform var(--menu-transition-duration-override, 0.15s) ease-out;
   width: var(--menu-width);
   will-change: scroll-position;
   z-index: 2;

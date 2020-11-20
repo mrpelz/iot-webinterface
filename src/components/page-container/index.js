@@ -4,8 +4,8 @@ import {
   c,
   render
 } from '../../dom.js';
+import { flags, state } from '../../index.js';
 import { hierarchy } from '../../network.js';
-import { state } from '../../index.js';
 
 const backgroundClass = bem('page-container', null, 'background');
 const backgroundImageUrl = (room) => {
@@ -127,6 +127,8 @@ export class PageContainer extends BaseComponent {
   }
 
   _handleRoomChange(index) {
+    if (flags.oledOptimizations) return;
+
     const { sections } = hierarchy;
     const { section = null } = [].concat(...sections)[index] || {};
 

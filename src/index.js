@@ -30,6 +30,7 @@ window.state = state;
  *  debug: boolean,
  *  invisibleOnBlur: boolean,
  *  lowPriorityStream: boolean,
+ *  oledOptimizations: boolean,
  *  pageOverride: number,
  *  serviceWorker: boolean,
  *  stream: boolean
@@ -62,10 +63,17 @@ function readFlags() {
     debug: read('dbg', false, (v) => Boolean(Number.parseInt(v, 10))),
     invisibleOnBlur: read('iob', false, (v) => Boolean(Number.parseInt(v, 10))),
     lowPriorityStream: read('lps', false, (v) => Boolean(Number.parseInt(v, 10))),
+    oledOptimizations: read('olo', false, (v) => Boolean(Number.parseInt(v, 10))),
     pageOverride: read('pao', null, (v) => Number.parseInt(v, 10)),
     serviceWorker: read('swo', true, (v) => Boolean(Number.parseInt(v, 10))),
     stream: read('str', true, (v) => Boolean(Number.parseInt(v, 10)))
   };
+}
+
+function handleOledOptimizations() {
+  if (!flags.oledOptimizations) return;
+  document.documentElement.style.setProperty('--translucent-override', '1');
+  document.documentElement.style.setProperty('--menu-transition-duration-override', '0');
 }
 
 async function deleteSW() {
@@ -107,6 +115,7 @@ async function handleSW() {
 
 async function pre() {
   readFlags();
+  handleOledOptimizations();
   await handleSW();
 }
 

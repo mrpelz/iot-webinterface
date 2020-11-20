@@ -86,11 +86,11 @@
   }
 }
 
-#wait svg {
+#wait:not(.oled) svg {
   animation: 2s linear infinite wait-outer-animation;
 }
 
-#wait circle {
+#wait:not(.oled) circle {
   animation: 1.4s ease-in-out infinite both wait-circle-animation;
   fill: transparent;
   stroke-dasharray: 283;
@@ -99,6 +99,10 @@
   stroke-width: 10;
   stroke: currentColor;
   transform-origin: 50% 50%;
+}
+
+#wait.oled circle {
+  fill: currentColor;
 }
 
 #wait.hide {
