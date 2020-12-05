@@ -7,7 +7,7 @@
     "deploy": "scripts/deploy.sh",
     "lint": "tsc -p jsconfig.json; eslint src",
     "lint:fix": "eslint --fix src",
-    "push": "git push -u origin HEAD --force && git push -u github HEAD --force"
+    "push": "git push origin HEAD --force && git push github HEAD --force"
   },
   "repository": {
     "type": "git",
