@@ -99,7 +99,7 @@ async function handleSW() {
   if (serviceWorker) {
     try {
       await navigator.serviceWorker.register(
-        './sw.js', {
+        '/src/sw.js', {
         scope: '/'
       }
       );
