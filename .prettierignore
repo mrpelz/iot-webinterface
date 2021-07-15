@@ -1,0 +1,5 @@
+*.d.ts
+*.json
+build
+dist
+node_modules

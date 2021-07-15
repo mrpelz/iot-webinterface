@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "alwaysStrict": true,
+    "checkJs": false,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "target": "esnext",
+    "useDefineForClassFields": true,
+  },
+  "include": [
+    "./src/**/*"
+  ]
+}
