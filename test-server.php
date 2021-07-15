@@ -2,17 +2,19 @@
 header('Access-Control-Allow-Origin: *');
 
 $contenttypes = [
-    'json' => 'application/json',
-    'js' => 'application/javascript',
-    'html' => 'text/html',
+    'cjs' => 'application/javascript',
     'css' => 'text/css',
+    'html' => 'text/html',
+    'js' => 'application/javascript',
+    'json' => 'application/json',
+    'mjs' => 'application/javascript',
 ];
 
 if (substr($_SERVER['REQUEST_URI'], -1, 1) === '/') {
     $_SERVER['REQUEST_URI'] .= 'index.html';
 }
 
-file_put_contents('php://stderr', $_SERVER['REQUEST_URI'] . PHP_EOL);
+file_put_contents('php://stderr', $_SERVER['REQUEST_METHOD'] . ' ' . $_SERVER['REQUEST_URI'] . PHP_EOL);
 
 if (file_exists(__DIR__ . $_SERVER['REQUEST_URI'])) {
     $pathinfo = pathinfo(__DIR__ . $_SERVER['REQUEST_URI']);

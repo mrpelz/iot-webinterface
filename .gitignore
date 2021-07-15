@@ -1,4 +1,6 @@
 .DS_Store
+build
+dist
 epaper
 index.nginx-debian.html
 led.xml
