@@ -1,7 +1,7 @@
 const ID_URL = '/id.json';
-const CHECK_INTERVAL = 10000;
+export const CHECK_INTERVAL = 30000;
 
-export async function autoReload(): Promise<void> {
+export async function autoReload(interval: number): Promise<void> {
   const getStoredId = () => sessionStorage.getItem('id');
   const setStoredId = (id: string) => sessionStorage.setItem('id', id);
 
@@ -20,8 +20,15 @@ export async function autoReload(): Promise<void> {
 
     setStoredId(liveId);
 
+    if (!('serviceWorker' in navigator)) {
+      location.reload();
+    }
+
+    const serviceWorker = await navigator.serviceWorker.ready;
+    await serviceWorker.update();
+
     location.reload();
-  }, CHECK_INTERVAL);
+  }, interval);
 
   const liveId = await getLiveId();
   if (!liveId) return;

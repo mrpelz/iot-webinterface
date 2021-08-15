@@ -1,5 +1,8 @@
+import { CHECK_INTERVAL } from './autoReload.js';
+
 export type Flags = {
   apiBaseUrl: string;
+  autoReload: number;
   darkOverride: boolean | null;
   debug: boolean;
   invisibleOnBlur: boolean;
@@ -24,6 +27,7 @@ function getFlag<T>(
 export function getFlags(): Flags {
   const defaults: Flags = {
     apiBaseUrl: new URL('/', location.href).href,
+    autoReload: CHECK_INTERVAL,
     darkOverride: null,
     debug: false,
     invisibleOnBlur: false,
@@ -42,6 +46,9 @@ export function getFlags(): Flags {
     const setFlags: Partial<Flags> = Object.fromEntries(
       Object.entries({
         apiBaseUrl: getFlag(hashFlags, 'apiBaseUrl', String),
+        autoReload: getFlag(hashFlags, 'autoReload', (input) =>
+          Number.parseInt(input, 10)
+        ),
         darkOverride: getFlag(hashFlags, 'darkOverride', (input) =>
           Boolean(Number.parseInt(input, 10))
         ),

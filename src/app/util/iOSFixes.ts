@@ -8,3 +8,7 @@ export function iOSScrollToTop(): void {
     });
   });
 }
+
+export function iOSHoverStyles(): void {
+  document.body.addEventListener('touchstart', () => null, { passive: true });
+}

@@ -16,6 +16,7 @@
     new RegExp('^\\/api\\/values'),
     new RegExp('^\\/id.json'),
     new RegExp('^\\/index.json'),
+    new RegExp('^\\/manifest.json'),
   ];
   const networkOnlyUrls: RegExp[] = [new RegExp('^\\/api\\/id')];
 
@@ -76,6 +77,7 @@
 
           return response;
         })
+        .catch(() => getLive(event, msg || 'cachePreferred'))
     );
   };
 
@@ -95,7 +97,11 @@
         event.respondWith(response);
       })
       .catch(() => {
-        getCache(event, msg);
+        try {
+          getCache(event, msg);
+        } catch {
+          // noop
+        }
       });
   };
 
@@ -126,7 +132,11 @@
       return;
     }
 
-    getCache(event);
+    try {
+      getCache(event);
+    } catch {
+      // noop
+    }
   };
 
   scope.oninstall = (event) => {
@@ -134,7 +144,8 @@
       (async () => {
         try {
           for (const key of await scope.caches.keys()) {
-            scope.caches.delete(key);
+            // eslint-disable-next-line no-await-in-loop
+            await scope.caches.delete(key);
           }
 
           const response = await fetch(new URL(INDEX_ENDPOINT, origin).href);
@@ -156,6 +167,16 @@
   };
 
   scope.onactivate = (event) => {
-    event.waitUntil(scope.clients.claim());
+    event.waitUntil(
+      (async () => {
+        try {
+          await scope.caches.delete(swCache);
+
+          await scope.clients.claim();
+        } catch {
+          // noop
+        }
+      })()
+    );
   };
 })(self as unknown as ServiceWorkerGlobalScope);
