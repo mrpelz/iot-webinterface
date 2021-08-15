@@ -8,11 +8,7 @@
   const preCache = 'preCache';
   const swCache = 'swCache';
 
-  const errorMessage = [
-    '504 Gateway timeout',
-    'service worker synthesized response',
-    'live resource unreachable',
-  ].join('\n');
+  const errorMessage = 'service worker synthesized response';
 
   const unhandledRequestUrls: RegExp[] = [new RegExp('^\\/api/stream')];
   const denyRequestUrls: RegExp[] = [new RegExp('^\\/favicon')];
@@ -32,35 +28,37 @@
     );
   };
 
-  const errorOut = (msg: string) => {
-    return new Response([errorMessage, `status: ${msg}`].join('\n'), {
-      status: 504,
-      statusText: 'Gateway timeout',
+  const errorOut = (status: number, msg: string) => {
+    return new Response([errorMessage, status.toString(), msg].join('\n'), {
+      status,
+      statusText: msg,
     });
   };
 
   const getLive = (event: FetchEvent, msg: string, doCache = true) => {
-    // eslint-disable-next-line no-console
-    console.log('live', event.request.url);
+    return fetch(event.request)
+      .then((response) => {
+        if (!response.ok || response.redirected) {
+          return errorOut(
+            response.status,
+            response.ok ? msg : response.statusText
+          );
+        }
 
-    return fetch(event.request).then((response) => {
-      if (!response.ok || response.redirected) {
-        return errorOut(msg);
-      }
+        const clonedResponse = response.clone();
 
-      const clonedResponse = response.clone();
+        (async () => {
+          if (!doCache) return;
 
-      (async () => {
-        if (!doCache) return;
+          const cache = await caches.open(swCache);
+          if (!cache) return;
 
-        const cache = await caches.open(swCache);
-        if (!cache) return;
+          await cache.put(event.request, clonedResponse);
+        })();
 
-        await cache.put(event.request, clonedResponse);
-      })();
-
-      return response;
-    });
+        return response;
+      })
+      .catch((reason) => errorOut(500, reason.toString()));
   };
 
   const getCache = (event: FetchEvent, msg?: string) => {
@@ -82,7 +80,7 @@
   };
 
   const denyRequest = (event: FetchEvent) => {
-    event.respondWith(errorOut('denyRequest'));
+    event.respondWith(errorOut(403, 'denyRequest'));
   };
 
   const getNetworkOnly = (event: FetchEvent) => {
@@ -135,24 +133,24 @@
     event.waitUntil(
       (async () => {
         try {
-          for (const key of await caches.keys()) {
-            caches.delete(key);
+          for (const key of await scope.caches.keys()) {
+            scope.caches.delete(key);
           }
+
+          const response = await fetch(new URL(INDEX_ENDPOINT, origin).href);
+          if (!response.ok || response.redirected) {
+            return;
+          }
+
+          const cache = await scope.caches.open(preCache);
+
+          await cache.add('/');
+          await cache.addAll(await response.json());
+
+          await scope.skipWaiting();
         } catch {
           // noop
         }
-
-        const response = await fetch(new URL(INDEX_ENDPOINT, origin).href);
-        if (!response.ok || response.redirected) {
-          return;
-        }
-
-        const cache = await caches.open(preCache);
-
-        await cache.add('/');
-        await cache.addAll(await response.json());
-
-        await scope.skipWaiting();
       })()
     );
   };

@@ -33,7 +33,7 @@ export function installServiceWorker(): void {
       });
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(`error registering ServiceWorker: ${error}`);
+      console.error(`error registering ServiceWorker (${url}): ${error}`);
     }
   })();
 }
@@ -51,7 +51,7 @@ export function getSharedWorker(
       });
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(`error getting SharedWorker "${name}": ${error}`);
+      console.error(`error getting SharedWorker "${name}" (${url}): ${error}`);
 
       return null;
     }

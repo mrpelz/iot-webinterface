@@ -2,31 +2,33 @@
 
 import { appendFile, readdir, stat, writeFile } from 'fs/promises';
 import { join, relative } from 'path';
-import { NginxBinary } from 'nginx-binaries';
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import { promisify } from 'util';
 
 const DIST_DIR = './dist';
+const STATIC_DIR = './static';
 
+const ID_FILE = './id.json';
+const SW_FILE = './js/workers/sw.js';
 const INDEX_FILE = './index.json';
+
 const INDEX_EXCLUSIONS = [
   new RegExp('.js.map$'),
   new RegExp('^\\/id.json'),
   new RegExp('^\\/index.json'),
   new RegExp('^\\/manifest.json'),
-  new RegExp('^\\/src'),
+  new RegExp('sw.js$'),
 ];
 
-const ID_FILE = './id.json';
-const SW_FILE = './js/workers/sw.js';
-
-const isServe = process.argv[process.argv.length - 1] === 'serve';
+const NGINX_CONFIG = './nginx.conf';
 
 async function precacheIndex() {
-  const root = join(process.cwd(), DIST_DIR);
+  const distDir = join(process.cwd(), DIST_DIR);
+  const staticDir = join(process.cwd(), STATIC_DIR);
+
   const indexFile = join(process.cwd(), DIST_DIR, INDEX_FILE);
 
-  const walk = async (path) => {
+  const walk = async (path, root) => {
     const stats = await stat(path);
 
     if (stats.isFile()) {
@@ -48,13 +50,19 @@ async function precacheIndex() {
 
     const entries = await readdir(path);
     const lists = await Promise.all(
-      entries.map(async (entry) => walk(join(path, entry)))
+      entries.map(async (entry) => walk(join(path, entry), root))
     );
 
     return lists.flat();
   };
 
-  const result = (await walk(root)).flat().sort();
+  const result = [
+    (await walk(distDir, distDir)).flat(),
+    (await walk(staticDir, staticDir)).flat(),
+  ]
+    .flat()
+    .sort();
+
   const filePayload = JSON.stringify(result, null, 2);
 
   await writeFile(indexFile, `${filePayload}\n`);
@@ -71,15 +79,32 @@ async function swCheat() {
   await appendFile(swFile, `\n// SW_CHEAT:${id}`);
 }
 
-(async () => {
-  const nginxBinary = await NginxBinary.download({});
+async function nginx() {
+  const config = join(process.cwd(), NGINX_CONFIG);
 
-  await promisify(exec)('npm run --silent transform');
+  const bin = await promisify(execFile)('which', ['nginx'])
+    .then(({ stdout }) => stdout.trim() || null)
+    .catch(() => null);
+
+  if (!bin) {
+    // eslint-disable-next-line no-console
+    console.error(
+      "please install nginx and try again, make sure it's in your PATH"
+    );
+
+    return;
+  }
+
+  const childProcess = execFile(bin, ['-p', process.cwd(), '-c', config]);
+
+  childProcess.stdout.pipe(process.stdout);
+  childProcess.stderr.pipe(process.stdout);
+}
+
+(async () => {
+  await promisify(execFile)('npm', ['run', '--silent', 'transform']);
+
   await precacheIndex();
   await swCheat();
-
-  if (!isServe) return;
-
-  // eslint-disable-next-line no-console
-  console.log(await promisify(exec)(`${nginxBinary} -h`));
+  await nginx();
 })();
