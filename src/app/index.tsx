@@ -1,8 +1,9 @@
 import {
   SHARED_PATH,
+  SW_PATH,
   getSharedWorker,
   installServiceWorker,
-  removeServiceWorker,
+  removeServiceWorkers,
 } from './util/workers.js';
 import { h, render } from 'preact';
 import { iOSHoverStyles, iOSScrollToTop } from './util/iOSFixes.js';
@@ -12,37 +13,20 @@ import { getFlags } from './util/flags.js';
 import { setup } from 'goober';
 
 export const flags = getFlags();
+export const shared = getSharedWorker(SHARED_PATH, 'shared');
 
-(() => {
-  const shared = getSharedWorker(SHARED_PATH, 'shared');
-  if (!shared) return;
+setup(h);
+render(<App />, document.body);
 
-  shared.port.start();
+iOSHoverStyles();
+iOSScrollToTop();
 
-  setInterval(() => {
-    shared.port.postMessage('test message');
-  }, 5000);
-})();
+if (flags.serviceWorker) {
+  installServiceWorker(SW_PATH);
+} else {
+  removeServiceWorkers();
+}
 
-(() => {
-  setup(h);
-  render(<App />, document.body);
-
-  iOSHoverStyles();
-  iOSScrollToTop();
-})();
-
-(() => {
-  if (flags.serviceWorker) {
-    installServiceWorker();
-    return;
-  }
-
-  removeServiceWorker();
-})();
-
-(() => {
-  if (!flags.autoReload) return;
-
+if (flags.autoReload) {
   autoReload(flags.autoReload);
-})();
+}

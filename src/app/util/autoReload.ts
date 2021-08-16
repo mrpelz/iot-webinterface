@@ -1,25 +1,13 @@
-const ID_URL = '/id.json';
+import { AUTO_RELOAD_PATH, getWorker } from './workers.js';
+import { shared } from '../index.js';
+
 export const CHECK_INTERVAL = 30000;
 
 export async function autoReload(interval: number): Promise<void> {
-  const getStoredId = () => sessionStorage.getItem('id');
-  const setStoredId = (id: string) => sessionStorage.setItem('id', id);
+  const worker = getWorker(AUTO_RELOAD_PATH, 'autoReload', shared, interval);
+  if (!worker) return;
 
-  const getLiveId = () =>
-    fetch(ID_URL)
-      .then((response) => response.json())
-      .then(({ id }) => (id as number).toString())
-      .catch(() => null);
-
-  setInterval(async () => {
-    const storedId = getStoredId();
-    const liveId = await getLiveId();
-
-    if (storedId === liveId) return;
-    if (liveId === null) return;
-
-    setStoredId(liveId);
-
+  worker.onmessage = async () => {
     if (!('serviceWorker' in navigator)) {
       location.reload();
     }
@@ -28,9 +16,5 @@ export async function autoReload(interval: number): Promise<void> {
     await serviceWorker.update();
 
     location.reload();
-  }, interval);
-
-  const liveId = await getLiveId();
-  if (!liveId) return;
-  setStoredId(liveId);
+  };
 }

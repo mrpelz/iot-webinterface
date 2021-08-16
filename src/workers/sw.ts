@@ -119,13 +119,13 @@
     }
   };
 
-  scope.onfetch = (event) => {
-    const { url } = event.request;
+  scope.onfetch = (fetchEvent) => {
+    const { url } = fetchEvent.request;
 
     const unhandled = testUrl(url, unhandledRequestUrls);
     if (unhandled) return;
 
-    event.respondWith(
+    fetchEvent.respondWith(
       (async () => {
         const deny = testUrl(url, denyRequestUrls);
         if (deny) {
@@ -134,10 +134,10 @@
 
         const preferred = testUrl(url, networkPreferredUrls);
         if (preferred) {
-          return getLive(event, 'networkPreferred/getLive', false).then(
+          return getLive(fetchEvent, 'networkPreferred/getLive', false).then(
             (response) => {
               if (!response || response.statusText === ERROR_OUT_STATUS_TEXT) {
-                return getCached(event, 'networkPreferred/getCache');
+                return getCached(fetchEvent, 'networkPreferred/getCache');
               }
 
               return setCached(response);
@@ -145,15 +145,15 @@
           ) as Promise<Response>;
         }
 
-        return getCached(event, 'cachePreferred').then(
+        return getCached(fetchEvent, 'cachePreferred').then(
           setCached
         ) as Promise<Response>;
       })()
     );
   };
 
-  scope.oninstall = (event) => {
-    event.waitUntil(
+  scope.oninstall = (installEvent) => {
+    installEvent.waitUntil(
       (async () => {
         try {
           for (const key of await scope.caches.keys()) {
@@ -180,8 +180,8 @@
     );
   };
 
-  scope.onactivate = (event) => {
-    event.waitUntil(
+  scope.onactivate = (activateEvent) => {
+    activateEvent.waitUntil(
       (async () => {
         try {
           await scope.clients.claim();
