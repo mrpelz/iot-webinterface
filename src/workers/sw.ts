@@ -3,6 +3,7 @@
 /// <reference lib="WebWorker" />
 
 ((scope) => {
+  const ERROR_OUT_STATUS_TEXT = '25C2A7B7-8004-4180-A3D5-0C6FA51FFECA';
   const INDEX_ENDPOINT = '/index.json';
 
   const preCache = 'preCache';
@@ -10,7 +11,10 @@
 
   const errorMessage = 'service worker synthesized response';
 
-  const unhandledRequestUrls: RegExp[] = [new RegExp('^\\/api/stream')];
+  const unhandledRequestUrls: RegExp[] = [
+    new RegExp('^\\/api/stream'),
+    new RegExp('^\\/api\\/id'),
+  ];
   const denyRequestUrls: RegExp[] = [new RegExp('^\\/favicon')];
   const networkPreferredUrls: RegExp[] = [
     new RegExp('^\\/api\\/values'),
@@ -18,7 +22,6 @@
     new RegExp('^\\/index.json'),
     new RegExp('^\\/manifest.json'),
   ];
-  const networkOnlyUrls: RegExp[] = [new RegExp('^\\/api\\/id')];
 
   const testUrl = (url: string, list: RegExp[]) => {
     const { pathname: urlPath } = new URL(url, origin);
@@ -32,77 +35,88 @@
   const errorOut = (status: number, msg: string) => {
     return new Response([errorMessage, status.toString(), msg].join('\n'), {
       status,
-      statusText: msg,
+      statusText: ERROR_OUT_STATUS_TEXT,
     });
   };
 
-  const getLive = (event: FetchEvent, msg: string, doCache = true) => {
+  const getLive = async (
+    event: FetchEvent,
+    task: string,
+    produceErrorResponse = true
+  ) => {
     return fetch(event.request)
       .then((response) => {
         if (!response.ok || response.redirected) {
-          return errorOut(
-            response.status,
-            response.ok ? msg : response.statusText
-          );
+          const message = [
+            'error fetching live request',
+            `for url "${event.request.url}"`,
+            `while running task "${task}"`,
+            `${response.status} ${response.statusText}`,
+          ].join('\n');
+
+          // eslint-disable-next-line no-console
+          console.info(message);
+
+          return produceErrorResponse
+            ? errorOut(response.status, message)
+            : null;
         }
-
-        const clonedResponse = response.clone();
-
-        (async () => {
-          if (!doCache) return;
-
-          const cache = await caches.open(swCache);
-          if (!cache) return;
-
-          await cache.put(event.request, clonedResponse);
-        })();
 
         return response;
       })
-      .catch((reason) => errorOut(500, reason.toString()));
-  };
+      .catch((error) => {
+        const message = [
+          'error fetching live request',
+          `for url "${event.request.url}"`,
+          `while running task "${task}"`,
+          error?.toString(),
+        ].join('\n');
 
-  const getCache = (event: FetchEvent, msg?: string) => {
-    event.respondWith(
-      caches
-        .match(event.request, {
-          ignoreMethod: true,
-          ignoreSearch: true,
-          ignoreVary: true,
-        })
-        .then((response) => {
-          if (!response) {
-            return getLive(event, msg || 'cachePreferred');
-          }
+        // eslint-disable-next-line no-console
+        console.info(message);
 
-          return response;
-        })
-        .catch(() => getLive(event, msg || 'cachePreferred'))
-    );
-  };
-
-  const denyRequest = (event: FetchEvent) => {
-    event.respondWith(errorOut(403, 'denyRequest'));
-  };
-
-  const getNetworkOnly = (event: FetchEvent) => {
-    event.respondWith(getLive(event, 'networkOnly', false));
-  };
-
-  const getNetworkPreferred = (event: FetchEvent) => {
-    const msg = 'networkPreferred';
-
-    getLive(event, msg)
-      .then((response) => {
-        event.respondWith(response);
-      })
-      .catch(() => {
-        try {
-          getCache(event, msg);
-        } catch {
-          // noop
-        }
+        return errorOut(500, message);
       });
+  };
+
+  const setCached = async (response: Response) => {
+    try {
+      if (!response) return response;
+      if (!response.ok) return response;
+      if (response.statusText === ERROR_OUT_STATUS_TEXT) return response;
+
+      const cloned = response.clone();
+      const cache = await scope.caches.open(swCache);
+      await cache.put(cloned.url, cloned);
+
+      return response;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`setCached error: ${error}`);
+
+      return response;
+    }
+  };
+
+  const getCached = async (event: FetchEvent, task: string) => {
+    try {
+      const cachedResponse = await caches.match(event.request);
+      if (cachedResponse) return cachedResponse;
+
+      return getLive(event, task);
+    } catch (error) {
+      const message = [
+        'error getting cached response',
+        `for url "${event.request.url}"`,
+        `while running task "${task}"`,
+        error?.toString(),
+      ].join('\n');
+
+      // eslint-disable-next-line no-console
+      console.info(message);
+
+      return errorOut(500, message);
+    }
   };
 
   scope.onfetch = (event) => {
@@ -111,32 +125,31 @@
     const unhandled = testUrl(url, unhandledRequestUrls);
     if (unhandled) return;
 
-    const deny = testUrl(url, denyRequestUrls);
-    if (deny) {
-      denyRequest(event);
+    event.respondWith(
+      (async () => {
+        const deny = testUrl(url, denyRequestUrls);
+        if (deny) {
+          return errorOut(403, 'denyRequest');
+        }
 
-      return;
-    }
+        const preferred = testUrl(url, networkPreferredUrls);
+        if (preferred) {
+          return getLive(event, 'networkPreferred/getLive', false).then(
+            (response) => {
+              if (!response || response.statusText === ERROR_OUT_STATUS_TEXT) {
+                return getCached(event, 'networkPreferred/getCache');
+              }
 
-    const only = testUrl(url, networkOnlyUrls);
-    if (only) {
-      getNetworkOnly(event);
+              return setCached(response);
+            }
+          ) as Promise<Response>;
+        }
 
-      return;
-    }
-
-    const preferred = testUrl(url, networkPreferredUrls);
-    if (preferred) {
-      getNetworkPreferred(event);
-
-      return;
-    }
-
-    try {
-      getCache(event);
-    } catch {
-      // noop
-    }
+        return getCached(event, 'cachePreferred').then(
+          setCached
+        ) as Promise<Response>;
+      })()
+    );
   };
 
   scope.oninstall = (event) => {
@@ -159,8 +172,9 @@
           await cache.addAll(await response.json());
 
           await scope.skipWaiting();
-        } catch {
-          // noop
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error(`oninstall error: ${error}`);
         }
       })()
     );
@@ -170,11 +184,12 @@
     event.waitUntil(
       (async () => {
         try {
-          await scope.caches.delete(swCache);
-
           await scope.clients.claim();
-        } catch {
-          // noop
+
+          await scope.caches.delete(swCache);
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error(`onactivate error: ${error}`);
         }
       })()
     );

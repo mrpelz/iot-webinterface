@@ -16,7 +16,6 @@ const INDEX_EXCLUSIONS = [
   new RegExp('.js.map$'),
   new RegExp('^\\/id.json'),
   new RegExp('^\\/index.json'),
-  new RegExp('^\\/manifest.json'),
   new RegExp('sw.js$'),
 ];
 
