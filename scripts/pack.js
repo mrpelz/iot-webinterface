@@ -21,6 +21,8 @@ const INDEX_EXCLUSIONS = [
 
 const NGINX_CONFIG = './nginx.conf';
 
+const tasks = process.argv[process.argv.length - 1].split(',');
+
 async function precacheIndex() {
   const distDir = join(process.cwd(), DIST_DIR);
   const staticDir = join(process.cwd(), STATIC_DIR);
@@ -101,9 +103,14 @@ async function nginx() {
 }
 
 (async () => {
-  await promisify(execFile)('npm', ['run', '--silent', 'transform']);
+  if (tasks.includes('transform')) {
+    await promisify(execFile)('native-esm-transform');
 
-  await precacheIndex();
-  await swCheat();
-  await nginx();
+    await precacheIndex();
+    await swCheat();
+  }
+
+  if (tasks.includes('serve')) {
+    await nginx();
+  }
 })();

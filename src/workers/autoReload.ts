@@ -34,4 +34,4 @@
 
     fn(port, data);
   };
-})(self as unknown as WorkerGlobalScope);
+})(self as unknown as DedicatedWorkerGlobalScope);
