@@ -19,14 +19,20 @@ const INDEX_EXCLUSIONS = [
   new RegExp('sw.js$'),
 ];
 
+const INDEX_TIERS = [
+  new RegExp('^\\/manifest.json$'),
+  new RegExp('^\\/index.html$'),
+  new RegExp('^\\/js\\/'),
+  new RegExp('^\\/images\\/icons\\/'),
+  new RegExp('^\\/images\\/splash\\/'),
+  new RegExp('^\\/images\\/background\\/'),
+];
+
 const NGINX_CONFIG = './nginx.conf';
 
 const tasks = process.argv[process.argv.length - 1].split(',');
 
 async function precacheIndex() {
-  const distDir = join(process.cwd(), DIST_DIR);
-  const staticDir = join(process.cwd(), STATIC_DIR);
-
   const indexFile = join(process.cwd(), DIST_DIR, INDEX_FILE);
 
   const walk = async (path, root) => {
@@ -57,12 +63,27 @@ async function precacheIndex() {
     return lists.flat();
   };
 
-  const result = [
-    (await walk(distDir, distDir)).flat(),
-    (await walk(staticDir, staticDir)).flat(),
-  ]
+  const fileList = (
+    await Promise.all(
+      [DIST_DIR, STATIC_DIR].map(async (path) => {
+        const absolutePath = join(process.cwd(), path);
+
+        return walk(absolutePath, absolutePath);
+      })
+    )
+  )
     .flat()
     .sort();
+
+  const result = [
+    ...INDEX_TIERS.map((tier) => fileList.filter((file) => tier.test(file))),
+    fileList.filter((file) => {
+      for (const tier of INDEX_TIERS) {
+        if (tier.test(file)) return false;
+      }
+      return true;
+    }),
+  ].flat();
 
   const filePayload = JSON.stringify(result, null, 2);
 

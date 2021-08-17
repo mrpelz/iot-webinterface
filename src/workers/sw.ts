@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-globals */
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 

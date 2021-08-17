@@ -2,10 +2,13 @@
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 
-((scope) => {
-  const ID_URL = '/id.json';
+importScripts('./utils/worker-scaffold.js');
+const ID_URL = '/id.json';
 
-  const fn = async (port: MessagePort, interval: number) => {
+(async () => {
+  (async (port: MessagePort, interval: number | null) => {
+    if (!interval) return;
+
     const getLiveId = () =>
       fetch(ID_URL)
         .then((response) => response.json())
@@ -24,14 +27,5 @@
 
       port.postMessage(null);
     }, interval);
-  };
-
-  scope.self.onmessage = ({ data, ports }: MessageEvent) => {
-    if (!ports) return;
-
-    const port = ports[0];
-    if (!port) return;
-
-    fn(port, data);
-  };
-})(self as unknown as DedicatedWorkerGlobalScope);
+  })(...(await scaffold<number>(self)));
+})();

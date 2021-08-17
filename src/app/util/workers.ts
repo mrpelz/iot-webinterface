@@ -1,20 +1,12 @@
-const PROXY_SETUP = '16374EFD-22A1-4064-9634-CC213639AD23' as const;
-const UNLOAD = 'BA51CF3C-0145-45A6-B418-41F275DCFA32' as const;
+const SETUP = '16374EFD-22A1-4064-9634-CC213639AD23';
+const UNLOAD = 'BA51CF3C-0145-45A6-B418-41F275DCFA32';
 
-type WorkerMessage =
-  | {
-      command: typeof PROXY_SETUP;
-      initValue?: unknown;
-      name: string;
-      url: string;
-    }
-  | {
-      command: typeof UNLOAD;
-    };
+export const autoReloadUrl = new URL(
+  '../../workers/auto-reload.js',
+  import.meta.url
+).href;
 
-export const AUTO_RELOAD_PATH = '../../workers/autoReload.js';
-export const SHARED_PATH = '../../workers/shared.js';
-export const SW_PATH = '../../workers/sw.js';
+export const swUrl = new URL('../../workers/sw.js', import.meta.url).href;
 
 export function removeServiceWorkers(): void {
   if (!('serviceWorker' in navigator)) return;
@@ -32,10 +24,8 @@ export function removeServiceWorkers(): void {
   })();
 }
 
-export function installServiceWorker(path: string): void {
+export function installServiceWorker(url: string): void {
   if (!('serviceWorker' in navigator)) return;
-
-  const url = new URL(path, import.meta.url).href;
 
   (async () => {
     try {
@@ -51,93 +41,61 @@ export function installServiceWorker(path: string): void {
   })();
 }
 
-export function getSharedWorker(
-  path: string,
-  name: string
-): MessagePort | null {
-  if (!('SharedWorker' in window)) return null;
-
-  const url = new URL(path, import.meta.url).href;
-
-  const worker = (() => {
-    try {
-      return new SharedWorker(url, {
-        name,
-      });
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(`error getting SharedWorker "${name}" (${url}): ${error}`);
-
-      return null;
-    }
-  })();
-
-  if (worker) {
-    const { port } = worker;
-
-    port.start();
-
-    const unloadMessage: WorkerMessage = {
-      command: UNLOAD,
-    };
-
-    addEventListener('unload', () => port.postMessage(unloadMessage), {
-      once: true,
-      passive: true,
-    });
-
-    return port;
-  }
-
-  return null;
-}
-
-export function getWorker(
-  path: string,
+export function connectWorker(
+  url: string,
   name: string,
-  sharedPort: MessagePort | null = null,
-  initValue?: unknown
+  setupMessage?: unknown
 ): MessagePort | null {
-  if (!('Worker' in window)) return null;
-
-  const url = new URL(path, import.meta.url).href;
-
   const { port1, port2 } = new MessageChannel();
 
-  if (sharedPort) {
-    const proxySetupMessage: WorkerMessage = {
-      command: PROXY_SETUP,
-      initValue,
-      name,
-      url,
-    };
-
-    sharedPort.postMessage(proxySetupMessage, [port2]);
-
-    port1.start();
-
-    return port1;
-  }
-
-  const worker = (() => {
+  if ('SharedWorker' in window) {
     try {
-      return new Worker(url, {
+      const worker = new SharedWorker(url, {
         name,
       });
+
+      const { port: managementPort } = worker;
+      managementPort.start();
+
+      addEventListener('unload', () => managementPort.postMessage(UNLOAD), {
+        once: true,
+        passive: true,
+      });
+
+      managementPort.postMessage(SETUP, [port2]);
+      managementPort.postMessage(setupMessage);
+
+      port1.start();
+
+      return port1;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(`error getting Worker "${name}" (${url}): ${error}`);
+      console.error(`error creating SharedWorker "${name}" (${url}): ${error}`);
 
       return null;
     }
-  })();
+  }
 
-  if (worker) {
-    worker.postMessage(initValue, [port2]);
+  if ('Worker' in window) {
+    try {
+      const worker = new Worker(url, {
+        name,
+      });
 
-    port1.start();
+      worker.postMessage(SETUP, [port2]);
+      worker.postMessage(setupMessage);
 
-    return port1;
+      port1.start();
+
+      return port1;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `error creating DedicatedWorker "${name}" (${url}): ${error}`
+      );
+
+      return null;
+    }
   }
 
   return null;

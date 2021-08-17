@@ -1,4 +1,4 @@
-import { CHECK_INTERVAL } from './autoReload.js';
+import { CHECK_INTERVAL } from './auto-reload.js';
 
 export type Flags = {
   apiBaseUrl: string;
