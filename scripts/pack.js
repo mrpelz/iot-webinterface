@@ -8,13 +8,13 @@ import { promisify } from 'util';
 const DIST_DIR = './dist';
 const STATIC_DIR = './static';
 
-const ID_FILE = './id.json';
+const ID_FILE = './id.txt';
 const SW_FILE = './js/workers/sw.js';
 const INDEX_FILE = './index.json';
 
 const INDEX_EXCLUSIONS = [
   new RegExp('.js.map$'),
-  new RegExp('^\\/id.json'),
+  new RegExp('^\\/id.txt'),
   new RegExp('^\\/index.json'),
   new RegExp('sw.js$'),
 ];
@@ -92,12 +92,11 @@ async function precacheIndex() {
 
 async function swCheat() {
   const id = Date.now();
-  const filePayload = JSON.stringify({ id }, null, 2);
 
   const idFile = join(process.cwd(), DIST_DIR, ID_FILE);
   const swFile = join(process.cwd(), DIST_DIR, SW_FILE);
 
-  await writeFile(idFile, `${filePayload}\n`);
+  await writeFile(idFile, `${id}`);
   await appendFile(swFile, `\n// SW_CHEAT:${id}`);
 }
 

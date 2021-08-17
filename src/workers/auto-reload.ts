@@ -3,7 +3,7 @@
 /// <reference lib="WebWorker" />
 
 importScripts('./utils/worker-scaffold.js');
-const ID_URL = '/id.json';
+const ID_URL = '/id.txt';
 
 (async () => {
   (async (port: MessagePort, interval: number | null) => {
@@ -11,8 +11,8 @@ const ID_URL = '/id.json';
 
     const getLiveId = () =>
       fetch(ID_URL)
-        .then((response) => response.json())
-        .then(({ id }) => (id as number).toString())
+        .then((response) => response.text())
+        .then((text) => text.trim() || null)
         .catch(() => null);
 
     let storedId = await getLiveId();

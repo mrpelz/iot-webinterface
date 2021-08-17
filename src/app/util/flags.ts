@@ -93,7 +93,7 @@ export function getFlags(): Flags {
             /* eslint-disable sort-keys */
             {
               set: setFlag,
-              '↔️': result === defaultFlag ? '🟦' : '🟥',
+              '↔️': result === defaultFlag ? '=' : '≠',
               default: defaultFlag,
               result,
             },

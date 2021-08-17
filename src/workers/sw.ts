@@ -1,6 +1,8 @@
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 
+importScripts('./utils/tools.js');
+
 ((scope) => {
   const ERROR_OUT_STATUS_TEXT = '25C2A7B7-8004-4180-A3D5-0C6FA51FFECA';
   const INDEX_ENDPOINT = '/index.json';
@@ -17,7 +19,7 @@
   const denyRequestUrls: RegExp[] = [new RegExp('^\\/favicon')];
   const networkPreferredUrls: RegExp[] = [
     new RegExp('^\\/api\\/values'),
-    new RegExp('^\\/id.json'),
+    new RegExp('^\\/id.txt'),
     new RegExp('^\\/index.json'),
     new RegExp('^\\/manifest.json'),
   ];
@@ -32,10 +34,20 @@
   };
 
   const errorOut = (status: number, msg: string) => {
-    return new Response([errorMessage, status.toString(), msg].join('\n'), {
-      status,
-      statusText: ERROR_OUT_STATUS_TEXT,
-    });
+    return new Response(
+      multiline`
+        Status: ${status.toString()}
+        ${errorMessage}
+
+        <msg>
+        ${msg}
+        </msg>
+      `,
+      {
+        status,
+        statusText: ERROR_OUT_STATUS_TEXT,
+      }
+    );
   };
 
   const getLive = async (
@@ -44,14 +56,17 @@
     produceErrorResponse = true
   ) => {
     return fetch(event.request)
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok || response.redirected) {
-          const message = [
-            'error fetching live request',
-            `for url "${event.request.url}"`,
-            `while running task "${task}"`,
-            `${response.status} ${response.statusText}`,
-          ].join('\n');
+          const message = multiline`
+            error fetching live request
+            * for url "${event.request.url}"
+            * while running task "${task}"
+            
+            <response-text>
+            ${await response.text()}
+            </response-text>
+          `;
 
           // eslint-disable-next-line no-console
           console.info(message);
@@ -64,12 +79,15 @@
         return response;
       })
       .catch((error) => {
-        const message = [
-          'error fetching live request',
-          `for url "${event.request.url}"`,
-          `while running task "${task}"`,
-          error?.toString(),
-        ].join('\n');
+        const message = multiline`
+          error fetching live request
+          * for url "${event.request.url}"
+          * while running task "${task}"
+          
+          <error>
+          ${error?.toString()}
+          </error>
+        `;
 
         // eslint-disable-next-line no-console
         console.info(message);
@@ -104,12 +122,15 @@
 
       return getLive(event, task);
     } catch (error) {
-      const message = [
-        'error getting cached response',
-        `for url "${event.request.url}"`,
-        `while running task "${task}"`,
-        error?.toString(),
-      ].join('\n');
+      const message = multiline`
+        error getting cached response
+        * for url "${event.request.url}"
+        * while running task "${task}"
+        
+        <error>
+        ${error?.toString()}
+        </error>
+      `;
 
       // eslint-disable-next-line no-console
       console.info(message);
@@ -169,6 +190,8 @@
 
           await cache.add('/');
           await cache.addAll(await response.json());
+
+          await scope.caches.delete(swCache);
 
           await scope.skipWaiting();
         } catch (error) {
