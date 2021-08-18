@@ -1,7 +1,7 @@
 #!/usr/bin/env node --use_strict --experimental-modules --experimental-import-meta-resolve
 
-import { appendFile, readdir, stat, writeFile } from 'fs/promises';
 import { join, relative } from 'path';
+import { readdir, stat, writeFile } from 'fs/promises';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 
@@ -9,7 +9,6 @@ const DIST_DIR = './dist';
 const STATIC_DIR = './static';
 
 const ID_FILE = './id.txt';
-const SW_FILE = './js/workers/sw.js';
 const INDEX_FILE = './index.json';
 
 const INDEX_EXCLUSIONS = [
@@ -90,14 +89,11 @@ async function precacheIndex() {
   await writeFile(indexFile, `${filePayload}\n`);
 }
 
-async function swCheat() {
+async function writeId() {
   const id = Date.now();
 
   const idFile = join(process.cwd(), DIST_DIR, ID_FILE);
-  const swFile = join(process.cwd(), DIST_DIR, SW_FILE);
-
   await writeFile(idFile, `${id}`);
-  await appendFile(swFile, `\n// SW_CHEAT:${id}`);
 }
 
 async function nginx() {
@@ -127,7 +123,7 @@ async function nginx() {
     await promisify(execFile)('native-esm-transform');
 
     await precacheIndex();
-    await swCheat();
+    await writeId();
   }
 
   if (tasks.includes('serve')) {

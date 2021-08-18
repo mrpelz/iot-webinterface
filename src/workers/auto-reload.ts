@@ -2,11 +2,17 @@
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 
-importScripts('./utils/worker-scaffold.js');
-const ID_URL = '/id.txt';
-
 (async () => {
-  (async (port: MessagePort, interval: number | null) => {
+  importScripts('./utils/worker-scaffold.js');
+
+  const ID_URL = '/id.txt';
+
+  type SetupMessage = { initialId: string | null; interval: number | null };
+
+  (async (port: MessagePort, setup: SetupMessage | null) => {
+    if (!setup) return;
+
+    const { initialId, interval } = setup;
     if (!interval) return;
 
     const getLiveId = () =>
@@ -15,17 +21,25 @@ const ID_URL = '/id.txt';
         .then((text) => text.trim() || null)
         .catch(() => null);
 
-    let storedId = await getLiveId();
+    workerConsole.info(`initial id: "${initialId}", interval: ${interval}`);
+
+    let storedId = initialId;
 
     setInterval(async () => {
       const liveId = await getLiveId();
 
+      workerConsole.info(`live id "${liveId}"`);
+
       if (storedId === liveId) return;
       if (liveId === null) return;
 
+      workerConsole.info(
+        `id changed from "${storedId}" to "${liveId}", requesting reload`
+      );
+
       storedId = liveId;
 
-      port.postMessage(null);
+      port.postMessage(storedId);
     }, interval);
-  })(...(await scaffold<number>(self)));
+  })(...(await scaffold<SetupMessage>(self)));
 })();

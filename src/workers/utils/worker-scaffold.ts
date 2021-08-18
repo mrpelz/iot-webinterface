@@ -1,60 +1,72 @@
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 
+/* eslint-disable no-console */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const workerConsole = {
+  debug: (...args: unknown[]) =>
+    console.debug(`worker "${self.name}":`, ...args),
+  error: (...args: unknown[]) =>
+    console.error(`worker "${self.name}":`, ...args),
+  info: (...args: unknown[]) => console.info(`worker "${self.name}":`, ...args),
+};
+/* eslint-enable no-console */
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const scaffold = <T>(
   scope: DedicatedWorkerGlobalScope | SharedWorkerGlobalScope
 ) => {
+  const voidSetup = Symbol('voidSetup');
+
   let setupDone = false;
 
   const SETUP = '16374EFD-22A1-4064-9634-CC213639AD23';
   const UNLOAD = 'BA51CF3C-0145-45A6-B418-41F275DCFA32';
 
-  const { port1, port2 } = new MessageChannel();
-
-  port1.start();
-  port2.start();
-
-  return new Promise<[MessagePort, T | null]>((resolve) => {
+  return new Promise<[MessagePort, T | null]>((resolve, reject) => {
     if (
       typeof DedicatedWorkerGlobalScope !== 'undefined' &&
       scope instanceof DedicatedWorkerGlobalScope
     ) {
-      // eslint-disable-next-line no-console
-      console.debug(
-        `worker "${scope.name}" (${scope.location.href}) running as DedicatedWorker`
+      workerConsole.debug(
+        `worker "${scope.location.href}" running as DedicatedWorker`
       );
+
+      let port: MessagePort | undefined;
+      let setupMessage: T | typeof voidSetup = voidSetup;
+
+      const launch = () => {
+        if (!port || setupMessage === voidSetup) return;
+
+        resolve([port, setupMessage]);
+      };
 
       const handleMessage = ({ data: managementData, ports }: MessageEvent) => {
         if (managementData === SETUP) {
           const communicationPort = ports[0];
           if (!communicationPort) return;
 
-          communicationPort.onmessage = ({ data }) => {
-            port2.postMessage(data);
-          };
+          port = communicationPort;
+          launch();
 
-          communicationPort.start();
-
-          port2.onmessage = ({ data }) => {
-            communicationPort.postMessage(data);
-          };
-
-          // eslint-disable-next-line no-console
-          console.debug(`worker "${scope.name}": added message port`);
+          workerConsole.debug('added message port');
 
           return;
         }
 
-        if (managementData === UNLOAD) return;
+        if (managementData === UNLOAD) {
+          port?.close();
+
+          return;
+        }
 
         if (setupDone) return;
         setupDone = true;
 
-        // eslint-disable-next-line no-console
-        console.debug(`worker "${scope.name}": received setupMessage`);
+        setupMessage = managementData;
+        launch();
 
-        resolve([port1, managementData]);
+        workerConsole.debug('received setupMessage');
       };
 
       scope.onmessage = (messageEvent) => handleMessage(messageEvent);
@@ -66,10 +78,14 @@ const scaffold = <T>(
       typeof SharedWorkerGlobalScope !== 'undefined' &&
       scope instanceof SharedWorkerGlobalScope
     ) {
-      // eslint-disable-next-line no-console
-      console.debug(
-        `worker "${scope.name}" (${scope.location.href}) running as SharedWorker`
+      workerConsole.debug(
+        `worker "${scope.location.href}" running as SharedWorker`
       );
+
+      const { port1, port2 } = new MessageChannel();
+
+      port1.start();
+      port2.start();
 
       const messagePorts = new Map<MessagePort, MessagePort>();
 
@@ -95,9 +111,8 @@ const scaffold = <T>(
 
           communicationPort.start();
 
-          // eslint-disable-next-line no-console
-          console.debug(
-            `worker "${scope.name}": added message port, number of connected ports: ${messagePorts.size}`
+          workerConsole.debug(
+            `added message port, number of connected ports: ${messagePorts.size}`
           );
 
           return;
@@ -109,9 +124,8 @@ const scaffold = <T>(
 
           messagePorts.delete(port);
 
-          // eslint-disable-next-line no-console
-          console.debug(
-            `worker "${scope.name}": removed message port, number of connected ports: ${messagePorts.size}`
+          workerConsole.debug(
+            `removed message port, number of connected ports: ${messagePorts.size}`
           );
 
           return;
@@ -120,8 +134,7 @@ const scaffold = <T>(
         if (setupDone) return;
         setupDone = true;
 
-        // eslint-disable-next-line no-console
-        console.debug(`worker "${scope.name}": received setupMessage`);
+        workerConsole.debug('received setupMessage');
 
         resolve([port1, managementData]);
       };
@@ -136,6 +149,13 @@ const scaffold = <T>(
       return;
     }
 
-    resolve([port1, null]);
+    const error = new Error(
+      'worker is neither DedicatedWorker nor SharedWorker, aborting'
+    );
+
+    // eslint-disable-next-line no-console
+    workerConsole.error(error);
+
+    reject(error);
   });
 };

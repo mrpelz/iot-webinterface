@@ -7,6 +7,7 @@ export type Flags = {
   debug: boolean;
   invisibleOnBlur: boolean;
   lowPriorityStream: boolean;
+  notifications: boolean;
   oledOptimizations: boolean;
   pageOverride: number | null;
   serviceWorker: boolean;
@@ -32,6 +33,7 @@ export function getFlags(): Flags {
     debug: false,
     invisibleOnBlur: false,
     lowPriorityStream: false,
+    notifications: true,
     oledOptimizations: false,
     pageOverride: null,
     serviceWorker: true,
@@ -59,6 +61,9 @@ export function getFlags(): Flags {
           Boolean(Number.parseInt(input, 10))
         ),
         lowPriorityStream: getFlag(hashFlags, 'lowPriorityStream', (input) =>
+          Boolean(Number.parseInt(input, 10))
+        ),
+        notifications: getFlag(hashFlags, 'notifications', (input) =>
           Boolean(Number.parseInt(input, 10))
         ),
         oledOptimizations: getFlag(hashFlags, 'oledOptimizations', (input) =>

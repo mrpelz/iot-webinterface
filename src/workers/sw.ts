@@ -1,25 +1,35 @@
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 
-importScripts('./utils/tools.js');
-
 ((scope) => {
+  importScripts('./utils/main.js');
+
+  /* eslint-disable no-console */
+  const wsConsole = {
+    debug: (...args: unknown[]) => console.debug('service worker:', ...args),
+    error: (...args: unknown[]) => console.error('service worker:', ...args),
+    info: (...args: unknown[]) => console.info('service worker:', ...args),
+  };
+  /* eslint-enable no-console */
+
   const ERROR_OUT_STATUS_TEXT = '25C2A7B7-8004-4180-A3D5-0C6FA51FFECA';
+  const REFRESH_CACHE = '55D934C6-FC0C-4256-B19B-3B1C8CFB84F4';
+
   const INDEX_ENDPOINT = '/index.json';
 
-  const preCache = 'preCache';
-  const swCache = 'swCache';
+  const PRE_CACHE = 'preCache';
+  const SW_CACHE = 'swCache';
 
   const errorMessage = 'service worker synthesized response';
 
   const unhandledRequestUrls: RegExp[] = [
     new RegExp('^\\/api/stream'),
     new RegExp('^\\/api\\/id'),
+    new RegExp('^\\/id.txt'),
   ];
   const denyRequestUrls: RegExp[] = [new RegExp('^\\/favicon')];
   const networkPreferredUrls: RegExp[] = [
     new RegExp('^\\/api\\/values'),
-    new RegExp('^\\/id.txt'),
     new RegExp('^\\/index.json'),
     new RegExp('^\\/manifest.json'),
   ];
@@ -68,8 +78,7 @@ importScripts('./utils/tools.js');
             </response-text>
           `;
 
-          // eslint-disable-next-line no-console
-          console.info(message);
+          wsConsole.info(message);
 
           return produceErrorResponse
             ? errorOut(response.status, message)
@@ -89,8 +98,7 @@ importScripts('./utils/tools.js');
           </error>
         `;
 
-        // eslint-disable-next-line no-console
-        console.info(message);
+        wsConsole.info(message);
 
         return errorOut(500, message);
       });
@@ -103,13 +111,12 @@ importScripts('./utils/tools.js');
       if (response.statusText === ERROR_OUT_STATUS_TEXT) return response;
 
       const cloned = response.clone();
-      const cache = await scope.caches.open(swCache);
+      const cache = await scope.caches.open(SW_CACHE);
       await cache.put(cloned.url, cloned);
 
       return response;
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(`setCached error: ${error}`);
+      wsConsole.error(`setCached error: ${error}`);
 
       return response;
     }
@@ -132,11 +139,31 @@ importScripts('./utils/tools.js');
         </error>
       `;
 
-      // eslint-disable-next-line no-console
-      console.info(message);
+      wsConsole.info(message);
 
       return errorOut(500, message);
     }
+  };
+
+  const refreshCache = async () => {
+    wsConsole.debug('refreshCache');
+
+    for (const key of await scope.caches.keys()) {
+      // eslint-disable-next-line no-await-in-loop
+      await scope.caches.delete(key);
+    }
+
+    const response = await fetch(new URL(INDEX_ENDPOINT, origin).href);
+    if (!response.ok || response.redirected) {
+      return;
+    }
+
+    const cache = await scope.caches.open(PRE_CACHE);
+
+    await cache.add('/');
+    await cache.addAll(await response.json());
+
+    await scope.caches.delete(SW_CACHE);
   };
 
   scope.onfetch = (fetchEvent) => {
@@ -173,47 +200,37 @@ importScripts('./utils/tools.js');
   };
 
   scope.oninstall = (installEvent) => {
-    installEvent.waitUntil(
+    wsConsole.debug('oninstall');
+
+    installEvent.waitUntil(scope.skipWaiting());
+  };
+
+  scope.onactivate = (activateEvent) => {
+    wsConsole.debug('onactivate');
+
+    activateEvent.waitUntil(
       (async () => {
         try {
-          for (const key of await scope.caches.keys()) {
-            // eslint-disable-next-line no-await-in-loop
-            await scope.caches.delete(key);
-          }
-
-          const response = await fetch(new URL(INDEX_ENDPOINT, origin).href);
-          if (!response.ok || response.redirected) {
-            return;
-          }
-
-          const cache = await scope.caches.open(preCache);
-
-          await cache.add('/');
-          await cache.addAll(await response.json());
-
-          await scope.caches.delete(swCache);
-
-          await scope.skipWaiting();
+          await refreshCache();
+          await scope.clients.claim();
         } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error(`oninstall error: ${error}`);
+          wsConsole.error(`onactivate error: ${error}`);
         }
       })()
     );
   };
 
-  scope.onactivate = (activateEvent) => {
-    activateEvent.waitUntil(
-      (async () => {
-        try {
-          await scope.clients.claim();
+  scope.onmessage = (messageEvent) => {
+    if (messageEvent.data !== REFRESH_CACHE) return;
 
-          await scope.caches.delete(swCache);
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error(`onactivate error: ${error}`);
-        }
-      })()
-    );
+    wsConsole.debug('received refreshRequest from client');
+
+    (async () => {
+      try {
+        await refreshCache();
+      } catch (error) {
+        wsConsole.error(`onmessage error: ${error}`);
+      }
+    })();
   };
 })(self as unknown as ServiceWorkerGlobalScope);

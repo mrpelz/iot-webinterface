@@ -1,3 +1,4 @@
+const REFRESH_CACHE = '55D934C6-FC0C-4256-B19B-3B1C8CFB84F4';
 const SETUP = '16374EFD-22A1-4064-9634-CC213639AD23';
 const UNLOAD = 'BA51CF3C-0145-45A6-B418-41F275DCFA32';
 
@@ -8,43 +9,61 @@ export const autoReloadUrl = new URL(
 
 export const swUrl = new URL('../../workers/sw.js', import.meta.url).href;
 
-export function removeServiceWorkers(): void {
+export async function removeServiceWorkers(): Promise<void> {
   if (!('serviceWorker' in navigator)) return;
 
-  (async () => {
-    try {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      for (const registration of registrations) {
-        registration.unregister();
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(`error unregistering ServiceWorker: ${error}`);
-    }
-  })();
+  try {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+
+    await Promise.all(
+      registrations.map((registration) => {
+        return registration.unregister();
+      })
+    );
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`error unregistering ServiceWorker: ${error}`);
+  }
 }
 
-export function installServiceWorker(url: string): void {
+export async function installServiceWorker(url: string): Promise<void> {
   if (!('serviceWorker' in navigator)) return;
 
-  (async () => {
-    try {
-      if (await navigator.serviceWorker.getRegistration(url)) return;
-
-      await navigator.serviceWorker.register(url, {
-        scope: '/',
-      });
-    } catch (error) {
+  try {
+    if (await navigator.serviceWorker.getRegistration(url)) {
       // eslint-disable-next-line no-console
-      console.error(`error registering ServiceWorker (${url}): ${error}`);
+      console.debug('service worker registration already in place');
+
+      return;
     }
-  })();
+
+    // eslint-disable-next-line no-console
+    console.debug('no service worker registration found, registering');
+
+    await removeServiceWorkers();
+    await navigator.serviceWorker.register(url, {
+      scope: '/',
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`error registering ServiceWorker (${url}): ${error}`);
+  }
 }
 
-export function connectWorker(
+export function refreshServiceWorker(): boolean {
+  if (!('serviceWorker' in navigator)) return false;
+
+  const { controller } = navigator.serviceWorker;
+  if (!controller) return false;
+
+  controller.postMessage(REFRESH_CACHE);
+  return true;
+}
+
+export function connectWorker<T>(
   url: string,
   name: string,
-  setupMessage?: unknown
+  setupMessage: T | null = null
 ): MessagePort | null {
   const { port1, port2 } = new MessageChannel();
 
