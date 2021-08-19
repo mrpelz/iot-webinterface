@@ -10,6 +10,7 @@ import { autoReload } from './util/auto-reload.js';
 import { getFlags } from './util/flags.js';
 import { requestNotificationPermission } from './util/notifications.js';
 import { setup } from 'goober';
+import { webApi } from './util/web-api.js';
 
 export const flags = getFlags();
 
@@ -26,12 +27,14 @@ const fn = async () => {
     await removeServiceWorkers();
   }
 
+  webApi();
+
   if (flags.notifications) {
     requestNotificationPermission();
   }
 
   if (flags.autoReload) {
-    autoReload(flags.autoReload);
+    autoReload();
   }
 };
 

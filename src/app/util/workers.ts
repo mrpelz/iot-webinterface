@@ -1,6 +1,7 @@
-const REFRESH_CACHE = '55D934C6-FC0C-4256-B19B-3B1C8CFB84F4';
-const SETUP = '16374EFD-22A1-4064-9634-CC213639AD23';
-const UNLOAD = 'BA51CF3C-0145-45A6-B418-41F275DCFA32';
+enum WorkerCommands {
+  SETUP,
+  UNLOAD,
+}
 
 export const autoReloadUrl = new URL(
   '../../workers/auto-reload.js',
@@ -8,6 +9,9 @@ export const autoReloadUrl = new URL(
 ).href;
 
 export const swUrl = new URL('../../workers/sw.js', import.meta.url).href;
+
+export const webApiUrl = new URL('../../workers/web-api.js', import.meta.url)
+  .href;
 
 export async function removeServiceWorkers(): Promise<void> {
   if (!('serviceWorker' in navigator)) return;
@@ -56,7 +60,7 @@ export function refreshServiceWorker(): boolean {
   const { controller } = navigator.serviceWorker;
   if (!controller) return false;
 
-  controller.postMessage(REFRESH_CACHE);
+  controller.postMessage(null);
   return true;
 }
 
@@ -76,12 +80,16 @@ export function connectWorker<T>(
       const { port: managementPort } = worker;
       managementPort.start();
 
-      addEventListener('unload', () => managementPort.postMessage(UNLOAD), {
-        once: true,
-        passive: true,
-      });
+      addEventListener(
+        'unload',
+        () => managementPort.postMessage(WorkerCommands.UNLOAD),
+        {
+          once: true,
+          passive: true,
+        }
+      );
 
-      managementPort.postMessage(SETUP, [port2]);
+      managementPort.postMessage(WorkerCommands.SETUP, [port2]);
       managementPort.postMessage(setupMessage);
 
       port1.start();
@@ -101,7 +109,7 @@ export function connectWorker<T>(
         name,
       });
 
-      worker.postMessage(SETUP, [port2]);
+      worker.postMessage(WorkerCommands.SETUP, [port2]);
       worker.postMessage(setupMessage);
 
       port1.start();

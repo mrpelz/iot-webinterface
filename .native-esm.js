@@ -4,6 +4,7 @@ export const entryPaths = [
   'build/workers/sw.js',
   'build/workers/utils/main.js',
   'build/workers/utils/worker-scaffold.js',
+  'build/workers/web-api.js',
 ];
 
 export const rootMap = {

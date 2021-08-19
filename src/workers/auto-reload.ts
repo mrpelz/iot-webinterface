@@ -1,13 +1,15 @@
 /* eslint-disable no-restricted-globals */
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
+// eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
+/// <reference path="utils/worker-scaffold.ts" />
 
 (async () => {
   importScripts('./utils/worker-scaffold.js');
 
   const ID_URL = '/id.txt';
 
-  type SetupMessage = { initialId: string | null; interval: number | null };
+  type SetupMessage = { initialId: string | null; interval: number };
 
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;
@@ -28,7 +30,7 @@
     setInterval(async () => {
       const liveId = await getLiveId();
 
-      workerConsole.info(`live id "${liveId}"`);
+      workerConsole.info(`live id: "${liveId}"`);
 
       if (storedId === liveId) return;
       if (liveId === null) return;

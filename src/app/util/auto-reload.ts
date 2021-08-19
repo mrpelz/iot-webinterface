@@ -6,12 +6,14 @@ import {
 import { canNotify } from './notifications.js';
 import { flags } from '../index.js';
 
-type SetupMessage = { initialId: string | null; interval: number | null };
+type SetupMessage = { initialId: string | null; interval: number };
 
 export const CHECK_INTERVAL = 10000;
 export const ID_STORAGE_KEY = 'autoReloadId';
 
-export function autoReload(interval: number): void {
+export function autoReload(): void {
+  const { autoReload: interval, notifications } = flags;
+
   const initialId = localStorage.getItem(ID_STORAGE_KEY);
 
   const port = connectWorker<SetupMessage>(autoReloadUrl, 'auto-reload', {
@@ -35,9 +37,10 @@ export function autoReload(interval: number): void {
     refreshServiceWorker();
 
     if (
-      !flags.notifications ||
+      !notifications ||
       !canNotify() ||
-      document.visibilityState !== 'visible'
+      document.visibilityState !== 'visible' ||
+      !document.hasFocus()
     ) {
       location.reload();
 

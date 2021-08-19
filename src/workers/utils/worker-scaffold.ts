@@ -18,10 +18,12 @@ const scaffold = <T>(
 ) => {
   const voidSetup = Symbol('voidSetup');
 
-  let setupDone = false;
+  enum WorkerCommands {
+    SETUP,
+    UNLOAD,
+  }
 
-  const SETUP = '16374EFD-22A1-4064-9634-CC213639AD23';
-  const UNLOAD = 'BA51CF3C-0145-45A6-B418-41F275DCFA32';
+  let setupDone = false;
 
   return new Promise<[MessagePort, T | null]>((resolve, reject) => {
     if (
@@ -42,7 +44,7 @@ const scaffold = <T>(
       };
 
       const handleMessage = ({ data: managementData, ports }: MessageEvent) => {
-        if (managementData === SETUP) {
+        if (managementData === WorkerCommands.SETUP) {
           const communicationPort = ports[0];
           if (!communicationPort) return;
 
@@ -54,7 +56,7 @@ const scaffold = <T>(
           return;
         }
 
-        if (managementData === UNLOAD) {
+        if (managementData === WorkerCommands.UNLOAD) {
           port?.close();
 
           return;
@@ -99,7 +101,7 @@ const scaffold = <T>(
         port: MessagePort,
         { data: managementData, ports }: MessageEvent
       ) => {
-        if (managementData === SETUP) {
+        if (managementData === WorkerCommands.SETUP) {
           const communicationPort = ports[0];
           if (!communicationPort) return;
 
@@ -118,7 +120,7 @@ const scaffold = <T>(
           return;
         }
 
-        if (managementData === UNLOAD) {
+        if (managementData === WorkerCommands.UNLOAD) {
           port.close();
           messagePorts.get(port)?.close();
 

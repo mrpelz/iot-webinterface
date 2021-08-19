@@ -1,5 +1,7 @@
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
+// eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
+/// <reference path="utils/main.ts" />
 
 ((scope) => {
   importScripts('./utils/main.js');
@@ -13,7 +15,6 @@
   /* eslint-enable no-console */
 
   const ERROR_OUT_STATUS_TEXT = '25C2A7B7-8004-4180-A3D5-0C6FA51FFECA';
-  const REFRESH_CACHE = '55D934C6-FC0C-4256-B19B-3B1C8CFB84F4';
 
   const INDEX_ENDPOINT = '/index.json';
 
@@ -23,7 +24,7 @@
   const errorMessage = 'service worker synthesized response';
 
   const unhandledRequestUrls: RegExp[] = [
-    new RegExp('^\\/api/stream'),
+    new RegExp('^\\/api\\/stream'),
     new RegExp('^\\/api\\/id'),
     new RegExp('^\\/id.txt'),
   ];
@@ -220,9 +221,7 @@
     );
   };
 
-  scope.onmessage = (messageEvent) => {
-    if (messageEvent.data !== REFRESH_CACHE) return;
-
+  scope.onmessage = () => {
     wsConsole.debug('received refreshRequest from client');
 
     (async () => {
