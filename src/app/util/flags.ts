@@ -2,7 +2,7 @@ import { CHECK_INTERVAL } from './auto-reload.js';
 
 export type Flags = {
   apiBaseUrl: string;
-  autoReload: number;
+  autoReloadInterval: number;
   darkOverride: boolean | null;
   debug: boolean;
   invisibleOnBlur: boolean;
@@ -11,7 +11,6 @@ export type Flags = {
   oledOptimizations: boolean;
   pageOverride: number | null;
   serviceWorker: boolean;
-  stream: boolean;
 };
 
 function getFlag<T>(
@@ -28,7 +27,7 @@ function getFlag<T>(
 export function getFlags(): Flags {
   const defaults: Flags = {
     apiBaseUrl: new URL('/', location.href).href,
-    autoReload: CHECK_INTERVAL,
+    autoReloadInterval: CHECK_INTERVAL,
     darkOverride: null,
     debug: false,
     invisibleOnBlur: false,
@@ -37,7 +36,6 @@ export function getFlags(): Flags {
     oledOptimizations: false,
     pageOverride: null,
     serviceWorker: true,
-    stream: true,
   };
 
   let flags = {} as Flags;
@@ -48,7 +46,7 @@ export function getFlags(): Flags {
     const setFlags: Partial<Flags> = Object.fromEntries(
       Object.entries({
         apiBaseUrl: getFlag(hashFlags, 'apiBaseUrl', String),
-        autoReload: getFlag(hashFlags, 'autoReload', (input) =>
+        autoReloadInterval: getFlag(hashFlags, 'autoReloadInterval', (input) =>
           Number.parseInt(input, 10)
         ),
         darkOverride: getFlag(hashFlags, 'darkOverride', (input) =>
@@ -73,9 +71,6 @@ export function getFlags(): Flags {
           Number.parseInt(input, 10)
         ),
         serviceWorker: getFlag(hashFlags, 'serviceWorker', (input) =>
-          Boolean(Number.parseInt(input, 10))
-        ),
-        stream: getFlag(hashFlags, 'stream', (input) =>
           Boolean(Number.parseInt(input, 10))
         ),
       }).filter(([, value]) => value !== undefined)

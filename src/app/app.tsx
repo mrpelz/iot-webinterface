@@ -1,4 +1,22 @@
+import { FunctionComponent, createContext } from 'preact';
+import { useEffect, useMemo, useState } from 'preact/hooks';
+import { Flags } from './util/flags.js';
+import { WebApi } from './util/web-api.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
+
+type Props = {
+  flags: Flags;
+  webApi: WebApi;
+};
+
+const FlagsContext = createContext<Flags | null>(null);
+
+const WebApiContext = createContext<{
+  createGetter: WebApi['createGetter'];
+  createSetter: WebApi['createSetter'];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  hierarchy: any;
+} | null>(null);
 
 const GlobalStyles = createGlobalStyle`
   * {
@@ -93,10 +111,37 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-export function App(): JSX.Element {
-  return (
-    <>
-      <GlobalStyles />
-    </>
+export const App: FunctionComponent<Props> = ({ flags, webApi }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [hierarchy, setHierarchy] = useState<any>(null);
+
+  useEffect(() => {
+    (async () => {
+      setHierarchy(await webApi.hierarchy);
+    })();
+  }, [webApi]);
+
+  const createGetter = useMemo(
+    () => webApi.createGetter.bind(webApi),
+    [webApi]
   );
-}
+
+  const createSetter = useMemo(
+    () => webApi.createSetter.bind(webApi),
+    [webApi]
+  );
+
+  return (
+    <FlagsContext.Provider value={flags}>
+      <WebApiContext.Provider
+        value={{
+          createGetter,
+          createSetter,
+          hierarchy,
+        }}
+      >
+        <GlobalStyles />
+      </WebApiContext.Provider>
+    </FlagsContext.Provider>
+  );
+};

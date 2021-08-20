@@ -45,7 +45,7 @@ const scaffold = <T>(
 
       const handleMessage = ({ data: managementData, ports }: MessageEvent) => {
         if (managementData === WorkerCommands.SETUP) {
-          const communicationPort = ports[0];
+          const [communicationPort] = ports;
           if (!communicationPort) return;
 
           port = communicationPort;
@@ -86,9 +86,6 @@ const scaffold = <T>(
 
       const { port1, port2 } = new MessageChannel();
 
-      port1.start();
-      port2.start();
-
       const messagePorts = new Map<MessagePort, MessagePort>();
 
       port2.onmessage = ({ data }) => {
@@ -97,17 +94,26 @@ const scaffold = <T>(
         }
       };
 
+      port1.start();
+      port2.start();
+
       const handleMessage = (
         port: MessagePort,
         { data: managementData, ports }: MessageEvent
       ) => {
         if (managementData === WorkerCommands.SETUP) {
-          const communicationPort = ports[0];
+          const [communicationPort] = ports;
           if (!communicationPort) return;
 
           messagePorts.set(port, communicationPort);
 
-          communicationPort.onmessage = ({ data }) => {
+          communicationPort.onmessage = ({ data, ports: childPorts }) => {
+            if (childPorts.length) {
+              port2.postMessage(data, [...childPorts]);
+
+              return;
+            }
+
             port2.postMessage(data);
           };
 
@@ -142,7 +148,7 @@ const scaffold = <T>(
       };
 
       scope.onconnect = (connectEvent) => {
-        const port = connectEvent.ports[0];
+        const [port] = connectEvent.ports;
 
         port.onmessage = (messageEvent) => handleMessage(port, messageEvent);
         port.start();
