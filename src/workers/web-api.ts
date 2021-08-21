@@ -18,6 +18,9 @@
 
   type Getter = (value: unknown) => void;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  type WebSocketHandler = (data: any) => void;
+
   const CLOSE_CHILD = '880E1EE9-15A2-462D-BCBC-E09630A1CFBB';
   const HIERARCHY_URL = '/api/hierarchy';
   const ID_URL = '/api/id';
@@ -58,30 +61,46 @@
   const setupStream = (
     apiBaseUrl: string,
     id: string,
-    lowPriorityStream: boolean
-  ) => {
+    lowPriorityStream: boolean,
+    handleMessage: WebSocketHandler
+  ): WebSocketHandler => {
     const url = new URL(WS_URL, apiBaseUrl);
     url.protocol = 'ws';
     url.searchParams.append('id', id);
 
     if (lowPriorityStream) url.searchParams.append('lowPriority', '1');
 
-    try {
-      const webSocket = new WebSocket(url.href);
+    let webSocket: WebSocket | null = null;
 
-      webSocket.onerror = () => {
-        throw new Error('webSocket onerror');
-      };
+    const createWebSocket = () => {
+      try {
+        if (webSocket?.readyState === WebSocket.OPEN) return;
+        if (webSocket?.readyState === WebSocket.CONNECTING) return;
 
-      webSocket.onopen = () => workerConsole.debug('websocket opened');
-      webSocket.onclose = () => workerConsole.error('websocket closed');
+        webSocket = new WebSocket(url.href);
 
-      return webSocket;
-    } catch (error) {
-      workerConsole.error(error);
+        webSocket.onerror = () => {
+          throw new Error('webSocket onerror');
+        };
 
-      return null;
-    }
+        webSocket.onopen = () => workerConsole.debug('websocket opened');
+        webSocket.onclose = () => workerConsole.error('websocket closed');
+
+        webSocket.onmessage = ({ data }) => handleMessage(JSON.parse(data));
+      } catch (error) {
+        workerConsole.error(error);
+      }
+    };
+
+    createWebSocket();
+
+    setInterval(() => createWebSocket(), 2000);
+
+    return (value) => {
+      if (webSocket?.readyState !== WebSocket.OPEN) return;
+
+      webSocket.send(JSON.stringify(value));
+    };
   };
 
   const handleMessage = ({ data: payload }: MessageEvent) => {
@@ -168,7 +187,7 @@
 
     const { apiBaseUrl, lowPriorityStream } = setup;
 
-    let stream: WebSocket | null = null;
+    let streamHandler: WebSocketHandler | null = null;
 
     port.onmessage = ({ data, ports }) => {
       const [childPort] = ports;
@@ -183,7 +202,7 @@
           createGetter(index, childPort);
           return;
         case ChildChannelType.SETTER:
-          createSetter(index, childPort, (value) => stream?.send(value));
+          createSetter(index, childPort, (value) => streamHandler?.(value));
           return;
         default:
           childPort.close();
@@ -198,9 +217,11 @@
 
     port.postMessage(hierarchy);
 
-    stream = setupStream(apiBaseUrl, id, lowPriorityStream);
-    if (!stream) return;
-
-    stream.onmessage = handleMessage;
+    streamHandler = setupStream(
+      apiBaseUrl,
+      id,
+      lowPriorityStream,
+      handleMessage
+    );
   })(...(await scaffold<SetupMessage>(self)));
 })();
