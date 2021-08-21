@@ -46,6 +46,12 @@
       .then((response) => response.json())
       .catch(() => null);
 
+    if (result) {
+      workerConsole.debug('hierarchy request success');
+    } else {
+      workerConsole.error('hierarchy request failure');
+    }
+
     return result;
   };
 
@@ -66,6 +72,9 @@
       webSocket.onerror = () => {
         throw new Error('webSocket onerror');
       };
+
+      webSocket.onopen = () => workerConsole.debug('websocket opened');
+      webSocket.onclose = () => workerConsole.error('websocket closed');
 
       return webSocket;
     } catch (error) {
@@ -99,6 +108,8 @@
   };
 
   const createGetter = (index: number, port: MessagePort) => {
+    workerConsole.info(`creating getter for index ${index}`);
+
     const gettersForIndex = (() => {
       const existingGetters = getters.get(index);
       if (existingGetters) return existingGetters;
@@ -116,12 +127,14 @@
     gettersForIndex.add(getter);
 
     const existingValue = existingValues.get(index);
-    if (existingValue) {
+    if (existingValue !== undefined) {
       getter(existingValue);
     }
 
     port.onmessage = ({ data: value }) => {
       if (value !== CLOSE_CHILD) return;
+
+      workerConsole.info(`removing getter for index ${index}`);
 
       port.close();
       gettersForIndex.delete(getter);
@@ -133,12 +146,18 @@
     port: MessagePort,
     callback: (value: string) => void
   ) => {
+    workerConsole.info(`creating setter for index ${index}`);
+
     port.onmessage = ({ data: value }) => {
       if (value === CLOSE_CHILD) {
+        workerConsole.info(`removing setter for index ${index}`);
+
         port.close();
 
         return;
       }
+
+      workerConsole.debug(`got setter call from index ${index}: "${value}"`);
 
       callback(JSON.stringify([index, value]));
     };
@@ -159,13 +178,15 @@
 
       const [cmd, index] = data as ChildChannelRequest;
 
-      // eslint-disable-next-line default-case
       switch (cmd) {
         case ChildChannelType.GETTER:
           createGetter(index, childPort);
           return;
         case ChildChannelType.SETTER:
           createSetter(index, childPort, (value) => stream?.send(value));
+          return;
+        default:
+          childPort.close();
       }
     };
 

@@ -1,4 +1,5 @@
 import { CHECK_INTERVAL } from './auto-reload.js';
+import { createContext } from 'preact';
 
 export type Flags = {
   apiBaseUrl: string;
@@ -12,6 +13,8 @@ export type Flags = {
   pageOverride: number | null;
   serviceWorker: boolean;
 };
+
+export const FlagsContext = createContext<Flags | null>(null);
 
 function getFlag<T>(
   hashFlags: URLSearchParams,

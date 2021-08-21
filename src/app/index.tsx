@@ -5,8 +5,9 @@ import {
   removeServiceWorkers,
   swUrl,
 } from './util/workers.js';
-import { App } from './app.js';
-import { WebApi } from './util/web-api.js';
+import { App } from './components/app.js';
+import { Root } from './root.js';
+import { WebApi } from './web-api/main.js';
 import { autoReload } from './util/auto-reload.js';
 import { getFlags } from './util/flags.js';
 import { requestNotificationPermission } from './util/notifications.js';
@@ -24,7 +25,12 @@ const {
 const webApi = new WebApi(apiBaseUrl, lowPriorityStream);
 
 setup(h);
-render(<App flags={flags} webApi={webApi} />, document.body);
+render(
+  <Root flags={flags} webApi={webApi}>
+    <App />
+  </Root>,
+  document.body
+);
 
 const fn = async () => {
   iOSHoverStyles();
@@ -44,20 +50,20 @@ const fn = async () => {
     autoReload(autoReloadInterval, notifications);
   }
 
-  webApi.createGetter<number>(71, (value) => {
-    // eslint-disable-next-line no-console
-    console.info('temperature', value);
-  });
+  // webApi.createGetter<number>(71, (value) => {
+  //   // eslint-disable-next-line no-console
+  //   console.info('temperature', value);
+  // });
 
-  webApi.createGetter<number>(66, (value) => {
-    // eslint-disable-next-line no-console
-    console.info('pressure', value);
-  });
+  // webApi.createGetter<number>(66, (value) => {
+  //   // eslint-disable-next-line no-console
+  //   console.info('pressure', value);
+  // });
 
-  webApi.createGetter<number>(55, (value) => {
-    // eslint-disable-next-line no-console
-    console.info('pm025', value);
-  });
+  // webApi.createGetter<number>(55, (value) => {
+  //   // eslint-disable-next-line no-console
+  //   console.info('pm025', value);
+  // });
 };
 
 (() => {
