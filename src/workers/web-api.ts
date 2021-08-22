@@ -77,6 +77,7 @@
         if (webSocket?.readyState === WebSocket.OPEN) return;
         if (webSocket?.readyState === WebSocket.CONNECTING) return;
 
+        webSocket?.close();
         webSocket = new WebSocket(url.href);
 
         webSocket.onerror = () => {
@@ -86,7 +87,14 @@
         webSocket.onopen = () => workerConsole.debug('websocket opened');
         webSocket.onclose = () => workerConsole.error('websocket closed');
 
-        webSocket.onmessage = ({ data }) => handleMessage(JSON.parse(data));
+        webSocket.onmessage = ({ data }) => {
+          if (!data) return;
+
+          const payload = JSON.parse(data);
+          if (!payload) return;
+
+          handleMessage(payload);
+        };
       } catch (error) {
         workerConsole.error(error);
       }
@@ -103,15 +111,7 @@
     };
   };
 
-  const handleMessage = ({ data: payload }: MessageEvent) => {
-    const data = (() => {
-      try {
-        return JSON.parse(payload as string);
-      } catch (error) {
-        return null;
-      }
-    })() as [number, unknown] | null;
-
+  const handleMessage: WebSocketHandler = (data) => {
     if (!data) return;
 
     const [index, value] = data;
@@ -163,7 +163,7 @@
   const createSetter = (
     index: number,
     port: MessagePort,
-    callback: (value: string) => void
+    callback: WebSocketHandler
   ) => {
     workerConsole.info(`creating setter for index ${index}`);
 
@@ -178,7 +178,7 @@
 
       workerConsole.debug(`got setter call from index ${index}: "${value}"`);
 
-      callback(JSON.stringify([index, value]));
+      callback([index, value]);
     };
   };
 

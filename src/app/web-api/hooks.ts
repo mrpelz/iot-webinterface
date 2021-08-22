@@ -2,11 +2,13 @@ import { useEffect, useState } from 'preact/hooks';
 import { WebApi } from './main.js';
 import { createContext } from 'preact';
 
+type SetterFunction<T> = (value: T) => void;
+
 type WebApiContextType = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   hierarchy: any;
   useGetter: <T>(index: number) => T | null;
-  useSetter: <T>(index: number) => (value: T) => void;
+  useSetter: <T>(index: number) => SetterFunction<T>;
 };
 
 export const WebApiContext = createContext<WebApiContextType>(
@@ -36,7 +38,7 @@ export const useWebApi = (webApi: WebApi): WebApiContextType => {
   };
 
   const useSetter = <T>(index: number) => {
-    const [setterFn, setSetterFn] = useState<(value: T) => void>(() => () => {
+    const [setterFn, setSetterFn] = useState<SetterFunction<T>>(() => () => {
       // eslint-disable-next-line no-console
       console.warn(
         `cannot send value for index ${index}, setter not yet ready`
@@ -45,7 +47,10 @@ export const useWebApi = (webApi: WebApi): WebApiContextType => {
 
     useEffect(() => {
       const setter = webApi.createSetter<T>(index);
-      setSetterFn(() => (value: T) => setter?.set(value));
+      setSetterFn(
+        () => (value: T) =>
+          setter?.set(value === undefined ? (null as unknown as T) : value)
+      );
 
       return () => setter?.remove();
     }, [webApi]);
