@@ -12,7 +12,7 @@ const WhiteTestText = styled('p')`
   margin: 1rem 0;
 `;
 
-const formatter = new Intl.NumberFormat(undefined, {
+const formatter = new Intl.NumberFormat(navigator.language, {
   maximumFractionDigits: 2,
   useGrouping: false,
 });
@@ -29,17 +29,20 @@ export const App: FunctionComponent = () => {
         Motion: {useGetter<boolean>(64) ? '✅' : '⛔️'}
       </WhiteTestText>
       <WhiteTestText>
-        Pressure: {formatter.format(useGetter<number>(66) || 0)}
+        Pressure: {formatter.format(useGetter<number>(66) || 0)} Pascal
       </WhiteTestText>
       <WhiteTestText>
-        Temperature: {formatter.format(useGetter<number>(71) || 0)}
+        Temperature: {formatter.format(useGetter<number>(71) || 0)} °C
+      </WhiteTestText>
+      <WhiteTestText>
+        PM<sub>2,5</sub>: {formatter.format(useGetter<number>(55) || 0)} ppm
       </WhiteTestText>
       <WhiteTestText onClick={() => obiJackFlip()}>
         ObiJack relay: {obiJackOn ? '🎚' : '💤'}
       </WhiteTestText>
       {obiJackOn ? (
         <WhiteTestText>
-          Humidity: {formatter.format(useGetter<number>(63) || 0)}
+          Humidity: {formatter.format(useGetter<number>(63) || 0)} %RH
         </WhiteTestText>
       ) : null}
     </AbsoluteTestContainer>

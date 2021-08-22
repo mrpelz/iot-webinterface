@@ -13,6 +13,9 @@ import { getFlags } from './util/flags.js';
 import { requestNotificationPermission } from './util/notifications.js';
 import { setup } from 'goober';
 
+onerror = () => removeServiceWorkers();
+onunhandledrejection = () => removeServiceWorkers();
+
 const flags = getFlags();
 const {
   serviceWorker,
