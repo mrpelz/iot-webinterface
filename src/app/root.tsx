@@ -1,5 +1,5 @@
 import { Flags, FlagsContext } from './util/flags.js';
-import { WebApiContext, useWebApi } from './web-api/hooks.js';
+import { WebApiContext, useWebApiInsert } from './web-api/hooks.js';
 import { FunctionComponent } from 'preact';
 import { WebApi } from './web-api/main.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
@@ -50,6 +50,8 @@ const GlobalStyles = createGlobalStyle`
 
     --safe-area-inset-top: env(safe-area-inset-top, 20px);
     /* --safe-area-inset-top: 20px; */
+
+    font-family: var(--font);
   }
 
   :root.dark {
@@ -103,18 +105,17 @@ const GlobalStyles = createGlobalStyle`
 `;
 
 export const Root: FunctionComponent<Props> = ({ children, flags, webApi }) => {
-  const webApiContent = useWebApi(webApi);
+  const webApiContext = useWebApiInsert(webApi);
+  const { hierarchy } = webApiContext;
 
   return (
-    <>
+    <FlagsContext.Provider value={flags}>
       <GlobalStyles />
-      <FlagsContext.Provider value={flags}>
-        {webApiContent.hierarchy ? (
-          <WebApiContext.Provider value={webApiContent}>
-            {children}
-          </WebApiContext.Provider>
-        ) : null}
-      </FlagsContext.Provider>
-    </>
+      {hierarchy ? (
+        <WebApiContext.Provider value={webApiContext}>
+          {children}
+        </WebApiContext.Provider>
+      ) : null}
+    </FlagsContext.Provider>
   );
 };

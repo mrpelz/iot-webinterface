@@ -53,17 +53,17 @@ const fn = async () => {
     autoReload(autoReloadInterval, notifications);
   }
 
-  // webApi.createGetter<number>(71, (value) => {
+  // webApi.createGetter<number>(72, (value) => {
   //   // eslint-disable-next-line no-console
   //   console.info('temperature', value);
   // });
 
-  // webApi.createGetter<number>(66, (value) => {
+  // webApi.createGetter<number>(67, (value) => {
   //   // eslint-disable-next-line no-console
   //   console.info('pressure', value);
   // });
 
-  // webApi.createGetter<number>(55, (value) => {
+  // webApi.createGetter<number>(56, (value) => {
   //   // eslint-disable-next-line no-console
   //   console.info('pm025', value);
   // });

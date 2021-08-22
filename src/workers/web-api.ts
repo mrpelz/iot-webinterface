@@ -18,8 +18,7 @@
 
   type Getter = (value: unknown) => void;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  type WebSocketHandler = (data: any) => void;
+  type WebSocketHandler = (data: [number, unknown]) => void;
 
   const CLOSE_CHILD = '880E1EE9-15A2-462D-BCBC-E09630A1CFBB';
   const HIERARCHY_URL = '/api/hierarchy';
