@@ -23,24 +23,19 @@ type Setter<T> = {
 type MetaKeys = 'actuator' | 'name' | 'metric' | 'type' | 'unit';
 export type Meta = Partial<Record<MetaKeys, string>>;
 
-export interface HierarchyMembers {
-  _get?: number;
-  _meta: Meta;
-  _set?: number;
-}
-
-export interface HierarchyChildren {
-  [key: string]: HierarchyElement;
-}
-
-export type HierarchyElement = HierarchyChildren & HierarchyMembers;
+export type HierarchyNode = {
+  get?: number;
+  meta: Meta;
+  nodes?: Record<string, HierarchyNode>;
+  set?: number;
+};
 
 const CLOSE_CHILD = '880E1EE9-15A2-462D-BCBC-E09630A1CFBB';
 
 export class WebApi {
   private readonly _port: MessagePort | null;
 
-  readonly hierarchy: Promise<HierarchyElement>;
+  readonly hierarchy: Promise<HierarchyNode>;
 
   constructor(apiBaseUrl: string, lowPriorityStream: boolean) {
     this._port = connectWorker<SetupMessage>(webApiUrl, 'web-api', {

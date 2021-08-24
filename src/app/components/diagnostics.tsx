@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useContext, useEffect, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from './hierarchy.js';
+import { WebApiContext } from '../web-api/hooks.js';
 import { styled } from 'goober';
-import { useWebApi } from '../web-api/hooks.js';
 
 const DIAGNOSTICS_KEY = 'd';
 const DIAGNOSTICS_KEY_REPEAT = 5;
@@ -23,7 +23,7 @@ export const Diagnostics: FunctionComponent = () => {
   const [dCount, setDCount] = useState(0);
   const [dTimeout, setDTimeout] = useState<number | null>(null);
 
-  const { hierarchy } = useWebApi();
+  const { hierarchy } = useContext(WebApiContext);
 
   useEffect(() => {
     const onDPress = ({ key }: KeyboardEvent) => {
@@ -58,7 +58,7 @@ export const Diagnostics: FunctionComponent = () => {
 
   return visible ? (
     <DiagnosticsContainer>
-      <Hierarchy element={hierarchy} />
+      <Hierarchy node={hierarchy} />
     </DiagnosticsContainer>
   ) : null;
 };

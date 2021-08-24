@@ -105,14 +105,13 @@ const GlobalStyles = createGlobalStyle`
 `;
 
 export const Root: FunctionComponent<Props> = ({ children, flags, webApi }) => {
-  const webApiContext = useWebApiInsert(webApi);
-  const { hierarchy } = webApiContext;
+  const webApiContextContent = useWebApiInsert(webApi);
 
   return (
     <FlagsContext.Provider value={flags}>
       <GlobalStyles />
-      {hierarchy ? (
-        <WebApiContext.Provider value={webApiContext}>
+      {webApiContextContent ? (
+        <WebApiContext.Provider value={webApiContextContent}>
           {children}
         </WebApiContext.Provider>
       ) : null}

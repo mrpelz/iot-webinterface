@@ -1,7 +1,7 @@
-import { WebApiNode, useWebApiNode } from '../web-api/hooks.js';
+import { useGetter, useSetter } from '../web-api/hooks.js';
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
-import { HierarchyElement } from '../web-api/main.js';
+import { HierarchyNode } from '../web-api/main.js';
 import { styled } from 'goober';
 
 const Container = styled('table')`
@@ -39,7 +39,7 @@ const GetterValue = styled('span')`
   word-break: break-all;
 `;
 
-const Meta: FunctionComponent<{ node: WebApiNode }> = ({ node }) => {
+const Meta: FunctionComponent<{ node: HierarchyNode }> = ({ node }) => {
   const { meta } = node;
 
   if (!Object.keys(meta).length) return null;
@@ -71,34 +71,35 @@ const Meta: FunctionComponent<{ node: WebApiNode }> = ({ node }) => {
   );
 };
 
-const Getter: FunctionComponent<{ node: WebApiNode }> = ({ node }) => {
-  const { getterIndex, useGetter } = node;
+const Getter: FunctionComponent<{ node: HierarchyNode }> = ({ node }) => {
+  const { get } = node;
 
-  const value = useMemo(
-    () => JSON.stringify(useGetter<unknown>()),
-    [useGetter]
-  );
+  const rawState = useGetter<unknown>(node);
+  const state = useMemo(() => JSON.stringify(rawState), [rawState]);
 
-  if (getterIndex === null) return null;
+  if (get === undefined) return null;
 
   return (
     <tr>
       <td>
-        <b>Getter</b> <i>{getterIndex}</i>
+        <b>Getter</b> <i>{get}</i>
       </td>
       <td>
-        <GetterValue>{value}</GetterValue>
+        <GetterValue>{state}</GetterValue>
       </td>
     </tr>
   );
 };
 
-const Setter: FunctionComponent<{ node: WebApiNode }> = ({ node }) => {
-  const { meta, setterIndex, useSetter } = node;
+const Setter: FunctionComponent<{ node: HierarchyNode }> = ({ node }) => {
+  const {
+    meta: { type },
+    set,
+  } = node;
 
-  const setter = useSetter<unknown>();
+  const setter = useSetter<unknown>(node);
 
-  const isNull = meta.type === 'null';
+  const isNull = type === 'null';
 
   const [input, setInput] = useState<unknown>(undefined);
 
@@ -117,9 +118,9 @@ const Setter: FunctionComponent<{ node: WebApiNode }> = ({ node }) => {
         const parsedValue = JSON.parse(value);
         const valueType = parsedValue === null ? 'null' : typeof parsedValue;
 
-        if (valueType !== meta.type) {
+        if (valueType !== type) {
           currentTarget.setCustomValidity(
-            `parsed type does not match the required type! Needed: ${meta.type}, parsed: ${valueType}`
+            `parsed type does not match the required type! Needed: ${type}, parsed: ${valueType}`
           );
 
           return;
@@ -140,19 +141,19 @@ const Setter: FunctionComponent<{ node: WebApiNode }> = ({ node }) => {
     setter(input);
   };
 
-  if (setterIndex === null) return null;
+  if (set === undefined) return null;
 
   return (
     <tr>
       <td>
-        <b>Setter</b> <i>{setterIndex}</i>
+        <b>Setter</b> <i>{set}</i>
       </td>
       <td>
         {isNull ? (
           <button onClick={() => setter(null)}>null</button>
         ) : (
           <form action="#" onSubmit={onSubmit}>
-            <input placeholder={meta.type} onChange={onChange} />
+            <input placeholder={type} onChange={onChange} />
           </form>
         )}
       </td>
@@ -160,12 +161,14 @@ const Setter: FunctionComponent<{ node: WebApiNode }> = ({ node }) => {
   );
 };
 
-const Child: FunctionComponent<{ name: string; node: HierarchyElement }> = ({
+const Child: FunctionComponent<{ name: string; node: HierarchyNode }> = ({
   name,
   node,
 }) => {
-  if (!node || typeof node !== 'object') return null;
-  if (Object.keys(node).length <= 1) return null;
+  if (!node) return null;
+
+  const { get, nodes, set } = node;
+  if (!get && !nodes && !set) return null;
 
   return (
     <tr>
@@ -174,26 +177,29 @@ const Child: FunctionComponent<{ name: string; node: HierarchyElement }> = ({
       </td>
       <td>
         {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
-        <Hierarchy element={node} />
+        <Hierarchy node={node} />
       </td>
     </tr>
   );
 };
 
-export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
-  element,
+export const Hierarchy: FunctionComponent<{ node: HierarchyNode }> = ({
+  node,
 }) => {
-  const node = useWebApiNode(element);
-  const { children } = node;
+  if (!node) return null;
+
+  const { nodes } = node;
 
   return (
     <Container>
       <Meta node={node} />
       <Getter node={node} />
       <Setter node={node} />
-      {Object.entries(children).map(([key, value]) => (
-        <Child name={key} node={value} />
-      ))}
+      {nodes
+        ? Object.entries(nodes).map(([name, childNode]) => (
+            <Child name={name} node={childNode} />
+          ))
+        : null}
     </Container>
   );
 };

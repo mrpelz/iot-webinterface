@@ -1,22 +1,13 @@
-import { HierarchyChildren, HierarchyElement, Meta, WebApi } from './main.js';
+import { HierarchyNode, WebApi } from './main.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 import { createContext } from 'preact';
 
 type SetterFunction<T> = (value: T) => void;
 
 type TWebApiContext = {
-  hierarchy: HierarchyElement;
-  useGetter: <T>(index: number) => T | null;
-  useSetter: <T>(index: number) => SetterFunction<T>;
-};
-
-export type WebApiNode = {
-  children: HierarchyChildren;
-  getterIndex: number | null;
-  meta: Meta;
-  setterIndex: number | null;
-  useGetter: <T>() => T | null;
-  useSetter: <T>() => SetterFunction<T>;
+  hierarchy: HierarchyNode;
+  useGetterIndex: <T>(index?: number) => T | null;
+  useSetterIndex: <T>(index?: number) => SetterFunction<T>;
 };
 
 export const WebApiContext = createContext<TWebApiContext>(
@@ -24,8 +15,8 @@ export const WebApiContext = createContext<TWebApiContext>(
 );
 
 export const useWebApiInsert = (webApi: WebApi): TWebApiContext => {
-  const [hierarchy, setHierarchy] = useState<HierarchyElement>(
-    null as unknown as HierarchyElement
+  const [hierarchy, setHierarchy] = useState<HierarchyNode>(
+    null as unknown as HierarchyNode
   );
 
   useEffect(() => {
@@ -34,19 +25,22 @@ export const useWebApiInsert = (webApi: WebApi): TWebApiContext => {
     })();
   }, [webApi]);
 
-  const useGetter = <T>(index: number) => {
+  const useGetterIndex = <T>(index?: number) => {
     const [state, setState] = useState<T | null>(null);
 
     useEffect(() => {
-      const getter = webApi.createGetter<T>(index, (value) => setState(value));
+      const getter =
+        index === undefined
+          ? null
+          : webApi.createGetter<T>(index, (value) => setState(value));
 
       return () => getter?.remove();
-    }, [webApi]);
+    }, [index]);
 
     return state;
   };
 
-  const useSetter = <T>(index: number) => {
+  const useSetterIndex = <T>(index?: number) => {
     const [setterFn, setSetterFn] = useState<SetterFunction<T>>(() => () => {
       // eslint-disable-next-line no-console
       console.warn(
@@ -55,44 +49,34 @@ export const useWebApiInsert = (webApi: WebApi): TWebApiContext => {
     });
 
     useEffect(() => {
-      const setter = webApi.createSetter<T>(index);
+      const setter = index === undefined ? null : webApi.createSetter<T>(index);
+
       setSetterFn(
         () => (value: T) =>
           setter?.set(value === undefined ? (null as unknown as T) : value)
       );
 
       return () => setter?.remove();
-    }, [webApi]);
+    }, [index]);
 
     return setterFn;
   };
 
   return {
     hierarchy,
-    useGetter,
-    useSetter,
+    useGetterIndex,
+    useSetterIndex,
   };
 };
 
-export const useWebApi = (): TWebApiContext => useContext(WebApiContext);
+export const useGetter = <T>({ get }: HierarchyNode): T | null => {
+  const { useGetterIndex } = useContext(WebApiContext);
 
-export const useWebApiNode = (node: HierarchyElement): WebApiNode => {
-  const { useGetter, useSetter } = useWebApi();
+  return useGetterIndex(get);
+};
 
-  return {
-    children: Object.fromEntries(
-      Object.entries(node).filter(
-        ([key]) => !['_get', '_meta', '_set'].includes(key)
-      )
-    ),
-    getterIndex: '_get' in node ? (node._get as number) : null,
-    meta: node._meta,
-    setterIndex: '_set' in node ? (node._set as number) : null,
-    useGetter: <T>() => {
-      return '_get' in node ? useGetter<T>(node._get as number) : null;
-    },
-    useSetter: <T>() => {
-      return '_set' in node ? useSetter<T>(node._set as number) : () => null;
-    },
-  };
+export const useSetter = <T>({ set }: HierarchyNode): SetterFunction<T> => {
+  const { useSetterIndex } = useContext(WebApiContext);
+
+  return useSetterIndex(set);
 };
