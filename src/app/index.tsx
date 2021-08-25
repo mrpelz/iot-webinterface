@@ -24,7 +24,7 @@ const {
   lowPriorityStream,
 } = flags;
 
-const webApi = new WebApi(apiBaseUrl, lowPriorityStream);
+const webApi = new WebApi(apiBaseUrl, autoReloadInterval, lowPriorityStream);
 
 setup(h);
 render(<Root initialFlags={flags} webApi={webApi} />, document.body);

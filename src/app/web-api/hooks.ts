@@ -20,9 +20,7 @@ export function useWebApiInsert(webApi: WebApi): TWebApiContext {
   );
 
   useEffect(() => {
-    (async () => {
-      setHierarchy(await webApi.hierarchy);
-    })();
+    webApi.onHierarchy((value) => setHierarchy(value));
   }, [webApi]);
 
   const useGetterIndex = <T>(index?: number) => {

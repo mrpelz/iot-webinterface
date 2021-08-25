@@ -7,7 +7,11 @@
 (async () => {
   importScripts('./utils/worker-scaffold.js');
 
-  type SetupMessage = { apiBaseUrl: string; lowPriorityStream: boolean };
+  type SetupMessage = {
+    apiBaseUrl: string;
+    interval: number;
+    lowPriorityStream: boolean;
+  };
 
   enum ChildChannelType {
     GETTER,
@@ -28,50 +32,74 @@
   const getters = new Map<number, Set<Getter>>();
   const existingValues = new Map<number, unknown>();
 
-  const getId = async (apiBaseUrl: string) => {
+  const getId = async (
+    apiBaseUrl: string,
+    interval: number,
+    onChange: (id: string) => void
+  ) => {
     const url = new URL(ID_URL, apiBaseUrl);
 
-    const result = await fetch(url.href)
-      .then((response) => response.text())
-      .catch(() => null);
+    const getLiveId = () =>
+      fetch(url.href)
+        .then((response) => (response.ok ? response.text() : null))
+        .then((text) => text?.trim() || null)
+        .catch(() => null);
 
-    workerConsole.info(`api id: "${result}"`);
+    let storedId: string | null = null;
 
-    return result;
+    const fn = async () => {
+      const id = await getLiveId();
+
+      workerConsole.info(`api id: "${id}"`);
+
+      if (storedId === id) return;
+      if (id === null) return;
+
+      workerConsole.info(`api id changed from "${storedId}" to "${id}"`);
+
+      storedId = id;
+
+      onChange(id);
+    };
+
+    fn();
+    setInterval(fn, interval);
   };
 
   const getHierarchy = async (apiBaseUrl: string, id: string) => {
     const url = new URL(HIERARCHY_URL, apiBaseUrl);
     url.searchParams.append('id', id);
 
-    const result = await fetch(url.href)
+    const hierarchy = await fetch(url.href)
       .then((response) => response.json())
       .catch(() => null);
 
-    if (result) {
+    if (hierarchy) {
       workerConsole.debug('hierarchy request success');
     } else {
       workerConsole.error('hierarchy request failure');
     }
 
-    return result;
+    return hierarchy;
   };
 
   const setupStream = (
     apiBaseUrl: string,
-    id: string,
     lowPriorityStream: boolean,
     handleMessage: WebSocketHandler
-  ): WebSocketHandler => {
-    const url = new URL(WS_URL, apiBaseUrl);
-    url.protocol = 'ws';
-    url.searchParams.append('id', id);
-
-    if (lowPriorityStream) url.searchParams.append('lowPriority', '1');
-
+  ): { sendMessage: WebSocketHandler; setId: (id: string) => void } => {
+    let storedId: string | null = null;
     let webSocket: WebSocket | null = null;
 
     const createWebSocket = () => {
+      if (!storedId) return;
+
+      const url = new URL(WS_URL, apiBaseUrl);
+      url.protocol = 'ws';
+      url.searchParams.append('id', storedId);
+
+      if (lowPriorityStream) url.searchParams.append('lowPriority', '1');
+
       try {
         if (webSocket?.readyState === WebSocket.OPEN) return;
         if (webSocket?.readyState === WebSocket.CONNECTING) return;
@@ -99,14 +127,24 @@
       }
     };
 
-    createWebSocket();
-
-    setInterval(() => createWebSocket(), 2000);
-
-    return (value) => {
+    const sendMessage = (value: unknown) => {
       if (webSocket?.readyState !== WebSocket.OPEN) return;
 
       webSocket.send(JSON.stringify(value));
+    };
+
+    const setId = (id: string) => {
+      storedId = id;
+
+      webSocket?.close();
+      createWebSocket();
+    };
+
+    setInterval(() => createWebSocket(), 2000);
+
+    return {
+      sendMessage,
+      setId,
     };
   };
 
@@ -184,9 +222,13 @@
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;
 
-    const { apiBaseUrl, lowPriorityStream } = setup;
+    const { apiBaseUrl, interval, lowPriorityStream } = setup;
 
-    let streamHandler: WebSocketHandler | null = null;
+    const { sendMessage, setId } = setupStream(
+      apiBaseUrl,
+      lowPriorityStream,
+      handleMessage
+    );
 
     port.onmessage = ({ data, ports }) => {
       const [childPort] = ports;
@@ -201,26 +243,18 @@
           createGetter(index, childPort);
           return;
         case ChildChannelType.SETTER:
-          createSetter(index, childPort, (value) => streamHandler?.(value));
+          createSetter(index, childPort, (value) => sendMessage(value));
           return;
         default:
           childPort.close();
       }
     };
 
-    const id = await getId(apiBaseUrl);
-    if (!id) return;
+    await getId(apiBaseUrl, interval, async (id) => {
+      const hierarchy = await getHierarchy(apiBaseUrl, id);
+      port.postMessage(hierarchy);
 
-    const hierarchy = await getHierarchy(apiBaseUrl, id);
-    if (!hierarchy) return;
-
-    port.postMessage(hierarchy);
-
-    streamHandler = setupStream(
-      apiBaseUrl,
-      id,
-      lowPriorityStream,
-      handleMessage
-    );
+      setId(id);
+    });
   })(...(await scaffold<SetupMessage>(self)));
 })();

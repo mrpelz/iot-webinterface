@@ -1,6 +1,10 @@
 import { connectWorker, webApiUrl } from '../util/workers.js';
 
-type SetupMessage = { apiBaseUrl: string; lowPriorityStream: boolean };
+type SetupMessage = {
+  apiBaseUrl: string;
+  interval: number;
+  lowPriorityStream: boolean;
+};
 
 enum ChildChannelType {
   GETTER,
@@ -10,6 +14,7 @@ enum ChildChannelType {
 type ChildChannelRequest = [ChildChannelType, number];
 
 type GetterCallback<T> = (value: T) => void;
+type HierarchyCallback = (value: HierarchyNode) => void;
 
 type Getter = {
   remove: () => void;
@@ -33,27 +38,29 @@ export type HierarchyNode = {
 const CLOSE_CHILD = '880E1EE9-15A2-462D-BCBC-E09630A1CFBB';
 
 export class WebApi {
+  private _hierarchyCallback?: HierarchyCallback;
   private readonly _port: MessagePort | null;
 
-  readonly hierarchy: Promise<HierarchyNode>;
-
-  constructor(apiBaseUrl: string, lowPriorityStream: boolean) {
+  constructor(
+    apiBaseUrl: string,
+    interval: number,
+    lowPriorityStream: boolean
+  ) {
     this._port = connectWorker<SetupMessage>(webApiUrl, 'web-api', {
       apiBaseUrl,
+      interval,
       lowPriorityStream,
     });
 
-    this.hierarchy = new Promise((resolve) => {
+    (() => {
       if (!this._port) return;
 
       this._port.onmessage = ({ data }) => {
-        resolve(data);
-      };
-    });
+        // eslint-disable-next-line no-console
+        console.info('web-api:', data);
 
-    (async () => {
-      // eslint-disable-next-line no-console
-      console.info('web-api:', await this.hierarchy);
+        this._hierarchyCallback?.(data);
+      };
     })();
   }
 
@@ -108,5 +115,9 @@ export class WebApi {
       remove,
       set,
     };
+  }
+
+  onHierarchy(callback: HierarchyCallback): void {
+    this._hierarchyCallback = callback;
   }
 }

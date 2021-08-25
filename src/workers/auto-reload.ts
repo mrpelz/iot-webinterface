@@ -19,8 +19,8 @@
 
     const getLiveId = () =>
       fetch(ID_URL)
-        .then((response) => response.text())
-        .then((text) => text.trim() || null)
+        .then((response) => (response.ok ? response.text() : null))
+        .then((text) => text?.trim() || null)
         .catch(() => null);
 
     workerConsole.info(`initial id: "${initialId}", interval: ${interval}`);
