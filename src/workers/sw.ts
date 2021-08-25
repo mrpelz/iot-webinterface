@@ -24,13 +24,11 @@
   const errorMessage = 'service worker synthesized response';
 
   const unhandledRequestUrls: RegExp[] = [
-    new RegExp('^\\/api\\/id'),
-    new RegExp('^\\/api\\/stream'),
+    new RegExp('^\\/api'),
     new RegExp('^\\/id.txt'),
   ];
   const denyRequestUrls: RegExp[] = [new RegExp('^\\/favicon')];
   const networkPreferredUrls: RegExp[] = [
-    new RegExp('^\\/api\\/values'),
     new RegExp('^\\/index.json'),
     new RegExp('^\\/manifest.json'),
   ];

@@ -1,46 +1,17 @@
 import { useGetter, useSetter } from '../web-api/hooks.js';
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
-import { HierarchyNode } from '../web-api/main.js';
+import { HierarchyElement } from '../web-api/main.js';
 import { styled } from 'goober';
-
-const Container = styled('table')`
-  border-collapse: collapse;
-  border: 1px solid currentColor;
-  color: hsl(var(--black));
-  margin: 1rem;
-  vertical-align: top;
-
-  table,
-  td {
-    border-collapse: collapse;
-    border: 1px solid currentColor;
-    vertical-align: top;
-  }
-
-  table {
-    margin: 0.2rem;
-  }
-
-  tr:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-
-  td {
-    padding: 0.5rem;
-  }
-
-  thead {
-    font-weight: bold;
-  }
-`;
 
 const GetterValue = styled('span')`
   word-break: break-all;
 `;
 
-const Meta: FunctionComponent<{ node: HierarchyNode }> = ({ node }) => {
-  const { meta } = node;
+const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
+  element,
+}) => {
+  const { meta } = element;
 
   if (!Object.keys(meta).length) return null;
 
@@ -51,30 +22,24 @@ const Meta: FunctionComponent<{ node: HierarchyNode }> = ({ node }) => {
       </td>
       <td>
         <table>
-          <thead>
+          {Object.entries(meta).map(([key, value]) => (
             <tr>
-              <td>key</td>
-              <td>value</td>
+              <td>{key}</td>
+              <td>{value}</td>
             </tr>
-          </thead>
-          <tbody>
-            {Object.entries(meta).map(([key, value]) => (
-              <tr>
-                <td>{key}</td>
-                <td>{value}</td>
-              </tr>
-            ))}
-          </tbody>
+          ))}
         </table>
       </td>
     </tr>
   );
 };
 
-const Getter: FunctionComponent<{ node: HierarchyNode }> = ({ node }) => {
-  const { get } = node;
+const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
+  element,
+}) => {
+  const { get } = element;
 
-  const rawState = useGetter<unknown>(node);
+  const rawState = useGetter<unknown>(element);
   const state = useMemo(() => JSON.stringify(rawState), [rawState]);
 
   if (get === undefined) return null;
@@ -91,13 +56,15 @@ const Getter: FunctionComponent<{ node: HierarchyNode }> = ({ node }) => {
   );
 };
 
-const Setter: FunctionComponent<{ node: HierarchyNode }> = ({ node }) => {
+const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
+  element,
+}) => {
   const {
     meta: { type },
     set,
-  } = node;
+  } = element;
 
-  const setter = useSetter<unknown>(node);
+  const setter = useSetter<unknown>(element);
 
   const isNull = type === 'null';
 
@@ -161,14 +128,14 @@ const Setter: FunctionComponent<{ node: HierarchyNode }> = ({ node }) => {
   );
 };
 
-const Child: FunctionComponent<{ name: string; node: HierarchyNode }> = ({
+const Child: FunctionComponent<{ element: HierarchyElement; name: string }> = ({
   name,
-  node,
+  element,
 }) => {
-  if (!node) return null;
+  if (!element) return null;
 
-  const { get, nodes, set } = node;
-  if (get === undefined && !nodes && set === undefined) return null;
+  const { get, children, set } = element;
+  if (get === undefined && !children && set === undefined) return null;
 
   return (
     <tr>
@@ -177,29 +144,29 @@ const Child: FunctionComponent<{ name: string; node: HierarchyNode }> = ({
       </td>
       <td>
         {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
-        <Hierarchy node={node} />
+        <Hierarchy element={element} />
       </td>
     </tr>
   );
 };
 
-export const Hierarchy: FunctionComponent<{ node: HierarchyNode }> = ({
-  node,
+export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
+  element,
 }) => {
-  if (!node) return null;
+  if (!element) return null;
 
-  const { nodes } = node;
+  const { children: hierarchyChildren } = element;
 
   return (
-    <Container>
-      <Meta node={node} />
-      <Getter node={node} />
-      <Setter node={node} />
-      {nodes
-        ? Object.entries(nodes).map(([name, childNode]) => (
-            <Child name={name} node={childNode} />
+    <table>
+      <Meta element={element} />
+      <Getter element={element} />
+      <Setter element={element} />
+      {hierarchyChildren
+        ? Object.entries(hierarchyChildren).map(([name, child]) => (
+            <Child name={name} element={child} />
           ))
         : null}
-    </Container>
+    </table>
   );
 };

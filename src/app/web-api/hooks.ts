@@ -1,26 +1,53 @@
-import { HierarchyNode, WebApi } from './main.js';
+import { HierarchyElement, WebApi } from './main.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
 import { createContext } from 'preact';
 
 type SetterFunction<T> = (value: T) => void;
 
 type TWebApiContext = {
-  hierarchy: HierarchyNode;
+  hierarchy: HierarchyElement;
+  streamOnline: boolean;
   useGetterIndex: <T>(index?: number) => T | null;
   useSetterIndex: <T>(index?: number) => SetterFunction<T>;
 };
+
+const HIERARCHY_STORAGE_KEY = 'webApiHierarchy';
 
 export const WebApiContext = createContext<TWebApiContext>(
   null as unknown as TWebApiContext
 );
 
 export function useWebApiInsert(webApi: WebApi): TWebApiContext {
-  const [hierarchy, setHierarchy] = useState<HierarchyNode>(
-    null as unknown as HierarchyNode
+  const initialHierarchy = (() => {
+    try {
+      const payload = localStorage.getItem(HIERARCHY_STORAGE_KEY);
+      if (!payload) return null;
+
+      const parsed = JSON.parse(payload);
+      if (typeof parsed !== 'object') return null;
+
+      return parsed as HierarchyElement;
+    } catch {
+      return null;
+    }
+  })();
+
+  const [hierarchy, setHierarchy] = useState<HierarchyElement>(
+    initialHierarchy as unknown as HierarchyElement
   );
 
+  const [streamOnline, setStreamOnline] = useState(false);
+
   useEffect(() => {
-    webApi.onHierarchy((value) => setHierarchy(value));
+    webApi.onHierarchy((value) => {
+      setHierarchy(value);
+
+      localStorage.setItem(HIERARCHY_STORAGE_KEY, JSON.stringify(value));
+    });
+
+    webApi.onStreamOnline((value) => {
+      setStreamOnline(value);
+    });
   }, [webApi]);
 
   const useGetterIndex = <T>(index?: number) => {
@@ -62,18 +89,19 @@ export function useWebApiInsert(webApi: WebApi): TWebApiContext {
 
   return {
     hierarchy,
+    streamOnline,
     useGetterIndex,
     useSetterIndex,
   };
 }
 
-export function useGetter<T>({ get }: HierarchyNode): T | null {
+export function useGetter<T>({ get }: HierarchyElement): T | null {
   const { useGetterIndex } = useContext(WebApiContext);
 
   return useGetterIndex(get);
 }
 
-export function useSetter<T>({ set }: HierarchyNode): SetterFunction<T> {
+export function useSetter<T>({ set }: HierarchyElement): SetterFunction<T> {
   const { useSetterIndex } = useContext(WebApiContext);
 
   return useSetterIndex(set);

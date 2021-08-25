@@ -14,7 +14,8 @@ enum ChildChannelType {
 type ChildChannelRequest = [ChildChannelType, number];
 
 type GetterCallback<T> = (value: T) => void;
-type HierarchyCallback = (value: HierarchyNode) => void;
+type HierarchyCallback = (value: HierarchyElement) => void;
+type StreamOnlineCallback = (online: boolean) => void;
 
 type Getter = {
   remove: () => void;
@@ -28,18 +29,21 @@ type Setter<T> = {
 type MetaKeys = 'actuator' | 'name' | 'metric' | 'type' | 'unit';
 export type Meta = Partial<Record<MetaKeys, string>>;
 
-export type HierarchyNode = {
+export type HierarchyElement = {
+  children?: Record<string, HierarchyElement>;
   get?: number;
   meta: Meta;
-  nodes?: Record<string, HierarchyNode>;
   set?: number;
 };
 
 const CLOSE_CHILD = '880E1EE9-15A2-462D-BCBC-E09630A1CFBB';
+const STREAM_ONLINE = 'B41F5C2A-3F67-449F-BF91-37A3153FFFE9';
+const STREAM_OFFLINE = '4A999429-B64A-4426-9818-E68039EF022D';
 
 export class WebApi {
   private _hierarchyCallback?: HierarchyCallback;
   private readonly _port: MessagePort | null;
+  private _streamOnlineCallback?: StreamOnlineCallback;
 
   constructor(
     apiBaseUrl: string,
@@ -56,8 +60,18 @@ export class WebApi {
       if (!this._port) return;
 
       this._port.onmessage = ({ data }) => {
+        if (data === STREAM_ONLINE) {
+          this._streamOnlineCallback?.(true);
+          return;
+        }
+
+        if (data === STREAM_OFFLINE) {
+          this._streamOnlineCallback?.(false);
+          return;
+        }
+
         // eslint-disable-next-line no-console
-        console.info('web-api:', data);
+        console.info('web-api hierarchy:', data);
 
         this._hierarchyCallback?.(data);
       };
@@ -119,5 +133,9 @@ export class WebApi {
 
   onHierarchy(callback: HierarchyCallback): void {
     this._hierarchyCallback = callback;
+  }
+
+  onStreamOnline(callback: StreamOnlineCallback): void {
+    this._streamOnlineCallback = callback;
   }
 }

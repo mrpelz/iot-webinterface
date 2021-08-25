@@ -24,7 +24,15 @@
 
   type WebSocketHandler = (data: [number, unknown]) => void;
 
+  type Stream = {
+    sendMessage: WebSocketHandler;
+    setId: (id: string) => void;
+  };
+
   const CLOSE_CHILD = '880E1EE9-15A2-462D-BCBC-E09630A1CFBB';
+  const STREAM_ONLINE = 'B41F5C2A-3F67-449F-BF91-37A3153FFFE9';
+  const STREAM_OFFLINE = '4A999429-B64A-4426-9818-E68039EF022D';
+
   const HIERARCHY_URL = '/api/hierarchy';
   const ID_URL = '/api/id';
   const WS_URL = '/api/stream';
@@ -50,7 +58,7 @@
     const fn = async () => {
       const id = await getLiveId();
 
-      workerConsole.info(`api id: "${id}"`);
+      workerConsole.info(`id: "${id}"`);
 
       if (storedId === id) return;
       if (id === null) return;
@@ -86,8 +94,9 @@
   const setupStream = (
     apiBaseUrl: string,
     lowPriorityStream: boolean,
-    handleMessage: WebSocketHandler
-  ): { sendMessage: WebSocketHandler; setId: (id: string) => void } => {
+    handleMessage: WebSocketHandler,
+    handleOnline: (online: boolean) => void
+  ): Stream => {
     let storedId: string | null = null;
     let webSocket: WebSocket | null = null;
 
@@ -111,8 +120,14 @@
           throw new Error('webSocket onerror');
         };
 
-        webSocket.onopen = () => workerConsole.debug('websocket opened');
-        webSocket.onclose = () => workerConsole.error('websocket closed');
+        webSocket.onopen = () => {
+          workerConsole.debug('websocket opened');
+          handleOnline(true);
+        };
+        webSocket.onclose = () => {
+          workerConsole.error('websocket closed');
+          handleOnline(false);
+        };
 
         webSocket.onmessage = ({ data }) => {
           if (!data) return;
@@ -124,6 +139,7 @@
         };
       } catch (error) {
         workerConsole.error(error);
+        handleOnline(false);
       }
     };
 
@@ -224,10 +240,15 @@
 
     const { apiBaseUrl, interval, lowPriorityStream } = setup;
 
+    const handleStreamOnline = (online: boolean) => {
+      port.postMessage(online ? STREAM_ONLINE : STREAM_OFFLINE);
+    };
+
     const { sendMessage, setId } = setupStream(
       apiBaseUrl,
       lowPriorityStream,
-      handleMessage
+      handleMessage,
+      handleStreamOnline
     );
 
     port.onmessage = ({ data, ports }) => {

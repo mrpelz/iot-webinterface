@@ -8,7 +8,7 @@ import { canNotify } from './notifications.js';
 type SetupMessage = { initialId: string | null; interval: number };
 
 export const CHECK_INTERVAL = 10000;
-export const ID_STORAGE_KEY = 'autoReloadId';
+const ID_STORAGE_KEY = 'autoReloadId';
 
 export function autoReload(interval: number, notifications: boolean): void {
   const initialId = localStorage.getItem(ID_STORAGE_KEY);
