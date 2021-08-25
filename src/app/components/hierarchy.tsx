@@ -168,7 +168,7 @@ const Child: FunctionComponent<{ name: string; node: HierarchyNode }> = ({
   if (!node) return null;
 
   const { get, nodes, set } = node;
-  if (!get && !nodes && !set) return null;
+  if (get === undefined && !nodes && set === undefined) return null;
 
   return (
     <tr>

@@ -14,7 +14,7 @@ export const WebApiContext = createContext<TWebApiContext>(
   null as unknown as TWebApiContext
 );
 
-export const useWebApiInsert = (webApi: WebApi): TWebApiContext => {
+export function useWebApiInsert(webApi: WebApi): TWebApiContext {
   const [hierarchy, setHierarchy] = useState<HierarchyNode>(
     null as unknown as HierarchyNode
   );
@@ -67,16 +67,16 @@ export const useWebApiInsert = (webApi: WebApi): TWebApiContext => {
     useGetterIndex,
     useSetterIndex,
   };
-};
+}
 
-export const useGetter = <T>({ get }: HierarchyNode): T | null => {
+export function useGetter<T>({ get }: HierarchyNode): T | null {
   const { useGetterIndex } = useContext(WebApiContext);
 
   return useGetterIndex(get);
-};
+}
 
-export const useSetter = <T>({ set }: HierarchyNode): SetterFunction<T> => {
+export function useSetter<T>({ set }: HierarchyNode): SetterFunction<T> {
   const { useSetterIndex } = useContext(WebApiContext);
 
   return useSetterIndex(set);
-};
+}

@@ -1,11 +1,13 @@
-import { Flags, FlagsContext } from './util/flags.js';
+import { Flags, FlagsContext, useInsertFlags } from './util/flags.js';
 import { WebApiContext, useWebApiInsert } from './web-api/hooks.js';
+import { App } from './components/app.js';
+import { Diagnostics } from './components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { WebApi } from './web-api/main.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
 
 type Props = {
-  flags: Flags;
+  initialFlags: Flags;
   webApi: WebApi;
 };
 
@@ -26,18 +28,49 @@ const GlobalStyles = createGlobalStyle`
     --menu-width: 200px;
     --translucent: var(--translucent-override, 0.8);
 
-    --black: 0, 0%, 0%;
-    --white: 0, 100%, 100%;
-    --white-shaded: 240, 7%, 97%;
-    --grey-light: 220, 2%, 76%;
-    --grey-mid: 0, 0%, 77%;
-    --grey-low: 0, 0%, 57%;
-    --blue: 211, 100%, 50%;
+    --black-hsl: 0, 0%, 0%;
+    --black: hsl(var(--black-hsl));
+    --black-translucent: hsla(var(--black-hsl), var(--translucent));
 
-    --black-shaded: 240, 17%, 9%;
-    --grey-dark: 0, 0%, 26%;
-    --grey-glow: 240, 9%, 23%;
-    --orange: 35, 100%, 50%;
+    --white-hsl: 0, 100%, 100%;
+    --white: hsl(var(--white-hsl));
+    --white-translucent: hsla(var(--white-hsl), var(--translucent));
+
+    --white-shaded-hsl: 240, 7%, 97%;
+    --white-shaded: hsl(var(--white-shaded-hsl));
+    --white-shaded-translucent: hsla(var(--white-shaded-hsl), var(--translucent));
+
+    --grey-light-hsl: 220, 2%, 76%;
+    --grey-light: hsl(var(--grey-light-hsl));
+    --grey-light-translucent: hsla(var(--grey-light-hsl), var(--translucent));
+
+    --grey-mid-hsl: 0, 0%, 77%;
+    --grey-mid: hsl(var(--grey-mid-hsl));
+    --grey-mid-translucent: hsla(var(--grey-mid-hsl), var(--translucent));
+
+    --grey-low-hsl: 0, 0%, 57%;
+    --grey-low: hsl(var(--grey-low-hsl));
+    --grey-low-translucent: hsla(var(--grey-low-hsl), var(--translucent));
+
+    --blue-hsl: 211, 100%, 50%;
+    --blue: hsl(var(--blue-hsl));
+    --blue-translucent: hsla(var(--blue-hsl), var(--translucent));
+
+    --black-shaded-hsl: 240, 17%, 9%;
+    --black-shaded: hsl(var(--black-shaded-hsl));
+    --black-shaded-translucent: hsla(var(--black-shaded-hsl), var(--translucent));
+
+    --grey-dark-hsl: 0, 0%, 26%;
+    --grey-dark: hsl(var(--grey-dark-hsl));
+    --grey-dark-translucent: hsla(var(--grey-dark-hsl), var(--translucent));
+
+    --grey-glow-hsl: 240, 9%, 23%;
+    --grey-glow: hsl(var(--grey-glow-hsl));
+    --grey-glow-translucent: hsla(var(--grey-glow-hsl), var(--translucent));
+
+    --orange-hsl: 35, 100%, 50%;
+    --orange: hsl(var(--orange-hsl));
+    --orange-translucent: hsla(var(--orange-hsl), var(--translucent));
 
     --background-primary: var(--white);
     --background-secondary: var(--white-shaded);
@@ -68,7 +101,7 @@ const GlobalStyles = createGlobalStyle`
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     background: no-repeat center url('/images/icons/favicon-192.png'),
-      hsl(var(--black-shaded));
+      var(--black-shaded);
     height: 100vh;
     overflow-x: hidden;
     scroll-behavior: auto;
@@ -87,13 +120,13 @@ const GlobalStyles = createGlobalStyle`
   }
 
   :root.ready body {
-    background: hsl(var(--black-shaded));
+    background: var(--black-shaded);
     height: unset;
     width: unset;
   }
 
   :root.ready body::before {
-    background: hsl(var(--status-bar-background));
+    background: var(--status-bar-background);
     content: '';
     height: var(--safe-area-inset-top);
     left: 0;
@@ -104,7 +137,8 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-export const Root: FunctionComponent<Props> = ({ children, flags, webApi }) => {
+export const Root: FunctionComponent<Props> = ({ initialFlags, webApi }) => {
+  const flags = useInsertFlags(initialFlags);
   const webApiContextContent = useWebApiInsert(webApi);
 
   return (
@@ -112,7 +146,8 @@ export const Root: FunctionComponent<Props> = ({ children, flags, webApi }) => {
       <GlobalStyles />
       {webApiContextContent ? (
         <WebApiContext.Provider value={webApiContextContent}>
-          {children}
+          <Diagnostics />
+          <App />
         </WebApiContext.Provider>
       ) : null}
     </FlagsContext.Provider>

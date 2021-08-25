@@ -5,8 +5,6 @@ import {
   removeServiceWorkers,
   swUrl,
 } from './util/workers.js';
-import { App } from './components/app.js';
-import { Diagnostics } from './components/diagnostics.js';
 import { Root } from './root.js';
 import { WebApi } from './web-api/main.js';
 import { autoReload } from './util/auto-reload.js';
@@ -29,13 +27,7 @@ const {
 const webApi = new WebApi(apiBaseUrl, lowPriorityStream);
 
 setup(h);
-render(
-  <Root flags={flags} webApi={webApi}>
-    <Diagnostics />
-    <App />
-  </Root>,
-  document.body
-);
+render(<Root initialFlags={flags} webApi={webApi} />, document.body);
 
 const fn = async () => {
   iOSHoverStyles();

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'preact/hooks';
 import { CHECK_INTERVAL } from './auto-reload.js';
 import { createContext } from 'preact';
 
@@ -14,7 +15,20 @@ export type Flags = {
   serviceWorker: boolean;
 };
 
-export const FlagsContext = createContext<Flags | null>(null);
+const defaultFlags: Flags = {
+  apiBaseUrl: new URL('/', location.href).href,
+  autoReloadInterval: CHECK_INTERVAL,
+  darkOverride: null,
+  debug: false,
+  invisibleOnBlur: false,
+  lowPriorityStream: false,
+  notifications: true,
+  oledOptimizations: false,
+  pageOverride: null,
+  serviceWorker: true,
+};
+
+export const FlagsContext = createContext<Flags>(null as unknown as Flags);
 
 function getFlag<T>(
   hashFlags: URLSearchParams,
@@ -28,87 +42,82 @@ function getFlag<T>(
 }
 
 export function getFlags(): Flags {
-  const defaults: Flags = {
-    apiBaseUrl: new URL('/', location.href).href,
-    autoReloadInterval: CHECK_INTERVAL,
-    darkOverride: null,
-    debug: false,
-    invisibleOnBlur: false,
-    lowPriorityStream: false,
-    notifications: true,
-    oledOptimizations: false,
-    pageOverride: null,
-    serviceWorker: true,
+  const hashFlags = new URLSearchParams(location.hash.slice(1));
+
+  const setFlags: Partial<Flags> = Object.fromEntries(
+    Object.entries({
+      apiBaseUrl: getFlag(hashFlags, 'apiBaseUrl', String),
+      autoReloadInterval: getFlag(hashFlags, 'autoReloadInterval', (input) =>
+        Number.parseInt(input, 10)
+      ),
+      darkOverride: getFlag(hashFlags, 'darkOverride', (input) =>
+        Boolean(Number.parseInt(input, 10))
+      ),
+      debug: getFlag(hashFlags, 'debug', (input) =>
+        Boolean(Number.parseInt(input, 10))
+      ),
+      invisibleOnBlur: getFlag(hashFlags, 'invisibleOnBlur', (input) =>
+        Boolean(Number.parseInt(input, 10))
+      ),
+      lowPriorityStream: getFlag(hashFlags, 'lowPriorityStream', (input) =>
+        Boolean(Number.parseInt(input, 10))
+      ),
+      notifications: getFlag(hashFlags, 'notifications', (input) =>
+        Boolean(Number.parseInt(input, 10))
+      ),
+      oledOptimizations: getFlag(hashFlags, 'oledOptimizations', (input) =>
+        Boolean(Number.parseInt(input, 10))
+      ),
+      pageOverride: getFlag(hashFlags, 'pageOverride', (input) =>
+        Number.parseInt(input, 10)
+      ),
+      serviceWorker: getFlag(hashFlags, 'serviceWorker', (input) =>
+        Boolean(Number.parseInt(input, 10))
+      ),
+    }).filter(([, value]) => value !== undefined)
+  );
+
+  const combinedFlags: Flags = {
+    ...defaultFlags,
+    ...setFlags,
   };
 
-  let flags = {} as Flags;
+  // eslint-disable-next-line no-console
+  console.table(
+    Object.fromEntries(
+      Object.entries(combinedFlags).map(([key, result]) => {
+        const defaultFlag = defaultFlags[key as keyof Flags];
+        const setFlag = setFlags[key as keyof Flags];
 
-  const fn = () => {
-    const hashFlags = new URLSearchParams(location.hash.slice(1));
+        return [
+          key,
+          /* eslint-disable sort-keys */
+          {
+            set: setFlag,
+            '↔️': result === defaultFlag ? '=' : '≠',
+            default: defaultFlag,
+            result,
+          },
+          /* eslint-enable sort-keys */
+        ];
+      })
+    )
+  );
 
-    const setFlags: Partial<Flags> = Object.fromEntries(
-      Object.entries({
-        apiBaseUrl: getFlag(hashFlags, 'apiBaseUrl', String),
-        autoReloadInterval: getFlag(hashFlags, 'autoReloadInterval', (input) =>
-          Number.parseInt(input, 10)
-        ),
-        darkOverride: getFlag(hashFlags, 'darkOverride', (input) =>
-          Boolean(Number.parseInt(input, 10))
-        ),
-        debug: getFlag(hashFlags, 'debug', (input) =>
-          Boolean(Number.parseInt(input, 10))
-        ),
-        invisibleOnBlur: getFlag(hashFlags, 'invisibleOnBlur', (input) =>
-          Boolean(Number.parseInt(input, 10))
-        ),
-        lowPriorityStream: getFlag(hashFlags, 'lowPriorityStream', (input) =>
-          Boolean(Number.parseInt(input, 10))
-        ),
-        notifications: getFlag(hashFlags, 'notifications', (input) =>
-          Boolean(Number.parseInt(input, 10))
-        ),
-        oledOptimizations: getFlag(hashFlags, 'oledOptimizations', (input) =>
-          Boolean(Number.parseInt(input, 10))
-        ),
-        pageOverride: getFlag(hashFlags, 'pageOverride', (input) =>
-          Number.parseInt(input, 10)
-        ),
-        serviceWorker: getFlag(hashFlags, 'serviceWorker', (input) =>
-          Boolean(Number.parseInt(input, 10))
-        ),
-      }).filter(([, value]) => value !== undefined)
-    );
+  return combinedFlags;
+}
 
-    flags = {
-      ...defaults,
-      ...setFlags,
+export function useInsertFlags(initialFlags: Flags): Flags {
+  const [flags, setFlags] = useState(initialFlags);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setFlags(getFlags());
     };
 
-    // eslint-disable-next-line no-console
-    console.table(
-      Object.fromEntries(
-        Object.entries(flags).map(([key, result]) => {
-          const defaultFlag = defaults[key as keyof Flags];
-          const setFlag = setFlags[key as keyof Flags];
-
-          return [
-            key,
-            /* eslint-disable sort-keys */
-            {
-              set: setFlag,
-              '↔️': result === defaultFlag ? '=' : '≠',
-              default: defaultFlag,
-              result,
-            },
-            /* eslint-enable sort-keys */
-          ];
-        })
-      )
-    );
-  };
-
-  fn();
-  onhashchange = fn;
+    addEventListener('hashchange', handleHashChange, { passive: true });
+    return () => removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   return flags;
 }
