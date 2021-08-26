@@ -115,6 +115,13 @@ export function useInsertFlags(initialFlags: Flags): Flags {
   useEffect(() => {
     const handleHashChange = () => {
       setFlags(getFlags());
+
+      if (location.hash.trim().length) return;
+
+      const cleanUrl = new URL(location.href);
+      cleanUrl.hash = '';
+
+      history.replaceState(undefined, '', cleanUrl.href);
     };
 
     addEventListener('hashchange', handleHashChange, { passive: true });
