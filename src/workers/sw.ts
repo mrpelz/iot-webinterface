@@ -3,14 +3,24 @@
 // eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
 /// <reference path="utils/main.ts" />
 
+const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
+
 ((scope) => {
   importScripts('./utils/main.js');
 
   /* eslint-disable no-console */
   const wsConsole = {
-    debug: (...args: unknown[]) => console.debug('service worker:', ...args),
-    error: (...args: unknown[]) => console.error('service worker:', ...args),
-    info: (...args: unknown[]) => console.info('service worker:', ...args),
+    debug: (...args: unknown[]) => {
+      if (!swDebug) return;
+      console.debug('service worker:', ...args);
+    },
+    error: (...args: unknown[]) => {
+      console.error('service worker:', ...args);
+    },
+    info: (...args: unknown[]) => {
+      if (!swDebug) return;
+      console.info('service worker:', ...args);
+    },
   };
   /* eslint-enable no-console */
 

@@ -30,27 +30,45 @@ export async function removeServiceWorkers(): Promise<void> {
   }
 }
 
-export async function installServiceWorker(url: string): Promise<void> {
+export async function installServiceWorker(
+  url: string,
+  debug: boolean
+): Promise<void> {
   if (!('serviceWorker' in navigator)) return;
 
+  const debugUrl = (() => {
+    const _url = new URL(url);
+    if (debug) _url.searchParams.append('debug', '1');
+
+    return _url.href;
+  })();
+
   try {
-    if (await navigator.serviceWorker.getRegistration(url)) {
-      // eslint-disable-next-line no-console
-      console.debug('service worker registration already in place');
+    const existingWorker = await navigator.serviceWorker.getRegistration(
+      debugUrl
+    );
+
+    if (existingWorker?.active?.scriptURL === debugUrl) {
+      if (debug) {
+        // eslint-disable-next-line no-console
+        console.debug('service worker registration already in place');
+      }
 
       return;
     }
 
-    // eslint-disable-next-line no-console
-    console.debug('no service worker registration found, registering');
+    if (debug) {
+      // eslint-disable-next-line no-console
+      console.debug('no service worker registration found, registering');
+    }
 
     await removeServiceWorkers();
-    await navigator.serviceWorker.register(url, {
+    await navigator.serviceWorker.register(debugUrl, {
       scope: '/',
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(`error registering ServiceWorker (${url}): ${error}`);
+    console.error(`error registering ServiceWorker (${debugUrl}): ${error}`);
   }
 }
 
@@ -67,13 +85,21 @@ export function refreshServiceWorker(): boolean {
 export function connectWorker<T>(
   url: string,
   name: string,
-  setupMessage: T | null = null
+  setupMessage: T | null = null,
+  debug: boolean
 ): MessagePort | null {
   const { port1, port2 } = new MessageChannel();
 
+  const debugUrl = (() => {
+    const _url = new URL(url);
+    if (debug) _url.searchParams.append('debug', '1');
+
+    return _url.href;
+  })();
+
   if ('SharedWorker' in window) {
     try {
-      const worker = new SharedWorker(url, {
+      const worker = new SharedWorker(debugUrl, {
         name,
       });
 
@@ -97,7 +123,9 @@ export function connectWorker<T>(
       return port1;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(`error creating SharedWorker "${name}" (${url}): ${error}`);
+      console.error(
+        `error creating SharedWorker "${name}" (${debugUrl}): ${error}`
+      );
 
       return null;
     }
@@ -105,7 +133,7 @@ export function connectWorker<T>(
 
   if ('Worker' in window) {
     try {
-      const worker = new Worker(url, {
+      const worker = new Worker(debugUrl, {
         name,
       });
 
@@ -118,7 +146,7 @@ export function connectWorker<T>(
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(
-        `error creating DedicatedWorker "${name}" (${url}): ${error}`
+        `error creating DedicatedWorker "${name}" (${debugUrl}): ${error}`
       );
 
       return null;

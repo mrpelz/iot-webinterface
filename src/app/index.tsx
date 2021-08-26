@@ -17,14 +17,20 @@ onunhandledrejection = () => removeServiceWorkers();
 
 const flags = getFlags();
 const {
-  serviceWorker,
-  notifications,
-  autoReloadInterval,
   apiBaseUrl,
+  autoReloadInterval,
+  debug,
   lowPriorityStream,
+  notifications,
+  serviceWorker,
 } = flags;
 
-const webApi = new WebApi(apiBaseUrl, autoReloadInterval, lowPriorityStream);
+const webApi = new WebApi(
+  apiBaseUrl,
+  autoReloadInterval,
+  lowPriorityStream,
+  debug
+);
 
 setup(h);
 render(<Root initialFlags={flags} webApi={webApi} />, document.body);
@@ -34,7 +40,7 @@ const fn = async () => {
   iOSScrollToTop();
 
   if (serviceWorker) {
-    await installServiceWorker(swUrl);
+    await installServiceWorker(swUrl, debug);
   } else {
     await removeServiceWorkers();
   }
@@ -44,7 +50,7 @@ const fn = async () => {
   }
 
   if (flags.autoReloadInterval) {
-    autoReload(autoReloadInterval, notifications);
+    autoReload(autoReloadInterval, notifications, debug);
   }
 };
 

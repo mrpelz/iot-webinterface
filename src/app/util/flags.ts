@@ -82,27 +82,29 @@ export function getFlags(): Flags {
     ...setFlags,
   };
 
-  // eslint-disable-next-line no-console
-  console.table(
-    Object.fromEntries(
-      Object.entries(combinedFlags).map(([key, result]) => {
-        const defaultFlag = defaultFlags[key as keyof Flags];
-        const setFlag = setFlags[key as keyof Flags];
+  if (combinedFlags.debug) {
+    // eslint-disable-next-line no-console
+    console.table(
+      Object.fromEntries(
+        Object.entries(combinedFlags).map(([key, result]) => {
+          const defaultFlag = defaultFlags[key as keyof Flags];
+          const setFlag = setFlags[key as keyof Flags];
 
-        return [
-          key,
-          /* eslint-disable sort-keys */
-          {
-            set: setFlag,
-            '↔️': result === defaultFlag ? '=' : '≠',
-            default: defaultFlag,
-            result,
-          },
-          /* eslint-enable sort-keys */
-        ];
-      })
-    )
-  );
+          return [
+            key,
+            /* eslint-disable sort-keys */
+            {
+              set: setFlag,
+              '↔️': result === defaultFlag ? '=' : '≠',
+              default: defaultFlag,
+              result,
+            },
+            /* eslint-enable sort-keys */
+          ];
+        })
+      )
+    );
+  }
 
   return combinedFlags;
 }

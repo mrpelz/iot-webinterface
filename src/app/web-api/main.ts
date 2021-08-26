@@ -48,13 +48,19 @@ export class WebApi {
   constructor(
     apiBaseUrl: string,
     interval: number,
-    lowPriorityStream: boolean
+    lowPriorityStream: boolean,
+    debug: boolean
   ) {
-    this._port = connectWorker<SetupMessage>(webApiUrl, 'web-api', {
-      apiBaseUrl,
-      interval,
-      lowPriorityStream,
-    });
+    this._port = connectWorker<SetupMessage>(
+      webApiUrl,
+      'web-api',
+      {
+        apiBaseUrl,
+        interval,
+        lowPriorityStream,
+      },
+      debug
+    );
 
     (() => {
       if (!this._port) return;
@@ -70,8 +76,10 @@ export class WebApi {
           return;
         }
 
-        // eslint-disable-next-line no-console
-        console.info('web-api hierarchy:', data);
+        if (debug) {
+          // eslint-disable-next-line no-console
+          console.info('web-api hierarchy:', data);
+        }
 
         this._hierarchyCallback?.(data);
       };

@@ -9,7 +9,11 @@
 
   const ID_URL = '/id.txt';
 
-  type SetupMessage = { initialId: string | null; interval: number };
+  type SetupMessage = {
+    debug: boolean;
+    initialId: string | null;
+    interval: number;
+  };
 
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;

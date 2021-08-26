@@ -10,19 +10,30 @@ type SetupMessage = { initialId: string | null; interval: number };
 export const CHECK_INTERVAL = 10000;
 const ID_STORAGE_KEY = 'autoReloadId';
 
-export function autoReload(interval: number, notifications: boolean): void {
+export function autoReload(
+  interval: number,
+  notifications: boolean,
+  debug: boolean
+): void {
   const initialId = localStorage.getItem(ID_STORAGE_KEY);
 
-  const port = connectWorker<SetupMessage>(autoReloadUrl, 'auto-reload', {
-    initialId,
-    interval,
-  });
+  const port = connectWorker<SetupMessage>(
+    autoReloadUrl,
+    'auto-reload',
+    {
+      initialId,
+      interval,
+    },
+    debug
+  );
 
   if (!port) return;
 
   port.onmessage = async ({ data: storedId }) => {
-    // eslint-disable-next-line no-console
-    console.info(`received reload request with new id "${storedId}"`);
+    if (debug) {
+      // eslint-disable-next-line no-console
+      console.info(`received reload request with new id "${storedId}"`);
+    }
 
     localStorage.setItem(ID_STORAGE_KEY, String(storedId));
 

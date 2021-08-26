@@ -1,14 +1,24 @@
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 
+const workerDebug = Boolean(
+  new URL(self.location.href).searchParams.get('debug')
+);
+
 /* eslint-disable no-console */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const workerConsole = {
-  debug: (...args: unknown[]) =>
-    console.debug(`worker "${self.name}":`, ...args),
-  error: (...args: unknown[]) =>
-    console.error(`worker "${self.name}":`, ...args),
-  info: (...args: unknown[]) => console.info(`worker "${self.name}":`, ...args),
+  debug: (...args: unknown[]) => {
+    if (!workerDebug) return;
+    console.debug(`worker "${self.name}":`, ...args);
+  },
+  error: (...args: unknown[]) => {
+    console.error(`worker "${self.name}":`, ...args);
+  },
+  info: (...args: unknown[]) => {
+    if (!workerDebug) return;
+    console.info(`worker "${self.name}":`, ...args);
+  },
 };
 /* eslint-enable no-console */
 
