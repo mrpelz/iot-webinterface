@@ -5,7 +5,7 @@ import { createContext } from 'preact';
 type SetterFunction<T> = (value: T) => void;
 
 type TWebApiContext = {
-  hierarchy: HierarchyElement;
+  hierarchy: HierarchyElement | null;
   streamOnline: boolean;
   useGetterIndex: <T>(index?: number) => T | null;
   useSetterIndex: <T>(index?: number) => SetterFunction<T>;
@@ -13,9 +13,12 @@ type TWebApiContext = {
 
 const HIERARCHY_STORAGE_KEY = 'webApiHierarchy';
 
-export const WebApiContext = createContext<TWebApiContext>(
-  null as unknown as TWebApiContext
-);
+export const WebApiContext = createContext<TWebApiContext>({
+  hierarchy: null,
+  streamOnline: false,
+  useGetterIndex: () => null,
+  useSetterIndex: () => () => undefined,
+});
 
 export function useWebApiInsert(webApi: WebApi): TWebApiContext {
   const initialHierarchy = (() => {

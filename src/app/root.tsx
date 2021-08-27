@@ -1,7 +1,6 @@
 import { Flags, FlagsContext, useInsertFlags } from './util/flags.js';
 import { WebApiContext, useWebApiInsert } from './web-api/hooks.js';
 import { App } from './components/app.js';
-import { Diagnostics } from './components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { WebApi } from './web-api/main.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
@@ -15,9 +14,18 @@ const GlobalStyles = createGlobalStyle`
   * {
     -moz-user-select: none;
     -ms-user-select: none;
+    -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
     user-select: none;
+  }
+
+  :root,
+  body {
+    margin: 0;
+    padding: 0;
   }
 
   :root {
@@ -72,6 +80,18 @@ const GlobalStyles = createGlobalStyle`
     --orange: hsl(var(--orange-hsl));
     --orange-translucent: hsla(var(--orange-hsl), var(--translucent));
 
+    --safe-area-inset-top: env(safe-area-inset-top, 20px);
+    /* --safe-area-inset-top: 20px; */
+
+    --hairline: 1px;
+    @media (-webkit-min-device-pixel-ratio: 2) {
+      --hairline: 0.5px;
+    }
+
+    font-family: var(--font);
+  }
+
+  :root.light {
     --background-primary: var(--white);
     --background-secondary: var(--white-shaded);
     --background-tertiary: var(--grey-light);
@@ -80,11 +100,6 @@ const GlobalStyles = createGlobalStyle`
     --font-tertiary: var(--grey-mid);
     --selection: var(--blue);
     --status-bar-background: var(--black);
-
-    --safe-area-inset-top: env(safe-area-inset-top, 20px);
-    /* --safe-area-inset-top: 20px; */
-
-    font-family: var(--font);
   }
 
   :root.dark {
@@ -92,48 +107,18 @@ const GlobalStyles = createGlobalStyle`
     --background-secondary: var(--black-shaded);
     --background-tertiary: var(--black-shaded);
     --font-primary: var(--white);
+    --font-secondary: var(--grey-low);
     --font-tertiary: var(--grey-glow);
     --selection: var(--orange);
     --status-bar-background: var(--black-shaded);
   }
 
   body {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    background: no-repeat center url('/images/icons/favicon-192.png'),
-      var(--black-shaded);
-    height: 100vh;
     overflow-x: hidden;
-    scroll-behavior: auto;
-    width: 100vw;
   }
 
   body::-webkit-scrollbar {
     display: none;
-  }
-
-  :root,
-  body {
-    margin: 0;
-    padding: 0;
-    scrollbar-width: none;
-  }
-
-  :root.ready body {
-    background: var(--black-shaded);
-    height: unset;
-    width: unset;
-  }
-
-  :root.ready body::before {
-    background: var(--status-bar-background);
-    content: '';
-    height: var(--safe-area-inset-top);
-    left: 0;
-    position: fixed;
-    top: 0;
-    width: 100vw;
-    z-index: 4;
   }
 `;
 
@@ -144,12 +129,9 @@ export const Root: FunctionComponent<Props> = ({ initialFlags, webApi }) => {
   return (
     <FlagsContext.Provider value={flags}>
       <GlobalStyles />
-      {webApiContextContent ? (
-        <WebApiContext.Provider value={webApiContextContent}>
-          <Diagnostics />
-          <App />
-        </WebApiContext.Provider>
-      ) : null}
+      <WebApiContext.Provider value={webApiContextContent}>
+        <App />
+      </WebApiContext.Provider>
     </FlagsContext.Provider>
   );
 };

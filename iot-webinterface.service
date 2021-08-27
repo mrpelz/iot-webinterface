@@ -1,0 +1,18 @@
+[Unit]
+Description=iot-webinterface
+
+[Service]
+Type=simple
+PIDFile=/run/iot-webinterface/iot-webinterface.pid
+WorkingDirectory=/opt/iot-webinterface/
+ExecStart=scripts/pack.js serve
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal+console
+SyslogLevel=debug
+SyslogIdentifier=iot-webinterface
+
+[Install]
+WantedBy=multi-user.target
+Alias=iot-webinterface.service

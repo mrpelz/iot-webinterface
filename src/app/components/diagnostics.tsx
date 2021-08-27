@@ -72,7 +72,7 @@ export const Diagnostics: FunctionComponent = () => {
           </td>
         </tr>
       </table>
-      <Hierarchy element={hierarchy} />
+      {hierarchy ? <Hierarchy element={hierarchy} /> : null}
     </DiagnosticsContainer>
   ) : null;
 };
