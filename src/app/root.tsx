@@ -1,14 +1,22 @@
 import { Flags, FlagsContext, useInsertFlags } from './util/flags.js';
+import {
+  FunctionComponent,
+  createContext,
+  h,
+  render as preactRender,
+} from 'preact';
 import { WebApiContext, useWebApiInsert } from './web-api/hooks.js';
 import { App } from './components/app.js';
-import { FunctionComponent } from 'preact';
 import { WebApi } from './web-api/main.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
+import { prefix } from 'goober/prefixer';
+import { setup } from 'goober';
+import { useContext } from 'preact/hooks';
 
-type Props = {
-  initialFlags: Flags;
-  webApi: WebApi;
-};
+export const defaultTheme = { breakpoint: 'screen and (min-width: 1024px)' };
+
+const ThemeContext = createContext(defaultTheme);
+const useTheme = () => useContext(ThemeContext);
 
 const GlobalStyles = createGlobalStyle`
   * {
@@ -35,6 +43,24 @@ const GlobalStyles = createGlobalStyle`
     --menu-height: 44px;
     --menu-width: 200px;
     --translucent: var(--translucent-override, 0.8);
+
+    --safe-area-inset-top: env(safe-area-inset-top, 20px);
+    --safe-area-inset-top: 20px;
+
+    --header-height: calc(var(--safe-area-inset-top) + var(--titlebar-height));
+    --header-height-shift-down: calc(var(--header-height) + var(--titlebar-height));
+    --app-height: calc(100vh - var(--header-height));
+    --app-height-shift-down: calc(var(--app-height) - var(--titlebar-height));
+
+    --app-width: 100vw;
+    @media ${({ theme }) => theme.breakpoint} {
+      --app-width: calc(100vw - var(--menu-width));
+    }
+
+    --hairline: 1px;
+    @media (-webkit-min-device-pixel-ratio: 2) {
+      --hairline: 0.5px;
+    }
 
     --black-hsl: 0, 0%, 0%;
     --black: hsl(var(--black-hsl));
@@ -80,15 +106,8 @@ const GlobalStyles = createGlobalStyle`
     --orange: hsl(var(--orange-hsl));
     --orange-translucent: hsla(var(--orange-hsl), var(--translucent));
 
-    --safe-area-inset-top: env(safe-area-inset-top, 20px);
-    /* --safe-area-inset-top: 20px; */
-
-    --hairline: 1px;
-    @media (-webkit-min-device-pixel-ratio: 2) {
-      --hairline: 0.5px;
-    }
-
     font-family: var(--font);
+    color: var(--white);
   }
 
   :root.light {
@@ -113,25 +132,28 @@ const GlobalStyles = createGlobalStyle`
     --status-bar-background: var(--black-shaded);
   }
 
-  body {
-    overflow-x: hidden;
-  }
-
   body::-webkit-scrollbar {
     display: none;
   }
 `;
 
-export const Root: FunctionComponent<Props> = ({ initialFlags, webApi }) => {
-  const flags = useInsertFlags(initialFlags);
-  const webApiContextContent = useWebApiInsert(webApi);
+export const Root: FunctionComponent<{ initialFlags: Flags; webApi: WebApi }> =
+  ({ initialFlags, webApi }) => {
+    const flags = useInsertFlags(initialFlags);
+    const webApiContextContent = useWebApiInsert(webApi);
 
-  return (
-    <FlagsContext.Provider value={flags}>
-      <GlobalStyles />
-      <WebApiContext.Provider value={webApiContextContent}>
-        <App />
-      </WebApiContext.Provider>
-    </FlagsContext.Provider>
-  );
-};
+    return (
+      <FlagsContext.Provider value={flags}>
+        <GlobalStyles />
+        <WebApiContext.Provider value={webApiContextContent}>
+          <App />
+        </WebApiContext.Provider>
+      </FlagsContext.Provider>
+    );
+  };
+
+export function render(flags: Flags, webApi: WebApi): void {
+  setup(h, prefix, useTheme);
+
+  preactRender(<Root initialFlags={flags} webApi={webApi} />, document.body);
+}

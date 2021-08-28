@@ -1,16 +1,14 @@
-import { h, render } from 'preact';
 import { iOSHoverStyles, iOSScrollToTop } from './util/ios-fixes.js';
 import {
   installServiceWorker,
   removeServiceWorkers,
   swUrl,
 } from './util/workers.js';
-import { Root } from './root.js';
 import { WebApi } from './web-api/main.js';
 import { autoReload } from './util/auto-reload.js';
 import { getFlags } from './util/flags.js';
+import { render } from './root.js';
 import { requestNotificationPermission } from './util/notifications.js';
-import { setup } from 'goober';
 
 onerror = () => removeServiceWorkers();
 onunhandledrejection = () => removeServiceWorkers();
@@ -32,8 +30,7 @@ const webApi = new WebApi(
   debug
 );
 
-setup(h);
-render(<Root initialFlags={flags} webApi={webApi} />, document.body);
+render(flags, webApi);
 
 const fn = async () => {
   iOSHoverStyles();

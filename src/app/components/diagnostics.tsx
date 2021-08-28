@@ -6,8 +6,8 @@ import { styled } from 'goober';
 import { useContext } from 'preact/hooks';
 
 const DiagnosticsContainer = styled('section')`
-  background-color: rgba(255, 255, 255, 0.75);
-  color: hsl(var(--black));
+  background-color: white;
+  color: var(--black);
   display: flex;
   flex-direction: column;
   height: calc(100vh - 2rem);
@@ -15,6 +15,7 @@ const DiagnosticsContainer = styled('section')`
   padding: 1rem;
   position: fixed;
   width: calc(100vw - 2rem);
+  z-index: 10;
 
   table,
   td {

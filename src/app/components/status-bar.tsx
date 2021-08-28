@@ -3,7 +3,7 @@ import { WebApiContext } from '../web-api/hooks.js';
 import { styled } from 'goober';
 import { useContext } from 'preact/hooks';
 
-const StyledStatusBar = styled('header')<{ isConnected: boolean }>`
+const _StatusBar = styled('section')<{ isConnected: boolean }>`
   background-color: ${({ isConnected }) => {
     if (isConnected) {
       return 'rgba(0, 255, 0, 0.4);';
@@ -33,17 +33,11 @@ const StyledStatusBar = styled('header')<{ isConnected: boolean }>`
     }
   }
 
-  content: '';
   height: var(--safe-area-inset-top);
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100vw;
-  z-index: 4;
 `;
 
 export const StatusBar: FunctionComponent = () => {
   const { streamOnline } = useContext(WebApiContext);
 
-  return <StyledStatusBar isConnected={streamOnline} />;
+  return <_StatusBar isConnected={streamOnline} />;
 };

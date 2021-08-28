@@ -1,23 +1,125 @@
+import {
+  FakeNotificationContext,
+  Notification,
+  useFakeNotificationInsert,
+} from './notification.js';
+import {
+  Menu,
+  MenuVisibleContext,
+  flipMenuVisible,
+  useMenuVisibleInsert,
+} from './menu.js';
 import { Diagnostics } from './diagnostics.js';
 import { FunctionComponent } from 'preact';
+import { Layout } from './layout.js';
 import { StatusBar } from './status-bar.js';
-import { styled } from 'goober';
-
-const StyledApp = styled('main')`
-  display: block;
-  margin-top: var(--safe-area-inset-top);
-  min-height: calc(100vh - var(--safe-area-inset-top));
-  position: relative;
-  width: 100vw;
-`;
+import { Titlebar } from './titlebar.js';
 
 export const App: FunctionComponent = () => {
   return (
-    <>
-      <StatusBar />
-      <StyledApp>
+    <MenuVisibleContext.Provider value={useMenuVisibleInsert()}>
+      <FakeNotificationContext.Provider value={useFakeNotificationInsert()}>
         <Diagnostics />
-      </StyledApp>
-    </>
+        <Layout
+          header={
+            <>
+              <StatusBar />
+              <Titlebar>titlebar</Titlebar>
+              <Notification />
+            </>
+          }
+          aside={<Menu />}
+        >
+          <div onClick={flipMenuVisible}>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+          </div>
+        </Layout>
+      </FakeNotificationContext.Provider>
+    </MenuVisibleContext.Provider>
   );
 };

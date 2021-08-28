@@ -3,6 +3,10 @@ import {
   connectWorker,
   refreshServiceWorker,
 } from './workers.js';
+import {
+  clearFakeNotification,
+  setFakeNotification,
+} from '../components/notification.js';
 import { canNotify } from './notifications.js';
 
 type SetupMessage = { initialId: string | null; interval: number };
@@ -50,7 +54,11 @@ export function autoReload(
       document.visibilityState !== 'visible' ||
       !document.hasFocus()
     ) {
-      location.reload();
+      setFakeNotification({
+        content: 'New App version installed — click to reload',
+        onClick: () => location.reload(),
+        onDismiss: () => clearFakeNotification(),
+      });
 
       return;
     }
