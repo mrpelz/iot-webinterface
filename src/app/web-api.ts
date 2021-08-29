@@ -1,4 +1,4 @@
-import { connectWorker, webApiUrl } from '../util/workers.js';
+import { connectWorker, webApiUrl } from './util/workers.js';
 
 type SetupMessage = {
   apiBaseUrl: string;

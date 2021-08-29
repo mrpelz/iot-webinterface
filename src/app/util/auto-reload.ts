@@ -3,11 +3,7 @@ import {
   connectWorker,
   refreshServiceWorker,
 } from './workers.js';
-import {
-  clearFakeNotification,
-  setFakeNotification,
-} from '../components/notification.js';
-import { canNotify } from './notifications.js';
+import { Notifications } from './notifications.js';
 
 type SetupMessage = { initialId: string | null; interval: number };
 
@@ -16,7 +12,7 @@ const ID_STORAGE_KEY = 'autoReloadId';
 
 export function autoReload(
   interval: number,
-  notifications: boolean,
+  notifications: Notifications,
   debug: boolean
 ): void {
   const initialId = localStorage.getItem(ID_STORAGE_KEY);
@@ -48,40 +44,18 @@ export function autoReload(
 
     refreshServiceWorker();
 
-    if (
-      !notifications ||
-      !canNotify() ||
-      document.visibilityState !== 'visible' ||
-      !document.hasFocus()
-    ) {
-      setFakeNotification({
-        content: 'New App version installed — click to reload',
-        onClick: () => location.reload(),
-        onDismiss: () => clearFakeNotification(),
-      });
-
-      return;
-    }
-
-    const notification = new Notification('New App version installed', {
-      body: 'Click to reload',
-      requireInteraction: true,
-      tag: 'versionUpdate',
-    });
-
-    const handleNotificationClick = () => {
-      notification.close();
-      location.reload();
-    };
-
-    notification.addEventListener('click', handleNotificationClick, {
-      once: true,
-      passive: true,
-    });
-
-    addEventListener('unload', () => notification.close(), {
-      once: true,
-      passive: true,
-    });
+    notifications.trigger(
+      'New App version installed',
+      {
+        body: 'Click to reload',
+        requireInteraction: true,
+        tag: 'versionUpdate',
+      },
+      () => {
+        notifications.clear();
+        location.reload();
+      },
+      () => notifications.clear()
+    );
   };
 }

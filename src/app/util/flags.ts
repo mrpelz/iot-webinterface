@@ -1,15 +1,13 @@
-import { useEffect, useState } from 'preact/hooks';
 import { CHECK_INTERVAL } from './auto-reload.js';
-import { createContext } from 'preact';
 
 export type Flags = {
   apiBaseUrl: string;
   autoReloadInterval: number;
   darkOverride: boolean | null;
   debug: boolean;
+  enableNotifications: boolean;
   invisibleOnBlur: boolean;
   lowPriorityStream: boolean;
-  notifications: boolean;
   oledOptimizations: boolean;
   pageOverride: number | null;
   serviceWorker: boolean;
@@ -20,15 +18,13 @@ const defaultFlags: Flags = {
   autoReloadInterval: CHECK_INTERVAL,
   darkOverride: null,
   debug: false,
+  enableNotifications: true,
   invisibleOnBlur: false,
   lowPriorityStream: false,
-  notifications: true,
   oledOptimizations: false,
   pageOverride: null,
   serviceWorker: true,
 };
-
-export const FlagsContext = createContext<Flags>(null as unknown as Flags);
 
 function getFlag<T>(
   hashFlags: URLSearchParams,
@@ -56,13 +52,13 @@ export function getFlags(): Flags {
       debug: getFlag(hashFlags, 'debug', (input) =>
         Boolean(Number.parseInt(input, 10))
       ),
+      enableNotifications: getFlag(hashFlags, 'enableNotifications', (input) =>
+        Boolean(Number.parseInt(input, 10))
+      ),
       invisibleOnBlur: getFlag(hashFlags, 'invisibleOnBlur', (input) =>
         Boolean(Number.parseInt(input, 10))
       ),
       lowPriorityStream: getFlag(hashFlags, 'lowPriorityStream', (input) =>
-        Boolean(Number.parseInt(input, 10))
-      ),
-      notifications: getFlag(hashFlags, 'notifications', (input) =>
         Boolean(Number.parseInt(input, 10))
       ),
       oledOptimizations: getFlag(hashFlags, 'oledOptimizations', (input) =>
@@ -107,26 +103,4 @@ export function getFlags(): Flags {
   }
 
   return combinedFlags;
-}
-
-export function useInsertFlags(initialFlags: Flags): Flags {
-  const [flags, setFlags] = useState(initialFlags);
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      setFlags(getFlags());
-
-      if (location.hash.trim().length) return;
-
-      const cleanUrl = new URL(location.href);
-      cleanUrl.hash = '';
-
-      history.replaceState(undefined, '', cleanUrl.href);
-    };
-
-    addEventListener('hashchange', handleHashChange, { passive: true });
-    return () => removeEventListener('hashchange', handleHashChange);
-  }, []);
-
-  return flags;
 }

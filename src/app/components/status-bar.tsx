@@ -1,7 +1,6 @@
 import { FunctionComponent } from 'preact';
-import { WebApiContext } from '../web-api/hooks.js';
 import { styled } from 'goober';
-import { useContext } from 'preact/hooks';
+import { useWebApi } from '../hooks/web-api.js';
 
 const _StatusBar = styled('section')<{ isConnected: boolean }>`
   background-color: ${({ isConnected }) => {
@@ -37,7 +36,7 @@ const _StatusBar = styled('section')<{ isConnected: boolean }>`
 `;
 
 export const StatusBar: FunctionComponent = () => {
-  const { streamOnline } = useContext(WebApiContext);
+  const { streamOnline } = useWebApi();
 
   return <_StatusBar isConnected={streamOnline} />;
 };

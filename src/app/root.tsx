@@ -1,13 +1,20 @@
-import { Flags, FlagsContext, useInsertFlags } from './util/flags.js';
+import {
+  FallbackNotificationContext,
+  useInitFallbackNotification,
+} from './hooks/notification.js';
+import { FlagsContext, useInitFlags } from './hooks/flags.js';
 import {
   FunctionComponent,
   createContext,
   h,
   render as preactRender,
 } from 'preact';
-import { WebApiContext, useWebApiInsert } from './web-api/hooks.js';
+import { MenuVisibleContext, useInitMenuVisible } from './hooks/menu.js';
+import { WebApiContext, useInitWebApi } from './hooks/web-api.js';
 import { App } from './components/app.js';
-import { WebApi } from './web-api/main.js';
+import { Flags } from './util/flags.js';
+import { Notifications } from './util/notifications.js';
+import { WebApi } from './web-api.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
 import { prefix } from 'goober/prefixer';
 import { setup } from 'goober';
@@ -137,23 +144,36 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-export const Root: FunctionComponent<{ initialFlags: Flags; webApi: WebApi }> =
-  ({ initialFlags, webApi }) => {
-    const flags = useInsertFlags(initialFlags);
-    const webApiContextContent = useWebApiInsert(webApi);
+export const Root: FunctionComponent<{
+  flags: Flags;
+  notifications: Notifications;
+  webApi: WebApi;
+}> = ({ flags, notifications, webApi }) => {
+  return (
+    <FlagsContext.Provider value={useInitFlags(flags)}>
+      <GlobalStyles />
+      <WebApiContext.Provider value={useInitWebApi(webApi)}>
+        <FallbackNotificationContext.Provider
+          value={useInitFallbackNotification(notifications)}
+        >
+          <MenuVisibleContext.Provider value={useInitMenuVisible()}>
+            <App />
+          </MenuVisibleContext.Provider>
+        </FallbackNotificationContext.Provider>
+      </WebApiContext.Provider>
+    </FlagsContext.Provider>
+  );
+};
 
-    return (
-      <FlagsContext.Provider value={flags}>
-        <GlobalStyles />
-        <WebApiContext.Provider value={webApiContextContent}>
-          <App />
-        </WebApiContext.Provider>
-      </FlagsContext.Provider>
-    );
-  };
-
-export function render(flags: Flags, webApi: WebApi): void {
+export function render(
+  flags: Flags,
+  notifications: Notifications,
+  webApi: WebApi
+): void {
   setup(h, prefix, useTheme);
 
-  preactRender(<Root initialFlags={flags} webApi={webApi} />, document.body);
+  preactRender(
+    <Root flags={flags} notifications={notifications} webApi={webApi} />,
+    document.body
+  );
 }

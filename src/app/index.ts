@@ -4,11 +4,11 @@ import {
   removeServiceWorkers,
   swUrl,
 } from './util/workers.js';
-import { WebApi } from './web-api/main.js';
+import { Notifications } from './util/notifications.js';
+import { WebApi } from './web-api.js';
 import { autoReload } from './util/auto-reload.js';
 import { getFlags } from './util/flags.js';
 import { render } from './root.js';
-import { requestNotificationPermission } from './util/notifications.js';
 
 onerror = () => removeServiceWorkers();
 onunhandledrejection = () => removeServiceWorkers();
@@ -19,7 +19,7 @@ const {
   autoReloadInterval,
   debug,
   lowPriorityStream,
-  notifications,
+  enableNotifications,
   serviceWorker,
 } = flags;
 
@@ -30,7 +30,9 @@ const webApi = new WebApi(
   debug
 );
 
-render(flags, webApi);
+const notifications = new Notifications(enableNotifications);
+
+render(flags, notifications, webApi);
 
 const fn = async () => {
   iOSHoverStyles();
@@ -40,10 +42,6 @@ const fn = async () => {
     await installServiceWorker(swUrl, debug);
   } else {
     await removeServiceWorkers();
-  }
-
-  if (notifications) {
-    requestNotificationPermission();
   }
 
   if (flags.autoReloadInterval) {

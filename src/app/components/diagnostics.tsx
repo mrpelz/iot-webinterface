@@ -1,20 +1,16 @@
-import { FlagsContext } from '../util/flags.js';
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from './hierarchy.js';
-import { WebApiContext } from '../web-api/hooks.js';
 import { styled } from 'goober';
-import { useContext } from 'preact/hooks';
+import { useFlags } from '../hooks/flags.js';
+import { useWebApi } from '../hooks/web-api.js';
 
 const DiagnosticsContainer = styled('section')`
   background-color: white;
   color: var(--black);
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 2rem);
-  overflow: scroll;
+  overflow-x: scroll;
   padding: 1rem;
-  position: fixed;
-  width: calc(100vw - 2rem);
   z-index: 10;
 
   table,
@@ -42,9 +38,9 @@ const DiagnosticsContainer = styled('section')`
 `;
 
 export const Diagnostics: FunctionComponent = () => {
-  const { hierarchy, streamOnline } = useContext(WebApiContext);
+  const { hierarchy, streamOnline } = useWebApi();
 
-  const flags = useContext(FlagsContext);
+  const flags = useFlags();
   const { debug } = flags;
 
   return debug ? (

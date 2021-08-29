@@ -1,8 +1,7 @@
 import { FunctionComponent, JSX } from 'preact';
-import { FakeNotificationContext } from './notification.js';
-import { MenuVisibleContext } from './menu.js';
 import { styled } from 'goober';
-import { useContext } from 'preact/hooks';
+import { useIsMenuVisible } from '../hooks/menu.js';
+import { useNotification } from '../hooks/notification.js';
 
 const _Header = styled('header')`
   left: 0;
@@ -40,9 +39,11 @@ const _Aside = styled('aside')<{ isVisible: boolean; shiftDown: boolean }>`
 `;
 
 const _Main = styled('main')<{ isAsideVisible: boolean; shiftDown: boolean }>`
+  overflow-x: hidden;
   transition: height 0.3s ease-out, margin-top 0.3s ease-out;
+  width: var(--app-width);
 
-  height: ${({ shiftDown }) => {
+  min-height: ${({ shiftDown }) => {
     return shiftDown ? 'var(--app-height-shift-down)' : 'var(--app-height)';
   }};
 
@@ -65,10 +66,10 @@ export const Layout: FunctionComponent<{
   aside: JSX.Element;
   header: JSX.Element;
 }> = ({ aside, children, header }) => {
-  const isAsideVisible = useContext(MenuVisibleContext);
+  const isAsideVisible = useIsMenuVisible();
 
-  const { content: notificationContent } = useContext(FakeNotificationContext);
-  const hasNotification = Boolean(notificationContent);
+  const fallbackNotification = useNotification();
+  const hasNotification = Boolean(fallbackNotification);
 
   return (
     <>

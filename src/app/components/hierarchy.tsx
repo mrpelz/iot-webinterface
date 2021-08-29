@@ -1,7 +1,7 @@
-import { useGetter, useSetter } from '../web-api/hooks.js';
+import { useGetter, useSetter } from '../hooks/web-api.js';
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
-import { HierarchyElement } from '../web-api/main.js';
+import { HierarchyElement } from '../web-api.js';
 import { styled } from 'goober';
 
 const GetterValue = styled('span')`
