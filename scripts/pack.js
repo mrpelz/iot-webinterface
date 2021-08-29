@@ -112,10 +112,19 @@ async function nginx() {
     return;
   }
 
-  const childProcess = execFile(bin, ['-p', process.cwd(), '-c', config]);
+  const fn = () => {
+    const childProcess = execFile(bin, ['-p', process.cwd(), '-c', config]);
 
-  childProcess.stdout.pipe(process.stdout);
-  childProcess.stderr.pipe(process.stdout);
+    childProcess.stdout.pipe(process.stdout);
+    childProcess.stderr.pipe(process.stdout);
+
+    childProcess.once('close', () => {
+      childProcess.kill();
+      fn();
+    });
+  };
+
+  fn();
 }
 
 (async () => {

@@ -1,6 +1,6 @@
 import { StateUpdater, useContext, useState } from 'preact/hooks';
 import { createContext } from 'preact';
-import { defaultTheme } from '../root.js';
+import { defaultTheme } from '../theme.js';
 
 export type TMenuVisibleContext = {
   isMenuVisible: boolean;

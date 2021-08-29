@@ -3,13 +3,9 @@ import {
   useInitFallbackNotification,
 } from './hooks/notification.js';
 import { FlagsContext, useInitFlags } from './hooks/flags.js';
-import {
-  FunctionComponent,
-  createContext,
-  h,
-  render as preactRender,
-} from 'preact';
+import { FunctionComponent, h, render as preactRender } from 'preact';
 import { MenuVisibleContext, useInitMenuVisible } from './hooks/menu.js';
+import { ThemeContext, useInitTheme, useTheme } from './hooks/theme.js';
 import { WebApiContext, useInitWebApi } from './hooks/web-api.js';
 import { App } from './components/app.js';
 import { Flags } from './util/flags.js';
@@ -18,12 +14,6 @@ import { WebApi } from './web-api.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
 import { prefix } from 'goober/prefixer';
 import { setup } from 'goober';
-import { useContext } from 'preact/hooks';
-
-export const defaultTheme = { breakpoint: 'screen and (min-width: 1024px)' };
-
-const ThemeContext = createContext(defaultTheme);
-const useTheme = () => useContext(ThemeContext);
 
 const GlobalStyles = createGlobalStyle`
   * {
@@ -149,18 +139,22 @@ export const Root: FunctionComponent<{
   notifications: Notifications;
   webApi: WebApi;
 }> = ({ flags, notifications, webApi }) => {
+  setup(h, prefix, useTheme);
+
   return (
     <FlagsContext.Provider value={useInitFlags(flags)}>
-      <GlobalStyles />
-      <WebApiContext.Provider value={useInitWebApi(webApi)}>
-        <FallbackNotificationContext.Provider
-          value={useInitFallbackNotification(notifications)}
-        >
-          <MenuVisibleContext.Provider value={useInitMenuVisible()}>
-            <App />
-          </MenuVisibleContext.Provider>
-        </FallbackNotificationContext.Provider>
-      </WebApiContext.Provider>
+      <ThemeContext.Provider value={useInitTheme()}>
+        <GlobalStyles />
+        <WebApiContext.Provider value={useInitWebApi(webApi)}>
+          <FallbackNotificationContext.Provider
+            value={useInitFallbackNotification(notifications)}
+          >
+            <MenuVisibleContext.Provider value={useInitMenuVisible()}>
+              <App />
+            </MenuVisibleContext.Provider>
+          </FallbackNotificationContext.Provider>
+        </WebApiContext.Provider>
+      </ThemeContext.Provider>
     </FlagsContext.Provider>
   );
 };
@@ -170,8 +164,6 @@ export function render(
   notifications: Notifications,
   webApi: WebApi
 ): void {
-  setup(h, prefix, useTheme);
-
   preactRender(
     <Root flags={flags} notifications={notifications} webApi={webApi} />,
     document.body
