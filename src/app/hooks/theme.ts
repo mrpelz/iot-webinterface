@@ -1,9 +1,11 @@
-import { Theme, defaultTheme } from '../theme.js';
-import { useContext, useState } from 'preact/hooks';
+import { StateUpdater, useContext, useState } from 'preact/hooks';
 import { createContext } from 'preact';
+import { useString } from '../style/main.js';
+
+export type Theme = 'light' | 'dark';
 
 type InitTheme = {
-  setTheme: (theme: string) => void;
+  setTheme: StateUpdater<Theme>;
   theme: Theme;
 };
 
@@ -12,10 +14,20 @@ export const ThemeContext = createContext<InitTheme>(
 );
 
 export function useInitTheme(): InitTheme {
-  const [theme, _setTheme] = useState<Theme>(defaultTheme);
+  const prefersDarkTheme = matchMedia(useString('prefersDarkTheme')).matches;
+  const prefersLightTheme = matchMedia(useString('prefersLightTheme')).matches;
+
+  const [theme, setTheme] = useState<Theme>(
+    (() => {
+      if (prefersDarkTheme) return 'dark';
+      if (prefersLightTheme) return 'light';
+
+      return 'light';
+    })()
+  );
 
   return {
-    setTheme: () => null,
+    setTheme,
     theme,
   };
 }

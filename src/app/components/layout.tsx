@@ -1,7 +1,56 @@
 import { FunctionComponent, JSX } from 'preact';
+import { dependentValue, mediaQuery, useString } from '../style/main.js';
+import {
+  dimension,
+  useAddition,
+  useDimension,
+  useSubtraction,
+} from '../style/dimensions.js';
 import { styled } from 'goober';
 import { useIsMenuVisible } from '../hooks/menu.js';
 import { useNotification } from '../hooks/notification.js';
+
+export const appWidthDesktop = (): (() => string) => {
+  return () =>
+    useSubtraction(useString('viewportWidth'), useDimension('menuWidth'));
+};
+
+export const appWidthMobile = (): (() => string) => {
+  return () => useString('viewportWidth');
+};
+
+export const appHeight = (): (() => string) => {
+  return () =>
+    useSubtraction(
+      useString('viewportHeight'),
+      useString('safeAreaInsetTop'),
+      useDimension('titlebarHeight')
+    );
+};
+
+export const appHeightShiftDown = (): (() => string) => {
+  return () =>
+    useSubtraction(
+      useString('viewportHeight'),
+      useString('safeAreaInsetTop'),
+      useDimension('titlebarHeight'),
+      useDimension('titlebarHeight')
+    );
+};
+
+export const headerHeight = (): (() => string) => {
+  return () =>
+    useAddition(useString('safeAreaInsetTop'), useDimension('titlebarHeight'));
+};
+
+export const headerHeightShiftDown = (): (() => string) => {
+  return () =>
+    useAddition(
+      useString('safeAreaInsetTop'),
+      useDimension('titlebarHeight'),
+      useDimension('titlebarHeight')
+    );
+};
 
 const _Header = styled('header')`
   left: 0;
@@ -13,52 +62,41 @@ const _Header = styled('header')`
 `;
 
 const _Aside = styled('aside')<{ isVisible: boolean; shiftDown: boolean }>`
+  height: ${appHeight()};
   left: 0;
-  min-height: var(--app-height);
   position: fixed;
+  touch-action: ${dependentValue('isVisible', 'none', 'auto')};
   transition: height 0.3s ease-out, transform 0.3s ease-out, top 0.3s ease-out;
-  width: 100%;
-  width: var(--menu-width);
+  width: ${dimension('menuWidth')};
   z-index: 4;
 
-  top: ${({ shiftDown }) => {
-    return shiftDown
-      ? 'var(--header-height-shift-down)'
-      : 'var(--header-height)';
-  }};
+  top: ${dependentValue('shiftDown', headerHeightShiftDown(), headerHeight())};
 
-  touch-action: ${({ isVisible }) => {
-    return isVisible ? 'none' : 'auto';
-  }};
-
-  @media not ${({ theme }) => theme.breakpoint} {
-    transform: ${({ isVisible }) => {
-      return isVisible ? 'translateX(0)' : 'translateX(-100%)';
-    }};
+  @media ${mediaQuery(dimension('breakpoint'), true)} {
+    transform: ${dependentValue(
+      'isVisible',
+      'translateX(0)',
+      'translateX(-100%)'
+    )};
   }
 `;
 
 const _Main = styled('main')<{ isAsideVisible: boolean; shiftDown: boolean }>`
+  min-height: ${dependentValue('shiftDown', appHeightShiftDown(), appHeight())};
   overflow-x: hidden;
+  touch-action: ${dependentValue('isAsideVisible', 'none', 'auto')};
   transition: height 0.3s ease-out, margin-top 0.3s ease-out;
-  width: var(--app-width);
+  width: ${appWidthMobile()};
 
-  min-height: ${({ shiftDown }) => {
-    return shiftDown ? 'var(--app-height-shift-down)' : 'var(--app-height)';
-  }};
+  margin-top: ${dependentValue(
+    'shiftDown',
+    headerHeightShiftDown(),
+    headerHeight()
+  )};
 
-  margin-top: ${({ shiftDown }) => {
-    return shiftDown
-      ? 'var(--header-height-shift-down)'
-      : 'var(--header-height)';
-  }};
-
-  touch-action: ${({ isAsideVisible }) => {
-    return isAsideVisible ? 'none' : 'auto';
-  }};
-
-  @media ${({ theme }) => theme.breakpoint} {
-    margin-left: var(--menu-width);
+  @media ${mediaQuery(dimension('breakpoint'))} {
+    margin-left: ${dimension('menuWidth')};
+    width: ${appWidthDesktop()};
   }
 `;
 

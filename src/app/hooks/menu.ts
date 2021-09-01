@@ -1,6 +1,7 @@
 import { StateUpdater, useContext, useState } from 'preact/hooks';
 import { createContext } from 'preact';
-import { defaultTheme } from '../theme.js';
+import { dimension } from '../style/dimensions.js';
+import { useMediaQuery } from '../style/main.js';
 
 export type TMenuVisibleContext = {
   isMenuVisible: boolean;
@@ -15,8 +16,10 @@ export const MenuVisibleContext = createContext<TMenuVisibleContext>({
 export function useInitMenuVisible(): TMenuVisibleContext {
   const [isMenuVisible, setMenuVisible] = useState(false);
 
-  const mediaQuery = matchMedia(defaultTheme.breakpoint);
-  mediaQuery.onchange = () => setMenuVisible(false);
+  const mediaQuery = matchMedia(useMediaQuery(dimension('breakpoint')));
+  mediaQuery.onchange = () => {
+    setMenuVisible(false);
+  };
 
   return {
     isMenuVisible,
@@ -30,7 +33,7 @@ export function useIsMenuVisible(): boolean {
 
 export function useSetMenuVisible(): StateUpdater<boolean> {
   const { setMenuVisible } = useContext(MenuVisibleContext);
-  const mediaQuery = matchMedia(defaultTheme.breakpoint);
+  const mediaQuery = matchMedia(useMediaQuery(dimension('breakpoint')));
 
   return (...args) => {
     if (mediaQuery.matches) return;
@@ -40,7 +43,7 @@ export function useSetMenuVisible(): StateUpdater<boolean> {
 
 export function useFlipMenuVisible(): () => void {
   const { setMenuVisible } = useContext(MenuVisibleContext);
-  const mediaQuery = matchMedia(defaultTheme.breakpoint);
+  const mediaQuery = matchMedia(useMediaQuery(dimension('breakpoint')));
 
   return () => {
     if (mediaQuery.matches) return;

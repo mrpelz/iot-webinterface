@@ -1,8 +1,9 @@
 import { FunctionComponent } from 'preact';
+import { dimension } from '../style/dimensions.js';
 import { styled } from 'goober';
 
 const _Titlebar = styled('section')`
-  height: var(--titlebar-height);
+  height: ${dimension('titlebarHeight')};
 `;
 
 export const Titlebar: FunctionComponent = ({ children }) => {
