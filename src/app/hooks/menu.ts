@@ -1,6 +1,7 @@
-import { StateUpdater, useContext, useState } from 'preact/hooks';
+import { StateUpdater, useContext, useEffect, useState } from 'preact/hooks';
 import { createContext } from 'preact';
 import { dimension } from '../style/dimensions.js';
+import { useBreakpoint } from '../style/breakpoint.js';
 import { useMediaQuery } from '../style/main.js';
 
 export type TMenuVisibleContext = {
@@ -14,12 +15,13 @@ export const MenuVisibleContext = createContext<TMenuVisibleContext>({
 });
 
 export function useInitMenuVisible(): TMenuVisibleContext {
+  const isDesktop = useBreakpoint(useMediaQuery(dimension('breakpoint')));
+
   const [isMenuVisible, setMenuVisible] = useState(false);
 
-  const mediaQuery = matchMedia(useMediaQuery(dimension('breakpoint')));
-  mediaQuery.onchange = () => {
+  useEffect(() => {
     setMenuVisible(false);
-  };
+  }, [isDesktop]);
 
   return {
     isMenuVisible,
@@ -32,21 +34,23 @@ export function useIsMenuVisible(): boolean {
 }
 
 export function useSetMenuVisible(): StateUpdater<boolean> {
+  const isDesktop = useBreakpoint(useMediaQuery(dimension('breakpoint')));
+
   const { setMenuVisible } = useContext(MenuVisibleContext);
-  const mediaQuery = matchMedia(useMediaQuery(dimension('breakpoint')));
 
   return (...args) => {
-    if (mediaQuery.matches) return;
+    if (isDesktop) return;
     setMenuVisible(...args);
   };
 }
 
 export function useFlipMenuVisible(): () => void {
+  const isDesktop = useBreakpoint(useMediaQuery(dimension('breakpoint')));
+
   const { setMenuVisible } = useContext(MenuVisibleContext);
-  const mediaQuery = matchMedia(useMediaQuery(dimension('breakpoint')));
 
   return () => {
-    if (mediaQuery.matches) return;
+    if (isDesktop) return;
     setMenuVisible((value) => !value);
   };
 }

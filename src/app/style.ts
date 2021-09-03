@@ -1,4 +1,6 @@
-import { cssEnv, cssVar } from './style/main.js';
+import { add, dimension, subtract } from './style/dimensions.js';
+import { cssEnv, cssVar, string } from './style/main.js';
+import { breakpointValue } from './style/breakpoint.js';
 
 export const dimensions = {
   breakpoint: 1024,
@@ -9,9 +11,9 @@ export const dimensions = {
 
 export const strings = {
   font: '-apple-system, SF UI Text, Helvetica Neue, Helvetica, Arial, sans-serif',
-  hairline: cssVar('hairline', '1px'),
-  prefersDarkTheme: 'prefers-color-scheme: dark',
-  prefersLightTheme: 'prefers-color-scheme: light',
+  isRetina: '(-webkit-min-device-pixel-ratio: 2)',
+  prefersDarkTheme: '(prefers-color-scheme: dark)',
+  prefersLightTheme: '(prefers-color-scheme: light)',
   safeAreaInsetTop: cssVar(
     'safe-area-inset-top',
     cssEnv('safe-area-inset-top')
@@ -56,4 +58,44 @@ export const themes = {
     selection: 'blue',
     statusBarBackground: 'black',
   },
+};
+
+export const hairline = (): (() => string) =>
+  breakpointValue(string('isRetina'), '0.5px', '1px');
+
+export const appWidthDesktop = (): (() => string) => {
+  return subtract(string('viewportWidth'), dimension('menuWidth'));
+};
+
+export const appWidthMobile = (): (() => string) => {
+  return string('viewportWidth');
+};
+
+export const appHeight = (): (() => string) => {
+  return subtract(
+    string('viewportHeight'),
+    string('safeAreaInsetTop'),
+    dimension('titlebarHeight')
+  );
+};
+
+export const appHeightShiftDown = (): (() => string) => {
+  return subtract(
+    string('viewportHeight'),
+    string('safeAreaInsetTop'),
+    dimension('titlebarHeight'),
+    dimension('titlebarHeight')
+  );
+};
+
+export const headerHeight = (): (() => string) => {
+  return add(string('safeAreaInsetTop'), dimension('titlebarHeight'));
+};
+
+export const headerHeightShiftDown = (): (() => string) => {
+  return add(
+    string('safeAreaInsetTop'),
+    dimension('titlebarHeight'),
+    dimension('titlebarHeight')
+  );
 };

@@ -1,56 +1,17 @@
 import { FunctionComponent, JSX } from 'preact';
-import { dependentValue, mediaQuery, useString } from '../style/main.js';
 import {
-  dimension,
-  useAddition,
-  useDimension,
-  useSubtraction,
-} from '../style/dimensions.js';
+  appHeight,
+  appHeightShiftDown,
+  appWidthDesktop,
+  appWidthMobile,
+  headerHeight,
+  headerHeightShiftDown,
+} from '../style.js';
+import { dependentValue, mediaQuery } from '../style/main.js';
+import { dimension } from '../style/dimensions.js';
 import { styled } from 'goober';
 import { useIsMenuVisible } from '../hooks/menu.js';
 import { useNotification } from '../hooks/notification.js';
-
-export const appWidthDesktop = (): (() => string) => {
-  return () =>
-    useSubtraction(useString('viewportWidth'), useDimension('menuWidth'));
-};
-
-export const appWidthMobile = (): (() => string) => {
-  return () => useString('viewportWidth');
-};
-
-export const appHeight = (): (() => string) => {
-  return () =>
-    useSubtraction(
-      useString('viewportHeight'),
-      useString('safeAreaInsetTop'),
-      useDimension('titlebarHeight')
-    );
-};
-
-export const appHeightShiftDown = (): (() => string) => {
-  return () =>
-    useSubtraction(
-      useString('viewportHeight'),
-      useString('safeAreaInsetTop'),
-      useDimension('titlebarHeight'),
-      useDimension('titlebarHeight')
-    );
-};
-
-export const headerHeight = (): (() => string) => {
-  return () =>
-    useAddition(useString('safeAreaInsetTop'), useDimension('titlebarHeight'));
-};
-
-export const headerHeightShiftDown = (): (() => string) => {
-  return () =>
-    useAddition(
-      useString('safeAreaInsetTop'),
-      useDimension('titlebarHeight'),
-      useDimension('titlebarHeight')
-    );
-};
 
 const _Header = styled('header')`
   left: 0;

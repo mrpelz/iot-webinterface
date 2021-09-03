@@ -35,11 +35,6 @@ const GlobalStyles = createGlobalStyle`
 
   :root {
     --safe-area-inset-top: 20px;
-
-    --hairline: 1px;
-    @media (-webkit-min-device-pixel-ratio: 2) {
-      --hairline: 0.5px;
-    }
   }
 
   body::-webkit-scrollbar {
@@ -53,12 +48,7 @@ export const Root: FunctionComponent<{
   webApi: WebApi;
 }> = ({ flags, notifications, webApi }) => {
   const initFlags = useInitFlags(flags);
-  const { darkOverride } = initFlags;
-
-  const initTheme = useInitTheme();
-  const { setTheme } = initTheme;
-
-  if (darkOverride !== null) setTheme(darkOverride ? 'dark' : 'light');
+  const initTheme = useInitTheme(initFlags);
 
   return (
     <FlagsContext.Provider value={initFlags}>
