@@ -1,25 +1,19 @@
-import { themes } from '../style.js';
-import { useTheme } from '../hooks/theme.js';
-
-export type DarkThemeKeys = keyof typeof themes.dark;
-export type LightThemeKeys = keyof typeof themes.light;
-
-export type ColorKeys = DarkThemeKeys | LightThemeKeys;
+import { Theme, useTheme } from '../hooks/theme.js';
 
 export type Color = (a?: number) => string;
 
-export function useThemedColor(id: ColorKeys, a?: number): string {
+export function useThemedColor(themedColors: Record<Theme, Color>): Color {
   const theme = useTheme();
 
-  return themes[theme][id](a);
+  return themedColors[theme];
 }
 
 export const color = (h: number, s: number, l: number): Color => {
-  return (a = 0) => {
-    if (a) {
-      return `hsla(${h}deg ${s}% ${l}% ${a}%)`;
+  return (a) => {
+    if (a === undefined) {
+      return `hsl(${h}deg ${s}% ${l}%)`;
     }
 
-    return `hsl(${h}deg ${s}% ${l}%)`;
+    return `hsla(${h}deg ${s}% ${l}% ${a}%)`;
   };
 };

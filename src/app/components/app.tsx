@@ -1,3 +1,4 @@
+import { colors, strings } from '../style.js';
 import { Diagnostics } from './diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Layout } from './layout.js';
@@ -5,23 +6,22 @@ import { Menu } from './menu.js';
 import { Notification } from './notification.js';
 import { StatusBar } from './status-bar.js';
 import { Titlebar } from './titlebar.js';
-import { strings } from '../style.js';
 import { styled } from 'goober';
 import { useEffect } from 'preact/hooks';
 import { useFlags } from '../hooks/flags.js';
 import { useFlipMenuVisible } from '../hooks/menu.js';
-import { useThemedColor } from '../style/colors.js';
 
 const _App = styled('app')`
-  background-color: ${() => useThemedColor('backgroundPrimary')};
-  color: ${() => useThemedColor('fontPrimary')};
+  color-scheme: ${strings.colorScheme};
+  background-color: ${colors.backgroundPrimary()};
+  color: ${colors.fontPrimary()};
   display: flow-root;
   font-family: ${strings.font};
 `;
 
 export const App: FunctionComponent = () => {
   const { debug } = useFlags();
-  const backgroundColor = useThemedColor('backgroundPrimary');
+  const backgroundColor = colors.backgroundPrimary()();
   const flipMenuVisible = useFlipMenuVisible();
 
   useEffect(() => {

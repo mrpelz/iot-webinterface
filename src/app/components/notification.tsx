@@ -1,9 +1,8 @@
+import { colors, dimensions } from '../style.js';
 import { FunctionComponent } from 'preact';
 import { dependentValue } from '../style/main.js';
-import { dimensions } from '../style.js';
 import { styled } from 'goober';
 import { useNotification } from '../hooks/notification.js';
-import { useThemedColor } from '../style/colors.js';
 
 export type Notification = {
   content: string | null;
@@ -19,7 +18,7 @@ const _Notification = styled('section')<{ isVisible: boolean }>`
 
   background-color: ${dependentValue(
     'isVisible',
-    () => useThemedColor('selection'),
+    colors.selection(),
     'rgba(0, 0, 0, 0)'
   )};
 `;
