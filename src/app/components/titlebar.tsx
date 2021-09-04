@@ -1,15 +1,14 @@
 import { FunctionComponent } from 'preact';
 import { dependentValue } from '../style/main.js';
-import { dimension } from '../style/dimensions.js';
-import { hairline } from '../style.js';
+import { dimensions } from '../style.js';
 import { styled } from 'goober';
 import { useWebApi } from '../hooks/web-api.js';
 
 const _Titlebar = styled('section')<{ isConnected: boolean }>`
-  height: ${dimension('titlebarHeight')};
+  height: ${dimensions.titlebarHeight};
 
   border-top-style: solid;
-  border-top-width: ${hairline()};
+  border-top-width: ${dimensions.hairline};
   border-top-color: ${dependentValue(
     'isConnected',
     'rgb(0, 255, 0)',

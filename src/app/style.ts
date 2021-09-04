@@ -1,13 +1,7 @@
 import { add, dimension, subtract } from './style/dimensions.js';
-import { cssEnv, cssVar, string } from './style/main.js';
-import { breakpointValue } from './style/breakpoint.js';
-
-export const dimensions = {
-  breakpoint: 1024,
-  menuHeight: 44,
-  menuWidth: 200,
-  titlebarHeight: 44,
-};
+import { cssEnv, cssVar, useMediaQuery } from './style/main.js';
+import { color } from './style/colors.js';
+import { useBreakpointValue } from './style/breakpoint.js';
 
 export const strings = {
   font: '-apple-system, SF UI Text, Helvetica Neue, Helvetica, Arial, sans-serif',
@@ -23,79 +17,83 @@ export const strings = {
   viewportWidth: '100vw',
 };
 
+const staticDimensions = {
+  breakpoint: dimension(1024),
+  menuHeight: dimension(44),
+  menuWidth: dimension(200),
+  titlebarHeight: dimension(44),
+};
+
+const dynamicDimensions = {
+  appHeight: subtract(
+    strings.viewportHeight,
+    strings.safeAreaInsetTop,
+    staticDimensions.titlebarHeight
+  ),
+  appHeightShiftDown: subtract(
+    strings.viewportHeight,
+    strings.safeAreaInsetTop,
+    staticDimensions.titlebarHeight,
+    staticDimensions.titlebarHeight
+  ),
+  get appWidth() {
+    return () =>
+      useBreakpointValue(
+        useMediaQuery(staticDimensions.breakpoint),
+        subtract(strings.viewportWidth, staticDimensions.menuWidth),
+        strings.viewportWidth
+      );
+  },
+  get hairline() {
+    return () =>
+      useBreakpointValue(strings.isRetina, dimension(0.5), dimension(1));
+  },
+  headerHeight: add(strings.safeAreaInsetTop, staticDimensions.titlebarHeight),
+  headerHeightShiftDown: add(
+    strings.safeAreaInsetTop,
+    staticDimensions.titlebarHeight,
+    staticDimensions.titlebarHeight
+  ),
+};
+
+export const dimensions = {
+  ...staticDimensions,
+  ...dynamicDimensions,
+};
+
 export const colors = {
-  black: [0, 0, 0],
-  blackShaded: [240, 17, 9],
-  blue: [211, 100, 50],
-  greyDark: [0, 0, 26],
-  greyGlow: [240, 9, 23],
-  greyLight: [220, 2, 76],
-  greyLow: [0, 0, 57],
-  greyMid: [0, 0, 77],
-  orange: [35, 100, 50],
-  white: [0, 100, 100],
-  whiteShaded: [240, 7, 97],
+  black: color(0, 0, 0),
+  blackShaded: color(240, 17, 9),
+  blue: color(211, 100, 50),
+  greyDark: color(0, 0, 26),
+  greyGlow: color(240, 9, 23),
+  greyLight: color(220, 2, 76),
+  greyLow: color(0, 0, 57),
+  greyMid: color(0, 0, 77),
+  orange: color(35, 100, 50),
+  white: color(0, 100, 100),
+  whiteShaded: color(240, 7, 97),
 };
 
 export const themes = {
   dark: {
-    backgroundPrimary: 'black',
-    backgroundSecondary: 'blackShaded',
-    backgroundTertiary: 'blackShaded',
-    fontPrimary: 'white',
-    fontSecondary: 'greyLow',
-    fontTertiary: 'greyGlow',
-    selection: 'orange',
-    statusBarBackground: 'blackShaded',
-  },
+    backgroundPrimary: colors.black,
+    backgroundSecondary: colors.blackShaded,
+    backgroundTertiary: colors.blackShaded,
+    fontPrimary: colors.white,
+    fontSecondary: colors.greyLow,
+    fontTertiary: colors.greyGlow,
+    selection: colors.orange,
+    statusBarBackground: colors.blackShaded,
+  } as const,
   light: {
-    backgroundPrimary: 'white',
-    backgroundSecondary: 'whiteShaded',
-    backgroundTertiary: 'greyLight',
-    fontPrimary: 'black',
-    fontSecondary: 'greyLow',
-    fontTertiary: 'greyMid',
-    selection: 'blue',
-    statusBarBackground: 'black',
-  },
-};
-
-export const hairline = (): (() => string) =>
-  breakpointValue(string('isRetina'), '0.5px', '1px');
-
-export const appWidthDesktop = (): (() => string) => {
-  return subtract(string('viewportWidth'), dimension('menuWidth'));
-};
-
-export const appWidthMobile = (): (() => string) => {
-  return string('viewportWidth');
-};
-
-export const appHeight = (): (() => string) => {
-  return subtract(
-    string('viewportHeight'),
-    string('safeAreaInsetTop'),
-    dimension('titlebarHeight')
-  );
-};
-
-export const appHeightShiftDown = (): (() => string) => {
-  return subtract(
-    string('viewportHeight'),
-    string('safeAreaInsetTop'),
-    dimension('titlebarHeight'),
-    dimension('titlebarHeight')
-  );
-};
-
-export const headerHeight = (): (() => string) => {
-  return add(string('safeAreaInsetTop'), dimension('titlebarHeight'));
-};
-
-export const headerHeightShiftDown = (): (() => string) => {
-  return add(
-    string('safeAreaInsetTop'),
-    dimension('titlebarHeight'),
-    dimension('titlebarHeight')
-  );
+    backgroundPrimary: colors.white,
+    backgroundSecondary: colors.whiteShaded,
+    backgroundTertiary: colors.greyLight,
+    fontPrimary: colors.black,
+    fontSecondary: colors.greyLow,
+    fontTertiary: colors.greyMid,
+    selection: colors.blue,
+    statusBarBackground: colors.black,
+  } as const,
 };

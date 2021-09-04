@@ -1,10 +1,11 @@
-import { dependentValue, string } from '../style/main.js';
 import { FunctionComponent } from 'preact';
+import { dependentValue } from '../style/main.js';
+import { strings } from '../style.js';
 import { styled } from 'goober';
 import { useWebApi } from '../hooks/web-api.js';
 
 const _StatusBar = styled('section')<{ isConnected: boolean }>`
-  height: ${string('safeAreaInsetTop')};
+  height: ${strings.safeAreaInsetTop};
 
   background-color: ${dependentValue(
     'isConnected',

@@ -1,8 +1,8 @@
 import { StateUpdater, useContext, useEffect, useState } from 'preact/hooks';
 import { Flags } from '../util/flags.js';
 import { createContext } from 'preact';
+import { strings } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
-import { useString } from '../style/main.js';
 
 export type Theme = 'light' | 'dark';
 
@@ -16,8 +16,8 @@ export const ThemeContext = createContext<InitTheme>(
 );
 
 export function useInitTheme(flags: Flags): InitTheme {
-  const prefersDarkTheme = useBreakpoint(useString('prefersDarkTheme'));
-  const prefersLightTheme = useBreakpoint(useString('prefersLightTheme'));
+  const prefersDarkTheme = useBreakpoint(strings.prefersDarkTheme);
+  const prefersLightTheme = useBreakpoint(strings.prefersLightTheme);
 
   const [theme, setTheme] = useState<Theme>(
     (() => {

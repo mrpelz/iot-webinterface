@@ -1,6 +1,6 @@
 import { StateUpdater, useContext, useEffect, useState } from 'preact/hooks';
 import { createContext } from 'preact';
-import { dimension } from '../style/dimensions.js';
+import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useMediaQuery } from '../style/main.js';
 
@@ -15,7 +15,7 @@ export const MenuVisibleContext = createContext<TMenuVisibleContext>({
 });
 
 export function useInitMenuVisible(): TMenuVisibleContext {
-  const isDesktop = useBreakpoint(useMediaQuery(dimension('breakpoint')));
+  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
   const [isMenuVisible, setMenuVisible] = useState(false);
 
@@ -34,7 +34,7 @@ export function useIsMenuVisible(): boolean {
 }
 
 export function useSetMenuVisible(): StateUpdater<boolean> {
-  const isDesktop = useBreakpoint(useMediaQuery(dimension('breakpoint')));
+  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
   const { setMenuVisible } = useContext(MenuVisibleContext);
 
@@ -45,7 +45,7 @@ export function useSetMenuVisible(): StateUpdater<boolean> {
 }
 
 export function useFlipMenuVisible(): () => void {
-  const isDesktop = useBreakpoint(useMediaQuery(dimension('breakpoint')));
+  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
   const { setMenuVisible } = useContext(MenuVisibleContext);
 

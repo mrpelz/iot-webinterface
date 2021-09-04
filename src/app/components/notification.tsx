@@ -1,9 +1,9 @@
 import { FunctionComponent } from 'preact';
-import { color } from '../style/colors.js';
 import { dependentValue } from '../style/main.js';
-import { dimension } from '../style/dimensions.js';
+import { dimensions } from '../style.js';
 import { styled } from 'goober';
 import { useNotification } from '../hooks/notification.js';
+import { useThemedColor } from '../style/colors.js';
 
 export type Notification = {
   content: string | null;
@@ -13,13 +13,13 @@ export type Notification = {
 
 const _Notification = styled('section')<{ isVisible: boolean }>`
   cursor: ${dependentValue('onClick', 'pointer', 'default')};
-  height: ${dependentValue('isVisible', dimension('titlebarHeight'), '0')};
+  height: ${dependentValue('isVisible', dimensions.titlebarHeight, '0')};
   overflow: hidden;
   transition: background-color 0.3s ease-out, height 0.3s ease-out;
 
   background-color: ${dependentValue(
     'isVisible',
-    color('selection'),
+    () => useThemedColor('selection'),
     'rgba(0, 0, 0, 0)'
   )};
 `;

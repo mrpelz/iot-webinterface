@@ -1,13 +1,13 @@
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from './hierarchy.js';
-import { color } from '../style/colors.js';
+import { colors } from '../style.js';
 import { styled } from 'goober';
 import { useFlags } from '../hooks/flags.js';
 import { useWebApi } from '../hooks/web-api.js';
 
 const DiagnosticsContainer = styled('section')`
   background-color: white;
-  color: ${color('black')};
+  color: ${colors.black()};
   display: flex;
   flex-direction: column;
   overflow-x: scroll;

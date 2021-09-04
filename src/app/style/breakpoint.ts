@@ -1,9 +1,8 @@
 import { Value, useUnwrapValue } from './main.js';
 import { useMemo, useState } from 'preact/hooks';
 
-export function useBreakpoint(breakpoint: Value): boolean {
-  const value = useUnwrapValue(breakpoint);
-  const mediaQuery = useMemo(() => matchMedia(value), [value]);
+export function useBreakpoint(breakpoint: string): boolean {
+  const mediaQuery = useMemo(() => matchMedia(breakpoint), [breakpoint]);
 
   const [matches, setMatches] = useState(mediaQuery.matches);
 
@@ -15,16 +14,13 @@ export function useBreakpoint(breakpoint: Value): boolean {
 }
 
 export function useBreakpointValue(
-  breakpoint: Value,
-  ifTrue: Value,
-  ifFalse: Value
+  breakpoint: string,
+  ifTrue: string,
+  ifFalse: string
 ): string {
   const matches = useBreakpoint(breakpoint);
 
-  const valueTrue = useUnwrapValue(ifTrue);
-  const valueFalse = useUnwrapValue(ifFalse);
-
-  return matches ? valueTrue : valueFalse;
+  return matches ? ifTrue : ifFalse;
 }
 
 export const breakpointValue = (
@@ -32,5 +28,10 @@ export const breakpointValue = (
   ifTrue: Value,
   ifFalse: Value
 ): (() => string) => {
-  return () => useBreakpointValue(breakpoint, ifTrue, ifFalse);
+  return () =>
+    useBreakpointValue(
+      useUnwrapValue(breakpoint),
+      useUnwrapValue(ifTrue),
+      useUnwrapValue(ifFalse)
+    );
 };

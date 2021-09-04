@@ -1,14 +1,7 @@
 import { FunctionComponent, JSX } from 'preact';
-import {
-  appHeight,
-  appHeightShiftDown,
-  appWidthDesktop,
-  appWidthMobile,
-  headerHeight,
-  headerHeightShiftDown,
-} from '../style.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
-import { dimension } from '../style/dimensions.js';
+import { breakpointValue } from '../style/breakpoint.js';
+import { dimensions } from '../style.js';
 import { styled } from 'goober';
 import { useIsMenuVisible } from '../hooks/menu.js';
 import { useNotification } from '../hooks/notification.js';
@@ -23,42 +16,53 @@ const _Header = styled('header')`
 `;
 
 const _Aside = styled('aside')<{ isVisible: boolean; shiftDown: boolean }>`
-  height: ${appHeight()};
+  height: ${dimensions.appHeight};
   left: 0;
   position: fixed;
   touch-action: ${dependentValue('isVisible', 'none', 'auto')};
   transition: height 0.3s ease-out, transform 0.3s ease-out, top 0.3s ease-out;
-  width: ${dimension('menuWidth')};
+  width: ${dimensions.menuWidth};
   z-index: 4;
 
-  top: ${dependentValue('shiftDown', headerHeightShiftDown(), headerHeight())};
+  top: ${dependentValue(
+    'shiftDown',
+    dimensions.headerHeightShiftDown,
+    dimensions.headerHeight
+  )};
 
-  @media ${mediaQuery(dimension('breakpoint'), true)} {
-    transform: ${dependentValue(
-      'isVisible',
+  transform: ${dependentValue(
+    'isVisible',
+    'translateX(0)',
+    breakpointValue(
+      mediaQuery(dimensions.breakpoint),
       'translateX(0)',
       'translateX(-100%)'
-    )};
-  }
+    )
+  )};
 `;
 
 const _Main = styled('main')<{ isAsideVisible: boolean; shiftDown: boolean }>`
-  min-height: ${dependentValue('shiftDown', appHeightShiftDown(), appHeight())};
+  min-height: ${dependentValue(
+    'shiftDown',
+    dimensions.appHeightShiftDown,
+    dimensions.appHeight
+  )};
   overflow-x: hidden;
   touch-action: ${dependentValue('isAsideVisible', 'none', 'auto')};
   transition: height 0.3s ease-out, margin-top 0.3s ease-out;
-  width: ${appWidthMobile()};
+  width: ${dimensions.appWidth};
 
   margin-top: ${dependentValue(
     'shiftDown',
-    headerHeightShiftDown(),
-    headerHeight()
+    dimensions.headerHeightShiftDown,
+    dimensions.headerHeight
   )};
 
-  @media ${mediaQuery(dimension('breakpoint'))} {
-    margin-left: ${dimension('menuWidth')};
-    width: ${appWidthDesktop()};
-  }
+  margin-left: ${breakpointValue(
+    mediaQuery(dimensions.breakpoint),
+    dimensions.menuWidth,
+    'unset'
+  )};
 `;
 
 export const Layout: FunctionComponent<{
