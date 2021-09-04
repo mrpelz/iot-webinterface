@@ -1,10 +1,16 @@
-import { StateUpdater, useContext, useEffect, useState } from 'preact/hooks';
+import {
+  StateUpdater,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'preact/hooks';
 import { Flags } from '../util/flags.js';
 import { createContext } from 'preact';
 import { strings } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 
-export type Theme = 'light' | 'dark';
+export type Theme = 'light' | 'dark' | 'dim';
 
 type InitTheme = {
   setTheme: StateUpdater<Theme>;
@@ -19,33 +25,33 @@ export function useInitTheme(flags: Flags): InitTheme {
   const prefersDarkTheme = useBreakpoint(strings.prefersDarkTheme);
   const prefersLightTheme = useBreakpoint(strings.prefersLightTheme);
 
-  const [theme, setTheme] = useState<Theme>(
-    (() => {
-      if (prefersDarkTheme) return 'dark';
-      if (prefersLightTheme) return 'light';
+  const browserPreferredTheme = useMemo(() => {
+    if (prefersDarkTheme) return 'dark';
+    if (prefersLightTheme) return 'light';
 
-      return 'light';
-    })()
+    return null;
+  }, [prefersDarkTheme, prefersLightTheme]);
+
+  const flagPreferredTheme = useMemo(() => {
+    const { darkOverride, dimOverride, lightOverride } = flags || {};
+
+    if (darkOverride) return 'dark';
+    if (dimOverride) return 'dim';
+    if (lightOverride) return 'light';
+
+    return null;
+  }, [flags]);
+
+  const preferredTheme = useMemo(
+    () => flagPreferredTheme || browserPreferredTheme || 'light',
+    [browserPreferredTheme, flagPreferredTheme]
   );
 
+  const [theme, setTheme] = useState<Theme>(preferredTheme);
+
   useEffect(() => {
-    const browserPreferredTheme = (() => {
-      if (prefersDarkTheme) return 'dark';
-      if (prefersLightTheme) return 'light';
-
-      return null;
-    })();
-
-    const flagPreferredTheme = (() => {
-      const { darkOverride = null } = flags || {};
-      if (darkOverride === null) return null;
-
-      if (darkOverride) return 'dark';
-      return 'light';
-    })();
-
-    setTheme(flagPreferredTheme || browserPreferredTheme || 'light');
-  }, [flags, prefersDarkTheme, prefersLightTheme]);
+    setTheme(preferredTheme);
+  }, [preferredTheme]);
 
   return {
     setTheme,
@@ -53,6 +59,6 @@ export function useInitTheme(flags: Flags): InitTheme {
   };
 }
 
-export function useTheme(): Theme {
-  return useContext(ThemeContext).theme;
+export function useTheme(): InitTheme {
+  return useContext(ThemeContext);
 }

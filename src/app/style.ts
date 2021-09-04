@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import { add, dimension, subtract } from './style/dimensions.js';
-import { color, useThemedColor } from './style/colors.js';
+import { color, useThemedValue } from './style/colors.js';
 import { cssEnv, cssVar, useMediaQuery } from './style/main.js';
+import { multiline } from './util/string.js';
 import { useBreakpointValue } from './style/breakpoint.js';
 import { useTheme } from './hooks/theme.js';
 
 export const strings = {
   get colorScheme() {
-    return () => useTheme();
+    return () => useTheme().theme;
   },
   font: '-apple-system, SF UI Text, Helvetica Neue, Helvetica, Arial, sans-serif',
   isRetina: '(-webkit-min-device-pixel-ratio: 2)',
@@ -67,13 +68,17 @@ export const dimensions = {
   ...dynamicDimensions,
 };
 
-const brandHue = 75;
+const brand = {
+  hue: 75,
+  lightness: 52,
+  saturation: 62,
+};
 
 const staticColors = {
   black: color(0, 0, 0),
   blackShaded: color(240, 17, 9),
   blue: color(211, 100, 50),
-  brand: color(brandHue, 62, 52),
+  brand: color(brand.hue, brand.saturation, brand.lightness),
   greyDark: color(0, 0, 26),
   greyGlow: color(240, 9, 23),
   greyLight: color(220, 2, 76),
@@ -86,39 +91,120 @@ const staticColors = {
 
 const themedColors = {
   backgroundPrimary: (a?: number) => () =>
-    useThemedColor({ dark: staticColors.black, light: staticColors.white })(a),
+    useThemedValue({
+      dark: staticColors.black,
+      dim: staticColors.black,
+      light: staticColors.white,
+    })(a),
   backgroundSecondary: (a?: number) => () =>
-    useThemedColor({
+    useThemedValue({
       dark: staticColors.blackShaded,
+      dim: staticColors.blackShaded,
       light: staticColors.whiteShaded,
     })(a),
   backgroundTertiary: (a?: number) => () =>
-    useThemedColor({
+    useThemedValue({
       dark: staticColors.blackShaded,
+      dim: staticColors.blackShaded,
       light: staticColors.greyLight,
     })(a),
   fontPrimary: (a?: number) => () =>
-    useThemedColor({ dark: staticColors.white, light: staticColors.black })(a),
+    useThemedValue({
+      dark: staticColors.white,
+      dim: staticColors.white,
+      light: staticColors.black,
+    })(a),
   fontSecondary: (a?: number) => () =>
-    useThemedColor({
+    useThemedValue({
       dark: staticColors.greyLow,
+      dim: staticColors.greyLow,
       light: staticColors.greyLow,
     })(a),
   fontTertiary: (a?: number) => () =>
-    useThemedColor({
+    useThemedValue({
       dark: staticColors.greyGlow,
+      dim: staticColors.greyGlow,
       light: staticColors.greyMid,
     })(a),
   selection: (a?: number) => () =>
-    useThemedColor({ dark: staticColors.orange, light: staticColors.blue })(a),
+    useThemedValue({
+      dark: staticColors.orange,
+      dim: staticColors.orange,
+      light: staticColors.blue,
+    })(a),
   statusBarBackground: (a?: number) => () =>
-    useThemedColor({
+    useThemedValue({
       dark: staticColors.blackShaded,
+      dim: staticColors.blackShaded,
       light: staticColors.black,
+    })(a),
+  surface1: (a?: number) => () =>
+    useThemedValue({
+      dark: color(brand.hue, 10, 10),
+      dim: color(brand.hue, 10, 20),
+      light: color(brand.hue, 25, 90),
+    })(a),
+  surface2: (a?: number) => () =>
+    useThemedValue({
+      dark: color(brand.hue, 10, 15),
+      dim: color(brand.hue, 10, 25),
+      light: color(brand.hue, 20, 99),
+    })(a),
+  surface3: (a?: number) => () =>
+    useThemedValue({
+      dark: color(brand.hue, 5, 20),
+      dim: color(brand.hue, 5, 30),
+      light: color(brand.hue, 20, 92),
+    })(a),
+  surface4: (a?: number) => () =>
+    useThemedValue({
+      dark: color(brand.hue, 5, 25),
+      dim: color(brand.hue, 5, 35),
+      light: color(brand.hue, 20, 85),
+    })(a),
+  surfaceShadow: (a?: number) => () =>
+    useThemedValue({
+      dark: color(brand.hue, 50, 3),
+      dim: color(brand.hue, 30, 13),
+      light: color(brand.hue, 10, 20),
+    })(a),
+  text1: (a?: number) => () =>
+    useThemedValue({
+      dark: color(brand.hue, 15, 85),
+      dim: color(brand.hue, 15, 75),
+      light: color(brand.hue, brand.saturation, 10),
+    })(a),
+  text2: (a?: number) => () =>
+    useThemedValue({
+      dark: color(brand.hue, 5, 65),
+      dim: color(brand.hue, 10, 61),
+      light: color(brand.hue, 30, 10),
     })(a),
 };
 
 export const colors = {
   ...staticColors,
   ...themedColors,
+};
+
+export const shadow = () => {
+  return () => {
+    const shadowSurface = colors.surfaceShadow;
+    const shadowStength = useThemedValue({
+      dark: 80,
+      dim: 20,
+      light: 2,
+    });
+
+    const result = multiline`
+      0 2.8px 2.2px ${shadowSurface(shadowStength + 3)()},
+      0 6.7px 5.3px ${shadowSurface(shadowStength + 1)()},
+      0 12.5px 10px ${shadowSurface(shadowStength + 2)()},
+      0 22.3px 17.9px ${shadowSurface(shadowStength + 2)()},
+      0 41.8px 33.4px ${shadowSurface(shadowStength + 3)()},
+      0 100px 80px ${shadowSurface(shadowStength)()}
+    `;
+
+    return result;
+  };
 };

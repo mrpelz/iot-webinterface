@@ -22,6 +22,7 @@ const GlobalStyles = createGlobalStyle`
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
+    box-sizing: border-box;
     scroll-behavior: smooth;
     scrollbar-width: none;
     user-select: none;

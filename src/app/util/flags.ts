@@ -3,10 +3,12 @@ import { CHECK_INTERVAL } from './auto-reload.js';
 export type Flags = {
   apiBaseUrl: string;
   autoReloadInterval: number;
-  darkOverride: boolean | null;
+  darkOverride: boolean;
   debug: boolean;
+  dimOverride: boolean;
   enableNotifications: boolean;
   invisibleOnBlur: boolean;
+  lightOverride: boolean;
   lowPriorityStream: boolean;
   oledOptimizations: boolean;
   pageOverride: number | null;
@@ -16,10 +18,12 @@ export type Flags = {
 const defaultFlags: Flags = {
   apiBaseUrl: new URL('/', location.href).href,
   autoReloadInterval: CHECK_INTERVAL,
-  darkOverride: null,
+  darkOverride: false,
   debug: false,
+  dimOverride: false,
   enableNotifications: true,
   invisibleOnBlur: false,
+  lightOverride: false,
   lowPriorityStream: false,
   oledOptimizations: false,
   pageOverride: null,
@@ -40,37 +44,45 @@ function getFlag<T>(
 export function getFlags(): Flags {
   const hashFlags = new URLSearchParams(location.hash.slice(1));
 
+  const readFlags: Partial<Flags> = {
+    apiBaseUrl: getFlag(hashFlags, 'apiBaseUrl', String),
+    autoReloadInterval: getFlag(hashFlags, 'autoReloadInterval', (input) =>
+      Number.parseInt(input, 10)
+    ),
+    darkOverride: getFlag(hashFlags, 'darkOverride', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+    debug: getFlag(hashFlags, 'debug', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+    dimOverride: getFlag(hashFlags, 'dimOverride', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+    enableNotifications: getFlag(hashFlags, 'enableNotifications', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+    invisibleOnBlur: getFlag(hashFlags, 'invisibleOnBlur', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+    lightOverride: getFlag(hashFlags, 'lightOverride', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+    lowPriorityStream: getFlag(hashFlags, 'lowPriorityStream', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+    oledOptimizations: getFlag(hashFlags, 'oledOptimizations', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+    pageOverride: getFlag(hashFlags, 'pageOverride', (input) =>
+      Number.parseInt(input, 10)
+    ),
+    serviceWorker: getFlag(hashFlags, 'serviceWorker', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+  };
+
   const setFlags: Partial<Flags> = Object.fromEntries(
-    Object.entries({
-      apiBaseUrl: getFlag(hashFlags, 'apiBaseUrl', String),
-      autoReloadInterval: getFlag(hashFlags, 'autoReloadInterval', (input) =>
-        Number.parseInt(input, 10)
-      ),
-      darkOverride: getFlag(hashFlags, 'darkOverride', (input) =>
-        Boolean(Number.parseInt(input, 10))
-      ),
-      debug: getFlag(hashFlags, 'debug', (input) =>
-        Boolean(Number.parseInt(input, 10))
-      ),
-      enableNotifications: getFlag(hashFlags, 'enableNotifications', (input) =>
-        Boolean(Number.parseInt(input, 10))
-      ),
-      invisibleOnBlur: getFlag(hashFlags, 'invisibleOnBlur', (input) =>
-        Boolean(Number.parseInt(input, 10))
-      ),
-      lowPriorityStream: getFlag(hashFlags, 'lowPriorityStream', (input) =>
-        Boolean(Number.parseInt(input, 10))
-      ),
-      oledOptimizations: getFlag(hashFlags, 'oledOptimizations', (input) =>
-        Boolean(Number.parseInt(input, 10))
-      ),
-      pageOverride: getFlag(hashFlags, 'pageOverride', (input) =>
-        Number.parseInt(input, 10)
-      ),
-      serviceWorker: getFlag(hashFlags, 'serviceWorker', (input) =>
-        Boolean(Number.parseInt(input, 10))
-      ),
-    }).filter(([, value]) => value !== undefined)
+    Object.entries(readFlags).filter(([, value]) => value !== undefined)
   );
 
   const combinedFlags: Flags = {
