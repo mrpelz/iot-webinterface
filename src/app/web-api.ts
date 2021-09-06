@@ -26,8 +26,32 @@ type Setter<T> = {
   set: (value: T) => void;
 };
 
-type MetaKeys = 'actuator' | 'name' | 'metric' | 'type' | 'unit';
-export type Meta = Partial<Record<MetaKeys, string>>;
+type MetaKeys =
+  | 'actuated'
+  | 'isBasement'
+  | 'isConnectingRoom'
+  | 'isDaylit'
+  | 'isGroundFloor'
+  | 'isPartiallyOutside'
+  | 'isPrimary'
+  | 'isSubDevice'
+  | 'level'
+  | 'measured'
+  | 'name'
+  | 'parentRelation'
+  | 'type'
+  | 'unit'
+  | 'valueType';
+
+export enum ValueType {
+  NULL,
+  BOOLEAN,
+  NUMBER,
+  STRING,
+  RAW,
+}
+
+export type Meta = Partial<Record<MetaKeys, unknown>>;
 
 export type HierarchyElement = {
   children?: Record<string, HierarchyElement>;

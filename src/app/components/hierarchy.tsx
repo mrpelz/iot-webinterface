@@ -1,7 +1,7 @@
+import { HierarchyElement, ValueType } from '../web-api.js';
 import { useGetter, useSetter } from '../hooks/web-api.js';
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
-import { HierarchyElement } from '../web-api.js';
 import { styled } from 'goober';
 
 const GetterValue = styled('span')`
@@ -22,12 +22,14 @@ const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
       </td>
       <td>
         <table>
-          {Object.entries(meta).map(([key, value]) => (
-            <tr>
-              <td>{key}</td>
-              <td>{value}</td>
-            </tr>
-          ))}
+          {Object.entries(meta).map(([key, value]) => {
+            return (
+              <tr>
+                <td>{key}</td>
+                <td>{JSON.stringify(value)}</td>
+              </tr>
+            );
+          })}
         </table>
       </td>
     </tr>
@@ -60,13 +62,15 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
 }) => {
   const {
-    meta: { type },
+    meta: { valueType: _valueType },
     set,
   } = element;
 
+  const valueType = _valueType as ValueType;
+
   const setter = useSetter<unknown>(element);
 
-  const isNull = type === 'null';
+  const isNull = valueType === 0;
 
   const [input, setInput] = useState<unknown>(undefined);
 
@@ -83,11 +87,24 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
 
       try {
         const parsedValue = JSON.parse(value);
-        const valueType = parsedValue === null ? 'null' : typeof parsedValue;
+        const inputType = (() => {
+          if (parsedValue === null) return ValueType.NULL;
 
-        if (valueType !== type) {
+          switch (typeof parsedValue) {
+            case 'boolean':
+              return ValueType.BOOLEAN;
+            case 'number':
+              return ValueType.NUMBER;
+            case 'string':
+              return ValueType.STRING;
+            default:
+              return ValueType.RAW;
+          }
+        })();
+
+        if (inputType !== valueType) {
           currentTarget.setCustomValidity(
-            `parsed type does not match the required type! Needed: ${type}, parsed: ${valueType}`
+            `parsed type does not match the required type! Needed: ${valueType}, parsed: ${inputType}`
           );
 
           return;
@@ -120,7 +137,7 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
           <button onClick={() => setter(null)}>null</button>
         ) : (
           <form action="#" onSubmit={onSubmit}>
-            <input placeholder={type} onChange={onChange} />
+            <input onChange={onChange} />
           </form>
         )}
       </td>
