@@ -5,6 +5,10 @@ import {
 import { FlagsContext, useInitFlags } from './hooks/flags.js';
 import { FunctionComponent, h, render as preactRender } from 'preact';
 import { MenuVisibleContext, useInitMenuVisible } from './hooks/menu.js';
+import {
+  SelectedPageContext,
+  useInitSelectedPage,
+} from './hooks/selected-page.js';
 import { ThemeContext, useInitTheme } from './hooks/theme.js';
 import { WebApiContext, useInitWebApi } from './hooks/web-api.js';
 import { App } from './components/app.js';
@@ -59,9 +63,13 @@ export const Root: FunctionComponent<{
           <FallbackNotificationContext.Provider
             value={useInitFallbackNotification(notifications)}
           >
-            <MenuVisibleContext.Provider value={useInitMenuVisible()}>
-              <App />
-            </MenuVisibleContext.Provider>
+            <SelectedPageContext.Provider
+              value={useInitSelectedPage(initFlags)}
+            >
+              <MenuVisibleContext.Provider value={useInitMenuVisible()}>
+                <App />
+              </MenuVisibleContext.Provider>
+            </SelectedPageContext.Provider>
           </FallbackNotificationContext.Provider>
         </WebApiContext.Provider>
       </ThemeContext.Provider>

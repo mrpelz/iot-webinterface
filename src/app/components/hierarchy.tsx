@@ -1,4 +1,14 @@
-import { HierarchyElement, ValueType } from '../web-api.js';
+import {
+  HierarchyElement,
+  Levels,
+  ParentRelation,
+  ValueType,
+  isMetaPropertyActuator,
+  levelToString,
+  parentRelationToString,
+  typeToValueType,
+  valueTypeToType,
+} from '../web-api.js';
 import { useGetter, useSetter } from '../hooks/web-api.js';
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
@@ -23,10 +33,30 @@ const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
       <td>
         <table>
           {Object.entries(meta).map(([key, value]) => {
+            const level =
+              key === 'level'
+                ? levelToString(value as unknown as Levels)
+                : null;
+
+            const parentRelation =
+              key === 'parentRelation'
+                ? parentRelationToString(value as unknown as ParentRelation)
+                : null;
+
+            const valueType =
+              key === 'valueType'
+                ? valueTypeToType(value as unknown as ValueType)
+                : null;
+
             return (
               <tr>
                 <td>{key}</td>
-                <td>{JSON.stringify(value)}</td>
+                <td>
+                  {level ||
+                    parentRelation ||
+                    valueType ||
+                    JSON.stringify(value)}
+                </td>
               </tr>
             );
           })}
@@ -61,18 +91,16 @@ const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
 const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
 }) => {
-  const {
-    meta: { valueType: _valueType },
-    set,
-  } = element;
-
-  const valueType = _valueType as ValueType;
+  const { meta, set } = element;
 
   const setter = useSetter<unknown>(element);
-
-  const isNull = valueType === 0;
-
   const [input, setInput] = useState<unknown>(undefined);
+
+  if (set === undefined || !isMetaPropertyActuator(meta)) return null;
+
+  const { valueType } = meta;
+  const isNull = valueType === ValueType.NULL;
+  const namedValueType = valueTypeToType(valueType);
 
   const onChange: JSX.EventHandler<JSX.TargetedEvent<HTMLInputElement, Event>> =
     ({ currentTarget }) => {
@@ -87,24 +115,12 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
 
       try {
         const parsedValue = JSON.parse(value);
-        const inputType = (() => {
-          if (parsedValue === null) return ValueType.NULL;
-
-          switch (typeof parsedValue) {
-            case 'boolean':
-              return ValueType.BOOLEAN;
-            case 'number':
-              return ValueType.NUMBER;
-            case 'string':
-              return ValueType.STRING;
-            default:
-              return ValueType.RAW;
-          }
-        })();
+        const inputType = typeToValueType(parsedValue);
+        const namedInputType = valueTypeToType(inputType);
 
         if (inputType !== valueType) {
           currentTarget.setCustomValidity(
-            `parsed type does not match the required type! Needed: ${valueType}, parsed: ${inputType}`
+            `parsed type does not match the required type! Needed: ${namedValueType}, parsed: ${namedInputType}`
           );
 
           return;
@@ -137,7 +153,7 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
           <button onClick={() => setter(null)}>null</button>
         ) : (
           <form action="#" onSubmit={onSubmit}>
-            <input onChange={onChange} />
+            <input placeholder={namedValueType} onChange={onChange} />
           </form>
         )}
       </td>

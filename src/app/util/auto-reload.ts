@@ -35,6 +35,8 @@ export function autoReload(
       console.info(`received reload request with new id "${storedId}"`);
     }
 
+    notifications.clear();
+
     localStorage.setItem(ID_STORAGE_KEY, String(storedId));
 
     if ('serviceWorker' in navigator) {

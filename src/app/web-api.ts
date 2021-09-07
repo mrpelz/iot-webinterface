@@ -26,22 +26,16 @@ type Setter<T> = {
   set: (value: T) => void;
 };
 
-type MetaKeys =
-  | 'actuated'
-  | 'isBasement'
-  | 'isConnectingRoom'
-  | 'isDaylit'
-  | 'isGroundFloor'
-  | 'isPartiallyOutside'
-  | 'isPrimary'
-  | 'isSubDevice'
-  | 'level'
-  | 'measured'
-  | 'name'
-  | 'parentRelation'
-  | 'type'
-  | 'unit'
-  | 'valueType';
+export enum Levels {
+  SYSTEM,
+  HOME,
+  BUILDING,
+  FLOOR,
+  ROOM,
+  AREA,
+  DEVICE,
+  PROPERTY,
+}
 
 export enum ValueType {
   NULL,
@@ -51,7 +45,85 @@ export enum ValueType {
   RAW,
 }
 
-export type Meta = Partial<Record<MetaKeys, unknown>>;
+export enum ParentRelation {
+  META_RELATION,
+  CONTROL_TRIGGER,
+  CONTROL_EXTENSION,
+  DATA_QUALIFIER,
+}
+
+type MetaSystem = {
+  level: Levels.SYSTEM;
+};
+
+type MetaHome = {
+  isPrimary?: true;
+  level: Levels.HOME;
+  name: string;
+};
+
+type MetaBuilding = {
+  isPrimary?: true;
+  level: Levels.BUILDING;
+  name: string;
+};
+
+type MetaFloor = {
+  isBasement?: true;
+  isGroundFloor?: true;
+  isPartiallyOutside?: true;
+  isPrimary?: true;
+  level: Levels.FLOOR;
+  name: string;
+};
+
+type MetaRoom = {
+  isConnectingRoom: boolean;
+  isDaylit: boolean;
+  level: Levels.ROOM;
+  name: string;
+};
+
+type MetaArea = {
+  level: Levels.AREA;
+  name: string;
+};
+
+type MetaDevice = {
+  isSubDevice?: true;
+  level: Levels.DEVICE;
+  name: string;
+};
+
+type MetaProperty = {
+  level: Levels.PROPERTY;
+  name?: string;
+  parentRelation?: ParentRelation;
+};
+
+type MetaPropertySensor = MetaProperty & {
+  measured?: string;
+  type: 'sensor';
+  unit?: string;
+  valueType: ValueType;
+};
+
+type MetaPropertyActuator = MetaProperty & {
+  actuated?: string;
+  type: 'actuator';
+  valueType: ValueType;
+};
+
+export type Meta =
+  | MetaSystem
+  | MetaHome
+  | MetaBuilding
+  | MetaFloor
+  | MetaRoom
+  | MetaArea
+  | MetaDevice
+  | MetaPropertySensor
+  | MetaPropertyActuator;
 
 export type HierarchyElement = {
   children?: Record<string, HierarchyElement>;
@@ -169,5 +241,115 @@ export class WebApi {
 
   onStreamOnline(callback: StreamOnlineCallback): void {
     this._streamOnlineCallback = callback;
+  }
+}
+
+export function isMetaSystem(element: Meta): element is MetaSystem {
+  return element.level === Levels.SYSTEM;
+}
+
+export function isMetaHome(element: Meta): element is MetaHome {
+  return element.level === Levels.HOME;
+}
+
+export function isMetaBuilding(element: Meta): element is MetaBuilding {
+  return element.level === Levels.BUILDING;
+}
+
+export function isMetaFloor(element: Meta): element is MetaFloor {
+  return element.level === Levels.FLOOR;
+}
+
+export function isMetaRoom(element: Meta): element is MetaRoom {
+  return element.level === Levels.ROOM;
+}
+
+export function isMetaArea(element: Meta): element is MetaArea {
+  return element.level === Levels.AREA;
+}
+
+export function isMetaDevice(element: Meta): element is MetaDevice {
+  return element.level === Levels.DEVICE;
+}
+
+export function isMetaPropertySensor(
+  element: Meta
+): element is MetaPropertySensor {
+  return element.level === Levels.PROPERTY && element.type === 'sensor';
+}
+
+export function isMetaPropertyActuator(
+  element: Meta
+): element is MetaPropertyActuator {
+  return element.level === Levels.PROPERTY && element.type === 'actuator';
+}
+
+export function levelToString(input: Levels): string | null {
+  switch (input) {
+    case Levels.SYSTEM:
+      return 'SYSTEM';
+    case Levels.HOME:
+      return 'HOME';
+    case Levels.BUILDING:
+      return 'BUILDING';
+    case Levels.FLOOR:
+      return 'FLOOR';
+    case Levels.ROOM:
+      return 'ROOM';
+    case Levels.AREA:
+      return 'AREA';
+    case Levels.DEVICE:
+      return 'DEVICE';
+    case Levels.PROPERTY:
+      return 'PROPERTY';
+    default:
+      return null;
+  }
+}
+
+export function valueTypeToType(input: ValueType): string {
+  switch (input) {
+    case ValueType.NULL:
+      return 'null';
+    case ValueType.BOOLEAN:
+      return 'boolean';
+    case ValueType.NUMBER:
+      return 'number';
+    case ValueType.STRING:
+      return 'string';
+    case ValueType.RAW:
+    default:
+      return 'object';
+  }
+}
+
+export function typeToValueType(input: unknown): ValueType {
+  if (input === null) return ValueType.NULL;
+
+  switch (typeof input) {
+    case 'boolean':
+      return ValueType.BOOLEAN;
+    case 'number':
+      return ValueType.NUMBER;
+    case 'string':
+      return ValueType.STRING;
+    case 'object':
+    default:
+      return ValueType.RAW;
+  }
+}
+
+export function parentRelationToString(input: ParentRelation): string | null {
+  switch (input) {
+    case ParentRelation.META_RELATION:
+      return 'META_RELATION';
+    case ParentRelation.CONTROL_TRIGGER:
+      return 'CONTROL_TRIGGER';
+    case ParentRelation.CONTROL_EXTENSION:
+      return 'CONTROL_EXTENSION';
+    case ParentRelation.DATA_QUALIFIER:
+      return 'DATA_QUALIFIER';
+    default:
+      return null;
   }
 }

@@ -9,23 +9,25 @@ export type TMenuVisibleContext = {
   setMenuVisible: StateUpdater<boolean>;
 };
 
-export const MenuVisibleContext = createContext<TMenuVisibleContext>({
-  isMenuVisible: false,
-  setMenuVisible: () => undefined,
-});
+export const MenuVisibleContext = createContext<TMenuVisibleContext>(
+  null as unknown as TMenuVisibleContext
+);
 
 export function useInitMenuVisible(): TMenuVisibleContext {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
-  const [isMenuVisible, setMenuVisible] = useState(false);
+  const [isMenuVisible, _setMenuVisible] = useState(false);
 
   useEffect(() => {
-    setMenuVisible(false);
+    _setMenuVisible(false);
   }, [isDesktop]);
 
   return {
     isMenuVisible,
-    setMenuVisible,
+    setMenuVisible: (...args) => {
+      if (isDesktop) return;
+      _setMenuVisible(...args);
+    },
   };
 }
 
@@ -34,23 +36,13 @@ export function useIsMenuVisible(): boolean {
 }
 
 export function useSetMenuVisible(): StateUpdater<boolean> {
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
-
-  const { setMenuVisible } = useContext(MenuVisibleContext);
-
-  return (...args) => {
-    if (isDesktop) return;
-    setMenuVisible(...args);
-  };
+  return useContext(MenuVisibleContext).setMenuVisible;
 }
 
 export function useFlipMenuVisible(): () => void {
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
-
   const { setMenuVisible } = useContext(MenuVisibleContext);
 
   return () => {
-    if (isDesktop) return;
     setMenuVisible((value) => !value);
   };
 }

@@ -1,4 +1,4 @@
-import { colors, dimensions, shadow, strings } from '../style.js';
+import { colors, shadow, strings } from '../style.js';
 import { Diagnostics } from './diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Layout } from './layout.js';

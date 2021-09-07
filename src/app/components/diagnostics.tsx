@@ -3,6 +3,8 @@ import { Hierarchy } from './hierarchy.js';
 import { colors } from '../style.js';
 import { styled } from 'goober';
 import { useFlags } from '../hooks/flags.js';
+import { useIsMenuVisible } from '../hooks/menu.js';
+import { useSelectedPage } from '../hooks/selected-page.js';
 import { useWebApi } from '../hooks/web-api.js';
 
 const DiagnosticsContainer = styled('section')`
@@ -44,6 +46,9 @@ export const Diagnostics: FunctionComponent = () => {
   const flags = useFlags();
   const { debug } = flags;
 
+  const menuVisible = useIsMenuVisible();
+  const selectedPage = useSelectedPage();
+
   return debug ? (
     <DiagnosticsContainer>
       <table>
@@ -52,6 +57,20 @@ export const Diagnostics: FunctionComponent = () => {
             <b>Stream</b>
           </td>
           <td>{streamOnline ? 'online' : 'offline'}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>Menu visible</b>
+          </td>
+          <td>{menuVisible ? 'visible' : 'invisible'}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>Selected page</b>
+          </td>
+          <td>{JSON.stringify(selectedPage)}</td>
         </tr>
 
         <tr>
