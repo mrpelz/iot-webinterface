@@ -44,12 +44,11 @@ export const Diagnostics: FunctionComponent = () => {
   const { hierarchy, streamOnline } = useWebApi();
 
   const flags = useFlags();
-  const { debug } = flags;
 
   const menuVisible = useIsMenuVisible();
   const selectedPage = useSelectedPage();
 
-  return debug ? (
+  return (
     <DiagnosticsContainer>
       <table>
         <tr>
@@ -91,5 +90,5 @@ export const Diagnostics: FunctionComponent = () => {
       </table>
       {hierarchy ? <Hierarchy element={hierarchy} /> : null}
     </DiagnosticsContainer>
-  ) : null;
+  );
 };

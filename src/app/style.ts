@@ -69,22 +69,21 @@ export const dimensions = {
 };
 
 const brand = {
-  hue: 75,
-  lightness: 52,
-  saturation: 62,
+  hue: 35,
+  lightness: 100,
+  saturation: 50,
 };
 
 const staticColors = {
   black: color(0, 0, 0),
   blackShaded: color(240, 17, 9),
   blue: color(211, 100, 50),
-  brand: color(brand.hue, brand.saturation, brand.lightness),
   greyDark: color(0, 0, 26),
   greyGlow: color(240, 9, 23),
   greyLight: color(220, 2, 76),
   greyLow: color(0, 0, 57),
   greyMid: color(0, 0, 77),
-  orange: color(35, 100, 50),
+  orange: color(brand.hue, brand.saturation, brand.lightness),
   white: color(0, 100, 100),
   whiteShaded: color(240, 7, 97),
 };

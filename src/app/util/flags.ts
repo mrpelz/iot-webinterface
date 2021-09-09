@@ -5,6 +5,7 @@ export type Flags = {
   autoReloadInterval: number;
   darkOverride: boolean;
   debug: boolean;
+  diagnostics: boolean;
   dimOverride: boolean;
   enableNotifications: boolean;
   invisibleOnBlur: boolean;
@@ -20,6 +21,7 @@ const defaultFlags: Flags = {
   autoReloadInterval: CHECK_INTERVAL,
   darkOverride: false,
   debug: false,
+  diagnostics: false,
   dimOverride: false,
   enableNotifications: true,
   invisibleOnBlur: false,
@@ -44,7 +46,7 @@ function getFlag<T>(
 export function getFlags(): Flags {
   const hashFlags = new URLSearchParams(location.hash.slice(1));
 
-  const readFlags: Partial<Flags> = {
+  const readFlags: { [P in keyof Flags]: Flags[P] | undefined } = {
     apiBaseUrl: getFlag(hashFlags, 'apiBaseUrl', String),
     autoReloadInterval: getFlag(hashFlags, 'autoReloadInterval', (input) =>
       Number.parseInt(input, 10)
@@ -53,6 +55,9 @@ export function getFlags(): Flags {
       Boolean(Number.parseInt(input, 10))
     ),
     debug: getFlag(hashFlags, 'debug', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+    diagnostics: getFlag(hashFlags, 'diagnostics', (input) =>
       Boolean(Number.parseInt(input, 10))
     ),
     dimOverride: getFlag(hashFlags, 'dimOverride', (input) =>
