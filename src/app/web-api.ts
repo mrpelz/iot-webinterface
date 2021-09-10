@@ -50,25 +50,26 @@ export enum ParentRelation {
   CONTROL_TRIGGER,
   CONTROL_EXTENSION,
   DATA_QUALIFIER,
+  DATA_AGGREGATION_SOURCE,
 }
 
-type MetaSystem = {
+export type MetaSystem = {
   level: Levels.SYSTEM;
 };
 
-type MetaHome = {
+export type MetaHome = {
   isPrimary?: true;
   level: Levels.HOME;
   name: string;
 };
 
-type MetaBuilding = {
+export type MetaBuilding = {
   isPrimary?: true;
   level: Levels.BUILDING;
   name: string;
 };
 
-type MetaFloor = {
+export type MetaFloor = {
   isBasement?: true;
   isGroundFloor?: true;
   isPartiallyOutside?: true;
@@ -77,19 +78,19 @@ type MetaFloor = {
   name: string;
 };
 
-type MetaRoom = {
-  isConnectingRoom: boolean;
-  isDaylit: boolean;
+export type MetaRoom = {
+  isConnectingRoom?: true;
+  isDaylit?: true;
   level: Levels.ROOM;
   name: string;
 };
 
-type MetaArea = {
+export type MetaArea = {
   level: Levels.AREA;
   name: string;
 };
 
-type MetaDevice = {
+export type MetaDevice = {
   isSubDevice?: true;
   level: Levels.DEVICE;
   name: string;
@@ -101,14 +102,14 @@ type MetaProperty = {
   parentRelation?: ParentRelation;
 };
 
-type MetaPropertySensor = MetaProperty & {
+export type MetaPropertySensor = MetaProperty & {
   measured?: string;
   type: 'sensor';
   unit?: string;
   valueType: ValueType;
 };
 
-type MetaPropertyActuator = MetaProperty & {
+export type MetaPropertyActuator = MetaProperty & {
   actuated?: string;
   type: 'actuator';
   valueType: ValueType;
@@ -349,6 +350,8 @@ export function parentRelationToString(input: ParentRelation): string | null {
       return 'CONTROL_EXTENSION';
     case ParentRelation.DATA_QUALIFIER:
       return 'DATA_QUALIFIER';
+    case ParentRelation.DATA_AGGREGATION_SOURCE:
+      return 'DATA_AGGREGATION_SOURCE';
     default:
       return null;
   }
