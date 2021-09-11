@@ -7,6 +7,8 @@ import { Notifications } from './notifications.js';
 
 type SetupMessage = { initialId: string | null; interval: number };
 
+let timeout: ReturnType<typeof setTimeout> | null = null;
+
 export const CHECK_INTERVAL = 10000;
 const ID_STORAGE_KEY = 'autoReloadId';
 
@@ -28,6 +30,16 @@ export function autoReload(
   );
 
   if (!port) return;
+
+  const reload = () => {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+
+    notifications.clear();
+    location.reload();
+  };
 
   port.onmessage = async ({ data: storedId }) => {
     if (debug) {
@@ -53,11 +65,10 @@ export function autoReload(
         requireInteraction: true,
         tag: 'versionUpdate',
       },
-      () => {
-        notifications.clear();
-        location.reload();
-      },
+      reload,
       () => notifications.clear()
     );
+
+    timeout = setTimeout(reload, interval);
   };
 }

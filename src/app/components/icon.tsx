@@ -1,5 +1,4 @@
 import { FunctionComponent } from 'preact';
-import { styled } from 'goober';
 import { useMemo } from 'preact/hooks';
 
 type Props = {
@@ -7,10 +6,6 @@ type Props = {
 };
 
 const svgBaseUrl = new URL('/images/icons/bundle.svg', location.href);
-
-const _SVG = styled('svg')`
-  fill: currentColor;
-`;
 
 export const Icon: FunctionComponent<Props> = ({ id }) => {
   const url = useMemo(() => {
@@ -21,8 +16,8 @@ export const Icon: FunctionComponent<Props> = ({ id }) => {
   }, [id]);
 
   return (
-    <_SVG>
+    <svg>
       <use href={url} />
-    </_SVG>
+    </svg>
   );
 };

@@ -70,8 +70,8 @@ export const dimensions = {
 
 const brand = {
   hue: 35,
-  lightness: 100,
-  saturation: 50,
+  lightness: 50,
+  saturation: 100,
 };
 
 const staticColors = {
