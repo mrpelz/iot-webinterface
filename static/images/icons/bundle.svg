@@ -42,15 +42,21 @@
       </circle>
     </g>
   </symbol>
-  <symbol id="menu" viewBox="0 0 50 50">
+  <symbol id="menu" viewBox="10 12 30 24">
     <path
       d="M10 12h30v4H10zM10 22h30v4H10zM10 32h30v4H10z"
       fill="currentColor"
     ></path>
   </symbol>
-  <symbol id="map" viewBox="0 -10 120 120">
+  <symbol id="map" viewBox="5 5 90 90">
     <path
       d="M75 30h-7v13H45v5h10v17h5V48h28v40H60v-8h-5v8H13V48h17v-5H13V13h55v7h7V5H5v90h90V40H75z"
+      fill="currentColor"
+    ></path>
+  </symbol>
+  <symbol id="back" viewBox="1 4 50 44">
+    <path
+      d="M22 16V4L1 24l21 20V32s17-4 29 16c0 0 3-15-10-27 0 0-6-5-19-5z"
       fill="currentColor"
     ></path>
   </symbol>

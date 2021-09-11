@@ -98,6 +98,7 @@ export const App: FunctionComponent = () => {
               <Icon id="wait" />
               <Icon id="menu" />
               <Icon id="map" />
+              <Icon id="back" />
               <section>main</section>
               <section>main</section>
               <section>main</section>
