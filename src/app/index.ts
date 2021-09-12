@@ -18,17 +18,11 @@ const {
   apiBaseUrl,
   autoReloadInterval,
   debug,
-  lowPriorityStream,
   enableNotifications,
   serviceWorker,
 } = flags;
 
-const webApi = new WebApi(
-  apiBaseUrl,
-  autoReloadInterval,
-  lowPriorityStream,
-  debug
-);
+const webApi = new WebApi(apiBaseUrl, autoReloadInterval, debug);
 
 const notifications = new Notifications(enableNotifications);
 

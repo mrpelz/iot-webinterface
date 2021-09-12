@@ -10,7 +10,9 @@ import { createContext } from 'preact';
 import { strings } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 
-export type Theme = 'light' | 'dark' | 'dim';
+export const themes = ['light', 'dark', 'dim'] as const;
+
+export type Theme = typeof themes[number];
 
 type InitTheme = {
   setTheme: StateUpdater<Theme>;
@@ -22,6 +24,8 @@ export const ThemeContext = createContext<InitTheme>(
 );
 
 export function useInitTheme(flags: Flags): InitTheme {
+  const { theme: flagPreferredTheme } = flags;
+
   const prefersDarkTheme = useBreakpoint(strings.prefersDarkTheme);
   const prefersLightTheme = useBreakpoint(strings.prefersLightTheme);
 
@@ -31,16 +35,6 @@ export function useInitTheme(flags: Flags): InitTheme {
 
     return null;
   }, [prefersDarkTheme, prefersLightTheme]);
-
-  const flagPreferredTheme = useMemo(() => {
-    const { darkOverride, dimOverride, lightOverride } = flags || {};
-
-    if (darkOverride) return 'dark';
-    if (dimOverride) return 'dim';
-    if (lightOverride) return 'light';
-
-    return null;
-  }, [flags]);
 
   const preferredTheme = useMemo(
     () => flagPreferredTheme || browserPreferredTheme || 'light',

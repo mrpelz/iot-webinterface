@@ -15,7 +15,7 @@ import { useFlipMenuVisible } from '../hooks/menu.js';
 const _App = styled('app')`
   color-scheme: ${strings.colorScheme};
   background-color: ${colors.surface1()};
-  color: ${colors.fontPrimary()};
+  color: ${colors.text1()};
   display: flow-root;
   font-family: ${strings.font};
 `;

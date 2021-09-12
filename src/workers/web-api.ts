@@ -10,7 +10,6 @@
   type SetupMessage = {
     apiBaseUrl: string;
     interval: number;
-    lowPriorityStream: boolean;
   };
 
   enum ChildChannelType {
@@ -93,7 +92,6 @@
 
   const setupStream = (
     apiBaseUrl: string,
-    lowPriorityStream: boolean,
     handleMessage: WebSocketHandler,
     handleOnline: (online: boolean) => void
   ): Stream => {
@@ -106,8 +104,6 @@
       const url = new URL(WS_URL, apiBaseUrl);
       url.protocol = 'ws';
       url.searchParams.append('id', storedId);
-
-      if (lowPriorityStream) url.searchParams.append('lowPriority', '1');
 
       try {
         if (webSocket?.readyState === WebSocket.OPEN) return;
@@ -238,7 +234,7 @@
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;
 
-    const { apiBaseUrl, interval, lowPriorityStream } = setup;
+    const { apiBaseUrl, interval } = setup;
 
     const handleStreamOnline = (online: boolean) => {
       port.postMessage(online ? STREAM_ONLINE : STREAM_OFFLINE);
@@ -246,7 +242,6 @@
 
     const { sendMessage, setId } = setupStream(
       apiBaseUrl,
-      lowPriorityStream,
       handleMessage,
       handleStreamOnline
     );

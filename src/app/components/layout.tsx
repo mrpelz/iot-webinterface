@@ -1,9 +1,9 @@
 import { FunctionComponent, JSX } from 'preact';
+import { MenuVisible, useIsMenuVisible } from '../hooks/menu.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
 import { breakpointValue } from '../style/breakpoint.js';
 import { dimensions } from '../style.js';
 import { styled } from 'goober';
-import { useIsMenuVisible } from '../hooks/menu.js';
 import { useNotification } from '../hooks/notification.js';
 
 const _Header = styled('header')`
@@ -15,7 +15,7 @@ const _Header = styled('header')`
   z-index: 4;
 `;
 
-const _Aside = styled('aside')<{ isVisible: boolean; shiftDown: boolean }>`
+const _Aside = styled('aside')<{ isVisible: MenuVisible; shiftDown: boolean }>`
   height: ${dimensions.appHeight};
   left: 0;
   position: fixed;
@@ -41,7 +41,10 @@ const _Aside = styled('aside')<{ isVisible: boolean; shiftDown: boolean }>`
   )};
 `;
 
-const _Main = styled('main')<{ isAsideVisible: boolean; shiftDown: boolean }>`
+const _Main = styled('main')<{
+  isAsideVisible: MenuVisible;
+  shiftDown: boolean;
+}>`
   min-height: ${dependentValue(
     'shiftDown',
     dimensions.appHeightShiftDown,

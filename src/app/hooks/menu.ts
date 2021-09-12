@@ -4,9 +4,11 @@ import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useMediaQuery } from '../style/main.js';
 
+export type MenuVisible = boolean | null;
+
 export type TMenuVisibleContext = {
-  isMenuVisible: boolean;
-  setMenuVisible: StateUpdater<boolean>;
+  isMenuVisible: MenuVisible;
+  setMenuVisible: StateUpdater<MenuVisible>;
 };
 
 export const MenuVisibleContext = createContext<TMenuVisibleContext>(
@@ -16,10 +18,12 @@ export const MenuVisibleContext = createContext<TMenuVisibleContext>(
 export function useInitMenuVisible(): TMenuVisibleContext {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
-  const [isMenuVisible, _setMenuVisible] = useState(false);
+  const [isMenuVisible, _setMenuVisible] = useState<MenuVisible>(
+    isDesktop ? null : false
+  );
 
   useEffect(() => {
-    _setMenuVisible(false);
+    _setMenuVisible(isDesktop ? null : false);
   }, [isDesktop]);
 
   return {
@@ -31,11 +35,11 @@ export function useInitMenuVisible(): TMenuVisibleContext {
   };
 }
 
-export function useIsMenuVisible(): boolean {
+export function useIsMenuVisible(): MenuVisible {
   return useContext(MenuVisibleContext).isMenuVisible;
 }
 
-export function useSetMenuVisible(): StateUpdater<boolean> {
+export function useSetMenuVisible(): StateUpdater<MenuVisible> {
   return useContext(MenuVisibleContext).setMenuVisible;
 }
 

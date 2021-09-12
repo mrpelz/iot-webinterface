@@ -55,14 +55,14 @@ export const Diagnostics: FunctionComponent = () => {
           <td>
             <b>Stream</b>
           </td>
-          <td>{streamOnline ? 'online' : 'offline'}</td>
+          <td>{JSON.stringify(streamOnline)}</td>
         </tr>
 
         <tr>
           <td>
             <b>Menu visible</b>
           </td>
-          <td>{menuVisible ? 'visible' : 'invisible'}</td>
+          <td>{JSON.stringify(menuVisible)}</td>
         </tr>
 
         <tr>

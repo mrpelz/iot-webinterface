@@ -3,7 +3,6 @@ import { connectWorker, webApiUrl } from './util/workers.js';
 type SetupMessage = {
   apiBaseUrl: string;
   interval: number;
-  lowPriorityStream: boolean;
 };
 
 enum ChildChannelType {
@@ -142,19 +141,13 @@ export class WebApi {
   private readonly _port: MessagePort | null;
   private _streamOnlineCallback?: StreamOnlineCallback;
 
-  constructor(
-    apiBaseUrl: string,
-    interval: number,
-    lowPriorityStream: boolean,
-    debug: boolean
-  ) {
+  constructor(apiBaseUrl: string, interval: number, debug: boolean) {
     this._port = connectWorker<SetupMessage>(
       webApiUrl,
       'web-api',
       {
         apiBaseUrl,
         interval,
-        lowPriorityStream,
       },
       debug
     );
