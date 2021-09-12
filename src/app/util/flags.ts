@@ -25,10 +25,15 @@ const defaultFlags: Flags = {
 
 function getFlag<T>(
   hashFlags: URLSearchParams,
+  queryFlags: URLSearchParams,
   flag: string,
   typeCast: (input: string) => T | undefined
 ) {
-  const storage = localStorage.getItem(`f_${flag}`) || hashFlags.get(flag);
+  const storage =
+    localStorage.getItem(`f_${flag}`) ||
+    hashFlags.get(flag) ||
+    queryFlags.get(flag);
+
   const value = storage === null ? undefined : typeCast(storage);
 
   return value;
@@ -36,28 +41,35 @@ function getFlag<T>(
 
 export function getFlags(): Flags {
   const hashFlags = new URLSearchParams(location.hash.slice(1));
+  const queryFlags = new URLSearchParams(location.search);
 
   const readFlags: { [P in keyof Flags]: Flags[P] | undefined } = {
-    apiBaseUrl: getFlag(hashFlags, 'apiBaseUrl', String),
-    autoReloadInterval: getFlag(hashFlags, 'autoReloadInterval', (input) =>
+    apiBaseUrl: getFlag(hashFlags, queryFlags, 'apiBaseUrl', String),
+    autoReloadInterval: getFlag(
+      hashFlags,
+      queryFlags,
+      'autoReloadInterval',
+      (input) => Number.parseInt(input, 10)
+    ),
+    debug: getFlag(hashFlags, queryFlags, 'debug', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+    diagnostics: getFlag(hashFlags, queryFlags, 'diagnostics', (input) =>
+      Boolean(Number.parseInt(input, 10))
+    ),
+    enableNotifications: getFlag(
+      hashFlags,
+      queryFlags,
+      'enableNotifications',
+      (input) => Boolean(Number.parseInt(input, 10))
+    ),
+    pageOverride: getFlag(hashFlags, queryFlags, 'pageOverride', (input) =>
       Number.parseInt(input, 10)
     ),
-    debug: getFlag(hashFlags, 'debug', (input) =>
+    serviceWorker: getFlag(hashFlags, queryFlags, 'serviceWorker', (input) =>
       Boolean(Number.parseInt(input, 10))
     ),
-    diagnostics: getFlag(hashFlags, 'diagnostics', (input) =>
-      Boolean(Number.parseInt(input, 10))
-    ),
-    enableNotifications: getFlag(hashFlags, 'enableNotifications', (input) =>
-      Boolean(Number.parseInt(input, 10))
-    ),
-    pageOverride: getFlag(hashFlags, 'pageOverride', (input) =>
-      Number.parseInt(input, 10)
-    ),
-    serviceWorker: getFlag(hashFlags, 'serviceWorker', (input) =>
-      Boolean(Number.parseInt(input, 10))
-    ),
-    theme: getFlag(hashFlags, 'theme', (input) => {
+    theme: getFlag(hashFlags, queryFlags, 'theme', (input) => {
       if (themes.includes(input as Theme)) return input as Theme;
       return undefined;
     }),
