@@ -1,12 +1,12 @@
 import { colors, shadow, strings } from '../style.js';
 import { Diagnostics } from './diagnostics.js';
 import { FunctionComponent } from 'preact';
-import { Icon } from './icon.js';
 import { Layout } from './layout.js';
 import { Menu } from './menu.js';
 import { Notification } from './notification.js';
 import { StatusBar } from './status-bar.js';
 import { Titlebar } from './titlebar.js';
+import { refreshServiceWorker } from '../util/workers.js';
 import { styled } from 'goober';
 import { useEffect } from 'preact/hooks';
 import { useFlags } from '../hooks/flags.js';
@@ -88,6 +88,14 @@ export const App: FunctionComponent = () => {
         ) : (
           <>
             <a href="#diagnostics=1">Diagnostics</a>
+            <button
+              onClick={() => {
+                refreshServiceWorker();
+                location.reload();
+              }}
+            >
+              Refresh
+            </button>
             <div onClick={flipMenuVisible}>
               <_Surface1>1</_Surface1>
               <_Surface2>2</_Surface2>
@@ -95,10 +103,6 @@ export const App: FunctionComponent = () => {
               <_Surface4>4</_Surface4>
               <_Text1>Text 1</_Text1>
               <_Text2>Text 2</_Text2>
-              <Icon id="wait" />
-              <Icon id="menu" />
-              <Icon id="map" />
-              <Icon id="back" />
               <section>main</section>
               <section>main</section>
               <section>main</section>

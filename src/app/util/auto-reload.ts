@@ -9,7 +9,7 @@ type SetupMessage = { initialId: string | null; interval: number };
 
 let timeout: ReturnType<typeof setTimeout> | null = null;
 
-export const CHECK_INTERVAL = 10000;
+export const CHECK_INTERVAL = 2000;
 const ID_STORAGE_KEY = 'autoReloadId';
 
 export function autoReload(
