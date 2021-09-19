@@ -1,3 +1,4 @@
+import { FunctionComponent, createContext } from 'preact';
 import {
   StateUpdater,
   useContext,
@@ -5,10 +6,9 @@ import {
   useMemo,
   useState,
 } from 'preact/hooks';
-import { Flags } from '../util/flags.js';
-import { createContext } from 'preact';
 import { strings } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
+import { useFlags } from './flags.js';
 
 export const themes = ['light', 'dark', 'dim'] as const;
 
@@ -19,12 +19,10 @@ type InitTheme = {
   theme: Theme;
 };
 
-export const ThemeContext = createContext<InitTheme>(
-  null as unknown as InitTheme
-);
+const ThemeContext = createContext<InitTheme>(null as unknown as InitTheme);
 
-export function useInitTheme(flags: Flags): InitTheme {
-  const { theme: flagPreferredTheme } = flags;
+export const ThemeProvider: FunctionComponent = ({ children }) => {
+  const { theme: flagPreferredTheme } = useFlags();
 
   const prefersDarkTheme = useBreakpoint(strings.prefersDarkTheme);
   const prefersLightTheme = useBreakpoint(strings.prefersLightTheme);
@@ -47,11 +45,17 @@ export function useInitTheme(flags: Flags): InitTheme {
     setTheme(preferredTheme);
   }, [preferredTheme]);
 
-  return {
-    setTheme,
-    theme,
-  };
-}
+  return (
+    <ThemeContext.Provider
+      value={{
+        setTheme,
+        theme,
+      }}
+    >
+      {children}
+    </ThemeContext.Provider>
+  );
+};
 
 export function useTheme(): InitTheme {
   return useContext(ThemeContext);

@@ -1,14 +1,39 @@
+import { Map, Menu } from './icons.js';
+import { colors, dimensions } from '../style.js';
 import { FunctionComponent } from 'preact';
-import { dimensions } from '../style.js';
 import { styled } from 'goober';
-import { useWebApi } from '../hooks/web-api.js';
 
-const _Titlebar = styled('section')<{ isConnected: boolean }>`
+const _Titlebar = styled('section')`
+  background-color: ${colors.surface1()};
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-areas: '. . .';
   height: ${dimensions.titlebarHeight};
 `;
 
-export const Titlebar: FunctionComponent = ({ children }) => {
-  const { streamOnline } = useWebApi();
+const _Icon = styled('div')`
+  height: ${dimensions.fontSize};
+  padding: ${dimensions.fontPadding};
+  position: relative;
+  width: ${dimensions.titlebarHeight};
+`;
 
-  return <_Titlebar isConnected={streamOnline}>{children}</_Titlebar>;
+const _Title = styled('div')`
+  font-weight: bold;
+  height: ${dimensions.fontSize};
+  padding: ${dimensions.fontPadding};
+`;
+
+export const Titlebar: FunctionComponent = ({ children }) => {
+  return (
+    <_Titlebar>
+      <_Icon>
+        <Menu />
+      </_Icon>
+      <_Title>{children}</_Title>
+      <_Icon>
+        <Map />
+      </_Icon>
+    </_Titlebar>
+  );
 };

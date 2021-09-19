@@ -1,23 +1,22 @@
 import {
-  FallbackNotificationContext,
-  useInitFallbackNotification,
-} from './hooks/notification.js';
-import { FlagsContext, useInitFlags } from './hooks/flags.js';
-import { FunctionComponent, h, render as preactRender } from 'preact';
-import { MenuVisibleContext, useInitMenuVisible } from './hooks/menu.js';
-import {
-  SelectedPageContext,
-  useInitSelectedPage,
-} from './hooks/selected-page.js';
-import { ThemeContext, useInitTheme } from './hooks/theme.js';
-import { WebApiContext, useInitWebApi } from './hooks/web-api.js';
+  FunctionComponent,
+  PreactDOMAttributes,
+  h,
+  render as preactRender,
+} from 'preact';
 import { App } from './components/app.js';
 import { Flags } from './util/flags.js';
+import { MenuVisibleProvider } from './hooks/menu.js';
 import { Notifications } from './util/notifications.js';
+import { SelectedPageProvider } from './hooks/selected-page.js';
+import { ThemeProvider } from './hooks/theme.js';
 import { WebApi } from './web-api.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
 import { prefix } from 'goober/prefixer';
 import { setup } from 'goober';
+import { useInitFallbackNotification } from './hooks/notification.js';
+import { useInitFlags } from './hooks/flags.js';
+import { useInitWebApi } from './hooks/web-api.js';
 
 const GlobalStyles = createGlobalStyle`
   * {
@@ -47,33 +46,47 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
+const combineComponents = (
+  ...components: FunctionComponent[]
+): FunctionComponent => {
+  return components.reduce(
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    (AccumulatedComponents, CurrentComponent) => {
+      return ({ children }: PreactDOMAttributes): JSX.Element => {
+        return (
+          <AccumulatedComponents>
+            <CurrentComponent>{children}</CurrentComponent>
+          </AccumulatedComponents>
+        );
+      };
+    },
+    ({ children }) => <>{children}</>
+  );
+};
+
 export const Root: FunctionComponent<{
   flags: Flags;
   notifications: Notifications;
   webApi: WebApi;
 }> = ({ flags, notifications, webApi }) => {
-  const initFlags = useInitFlags(flags);
-  const initTheme = useInitTheme(initFlags);
+  const NonInteractiveState = combineComponents(
+    useInitFlags(flags),
+    ThemeProvider
+  );
+
+  const InteractiveState = combineComponents(
+    useInitWebApi(webApi),
+    useInitFallbackNotification(notifications),
+    SelectedPageProvider,
+    MenuVisibleProvider,
+    App
+  );
 
   return (
-    <FlagsContext.Provider value={initFlags}>
-      <ThemeContext.Provider value={initTheme}>
-        <GlobalStyles />
-        <WebApiContext.Provider value={useInitWebApi(webApi)}>
-          <FallbackNotificationContext.Provider
-            value={useInitFallbackNotification(notifications)}
-          >
-            <SelectedPageContext.Provider
-              value={useInitSelectedPage(initFlags)}
-            >
-              <MenuVisibleContext.Provider value={useInitMenuVisible()}>
-                <App />
-              </MenuVisibleContext.Provider>
-            </SelectedPageContext.Provider>
-          </FallbackNotificationContext.Provider>
-        </WebApiContext.Provider>
-      </ThemeContext.Provider>
-    </FlagsContext.Provider>
+    <NonInteractiveState>
+      <GlobalStyles />
+      <InteractiveState />
+    </NonInteractiveState>
   );
 };
 

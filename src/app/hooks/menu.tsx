@@ -1,5 +1,5 @@
+import { FunctionComponent, createContext } from 'preact';
 import { StateUpdater, useContext, useEffect, useState } from 'preact/hooks';
-import { createContext } from 'preact';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useMediaQuery } from '../style/main.js';
@@ -11,11 +11,11 @@ export type TMenuVisibleContext = {
   setMenuVisible: StateUpdater<MenuVisible>;
 };
 
-export const MenuVisibleContext = createContext<TMenuVisibleContext>(
+const MenuVisibleContext = createContext<TMenuVisibleContext>(
   null as unknown as TMenuVisibleContext
 );
 
-export function useInitMenuVisible(): TMenuVisibleContext {
+export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
   const [isMenuVisible, _setMenuVisible] = useState<MenuVisible>(
@@ -26,14 +26,20 @@ export function useInitMenuVisible(): TMenuVisibleContext {
     _setMenuVisible(isDesktop ? null : false);
   }, [isDesktop]);
 
-  return {
-    isMenuVisible,
-    setMenuVisible: (...args) => {
-      if (isDesktop) return;
-      _setMenuVisible(...args);
-    },
-  };
-}
+  return (
+    <MenuVisibleContext.Provider
+      value={{
+        isMenuVisible,
+        setMenuVisible: (...args) => {
+          if (isDesktop) return;
+          _setMenuVisible(...args);
+        },
+      }}
+    >
+      {children}
+    </MenuVisibleContext.Provider>
+  );
+};
 
 export function useIsMenuVisible(): MenuVisible {
   return useContext(MenuVisibleContext).isMenuVisible;

@@ -1,4 +1,4 @@
-import { colors, shadow, strings } from '../style.js';
+import { colors, dimensions, shadow, strings } from '../style.js';
 import { Diagnostics } from './diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Layout } from './layout.js';
@@ -13,11 +13,12 @@ import { useFlags } from '../hooks/flags.js';
 import { useFlipMenuVisible } from '../hooks/menu.js';
 
 const _App = styled('app')`
-  color-scheme: ${strings.colorScheme};
   background-color: ${colors.surface1()};
+  color-scheme: ${strings.colorScheme};
   color: ${colors.text1()};
   display: flow-root;
   font-family: ${strings.font};
+  font-size: ${dimensions.fontSize};
 `;
 
 const _Surface = styled('div')`

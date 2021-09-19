@@ -3,6 +3,7 @@ import { styled } from 'goober';
 
 const _Back = styled('svg')`
   fill: currentColor;
+  max-height: 100%;
 `;
 
 export const Back: FunctionComponent = () => (
@@ -13,6 +14,7 @@ export const Back: FunctionComponent = () => (
 
 const _Map = styled('svg')`
   fill: currentColor;
+  max-height: 100%;
 `;
 
 export const Map: FunctionComponent = () => (
@@ -23,6 +25,7 @@ export const Map: FunctionComponent = () => (
 
 const _Menu = styled('svg')`
   fill: currentColor;
+  max-height: 100%;
 `;
 
 export const Menu: FunctionComponent = () => (
@@ -32,8 +35,9 @@ export const Menu: FunctionComponent = () => (
 );
 
 const _Wait = styled('svg')`
-  stroke: currentColor;
   animation: 2s linear infinite wait-outer-animation;
+  max-height: 100%;
+  stroke: currentColor;
 
   @keyframes wait-outer-animation {
     0% {

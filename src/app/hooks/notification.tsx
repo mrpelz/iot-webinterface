@@ -2,23 +2,24 @@ import {
   FallbackNotificationOptions,
   Notifications,
 } from '../util/notifications.js';
+import { FunctionComponent, createContext } from 'preact';
 import { StateUpdater, useContext, useState } from 'preact/hooks';
-import { createContext } from 'preact';
 
 export type TFallbackNotificationContext = {
   fallbackNotification: FallbackNotificationOptions;
   setFallbackNotification: StateUpdater<FallbackNotificationOptions>;
 };
 
-export const FallbackNotificationContext =
-  createContext<TFallbackNotificationContext>({
+const FallbackNotificationContext = createContext<TFallbackNotificationContext>(
+  {
     fallbackNotification: null,
     setFallbackNotification: () => undefined,
-  });
+  }
+);
 
 export function useInitFallbackNotification(
   notifications: Notifications
-): TFallbackNotificationContext {
+): FunctionComponent {
   const [fallbackNotification, setFallbackNotification] =
     useState<FallbackNotificationOptions>(null);
 
@@ -26,10 +27,16 @@ export function useInitFallbackNotification(
     setFallbackNotification(options)
   );
 
-  return {
-    fallbackNotification,
-    setFallbackNotification,
-  };
+  return ({ children }) => (
+    <FallbackNotificationContext.Provider
+      value={{
+        fallbackNotification,
+        setFallbackNotification,
+      }}
+    >
+      {children}
+    </FallbackNotificationContext.Provider>
+  );
 }
 
 export function useNotification(): FallbackNotificationOptions {

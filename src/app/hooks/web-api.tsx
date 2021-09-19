@@ -1,6 +1,6 @@
+import { FunctionComponent, createContext } from 'preact';
 import { HierarchyElement, WebApi } from '../web-api.js';
 import { useContext, useEffect, useState } from 'preact/hooks';
-import { createContext } from 'preact';
 
 type SetterFunction<T> = (value: T) => void;
 
@@ -13,7 +13,14 @@ type TWebApiContext = {
 
 const HIERARCHY_STORAGE_KEY = 'webApiHierarchy';
 
-export function useInitWebApi(webApi: WebApi): TWebApiContext {
+const WebApiContext = createContext<TWebApiContext>({
+  hierarchy: null,
+  streamOnline: false,
+  useGetterIndex: () => null,
+  useSetterIndex: () => () => undefined,
+});
+
+export function useInitWebApi(webApi: WebApi): FunctionComponent {
   const initialHierarchy = (() => {
     try {
       const payload = localStorage.getItem(HIERARCHY_STORAGE_KEY);
@@ -46,7 +53,8 @@ export function useInitWebApi(webApi: WebApi): TWebApiContext {
     });
   }, [webApi]);
 
-  const useGetterIndex = <T>(index?: number) => {
+  // eslint-disable-next-line comma-spacing
+  const useGetterIndex = <T,>(index?: number) => {
     const [state, setState] = useState<T | null>(null);
 
     useEffect(() => {
@@ -61,7 +69,8 @@ export function useInitWebApi(webApi: WebApi): TWebApiContext {
     return state;
   };
 
-  const useSetterIndex = <T>(index?: number) => {
+  // eslint-disable-next-line comma-spacing
+  const useSetterIndex = <T,>(index?: number) => {
     const [setterFn, setSetterFn] = useState<SetterFunction<T>>(() => () => {
       // eslint-disable-next-line no-console
       console.warn(
@@ -83,20 +92,19 @@ export function useInitWebApi(webApi: WebApi): TWebApiContext {
     return setterFn;
   };
 
-  return {
-    hierarchy,
-    streamOnline,
-    useGetterIndex,
-    useSetterIndex,
-  };
+  return ({ children }) => (
+    <WebApiContext.Provider
+      value={{
+        hierarchy,
+        streamOnline,
+        useGetterIndex,
+        useSetterIndex,
+      }}
+    >
+      {children}
+    </WebApiContext.Provider>
+  );
 }
-
-export const WebApiContext = createContext<TWebApiContext>({
-  hierarchy: null,
-  streamOnline: false,
-  useGetterIndex: () => null,
-  useSetterIndex: () => () => undefined,
-});
 
 export function useWebApi(): TWebApiContext {
   return useContext(WebApiContext);

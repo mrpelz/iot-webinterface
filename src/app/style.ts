@@ -26,6 +26,9 @@ export const strings = {
 
 const staticDimensions = {
   breakpoint: dimension(1024),
+  fontSize: dimension(17),
+  fontSizeLarge: dimension(21),
+  fontSizeSmall: dimension(14),
   menuHeight: dimension(44),
   menuWidth: dimension(200),
   titlebarHeight: dimension(44),
@@ -51,6 +54,7 @@ const dynamicDimensions = {
         strings.viewportWidth
       );
   },
+  fontPadding: `calc((${staticDimensions.titlebarHeight} - ${staticDimensions.fontSize}) / 2)`,
   get hairline() {
     return () =>
       useBreakpointValue(strings.isRetina, dimension(0.5), dimension(1));
