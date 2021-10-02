@@ -2,10 +2,10 @@
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 // eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
-/// <reference path="utils/worker-scaffold.ts" />
+/// <reference path="util/worker-scaffold.ts" />
 
 (async () => {
-  importScripts('./utils/worker-scaffold.js');
+  importScripts('./util/worker-scaffold.js');
 
   const ID_URL = '/id.txt';
 

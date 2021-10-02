@@ -138,6 +138,7 @@ const STREAM_OFFLINE = '4A999429-B64A-4426-9818-E68039EF022D';
 
 export class WebApi {
   private _hierarchyCallback?: HierarchyCallback;
+  private _isStreamOnline = false;
   private readonly _port: MessagePort | null;
   private _streamOnlineCallback?: StreamOnlineCallback;
 
@@ -157,11 +158,23 @@ export class WebApi {
 
       this._port.onmessage = ({ data }) => {
         if (data === STREAM_ONLINE) {
+          if (debug) {
+            // eslint-disable-next-line no-console
+            console.info('stream online');
+          }
+
+          this._isStreamOnline = true;
           this._streamOnlineCallback?.(true);
           return;
         }
 
         if (data === STREAM_OFFLINE) {
+          if (debug) {
+            // eslint-disable-next-line no-console
+            console.info('stream offline');
+          }
+
+          this._isStreamOnline = false;
           this._streamOnlineCallback?.(false);
           return;
         }
@@ -235,6 +248,10 @@ export class WebApi {
 
   onStreamOnline(callback: StreamOnlineCallback): void {
     this._streamOnlineCallback = callback;
+
+    if (this._isStreamOnline) {
+      this._streamOnlineCallback?.(true);
+    }
   }
 }
 

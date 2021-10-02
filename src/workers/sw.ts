@@ -1,12 +1,12 @@
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 // eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
-/// <reference path="utils/main.ts" />
+/// <reference path="util/main.ts" />
 
 const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 
 ((scope) => {
-  importScripts('./utils/main.js');
+  importScripts('./util/main.js');
 
   /* eslint-disable no-console */
   const wsConsole = {
@@ -173,6 +173,10 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     await cache.addAll(await response.json());
 
     await scope.caches.delete(SW_CACHE);
+
+    for (const client of await scope.clients.matchAll({ type: 'window' })) {
+      client.postMessage(null);
+    }
   };
 
   scope.onfetch = (fetchEvent) => {
@@ -220,7 +224,6 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     activateEvent.waitUntil(
       (async () => {
         try {
-          await refreshCache();
           await scope.clients.claim();
         } catch (error) {
           wsConsole.error(`onactivate error: ${error}`);

@@ -1,11 +1,10 @@
-import { colors, strings } from '../style.js';
 import { FunctionComponent } from 'preact';
 import { dependentValue } from '../style/main.js';
+import { strings } from '../style.js';
 import { styled } from 'goober';
 import { useWebApi } from '../hooks/web-api.js';
 
 const _StatusBar = styled('section')<{ isConnected: boolean }>`
-  --background-color: ${colors.surface1()};
   height: ${strings.safeAreaInsetTop};
 
   background-color: ${dependentValue(
@@ -25,7 +24,7 @@ const _StatusBar = styled('section')<{ isConnected: boolean }>`
     }
 
     to {
-      background-color: var(--background-color);
+      background-color: transparent;
     }
   }
 `;

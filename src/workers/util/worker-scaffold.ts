@@ -24,7 +24,8 @@ const workerConsole = {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const scaffold = <T>(
-  scope: DedicatedWorkerGlobalScope | SharedWorkerGlobalScope
+  scope: DedicatedWorkerGlobalScope | SharedWorkerGlobalScope,
+  handleNewPort?: () => void
 ) => {
   const voidSetup = Symbol('voidSetup');
 
@@ -132,6 +133,8 @@ const scaffold = <T>(
           workerConsole.debug(
             `added message port, number of connected ports: ${messagePorts.size}`
           );
+
+          handleNewPort?.();
 
           return;
         }

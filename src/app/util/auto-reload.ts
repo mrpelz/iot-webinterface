@@ -7,8 +7,6 @@ import { Notifications } from './notifications.js';
 
 type SetupMessage = { initialId: string | null; interval: number };
 
-let timeout: ReturnType<typeof setTimeout> | null = null;
-
 export const CHECK_INTERVAL = 2000;
 const ID_STORAGE_KEY = 'autoReloadId';
 
@@ -31,14 +29,17 @@ export function autoReload(
 
   if (!port) return;
 
-  const reload = () => {
-    if (timeout) {
-      clearTimeout(timeout);
-      timeout = null;
-    }
-
-    notifications.clear();
-    location.reload();
+  const notification = () => {
+    notifications.trigger(
+      'New App version installed',
+      {
+        body: 'Click to reload',
+        requireInteraction: true,
+        tag: 'versionUpdate',
+      },
+      () => location.reload(),
+      () => notifications.clear()
+    );
   };
 
   port.onmessage = async ({ data: storedId }) => {
@@ -58,17 +59,11 @@ export function autoReload(
 
     refreshServiceWorker();
 
-    notifications.trigger(
-      'New App version installed',
-      {
-        body: 'Click to reload',
-        requireInteraction: true,
-        tag: 'versionUpdate',
-      },
-      reload,
-      () => notifications.clear()
-    );
-
-    timeout = setTimeout(reload, interval);
+    if (!('serviceWorker' in navigator)) return;
+    notification();
   };
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', () => notification());
+  }
 }

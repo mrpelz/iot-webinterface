@@ -1,39 +1,87 @@
-import { Map, Menu } from './icons.js';
-import { colors, dimensions } from '../style.js';
-import { FunctionComponent } from 'preact';
+import { FunctionComponent, JSX, createContext } from 'preact';
+import { useContext, useEffect, useRef, useState } from 'preact/hooks';
+import { add } from '../style/dimensions.js';
+import { dimensions } from '../style.js';
+import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 
-const _Titlebar = styled('section')`
-  background-color: ${colors.surface1()};
-  display: grid;
-  grid-auto-flow: row;
-  grid-template-areas: '. . .';
-  height: ${dimensions.titlebarHeight};
-`;
+const ProgrammaticPaddingContext = createContext(
+  null as unknown as (padding: number) => void
+);
 
-const _Icon = styled('div')`
-  height: ${dimensions.fontSize};
+const _Titlebar = styled('section')<{ padding: number }>`
+  display: flex;
+  font-weight: bold;
+  height: ${dimensions.titlebarHeight};
+  justify-content: center;
   padding: ${dimensions.fontPadding};
   position: relative;
-  width: ${dimensions.titlebarHeight};
+  word-break: break-all;
+
+  padding-inline: ${({ padding }) =>
+    add(dimensions.fontPadding, `${padding}px`)};
 `;
 
-const _Title = styled('div')`
-  font-weight: bold;
-  height: ${dimensions.fontSize};
-  padding: ${dimensions.fontPadding};
+const _IconContainer = styled('div', forwardRef)<{ right?: true }>`
+  display: flex;
+  position: absolute;
+  top: 0;
+
+  ${({ right }) => (right ? 'right' : 'left')}: 0;
+
+  & > * {
+    height: ${dimensions.titlebarHeight};
+    padding: ${dimensions.fontPadding};
+  }
 `;
 
-export const Titlebar: FunctionComponent = ({ children }) => {
+export const IconContainer: FunctionComponent<{ right?: true }> = ({
+  children,
+  right,
+}) => {
+  const setPadding = useContext(ProgrammaticPaddingContext);
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    setPadding(ref.current.clientWidth);
+  }, [ref, setPadding]);
+
   return (
-    <_Titlebar>
-      <_Icon>
-        <Menu />
-      </_Icon>
-      <_Title>{children}</_Title>
-      <_Icon>
-        <Map />
-      </_Icon>
+    <_IconContainer ref={ref} right={right}>
+      {children}
+    </_IconContainer>
+  );
+};
+
+export const Titlebar: FunctionComponent<{
+  iconsLeft?: JSX.Element[];
+  iconsRight?: JSX.Element[];
+}> = ({ children, iconsLeft, iconsRight }) => {
+  const [padding, setPadding] = useState(0);
+
+  useEffect(() => {
+    setPadding(0);
+  }, [iconsLeft, iconsRight]);
+
+  return (
+    <_Titlebar padding={padding}>
+      {children}
+      <ProgrammaticPaddingContext.Provider
+        value={(number) =>
+          setPadding((previous) => {
+            if (previous > number) return previous;
+            return number;
+          })
+        }
+      >
+        {iconsLeft?.length ? <IconContainer>{iconsLeft}</IconContainer> : null}
+        {iconsRight?.length ? (
+          <IconContainer right>{iconsRight}</IconContainer>
+        ) : null}
+      </ProgrammaticPaddingContext.Provider>
     </_Titlebar>
   );
 };

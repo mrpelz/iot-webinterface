@@ -1,3 +1,4 @@
+import { MapIcon, MenuIcon } from './icons.js';
 import { colors, dimensions, shadow, strings } from '../style.js';
 import { Diagnostics } from './diagnostics.js';
 import { FunctionComponent } from 'preact';
@@ -8,9 +9,11 @@ import { StatusBar } from './status-bar.js';
 import { Titlebar } from './titlebar.js';
 import { refreshServiceWorker } from '../util/workers.js';
 import { styled } from 'goober';
+import { useBreakpoint } from '../style/breakpoint.js';
 import { useEffect } from 'preact/hooks';
 import { useFlags } from '../hooks/flags.js';
 import { useFlipMenuVisible } from '../hooks/menu.js';
+import { useMediaQuery } from '../style/main.js';
 
 const _App = styled('app')`
   background-color: ${colors.surface1()};
@@ -58,6 +61,8 @@ const _Text2 = styled(_Text)`
 
 export const App: FunctionComponent = () => {
   const { diagnostics } = useFlags();
+  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
+
   const backgroundColor = colors.surface1()();
   const flipMenuVisible = useFlipMenuVisible();
 
@@ -78,7 +83,14 @@ export const App: FunctionComponent = () => {
         header={
           <>
             <StatusBar />
-            <Titlebar>titlebar</Titlebar>
+            <Titlebar
+              iconsLeft={
+                isDesktop ? [] : [<MenuIcon onClick={flipMenuVisible} />]
+              }
+              iconsRight={[<MapIcon />]}
+            >
+              titlebar
+            </Titlebar>
             <Notification />
           </>
         }
@@ -91,106 +103,104 @@ export const App: FunctionComponent = () => {
             <a href="#diagnostics=1">Diagnostics</a>
             <button
               onClick={() => {
-                refreshServiceWorker();
+                if (refreshServiceWorker()) return;
                 location.reload();
               }}
             >
               Refresh
             </button>
-            <div onClick={flipMenuVisible}>
-              <_Surface1>1</_Surface1>
-              <_Surface2>2</_Surface2>
-              <_Surface3>3</_Surface3>
-              <_Surface4>4</_Surface4>
-              <_Text1>Text 1</_Text1>
-              <_Text2>Text 2</_Text2>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-              <section>main</section>
-            </div>
+            <_Surface1>1</_Surface1>
+            <_Surface2>2</_Surface2>
+            <_Surface3>3</_Surface3>
+            <_Surface4>4</_Surface4>
+            <_Text1>Text 1</_Text1>
+            <_Text2>Text 2</_Text2>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
+            <section>main</section>
           </>
         )}
       </Layout>

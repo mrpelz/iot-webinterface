@@ -2,10 +2,10 @@
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 // eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
-/// <reference path="utils/worker-scaffold.ts" />
+/// <reference path="util/worker-scaffold.ts" />
 
 (async () => {
-  importScripts('./utils/worker-scaffold.js');
+  importScripts('./util/worker-scaffold.js');
 
   type SetupMessage = {
     apiBaseUrl: string;
@@ -231,13 +231,19 @@
     };
   };
 
+  let handleNewPort: () => void = () => undefined;
+
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;
 
     const { apiBaseUrl, interval } = setup;
 
     const handleStreamOnline = (online: boolean) => {
-      port.postMessage(online ? STREAM_ONLINE : STREAM_OFFLINE);
+      handleNewPort = () => {
+        port.postMessage(online ? STREAM_ONLINE : STREAM_OFFLINE);
+      };
+
+      handleNewPort();
     };
 
     const { sendMessage, setId } = setupStream(
@@ -272,5 +278,5 @@
 
       setId(id);
     });
-  })(...(await scaffold<SetupMessage>(self)));
+  })(...(await scaffold<SetupMessage>(self, () => handleNewPort())));
 })();

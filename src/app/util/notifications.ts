@@ -81,6 +81,8 @@ export class Notifications {
     onClick?: VoidHandler,
     onDismiss?: VoidHandler
   ): Promise<void> {
+    this.clear();
+
     if (!this._isCapableOfNativeNotifications) {
       this._fallbackNotificationCallback?.({
         body: options?.body,
@@ -104,7 +106,6 @@ export class Notifications {
       });
     }
 
-    this.clear();
     this._nativeNotification = new Notification(title, options);
 
     if (onClick) this._nativeNotification.onclick = () => onClick();

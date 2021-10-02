@@ -78,14 +78,15 @@ export const Root: FunctionComponent<{
     useInitWebApi(webApi),
     useInitFallbackNotification(notifications),
     SelectedPageProvider,
-    MenuVisibleProvider,
-    App
+    MenuVisibleProvider
   );
 
   return (
     <NonInteractiveState>
       <GlobalStyles />
-      <InteractiveState />
+      <InteractiveState>
+        <App />
+      </InteractiveState>
     </NonInteractiveState>
   );
 };

@@ -1,12 +1,13 @@
 import { FunctionComponent, JSX } from 'preact';
 import { MenuVisible, useIsMenuVisible } from '../hooks/menu.js';
+import { colors, dimensions } from '../style.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
 import { breakpointValue } from '../style/breakpoint.js';
-import { dimensions } from '../style.js';
 import { styled } from 'goober';
 import { useNotification } from '../hooks/notification.js';
 
 const _Header = styled('header')`
+  background-color: ${colors.surface1()};
   left: 0;
   position: fixed;
   top: 0;
