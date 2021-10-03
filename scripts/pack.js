@@ -4,6 +4,7 @@ import { join, relative } from 'path';
 import { readdir, stat, writeFile } from 'fs/promises';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import { tmpdir } from 'os';
 
 const DIST_DIR = './dist';
 const STATIC_DIR = './static';
@@ -113,7 +114,16 @@ async function nginx() {
   }
 
   const fn = () => {
-    const childProcess = execFile(bin, ['-p', process.cwd(), '-c', config]);
+    const childProcess = execFile(bin, [
+      '-p',
+      process.cwd(),
+      '-c',
+      config,
+      '-e',
+      '/dev/null',
+      '-g',
+      `pid ${join(tmpdir(), 'nginx.pid')};`,
+    ]);
 
     childProcess.stdout.pipe(process.stdout);
     childProcess.stderr.pipe(process.stdout);
