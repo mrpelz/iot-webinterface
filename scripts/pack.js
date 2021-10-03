@@ -1,4 +1,4 @@
-#!/usr/bin/env node --use_strict --experimental-modules --experimental-import-meta-resolve
+#!/usr/bin/env -S node --use_strict --experimental-modules --experimental-import-meta-resolve
 
 import { join, relative } from 'path';
 import { readdir, stat, writeFile } from 'fs/promises';

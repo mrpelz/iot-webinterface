@@ -1,4 +1,4 @@
-import { I18nLanguages, i18nLanguages } from '../i18n/main.js';
+import { I18nLanguages, reconcileLanguage } from '../i18n/main.js';
 import { Theme, themes } from '../hooks/theme.js';
 import { CHECK_INTERVAL } from './auto-reload.js';
 import { getLanguage } from './locale.js';
@@ -13,14 +13,6 @@ export type Flags = {
   pageOverride: number | null;
   serviceWorker: boolean;
   theme: Theme | null;
-};
-
-const reconcileLanguage = (input: string) => {
-  if (i18nLanguages.includes(input)) {
-    return input as unknown as I18nLanguages;
-  }
-
-  return null;
 };
 
 const defaultFlags: Flags = {
