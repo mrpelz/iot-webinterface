@@ -7,6 +7,7 @@ import { Menu } from './menu.js';
 import { Notification } from './notification.js';
 import { StatusBar } from './status-bar.js';
 import { Titlebar } from './titlebar.js';
+import { en } from '../i18n/en.js';
 import { refreshServiceWorker } from '../util/workers.js';
 import { styled } from 'goober';
 import { useBreakpoint } from '../style/breakpoint.js';
@@ -89,7 +90,7 @@ export const App: FunctionComponent = () => {
               }
               iconsRight={[<MapIcon />]}
             >
-              titlebar
+              {en.titlebar}
             </Titlebar>
             <Notification />
           </>
@@ -100,7 +101,7 @@ export const App: FunctionComponent = () => {
           <Diagnostics />
         ) : (
           <>
-            <a href="#diagnostics=1">Diagnostics</a>
+            <a href="#diagnostics=1">{en.diagnostics}</a>
             <button
               onClick={() => {
                 if (refreshServiceWorker()) return;

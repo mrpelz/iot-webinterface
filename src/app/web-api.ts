@@ -247,10 +247,12 @@ export class WebApi {
   }
 
   onStreamOnline(callback: StreamOnlineCallback): void {
+    const hasCallbackSet = Boolean(this._streamOnlineCallback);
+
     this._streamOnlineCallback = callback;
 
-    if (this._isStreamOnline) {
-      this._streamOnlineCallback?.(true);
+    if (!hasCallbackSet) {
+      this._streamOnlineCallback?.(this._isStreamOnline);
     }
   }
 }

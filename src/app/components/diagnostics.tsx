@@ -1,9 +1,14 @@
+import { colors, dimensions } from '../style.js';
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from './hierarchy.js';
-import { colors } from '../style.js';
+import { getLocale } from '../util/locale.js';
 import { styled } from 'goober';
+import { translations } from '../i18n/main.js';
+import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlags } from '../hooks/flags.js';
 import { useIsMenuVisible } from '../hooks/menu.js';
+import { useMediaQuery } from '../style/main.js';
+import { useMemo } from 'preact/hooks';
 import { useSelectedPage } from '../hooks/selected-page.js';
 import { useWebApi } from '../hooks/web-api.js';
 
@@ -44,9 +49,16 @@ export const Diagnostics: FunctionComponent = () => {
   const { hierarchy, streamOnline } = useWebApi();
 
   const flags = useFlags();
+  const { language: flagsLanguage } = flags;
 
   const menuVisible = useIsMenuVisible();
   const selectedPage = useSelectedPage();
+
+  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
+
+  const { country, language, locale } = useMemo(() => getLocale(), []);
+
+  const i18n = flagsLanguage ? translations[flagsLanguage] : null;
 
   return (
     <DiagnosticsContainer>
@@ -70,6 +82,48 @@ export const Diagnostics: FunctionComponent = () => {
             <b>Selected page</b>
           </td>
           <td>{JSON.stringify(selectedPage)}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>isDesktop</b>
+          </td>
+          <td>{JSON.stringify(isDesktop)}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>i18n</b>
+          </td>
+          <td>
+            <table>
+              <tr>
+                <td>country</td>
+                <td>{JSON.stringify(country)}</td>
+              </tr>
+              <tr>
+                <td>language</td>
+                <td>{JSON.stringify(language)}</td>
+              </tr>
+              <tr>
+                <td>locale</td>
+                <td>{JSON.stringify(locale)}</td>
+              </tr>
+            </table>
+
+            {flagsLanguage ? (
+              <table>
+                <tr>
+                  <td>{flagsLanguage}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <pre>{JSON.stringify(i18n, undefined, 2)}</pre>
+                  </td>
+                </tr>
+              </table>
+            ) : null}
+          </td>
         </tr>
 
         <tr>

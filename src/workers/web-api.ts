@@ -231,7 +231,7 @@
     };
   };
 
-  let handleNewPort: () => void = () => undefined;
+  let handleNewPort: () => void | undefined;
 
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;
@@ -278,5 +278,5 @@
 
       setId(id);
     });
-  })(...(await scaffold<SetupMessage>(self, () => handleNewPort())));
+  })(...(await scaffold<SetupMessage>(self, () => handleNewPort?.())));
 })();

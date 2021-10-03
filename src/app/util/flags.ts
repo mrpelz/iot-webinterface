@@ -1,5 +1,7 @@
+import { I18nLanguages, i18nLanguages } from '../i18n/main.js';
 import { Theme, themes } from '../hooks/theme.js';
 import { CHECK_INTERVAL } from './auto-reload.js';
+import { getLanguage } from './locale.js';
 
 export type Flags = {
   apiBaseUrl: string;
@@ -7,9 +9,18 @@ export type Flags = {
   debug: boolean;
   diagnostics: boolean;
   enableNotifications: boolean;
+  language: I18nLanguages | null;
   pageOverride: number | null;
   serviceWorker: boolean;
   theme: Theme | null;
+};
+
+const reconcileLanguage = (input: string) => {
+  if (i18nLanguages.includes(input)) {
+    return input as unknown as I18nLanguages;
+  }
+
+  return null;
 };
 
 const defaultFlags: Flags = {
@@ -18,6 +29,7 @@ const defaultFlags: Flags = {
   debug: false,
   diagnostics: false,
   enableNotifications: true,
+  language: reconcileLanguage(getLanguage()),
   pageOverride: null,
   serviceWorker: true,
   theme: null,
@@ -44,7 +56,9 @@ export function getFlags(): Flags {
   const queryFlags = new URLSearchParams(location.search);
 
   const readFlags: { [P in keyof Flags]: Flags[P] | undefined } = {
-    apiBaseUrl: getFlag(hashFlags, queryFlags, 'apiBaseUrl', String),
+    apiBaseUrl: getFlag(hashFlags, queryFlags, 'apiBaseUrl', (input) =>
+      input.trim()
+    ),
     autoReloadInterval: getFlag(
       hashFlags,
       queryFlags,
@@ -62,6 +76,9 @@ export function getFlags(): Flags {
       queryFlags,
       'enableNotifications',
       (input) => Boolean(Number.parseInt(input, 10))
+    ),
+    language: getFlag(hashFlags, queryFlags, 'language', (input) =>
+      reconcileLanguage(input.trim())
     ),
     pageOverride: getFlag(hashFlags, queryFlags, 'pageOverride', (input) =>
       Number.parseInt(input, 10)
