@@ -1,9 +1,9 @@
 import { colors, dimensions } from '../style.js';
+import { useI18n, useI18nLanguage } from '../hooks/i18n.js';
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from './hierarchy.js';
 import { getLocale } from '../util/locale.js';
 import { styled } from 'goober';
-import { translations } from '../i18n/main.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlags } from '../hooks/flags.js';
 import { useIsMenuVisible } from '../hooks/menu.js';
@@ -49,16 +49,14 @@ export const Diagnostics: FunctionComponent = () => {
   const { hierarchy, streamOnline } = useWebApi();
 
   const flags = useFlags();
-  const { language: flagsLanguage } = flags;
-
   const menuVisible = useIsMenuVisible();
   const selectedPage = useSelectedPage();
+  const i18n = useI18n();
+  const i18nLanguage = useI18nLanguage();
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
   const { country, language, locale } = useMemo(() => getLocale(), []);
-
-  const i18n = flagsLanguage ? translations[flagsLanguage] : null;
 
   return (
     <DiagnosticsContainer>
@@ -111,10 +109,10 @@ export const Diagnostics: FunctionComponent = () => {
               </tr>
             </table>
 
-            {flagsLanguage ? (
+            {i18nLanguage ? (
               <table>
                 <tr>
-                  <td>{flagsLanguage}</td>
+                  <td>{i18n}</td>
                 </tr>
                 <tr>
                   <td>

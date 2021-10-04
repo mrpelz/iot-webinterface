@@ -1,7 +1,6 @@
-import { I18nLanguages, reconcileLanguage } from '../i18n/main.js';
+import { I18nLanguage, reconcileLanguage } from '../i18n/main.js';
 import { Theme, themes } from '../hooks/theme.js';
 import { CHECK_INTERVAL } from './auto-reload.js';
-import { getLanguage } from './locale.js';
 
 export type Flags = {
   apiBaseUrl: string;
@@ -9,7 +8,7 @@ export type Flags = {
   debug: boolean;
   diagnostics: boolean;
   enableNotifications: boolean;
-  language: I18nLanguages | null;
+  language: I18nLanguage | null;
   pageOverride: number | null;
   serviceWorker: boolean;
   theme: Theme | null;
@@ -21,7 +20,7 @@ const defaultFlags: Flags = {
   debug: false,
   diagnostics: false,
   enableNotifications: true,
-  language: reconcileLanguage(getLanguage()),
+  language: null,
   pageOverride: null,
   serviceWorker: true,
   theme: null,

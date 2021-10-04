@@ -1,28 +1,23 @@
 import { en } from './en.js';
 
-const defaultTranslation = en;
+const i18nLanguageDefault = 'en' as const;
+const i18nLanguages = [i18nLanguageDefault] as const;
 
-const additionalTranslations = {};
+export type I18nLanguage = typeof i18nLanguages[number];
 
 export const translations = {
   en,
-  ...additionalTranslations,
 };
 
-export const i18nLanguages = Object.keys(
-  translations
-) as unknown as keyof typeof translations;
+export type I18nKey = keyof typeof translations[I18nLanguage];
+export type I18nTranslation = Record<I18nKey, string>;
 
-export type I18nLanguages = typeof i18nLanguages;
+export function reconcileLanguage(input: string): I18nLanguage {
+  const test = input as unknown as I18nLanguage;
 
-export type I18nKeys = keyof typeof defaultTranslation;
-
-export type I18nTranslations = Record<I18nKeys, string>;
-
-export function reconcileLanguage(input: string): I18nLanguages | null {
-  if (i18nLanguages.includes(input)) {
-    return input as unknown as I18nLanguages;
+  if (!i18nLanguages.includes(test)) {
+    return i18nLanguageDefault;
   }
 
-  return null;
+  return test;
 }

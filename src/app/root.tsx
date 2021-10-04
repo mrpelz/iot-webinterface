@@ -6,6 +6,7 @@ import {
 } from 'preact';
 import { App } from './components/app.js';
 import { Flags } from './util/flags.js';
+import { I18nProvider } from './hooks/i18n.js';
 import { MenuVisibleProvider } from './hooks/menu.js';
 import { Notifications } from './util/notifications.js';
 import { SelectedPageProvider } from './hooks/selected-page.js';
@@ -71,7 +72,8 @@ export const Root: FunctionComponent<{
 }> = ({ flags, notifications, webApi }) => {
   const NonInteractiveState = combineComponents(
     useInitFlags(flags),
-    ThemeProvider
+    ThemeProvider,
+    I18nProvider
   );
 
   const InteractiveState = combineComponents(
