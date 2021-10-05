@@ -11,8 +11,6 @@ type TWebApiContext = {
   useSetterIndex: <T>(index?: number) => SetterFunction<T>;
 };
 
-const HIERARCHY_STORAGE_KEY = 'webApiHierarchy';
-
 const WebApiContext = createContext<TWebApiContext>({
   hierarchy: null,
   streamOnline: false,
@@ -21,22 +19,8 @@ const WebApiContext = createContext<TWebApiContext>({
 });
 
 export function useInitWebApi(webApi: WebApi): FunctionComponent {
-  const initialHierarchy = (() => {
-    try {
-      const payload = localStorage.getItem(HIERARCHY_STORAGE_KEY);
-      if (!payload) return null;
-
-      const parsed = JSON.parse(payload);
-      if (typeof parsed !== 'object') return null;
-
-      return parsed as HierarchyElement;
-    } catch {
-      return null;
-    }
-  })();
-
   const [hierarchy, setHierarchy] = useState<HierarchyElement>(
-    initialHierarchy as unknown as HierarchyElement
+    null as unknown as HierarchyElement
   );
 
   const [streamOnline, setStreamOnline] = useState(false);
@@ -44,8 +28,6 @@ export function useInitWebApi(webApi: WebApi): FunctionComponent {
   useEffect(() => {
     webApi.onHierarchy((value) => {
       setHierarchy(value);
-
-      localStorage.setItem(HIERARCHY_STORAGE_KEY, JSON.stringify(value));
     });
 
     webApi.onStreamOnline((value) => {

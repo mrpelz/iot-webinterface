@@ -1,4 +1,3 @@
-import { I18nLanguage, reconcileLanguage } from '../i18n/main.js';
 import { Theme, themes } from '../hooks/theme.js';
 import { CHECK_INTERVAL } from './auto-reload.js';
 
@@ -8,7 +7,7 @@ export type Flags = {
   debug: boolean;
   diagnostics: boolean;
   enableNotifications: boolean;
-  language: I18nLanguage | null;
+  language: string | null;
   pageOverride: number | null;
   serviceWorker: boolean;
   theme: Theme | null;
@@ -69,7 +68,7 @@ export function getFlags(): Flags {
       (input) => Boolean(Number.parseInt(input, 10))
     ),
     language: getFlag(hashFlags, queryFlags, 'language', (input) =>
-      reconcileLanguage(input.trim())
+      input.trim()
     ),
     pageOverride: getFlag(hashFlags, queryFlags, 'pageOverride', (input) =>
       Number.parseInt(input, 10)

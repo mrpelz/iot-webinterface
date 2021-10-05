@@ -137,8 +137,9 @@ const STREAM_ONLINE = 'B41F5C2A-3F67-449F-BF91-37A3153FFFE9';
 const STREAM_OFFLINE = '4A999429-B64A-4426-9818-E68039EF022D';
 
 export class WebApi {
+  private _hierarchy?: HierarchyElement;
   private _hierarchyCallback?: HierarchyCallback;
-  private _isStreamOnline = false;
+  private _isStreamOnline?: boolean;
   private readonly _port: MessagePort | null;
   private _streamOnlineCallback?: StreamOnlineCallback;
 
@@ -184,6 +185,7 @@ export class WebApi {
           console.info('web-api hierarchy:', data);
         }
 
+        this._hierarchy = data;
         this._hierarchyCallback?.(data);
       };
     })();
@@ -243,7 +245,14 @@ export class WebApi {
   }
 
   onHierarchy(callback: HierarchyCallback): void {
+    const hasCallbackSet = Boolean(this._hierarchyCallback);
+
     this._hierarchyCallback = callback;
+
+    if (!hasCallbackSet && this._hierarchy) {
+      this._hierarchyCallback?.(this._hierarchy);
+      this._hierarchy = undefined;
+    }
   }
 
   onStreamOnline(callback: StreamOnlineCallback): void {
@@ -251,8 +260,9 @@ export class WebApi {
 
     this._streamOnlineCallback = callback;
 
-    if (!hasCallbackSet) {
+    if (!hasCallbackSet && this._isStreamOnline !== undefined) {
       this._streamOnlineCallback?.(this._isStreamOnline);
+      this._isStreamOnline = undefined;
     }
   }
 }

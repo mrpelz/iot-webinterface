@@ -25,16 +25,13 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   /* eslint-enable no-console */
 
   const ERROR_OUT_STATUS_TEXT = '25C2A7B7-8004-4180-A3D5-0C6FA51FFECA';
-
   const INDEX_ENDPOINT = '/index.json';
-
-  const PRE_CACHE = 'preCache';
-  const SW_CACHE = 'swCache';
+  const CACHE_KEY = 'cache';
 
   const errorMessage = 'service worker synthesized response';
 
   const unhandledRequestUrls: RegExp[] = [
-    new RegExp('^\\/api'),
+    new RegExp('^\\/api(?!\\/hierarchy|\\/id)'),
     new RegExp('^\\/id.txt'),
   ];
   const denyRequestUrls: RegExp[] = [new RegExp('^\\/favicon')];
@@ -44,7 +41,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   ];
 
   const testUrl = (url: string, list: RegExp[]) => {
-    const { pathname: urlPath } = new URL(url, origin);
+    const { pathname: urlPath } = new URL(url, scope.origin);
     return Boolean(
       list.find((listEntry) => {
         return listEntry.test(urlPath);
@@ -120,7 +117,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
       if (response.statusText === ERROR_OUT_STATUS_TEXT) return response;
 
       const cloned = response.clone();
-      const cache = await scope.caches.open(SW_CACHE);
+      const cache = await scope.caches.open(CACHE_KEY);
       await cache.put(cloned.url, cloned);
 
       return response;
@@ -157,22 +154,17 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   const refreshCache = async () => {
     wsConsole.debug('refreshCache');
 
-    for (const key of await scope.caches.keys()) {
-      // eslint-disable-next-line no-await-in-loop
-      await scope.caches.delete(key);
-    }
+    await scope.caches.delete(CACHE_KEY);
 
-    const response = await fetch(new URL(INDEX_ENDPOINT, origin).href);
+    const response = await fetch(new URL(INDEX_ENDPOINT, scope.origin).href);
     if (!response.ok || response.redirected) {
       return;
     }
 
-    const cache = await scope.caches.open(PRE_CACHE);
+    const cache = await scope.caches.open(CACHE_KEY);
 
     await cache.add('/');
     await cache.addAll(await response.json());
-
-    await scope.caches.delete(SW_CACHE);
 
     for (const client of await scope.clients.matchAll({ type: 'window' })) {
       client.postMessage(null);
@@ -215,7 +207,15 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   scope.oninstall = (installEvent) => {
     wsConsole.debug('oninstall');
 
-    installEvent.waitUntil(scope.skipWaiting());
+    installEvent.waitUntil(
+      (async () => {
+        try {
+          await scope.skipWaiting();
+        } catch (error) {
+          wsConsole.error(`oninstall error: ${error}`);
+        }
+      })()
+    );
   };
 
   scope.onactivate = (activateEvent) => {

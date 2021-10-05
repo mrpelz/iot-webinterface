@@ -22,7 +22,7 @@ export const I18nProvider: FunctionComponent = ({ children }) => {
   const { language: languageOverride } = useFlags();
 
   const language = useMemo(
-    () => languageOverride || reconcileLanguage(getLanguage()),
+    () => reconcileLanguage(languageOverride || getLanguage()),
     [languageOverride]
   );
 

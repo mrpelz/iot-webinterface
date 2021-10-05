@@ -231,19 +231,29 @@
     };
   };
 
+  let _handleStreamOnline: () => void | undefined;
+  let _handleHierachy: () => void | undefined;
+
   let handleNewPort: () => void | undefined;
 
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;
 
+    handleNewPort = () => {
+      _handleHierachy();
+      _handleStreamOnline();
+    };
+
     const { apiBaseUrl, interval } = setup;
 
     const handleStreamOnline = (online: boolean) => {
-      handleNewPort = () => {
+      port.postMessage(online ? STREAM_ONLINE : STREAM_OFFLINE);
+
+      _handleStreamOnline = () => {
         port.postMessage(online ? STREAM_ONLINE : STREAM_OFFLINE);
       };
 
-      handleNewPort();
+      _handleStreamOnline();
     };
 
     const { sendMessage, setId } = setupStream(
@@ -274,7 +284,12 @@
 
     await getId(apiBaseUrl, interval, async (id) => {
       const hierarchy = await getHierarchy(apiBaseUrl, id);
-      port.postMessage(hierarchy);
+
+      _handleHierachy = () => {
+        port.postMessage(hierarchy);
+      };
+
+      _handleHierachy();
 
       setId(id);
     });

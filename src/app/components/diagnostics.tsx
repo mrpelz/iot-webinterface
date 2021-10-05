@@ -112,7 +112,7 @@ export const Diagnostics: FunctionComponent = () => {
             {i18nLanguage ? (
               <table>
                 <tr>
-                  <td>{i18n}</td>
+                  <td>{i18nLanguage}</td>
                 </tr>
                 <tr>
                   <td>
