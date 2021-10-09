@@ -231,29 +231,20 @@
     };
   };
 
-  let _handleStreamOnline: () => void | undefined;
-  let _handleHierachy: () => void | undefined;
-
-  let handleNewPort: () => void | undefined;
+  let _handleStreamOnline: (port: MessagePort) => void;
+  let _handleHierachy: (port: MessagePort) => void;
 
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;
 
-    handleNewPort = () => {
-      _handleHierachy();
-      _handleStreamOnline();
-    };
-
     const { apiBaseUrl, interval } = setup;
 
     const handleStreamOnline = (online: boolean) => {
-      port.postMessage(online ? STREAM_ONLINE : STREAM_OFFLINE);
-
-      _handleStreamOnline = () => {
-        port.postMessage(online ? STREAM_ONLINE : STREAM_OFFLINE);
+      _handleStreamOnline = (childPort) => {
+        childPort.postMessage(online ? STREAM_ONLINE : STREAM_OFFLINE);
       };
 
-      _handleStreamOnline();
+      _handleStreamOnline(port);
     };
 
     const { sendMessage, setId } = setupStream(
@@ -285,13 +276,18 @@
     await getId(apiBaseUrl, interval, async (id) => {
       const hierarchy = await getHierarchy(apiBaseUrl, id);
 
-      _handleHierachy = () => {
-        port.postMessage(hierarchy);
+      _handleHierachy = (childPort) => {
+        childPort.postMessage(hierarchy);
       };
 
-      _handleHierachy();
+      _handleHierachy(port);
 
       setId(id);
     });
-  })(...(await scaffold<SetupMessage>(self, () => handleNewPort?.())));
+  })(
+    ...(await scaffold<SetupMessage>(self, (port) => {
+      _handleHierachy(port);
+      _handleStreamOnline(port);
+    }))
+  );
 })();

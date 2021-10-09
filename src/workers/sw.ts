@@ -155,6 +155,10 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     wsConsole.debug('refreshCache');
 
     await scope.caches.delete(CACHE_KEY);
+    await scope.caches.delete(CACHE_KEY);
+    await scope.caches.delete(CACHE_KEY);
+    await scope.caches.delete(CACHE_KEY);
+    await scope.caches.delete(CACHE_KEY);
 
     const response = await fetch(new URL(INDEX_ENDPOINT, scope.origin).href);
     if (!response.ok || response.redirected) {

@@ -13,6 +13,7 @@ import { useGetter, useSetter } from '../hooks/web-api.js';
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
+import { useI18n } from '../hooks/i18n.js';
 
 const GetterValue = styled('span')`
   word-break: break-all;
@@ -69,10 +70,17 @@ const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
 const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
 }) => {
-  const { get } = element;
+  const { get, meta } = element;
+  const isLastSeen = meta.level === Levels.PROPERTY && meta.name === 'lastSeen';
+
+  const { country } = useI18n();
 
   const rawState = useGetter<unknown>(element);
-  const state = useMemo(() => JSON.stringify(rawState), [rawState]);
+  const state = useMemo(() => {
+    return isLastSeen && country && rawState
+      ? new Date(rawState as number).toLocaleString(country)
+      : JSON.stringify(rawState);
+  }, [isLastSeen, country, rawState]);
 
   if (get === undefined) return null;
 
@@ -172,10 +180,8 @@ const Child: FunctionComponent<{ element: HierarchyElement; name: string }> = ({
 
   return (
     <tr>
-      <td>
+      <td colSpan={999}>
         <b>Child:</b> {name}
-      </td>
-      <td>
         {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
         <Hierarchy element={element} />
       </td>

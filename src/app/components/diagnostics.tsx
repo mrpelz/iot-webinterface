@@ -1,14 +1,12 @@
 import { colors, dimensions } from '../style.js';
-import { useI18n, useI18nLanguage } from '../hooks/i18n.js';
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from './hierarchy.js';
-import { getLocale } from '../util/locale.js';
 import { styled } from 'goober';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlags } from '../hooks/flags.js';
+import { useI18n } from '../hooks/i18n.js';
 import { useIsMenuVisible } from '../hooks/menu.js';
 import { useMediaQuery } from '../style/main.js';
-import { useMemo } from 'preact/hooks';
 import { useSelectedPage } from '../hooks/selected-page.js';
 import { useWebApi } from '../hooks/web-api.js';
 
@@ -17,8 +15,10 @@ const DiagnosticsContainer = styled('section')`
   color: ${colors.black()};
   display: flex;
   flex-direction: column;
-  overflow-x: scroll;
-  padding: 1rem;
+  font-size: 0.75rem;
+  height: ${dimensions.appHeight};
+  overflow: scroll;
+  padding: 0.5rem;
   z-index: 10;
 
   table,
@@ -29,7 +29,7 @@ const DiagnosticsContainer = styled('section')`
   }
 
   table {
-    margin: 0.5rem;
+    margin: 0.25rem;
   }
 
   tr:hover {
@@ -37,7 +37,7 @@ const DiagnosticsContainer = styled('section')`
   }
 
   td {
-    padding: 0.5rem;
+    padding: 0.25rem;
   }
 
   thead {
@@ -51,12 +51,10 @@ export const Diagnostics: FunctionComponent = () => {
   const flags = useFlags();
   const menuVisible = useIsMenuVisible();
   const selectedPage = useSelectedPage();
-  const i18n = useI18n();
-  const i18nLanguage = useI18nLanguage();
+  const { country, language, locale, translation, translationLanguage } =
+    useI18n();
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
-
-  const { country, language, locale } = useMemo(() => getLocale(), []);
 
   return (
     <DiagnosticsContainer>
@@ -109,18 +107,16 @@ export const Diagnostics: FunctionComponent = () => {
               </tr>
             </table>
 
-            {i18nLanguage ? (
-              <table>
-                <tr>
-                  <td>{i18nLanguage}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <pre>{JSON.stringify(i18n, undefined, 2)}</pre>
-                  </td>
-                </tr>
-              </table>
-            ) : null}
+            <table>
+              <tr>
+                <td>{translationLanguage}</td>
+              </tr>
+              <tr>
+                <td>
+                  <pre>{JSON.stringify(translation, undefined, 2)}</pre>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
 

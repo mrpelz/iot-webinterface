@@ -1,9 +1,4 @@
-import {
-  FunctionComponent,
-  PreactDOMAttributes,
-  h,
-  render as preactRender,
-} from 'preact';
+import { FunctionComponent, h, render as preactRender } from 'preact';
 import { App } from './components/app.js';
 import { Flags } from './util/flags.js';
 import { I18nProvider } from './hooks/i18n.js';
@@ -12,6 +7,7 @@ import { Notifications } from './util/notifications.js';
 import { SelectedPageProvider } from './hooks/selected-page.js';
 import { ThemeProvider } from './hooks/theme.js';
 import { WebApi } from './web-api.js';
+import { combineComponents } from './util/combine-components.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
 import { prefix } from 'goober/prefixer';
 import { setup } from 'goober';
@@ -47,36 +43,18 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-const combineComponents = (
-  ...components: FunctionComponent[]
-): FunctionComponent => {
-  return components.reduce(
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    (AccumulatedComponents, CurrentComponent) => {
-      return ({ children }: PreactDOMAttributes): JSX.Element => {
-        return (
-          <AccumulatedComponents>
-            <CurrentComponent>{children}</CurrentComponent>
-          </AccumulatedComponents>
-        );
-      };
-    },
-    ({ children }) => <>{children}</>
-  );
-};
-
 export const Root: FunctionComponent<{
   flags: Flags;
   notifications: Notifications;
   webApi: WebApi;
 }> = ({ flags, notifications, webApi }) => {
-  const NonInteractiveState = combineComponents(
+  const OuterState = combineComponents(
     useInitFlags(flags),
     ThemeProvider,
     I18nProvider
   );
 
-  const InteractiveState = combineComponents(
+  const InnerState = combineComponents(
     useInitWebApi(webApi),
     useInitFallbackNotification(notifications),
     SelectedPageProvider,
@@ -84,12 +62,12 @@ export const Root: FunctionComponent<{
   );
 
   return (
-    <NonInteractiveState>
+    <OuterState>
       <GlobalStyles />
-      <InteractiveState>
+      <InnerState>
         <App />
-      </InteractiveState>
-    </NonInteractiveState>
+      </InnerState>
+    </OuterState>
   );
 };
 
