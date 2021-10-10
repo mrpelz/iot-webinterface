@@ -231,8 +231,8 @@
     };
   };
 
-  let _handleStreamOnline: (port: MessagePort) => void;
-  let _handleHierachy: (port: MessagePort) => void;
+  let _handleStreamOnline: ((port: MessagePort) => void) | undefined;
+  let _handleHierachy: ((port: MessagePort) => void) | undefined;
 
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;
@@ -286,8 +286,8 @@
     });
   })(
     ...(await scaffold<SetupMessage>(self, (port) => {
-      _handleHierachy(port);
-      _handleStreamOnline(port);
+      _handleHierachy?.(port);
+      _handleStreamOnline?.(port);
     }))
   );
 })();

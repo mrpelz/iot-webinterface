@@ -37,7 +37,10 @@ export function autoReload(
         requireInteraction: true,
         tag: 'versionUpdate',
       },
-      () => location.reload(),
+      () => {
+        notifications.clear();
+        location.reload();
+      },
       () => notifications.clear()
     );
   };
@@ -59,11 +62,10 @@ export function autoReload(
 
     refreshServiceWorker();
 
-    if (!('serviceWorker' in navigator)) return;
+    if ('serviceWorker' in navigator) return;
     notification();
   };
 
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.addEventListener('message', () => notification());
-  }
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.addEventListener('message', () => notification());
 }

@@ -125,12 +125,33 @@ export type Meta =
   | MetaPropertySensor
   | MetaPropertyActuator;
 
-export type HierarchyElement = {
-  children?: Record<string, HierarchyElement>;
+export type HierarchyElement<T extends Meta = Meta> = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  children?: Record<string, HierarchyElement | {}>;
   get?: number;
-  meta: Meta;
+  meta: T;
   set?: number;
 };
+
+export type HierarchyElementSystem = HierarchyElement<MetaSystem>;
+
+export type HierarchyElementHome = HierarchyElement<MetaHome>;
+
+export type HierarchyElementBuilding = HierarchyElement<MetaBuilding>;
+
+export type HierarchyElementFloor = HierarchyElement<MetaFloor>;
+
+export type HierarchyElementRoom = HierarchyElement<MetaRoom>;
+
+export type HierarchyElementArea = HierarchyElement<MetaArea>;
+
+export type HierarchyElementDevice = HierarchyElement<MetaDevice>;
+
+export type HierarchyElementPropertySensor =
+  HierarchyElement<MetaPropertySensor>;
+
+export type HierarchyElementPropertyActuator =
+  HierarchyElement<MetaPropertyActuator>;
 
 const CLOSE_CHILD = '880E1EE9-15A2-462D-BCBC-E09630A1CFBB';
 const STREAM_ONLINE = 'B41F5C2A-3F67-449F-BF91-37A3153FFFE9';
@@ -377,4 +398,34 @@ export function parentRelationToString(input: ParentRelation): string | null {
     default:
       return null;
   }
+}
+
+export function flatten<T extends HierarchyElement>(
+  input: HierarchyElement
+): T[] {
+  const result = new Set<HierarchyElement>();
+
+  const getChildren = (element: HierarchyElement) => {
+    result.add(element);
+
+    const { children } = element;
+    if (!children) return;
+
+    for (const child of Object.values(children)) {
+      if (!('meta' in child)) return;
+
+      getChildren(child);
+    }
+  };
+
+  getChildren(input);
+
+  return Array.from(result) as unknown as T[];
+}
+
+export function getElementsFromLevel<T extends HierarchyElement>(
+  input: HierarchyElement[],
+  level: T['meta']['level']
+): T[] {
+  return input.filter((element): element is T => element.meta.level === level);
 }

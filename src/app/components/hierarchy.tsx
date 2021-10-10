@@ -4,6 +4,7 @@ import {
   ParentRelation,
   ValueType,
   isMetaPropertyActuator,
+  isMetaPropertySensor,
   levelToString,
   parentRelationToString,
   typeToValueType,
@@ -71,7 +72,7 @@ const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
 }) => {
   const { get, meta } = element;
-  const isLastSeen = meta.level === Levels.PROPERTY && meta.name === 'lastSeen';
+  const isLastSeen = isMetaPropertySensor(meta) && meta.name === 'lastSeen';
 
   const { country } = useI18n();
 
@@ -202,9 +203,11 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
       <Getter element={element} />
       <Setter element={element} />
       {hierarchyChildren
-        ? Object.entries(hierarchyChildren).map(([name, child]) => (
-            <Child name={name} element={child} />
-          ))
+        ? Object.entries(hierarchyChildren).map(([name, child]) => {
+            return 'meta' in child ? (
+              <Child name={name} element={child} />
+            ) : null;
+          })
         : null}
     </table>
   );

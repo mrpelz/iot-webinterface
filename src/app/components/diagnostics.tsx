@@ -7,7 +7,6 @@ import { useFlags } from '../hooks/flags.js';
 import { useI18n } from '../hooks/i18n.js';
 import { useIsMenuVisible } from '../hooks/menu.js';
 import { useMediaQuery } from '../style/main.js';
-import { useSelectedPage } from '../hooks/selected-page.js';
 import { useWebApi } from '../hooks/web-api.js';
 
 const DiagnosticsContainer = styled('section')`
@@ -50,11 +49,10 @@ export const Diagnostics: FunctionComponent = () => {
 
   const flags = useFlags();
   const menuVisible = useIsMenuVisible();
-  const selectedPage = useSelectedPage();
+  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
+
   const { country, language, locale, translation, translationLanguage } =
     useI18n();
-
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
   return (
     <DiagnosticsContainer>
@@ -71,13 +69,6 @@ export const Diagnostics: FunctionComponent = () => {
             <b>Menu visible</b>
           </td>
           <td>{JSON.stringify(menuVisible)}</td>
-        </tr>
-
-        <tr>
-          <td>
-            <b>Selected page</b>
-          </td>
-          <td>{JSON.stringify(selectedPage)}</td>
         </tr>
 
         <tr>

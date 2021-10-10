@@ -50,7 +50,7 @@ export function useSetMenuVisible(): StateUpdater<MenuVisible> {
 }
 
 export function useFlipMenuVisible(): () => void {
-  const { setMenuVisible } = useContext(MenuVisibleContext);
+  const setMenuVisible = useSetMenuVisible();
 
   return () => {
     setMenuVisible((value) => !value);

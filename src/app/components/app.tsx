@@ -89,9 +89,7 @@ export const App: FunctionComponent = () => {
                 isDesktop ? [] : [<MenuIcon onClick={flipMenuVisible} />]
               }
               iconsRight={[<MapIcon />]}
-            >
-              {en.titlebar}
-            </Titlebar>
+            />
             <Notification />
           </>
         }

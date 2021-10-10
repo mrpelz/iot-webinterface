@@ -3,8 +3,8 @@ import { App } from './components/app.js';
 import { Flags } from './util/flags.js';
 import { I18nProvider } from './hooks/i18n.js';
 import { MenuVisibleProvider } from './hooks/menu.js';
+import { NavigationProvider } from './hooks/navigation.js';
 import { Notifications } from './util/notifications.js';
-import { SelectedPageProvider } from './hooks/selected-page.js';
 import { ThemeProvider } from './hooks/theme.js';
 import { WebApi } from './web-api.js';
 import { combineComponents } from './util/combine-components.js';
@@ -48,16 +48,13 @@ export const Root: FunctionComponent<{
   notifications: Notifications;
   webApi: WebApi;
 }> = ({ flags, notifications, webApi }) => {
-  const OuterState = combineComponents(
-    useInitFlags(flags),
-    ThemeProvider,
-    I18nProvider
-  );
+  const OuterState = combineComponents(useInitFlags(flags), ThemeProvider);
 
   const InnerState = combineComponents(
     useInitWebApi(webApi),
     useInitFallbackNotification(notifications),
-    SelectedPageProvider,
+    I18nProvider,
+    NavigationProvider,
     MenuVisibleProvider
   );
 

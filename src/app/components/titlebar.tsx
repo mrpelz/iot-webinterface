@@ -1,7 +1,9 @@
 import { FunctionComponent, JSX, createContext } from 'preact';
+import { colors, dimensions } from '../style.js';
 import { useContext, useEffect, useRef, useState } from 'preact/hooks';
+import { useRoom, useStaticPage } from '../hooks/navigation.js';
+import { Translation } from '../hooks/i18n.js';
 import { add } from '../style/dimensions.js';
-import { dimensions } from '../style.js';
 import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 
@@ -10,6 +12,7 @@ const ProgrammaticPaddingContext = createContext(
 );
 
 const _Titlebar = styled('section')<{ padding: number }>`
+  border-block-end: ${dimensions.hairline} solid ${colors.text2()};
   display: flex;
   font-weight: bold;
   height: ${dimensions.titlebarHeight};
@@ -59,16 +62,19 @@ export const IconContainer: FunctionComponent<{ right?: true }> = ({
 export const Titlebar: FunctionComponent<{
   iconsLeft?: JSX.Element[];
   iconsRight?: JSX.Element[];
-}> = ({ children, iconsLeft, iconsRight }) => {
+}> = ({ iconsLeft, iconsRight }) => {
   const [padding, setPadding] = useState(0);
 
   useEffect(() => {
     setPadding(0);
   }, [iconsLeft, iconsRight]);
 
+  const { state: selectedRoom } = useRoom();
+  const { state: selectedStaticPage } = useStaticPage();
+
   return (
     <_Titlebar padding={padding}>
-      {children}
+      <Translation i18nKey={selectedStaticPage || selectedRoom?.meta.name} />
       <ProgrammaticPaddingContext.Provider
         value={(number) =>
           setPadding((previous) => {

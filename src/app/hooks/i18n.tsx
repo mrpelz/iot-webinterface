@@ -45,3 +45,25 @@ export const I18nProvider: FunctionComponent = ({ children }) => {
 export function useI18n(): TI18nContext {
   return useContext(I18nContext);
 }
+
+export function useI18nKey(key?: string): string {
+  const { translation } = useI18n();
+
+  return useMemo(() => {
+    if (!key) return '<[empty]>';
+
+    if (key in translation) {
+      return translation[key as unknown as keyof I18nTranslation];
+    }
+
+    return `<${key}>`;
+  }, [key, translation]);
+}
+
+export const Translation: FunctionComponent<{ i18nKey?: string }> = ({
+  i18nKey,
+}) => {
+  const translation = useI18nKey(i18nKey);
+
+  return <>{translation}</>;
+};
