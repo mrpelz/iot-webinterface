@@ -17,9 +17,8 @@ import { useFlipMenuVisible } from '../hooks/menu.js';
 import { useMediaQuery } from '../style/main.js';
 
 const _App = styled('app')`
-  background-color: ${colors.surface1()};
+  background-color: ${colors.backgroundPrimary()};
   color-scheme: ${strings.colorScheme};
-  color: ${colors.text1()};
   display: flow-root;
   font-family: ${strings.font};
   font-size: ${dimensions.fontSize};
@@ -28,15 +27,17 @@ const _App = styled('app')`
 const _Surface = styled('div')`
   align-items: center;
   border-radius: 20px;
-  color: ${colors.text1()};
+  box-shadow: ${shadow()};
+  color: ${colors.fontPrimary()};
   display: flex;
   font-size: 50px;
   height: 100px;
   justify-content: center;
   margin: 50px;
   width: 100px;
-
-  box-shadow: ${shadow()};
+`;
+const _Surface0 = styled(_Surface)`
+  background-color: ${colors.surface0()};
 `;
 const _Surface1 = styled(_Surface)`
   background-color: ${colors.surface1()};
@@ -64,7 +65,7 @@ export const App: FunctionComponent = () => {
   const { diagnostics } = useFlags();
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
-  const backgroundColor = colors.surface1()();
+  const backgroundColor = colors.backgroundSecondary()();
   const flipMenuVisible = useFlipMenuVisible();
 
   useEffect(() => {
@@ -108,6 +109,7 @@ export const App: FunctionComponent = () => {
             >
               Refresh
             </button>
+            <_Surface0>0</_Surface0>
             <_Surface1>1</_Surface1>
             <_Surface2>2</_Surface2>
             <_Surface3>3</_Surface3>

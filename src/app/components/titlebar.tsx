@@ -12,7 +12,7 @@ const ProgrammaticPaddingContext = createContext(
 );
 
 const _Titlebar = styled('section')<{ padding: number }>`
-  border-block-end: ${dimensions.hairline} solid ${colors.text2()};
+  border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
   display: flex;
   font-weight: bold;
   height: ${dimensions.titlebarHeight};
@@ -25,9 +25,17 @@ const _Titlebar = styled('section')<{ padding: number }>`
     add(dimensions.fontPadding, `${padding}px`)};
 `;
 
+const _Title = styled('h1')`
+  font-size: ${dimensions.fontSize};
+  line-height: ${dimensions.fontSize};
+  margin: 0;
+  color: ${colors.fontPrimary()};
+`;
+
 const _IconContainer = styled('div', forwardRef)<{ right?: true }>`
   display: flex;
   position: absolute;
+  color: ${colors.fontPrimary()};
   top: 0;
 
   ${({ right }) => (right ? 'right' : 'left')}: 0;
@@ -74,7 +82,9 @@ export const Titlebar: FunctionComponent<{
 
   return (
     <_Titlebar padding={padding}>
-      <Translation i18nKey={selectedStaticPage || selectedRoom?.meta.name} />
+      <_Title>
+        <Translation i18nKey={selectedStaticPage || selectedRoom?.meta.name} />
+      </_Title>
       <ProgrammaticPaddingContext.Provider
         value={(number) =>
           setPadding((previous) => {

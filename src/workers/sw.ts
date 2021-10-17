@@ -36,6 +36,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   ];
   const denyRequestUrls: RegExp[] = [new RegExp('^\\/favicon')];
   const networkPreferredUrls: RegExp[] = [
+    new RegExp('^\\/api\\/id'),
     new RegExp('^\\/index.json'),
     new RegExp('^\\/manifest.json'),
   ];

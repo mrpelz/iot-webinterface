@@ -7,7 +7,7 @@ import { styled } from 'goober';
 import { useNotification } from '../hooks/notification.js';
 
 const _Header = styled('header')`
-  background-color: ${colors.surface1()};
+  background-color: ${colors.backgroundSecondary()};
   left: 0;
   position: fixed;
   top: 0;
@@ -55,6 +55,7 @@ const _Main = styled('main')<{
   touch-action: ${dependentValue('isAsideVisible', 'none', 'auto')};
   transition: height 0.3s ease-out, margin-top 0.3s ease-out;
   width: ${dimensions.appWidth};
+  color: ${colors.fontPrimary()};
 
   margin-top: ${dependentValue(
     'shiftDown',

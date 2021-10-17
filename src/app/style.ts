@@ -165,6 +165,15 @@ const themedColors = {
       },
       themeOverride
     )(a),
+  surface0: (a?: number, themeOverride?: Theme) => () =>
+    useThemedValue(
+      {
+        dark: color(brand.hue, 10, 5),
+        dim: color(brand.hue, 10, 15),
+        light: color(brand.hue, 25, 70),
+      },
+      themeOverride
+    )(a),
   surface1: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
       {

@@ -35,7 +35,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   :root {
-    --safe-area-inset-top: 20px;
+    /* --safe-area-inset-top: 20px; */
   }
 
   body::-webkit-scrollbar {
