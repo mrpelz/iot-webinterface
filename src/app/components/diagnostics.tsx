@@ -20,6 +20,16 @@ const DiagnosticsContainer = styled('section')`
   padding: 0.5rem;
   z-index: 10;
 
+  &,
+  & * {
+    -moz-user-select: text;
+    -ms-user-select: text;
+    -webkit-tap-highlight-color: text;
+    -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
   table,
   td {
     border-collapse: collapse;

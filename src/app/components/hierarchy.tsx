@@ -16,7 +16,7 @@ import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
 import { useI18n } from '../hooks/i18n.js';
 
-const GetterValue = styled('span')`
+const GetterValue = styled('pre')`
   word-break: break-all;
 `;
 
@@ -80,7 +80,7 @@ const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
   const state = useMemo(() => {
     return isLastSeen && country && rawState
       ? new Date(rawState as number).toLocaleString(country)
-      : JSON.stringify(rawState);
+      : JSON.stringify(rawState, undefined, 2);
   }, [isLastSeen, country, rawState]);
 
   if (get === undefined) return null;
