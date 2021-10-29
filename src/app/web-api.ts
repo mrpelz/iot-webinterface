@@ -125,33 +125,36 @@ export type Meta =
   | MetaPropertySensor
   | MetaPropertyActuator;
 
-export type HierarchyElement<T extends Meta = Meta> = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  children?: Record<string, HierarchyElement | {}>;
+export type HierarchyChildren = Record<string, HierarchyElement>;
+
+export type HierarchyElement = {
+  children?: HierarchyChildren;
   get?: number;
-  meta: T;
+  meta?: Meta;
   set?: number;
 };
 
-export type HierarchyElementSystem = HierarchyElement<MetaSystem>;
+export type HierarchyElementWithMeta<T = Meta> = HierarchyElement & { meta: T };
 
-export type HierarchyElementHome = HierarchyElement<MetaHome>;
+export type HierarchyElementSystem = HierarchyElementWithMeta<MetaSystem>;
 
-export type HierarchyElementBuilding = HierarchyElement<MetaBuilding>;
+export type HierarchyElementHome = HierarchyElementWithMeta<MetaHome>;
 
-export type HierarchyElementFloor = HierarchyElement<MetaFloor>;
+export type HierarchyElementBuilding = HierarchyElementWithMeta<MetaBuilding>;
 
-export type HierarchyElementRoom = HierarchyElement<MetaRoom>;
+export type HierarchyElementFloor = HierarchyElementWithMeta<MetaFloor>;
 
-export type HierarchyElementArea = HierarchyElement<MetaArea>;
+export type HierarchyElementRoom = HierarchyElementWithMeta<MetaRoom>;
 
-export type HierarchyElementDevice = HierarchyElement<MetaDevice>;
+export type HierarchyElementArea = HierarchyElementWithMeta<MetaArea>;
+
+export type HierarchyElementDevice = HierarchyElementWithMeta<MetaDevice>;
 
 export type HierarchyElementPropertySensor =
-  HierarchyElement<MetaPropertySensor>;
+  HierarchyElementWithMeta<MetaPropertySensor>;
 
 export type HierarchyElementPropertyActuator =
-  HierarchyElement<MetaPropertyActuator>;
+  HierarchyElementWithMeta<MetaPropertyActuator>;
 
 const CLOSE_CHILD = '880E1EE9-15A2-462D-BCBC-E09630A1CFBB';
 const STREAM_ONLINE = 'B41F5C2A-3F67-449F-BF91-37A3153FFFE9';
@@ -288,44 +291,50 @@ export class WebApi {
   }
 }
 
-export function isMetaSystem(element: Meta): element is MetaSystem {
-  return element.level === Levels.SYSTEM;
+export function isElementWithMeta(
+  element: HierarchyElement
+): element is HierarchyElementWithMeta {
+  return Boolean(element?.meta);
 }
 
-export function isMetaHome(element: Meta): element is MetaHome {
-  return element.level === Levels.HOME;
+export function isMetaSystem(meta: Meta | undefined): meta is MetaSystem {
+  return meta?.level === Levels.SYSTEM;
 }
 
-export function isMetaBuilding(element: Meta): element is MetaBuilding {
-  return element.level === Levels.BUILDING;
+export function isMetaHome(meta: Meta | undefined): meta is MetaHome {
+  return meta?.level === Levels.HOME;
 }
 
-export function isMetaFloor(element: Meta): element is MetaFloor {
-  return element.level === Levels.FLOOR;
+export function isMetaBuilding(meta: Meta | undefined): meta is MetaBuilding {
+  return meta?.level === Levels.BUILDING;
 }
 
-export function isMetaRoom(element: Meta): element is MetaRoom {
-  return element.level === Levels.ROOM;
+export function isMetaFloor(meta: Meta | undefined): meta is MetaFloor {
+  return meta?.level === Levels.FLOOR;
 }
 
-export function isMetaArea(element: Meta): element is MetaArea {
-  return element.level === Levels.AREA;
+export function isMetaRoom(meta: Meta | undefined): meta is MetaRoom {
+  return meta?.level === Levels.ROOM;
 }
 
-export function isMetaDevice(element: Meta): element is MetaDevice {
-  return element.level === Levels.DEVICE;
+export function isMetaArea(meta: Meta | undefined): meta is MetaArea {
+  return meta?.level === Levels.AREA;
+}
+
+export function isMetaDevice(meta: Meta | undefined): meta is MetaDevice {
+  return meta?.level === Levels.DEVICE;
 }
 
 export function isMetaPropertySensor(
-  element: Meta
-): element is MetaPropertySensor {
-  return element.level === Levels.PROPERTY && element.type === 'sensor';
+  meta: Meta | undefined
+): meta is MetaPropertySensor {
+  return meta?.level === Levels.PROPERTY && meta.type === 'sensor';
 }
 
 export function isMetaPropertyActuator(
-  element: Meta
-): element is MetaPropertyActuator {
-  return element.level === Levels.PROPERTY && element.type === 'actuator';
+  meta: Meta | undefined
+): meta is MetaPropertyActuator {
+  return meta?.level === Levels.PROPERTY && meta.type === 'actuator';
 }
 
 export function levelToString(input: Levels): string | null {
@@ -423,9 +432,9 @@ export function flatten<T extends HierarchyElement>(
   return Array.from(result) as unknown as T[];
 }
 
-export function getElementsFromLevel<T extends HierarchyElement>(
+export function getElementsFromLevel<T extends HierarchyElementWithMeta>(
   input: HierarchyElement[],
   level: T['meta']['level']
 ): T[] {
-  return input.filter((element): element is T => element.meta.level === level);
+  return input.filter((element): element is T => element.meta?.level === level);
 }

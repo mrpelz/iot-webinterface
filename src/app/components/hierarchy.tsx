@@ -1,8 +1,10 @@
 import {
   HierarchyElement,
   Levels,
+  Meta,
   ParentRelation,
   ValueType,
+  isElementWithMeta,
   isMetaPropertyActuator,
   isMetaPropertySensor,
   levelToString,
@@ -23,6 +25,8 @@ const GetterValue = styled('pre')`
 const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
 }) => {
+  if (!isElementWithMeta(element)) return null;
+
   const { meta } = element;
 
   if (!Object.keys(meta).length) return null;
@@ -203,11 +207,9 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
       <Getter element={element} />
       <Setter element={element} />
       {hierarchyChildren
-        ? Object.entries(hierarchyChildren).map(([name, child]) => {
-            return 'meta' in child ? (
-              <Child name={name} element={child} />
-            ) : null;
-          })
+        ? Object.entries(hierarchyChildren).map(([name, child]) => (
+            <Child name={name} element={child} />
+          ))
         : null}
     </table>
   );

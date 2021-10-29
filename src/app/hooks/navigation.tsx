@@ -5,6 +5,7 @@ import {
   HierarchyElementFloor,
   HierarchyElementHome,
   HierarchyElementRoom,
+  HierarchyElementWithMeta,
   Levels,
   MetaRoom,
   flatten,
@@ -86,8 +87,8 @@ function useNavigationElements<
 }
 
 function useNavigationElementsSubdivided<
-  T extends HierarchyElement,
-  S extends HierarchyElement
+  T extends HierarchyElementWithMeta,
+  S extends HierarchyElementWithMeta
 >(
   allElements: HierarchyElement[] | null,
   level: T['meta']['level'],
