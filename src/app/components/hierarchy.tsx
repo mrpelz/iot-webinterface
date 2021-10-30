@@ -18,8 +18,12 @@ import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
 import { useI18n } from '../hooks/i18n.js';
 
-const GetterValue = styled('pre')`
+const _GetterValue = styled('pre')`
   word-break: break-all;
+`;
+
+const _Summary = styled('summary')`
+  cursor: pointer;
 `;
 
 const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
@@ -95,7 +99,7 @@ const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
         <b>Getter</b> <i>{get}</i>
       </td>
       <td>
-        <GetterValue>{state}</GetterValue>
+        <_GetterValue>{state}</_GetterValue>
       </td>
     </tr>
   );
@@ -174,10 +178,11 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
   );
 };
 
-const Child: FunctionComponent<{ element: HierarchyElement; name: string }> = ({
-  name,
-  element,
-}) => {
+const Child: FunctionComponent<{
+  element: HierarchyElement;
+  name: string;
+  open: boolean;
+}> = ({ name, element, open }) => {
   if (!element) return null;
 
   const { get, children, set } = element;
@@ -186,9 +191,14 @@ const Child: FunctionComponent<{ element: HierarchyElement; name: string }> = ({
   return (
     <tr>
       <td colSpan={999}>
-        <b>Child:</b> {name}
-        {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
-        <Hierarchy element={element} />
+        <details open={open}>
+          <_Summary>
+            <b>Child:</b> {name}
+          </_Summary>
+
+          {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
+          <Hierarchy element={element} />
+        </details>
       </td>
     </tr>
   );
@@ -201,6 +211,11 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
 
   const { children: hierarchyChildren } = element;
 
+  const openChildList =
+    element.meta?.level === Levels.SYSTEM ||
+    element.meta?.level === Levels.HOME ||
+    element.meta?.level === Levels.BUILDING;
+
   return (
     <table>
       <Meta element={element} />
@@ -208,7 +223,7 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
       <Setter element={element} />
       {hierarchyChildren
         ? Object.entries(hierarchyChildren).map(([name, child]) => (
-            <Child name={name} element={child} />
+            <Child name={name} element={child} open={openChildList} />
           ))
         : null}
     </table>
