@@ -9,7 +9,7 @@ import { useBreakpointValue } from './style/breakpoint.js';
 
 export const strings = {
   get colorScheme() {
-    return () => useTheme().theme;
+    return () => useTheme();
   },
   font: '-apple-system, SF UI Text, Helvetica Neue, Helvetica, Arial, sans-serif',
   isRetina: '(-webkit-min-device-pixel-ratio: 2)',

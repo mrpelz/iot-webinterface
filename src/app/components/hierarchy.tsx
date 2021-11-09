@@ -15,15 +15,12 @@ import {
 import { useGetter, useSetter } from '../hooks/web-api.js';
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
+import { _Summary } from './diagnostics.js';
 import { styled } from 'goober';
 import { useI18n } from '../hooks/i18n.js';
 
 const _GetterValue = styled('pre')`
   word-break: break-all;
-`;
-
-const _Summary = styled('summary')`
-  cursor: pointer;
 `;
 
 const Meta: FunctionComponent<{ element: HierarchyElement }> = ({

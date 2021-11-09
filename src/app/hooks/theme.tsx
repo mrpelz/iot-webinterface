@@ -57,6 +57,10 @@ export const ThemeProvider: FunctionComponent = ({ children }) => {
   );
 };
 
-export function useTheme(): InitTheme {
-  return useContext(ThemeContext);
+export function useTheme(): Theme {
+  return useContext(ThemeContext).theme;
+}
+
+export function useSetTheme(): StateUpdater<Theme> {
+  return useContext(ThemeContext).setTheme;
 }

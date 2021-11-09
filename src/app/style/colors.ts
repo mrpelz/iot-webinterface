@@ -6,7 +6,7 @@ export function useThemedValue<T>(
   themedColors: Record<Theme, T>,
   themeOverride?: Theme
 ): T {
-  const { theme } = useTheme();
+  const theme = useTheme();
 
   return themedColors[themeOverride || theme];
 }
