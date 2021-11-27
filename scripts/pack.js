@@ -1,7 +1,8 @@
 #!/usr/bin/env -S node --use_strict --experimental-modules --experimental-import-meta-resolve
 
 import { join, relative } from 'path';
-import { readdir, stat, writeFile } from 'fs/promises';
+import { readFile, readdir, stat, writeFile } from 'fs/promises';
+import { createHash } from 'crypto';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { tmpdir } from 'os';
@@ -14,9 +15,9 @@ const INDEX_FILE = './index.json';
 
 const INDEX_EXCLUSIONS = [
   new RegExp('.js.map$'),
-  new RegExp('^\\/id.txt'),
-  new RegExp('^\\/index.json'),
-  new RegExp('sw.js$'),
+  new RegExp('^\\/id.txt$'),
+  new RegExp('^\\/index.json$'),
+  new RegExp('^\\/js\\/workers\\/sw.js$'),
 ];
 
 const INDEX_TIERS = [
@@ -34,6 +35,9 @@ const tasks = process.argv[process.argv.length - 1].split(',');
 
 async function precacheIndex() {
   const indexFile = join(process.cwd(), DIST_DIR, INDEX_FILE);
+  const idFile = join(process.cwd(), DIST_DIR, ID_FILE);
+
+  const hashes = [];
 
   const walk = async (path, root) => {
     const stats = await stat(path);
@@ -50,6 +54,12 @@ async function precacheIndex() {
         return [];
       }
 
+      hashes.push(
+        createHash('md5')
+          .update(await readFile(path))
+          .digest('hex')
+      );
+
       return [prefixedPath];
     }
 
@@ -57,7 +67,8 @@ async function precacheIndex() {
 
     const entries = await readdir(path);
     const lists = await Promise.all(
-      entries.map(async (entry) => walk(join(path, entry), root))
+      // eslint-disable-next-line no-return-await
+      entries.map(async (entry) => await walk(join(path, entry), root))
     );
 
     return lists.flat();
@@ -68,12 +79,17 @@ async function precacheIndex() {
       [DIST_DIR, STATIC_DIR].map(async (path) => {
         const absolutePath = join(process.cwd(), path);
 
-        return walk(absolutePath, absolutePath);
+        // eslint-disable-next-line no-return-await
+        return await walk(absolutePath, absolutePath);
       })
     )
   )
     .flat()
     .sort();
+
+  const globalHash = createHash('md5')
+    .update(hashes.sort().join(''))
+    .digest('hex');
 
   const result = [
     ...INDEX_TIERS.map((tier) => fileList.filter((file) => tier.test(file))),
@@ -87,14 +103,10 @@ async function precacheIndex() {
 
   const filePayload = JSON.stringify(result, null, 2);
 
-  await writeFile(indexFile, `${filePayload}\n`);
-}
-
-async function writeId() {
-  const id = Date.now();
-
-  const idFile = join(process.cwd(), DIST_DIR, ID_FILE);
-  await writeFile(idFile, `${id}`);
+  await Promise.all([
+    writeFile(indexFile, `${filePayload}\n`),
+    writeFile(idFile, `${globalHash}\n`),
+  ]);
 }
 
 async function nginx() {
@@ -142,7 +154,6 @@ async function nginx() {
     await promisify(execFile)('native-esm-transform');
 
     await precacheIndex();
-    await writeId();
   }
 
   if (tasks.includes('serve')) {

@@ -36,14 +36,18 @@
 
       workerConsole.info(`live id: "${liveId}"`);
 
-      if (storedId === liveId) return;
       if (liveId === null) return;
+      if (storedId === liveId) return;
 
       workerConsole.info(
         `id changed from "${storedId}" to "${liveId}", requesting reload`
       );
 
+      const skipReload = storedId === null;
+
       storedId = liveId;
+
+      if (skipReload) return;
 
       port.postMessage(storedId);
     }, interval);
