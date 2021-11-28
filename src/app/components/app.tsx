@@ -1,4 +1,5 @@
 import { MapIcon, MenuIcon } from './icons.js';
+import { add, dimension } from '../style/dimensions.js';
 import { colors, dimensions, strings } from '../style.js';
 import { useFlipMenuVisible, useIsMenuVisible } from '../hooks/menu.js';
 import { Diagnostics } from './static-pages/diagnostics.js';
@@ -16,17 +17,26 @@ import { useMediaQuery } from '../style/main.js';
 import { useStaticPage } from '../hooks/navigation.js';
 
 const _App = styled('main')`
-  background-color: ${colors.backgroundPrimary()};
   color-scheme: ${strings.colorScheme};
   display: flow-root;
   font-family: ${strings.font};
   font-size: ${dimensions.fontSize};
 `;
 
+const _Image = styled('img')`
+  height: ${dimension(100)};
+  margin-top: ${add(dimensions.headerHeight, dimension(20))};
+  object-fit: contain;
+  object-position: center;
+  position: fixed;
+  width: 100vw;
+  z-index: 1;
+`;
+
 export const App: FunctionComponent = () => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
-  const backgroundColor = colors.backgroundSecondary()();
+  const backgroundColor = colors.backgroundPrimary()();
   const flipMenuVisible = useFlipMenuVisible();
   const isMenuVisible = useIsMenuVisible();
 
@@ -35,7 +45,7 @@ export const App: FunctionComponent = () => {
   useEffect(() => {
     const { style } = document.documentElement;
 
-    style.backgroundColor = backgroundColor;
+    style.background = backgroundColor;
 
     return () => {
       style.backgroundColor = '';
@@ -54,6 +64,7 @@ export const App: FunctionComponent = () => {
 
   return (
     <_App>
+      <_Image src="/images/icons/ufi.svg" />
       <Layout
         header={
           <>

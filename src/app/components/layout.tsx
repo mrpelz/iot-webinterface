@@ -29,7 +29,6 @@ const _Aside = styled('aside', forwardRef)<{
   height: ${dimensions.appHeight};
   left: 0;
   position: fixed;
-  touch-action: auto;
   transition: height 0.3s ease-out, transform 0.3s ease-out, top 0.3s ease-out;
   width: ${dimensions.menuWidth};
   z-index: 4;
@@ -55,17 +54,19 @@ const _Main = styled('article', forwardRef)<{
   isAsideVisible: MenuVisible;
   shiftDown: boolean;
 }>`
+  background-color: ${colors.backgroundPrimary()};
+  color: ${colors.fontPrimary()};
+  position: relative;
+  touch-action: ${dependentValue('isAsideVisible', 'none', 'auto')};
+  transition: height 0.3s ease-out, margin-top 0.3s ease-out;
+  width: ${dimensions.appWidth};
+  z-index: 2;
+
   min-height: ${dependentValue(
     'shiftDown',
     dimensions.appHeightShiftDown,
     dimensions.appHeight
   )};
-
-  overflow-x: hidden;
-  touch-action: ${dependentValue('isAsideVisible', 'none', 'auto')};
-  transition: height 0.3s ease-out, margin-top 0.3s ease-out;
-  width: ${dimensions.appWidth};
-  color: ${colors.fontPrimary()};
 
   margin-top: ${dependentValue(
     'shiftDown',

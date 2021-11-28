@@ -31,6 +31,7 @@ const GlobalStyles = createGlobalStyle`
   :root,
   body {
     margin: 0;
+    overscroll-behavior-y: none;
     padding: 0;
   }
 
