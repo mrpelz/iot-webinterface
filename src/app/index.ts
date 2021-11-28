@@ -16,13 +16,14 @@ onunhandledrejection = () => removeServiceWorkers();
 const flags = getFlags();
 const {
   apiBaseUrl,
-  autoReloadInterval,
+  autoReloadCheckInterval,
+  autoReloadUnattended,
   debug,
   enableNotifications,
   serviceWorker,
 } = flags;
 
-const webApi = new WebApi(apiBaseUrl, autoReloadInterval, debug);
+const webApi = new WebApi(apiBaseUrl, autoReloadCheckInterval, debug);
 
 const notifications = new Notifications(enableNotifications);
 
@@ -38,8 +39,13 @@ const fn = async () => {
     await removeServiceWorkers();
   }
 
-  if (flags.autoReloadInterval) {
-    autoReload(autoReloadInterval, notifications, debug);
+  if (flags.autoReloadCheckInterval) {
+    autoReload(
+      autoReloadCheckInterval,
+      autoReloadUnattended,
+      notifications,
+      debug
+    );
   }
 };
 

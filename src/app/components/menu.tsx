@@ -18,6 +18,7 @@ const _Menu = styled('nav')`
   overflow-y: auto;
   overscroll-behavior-y: contain;
   padding: ${dimensions.titlebarHeight} 0;
+  scroll-behavior: smooth;
 `;
 
 const _MenuContent = styled('ul')`

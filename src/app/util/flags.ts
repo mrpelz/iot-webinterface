@@ -3,7 +3,8 @@ import { CHECK_INTERVAL } from './auto-reload.js';
 
 export type Flags = {
   apiBaseUrl: string;
-  autoReloadInterval: number;
+  autoReloadCheckInterval: number;
+  autoReloadUnattended: boolean;
   debug: boolean;
   enableNotifications: boolean;
   language: string | null;
@@ -14,7 +15,8 @@ export type Flags = {
 
 const defaultFlags: Flags = {
   apiBaseUrl: new URL('/', location.href).href,
-  autoReloadInterval: CHECK_INTERVAL,
+  autoReloadCheckInterval: CHECK_INTERVAL,
+  autoReloadUnattended: false,
   debug: false,
   enableNotifications: true,
   language: null,
@@ -47,11 +49,17 @@ export function getFlags(): Flags {
     apiBaseUrl: getFlag(hashFlags, queryFlags, 'apiBaseUrl', (input) =>
       input.trim()
     ),
-    autoReloadInterval: getFlag(
+    autoReloadCheckInterval: getFlag(
       hashFlags,
       queryFlags,
-      'autoReloadInterval',
+      'autoReloadCheckInterval',
       (input) => Number.parseInt(input, 10)
+    ),
+    autoReloadUnattended: getFlag(
+      hashFlags,
+      queryFlags,
+      'autoReloadUnattended',
+      (input) => Boolean(Number.parseInt(input, 10))
     ),
     debug: getFlag(hashFlags, queryFlags, 'debug', (input) =>
       Boolean(Number.parseInt(input, 10))

@@ -12,6 +12,7 @@ const ID_STORAGE_KEY = 'autoReloadId';
 
 export function autoReload(
   interval: number,
+  unattended: boolean,
   notifications: Notifications,
   debug: boolean
 ): void {
@@ -29,7 +30,18 @@ export function autoReload(
 
   if (!port) return;
 
-  const notification = () => {
+  const handleUpdateInstalled = () => {
+    const onReloadConfirm = () => {
+      notifications.clear();
+      location.reload();
+    };
+
+    if (unattended) {
+      onReloadConfirm();
+
+      return;
+    }
+
     notifications.trigger(
       'New App version installed',
       {
@@ -37,10 +49,7 @@ export function autoReload(
         requireInteraction: true,
         tag: 'versionUpdate',
       },
-      () => {
-        notifications.clear();
-        location.reload();
-      },
+      onReloadConfirm,
       () => notifications.clear()
     );
   };
@@ -63,9 +72,11 @@ export function autoReload(
     refreshServiceWorker();
 
     if ('serviceWorker' in navigator) return;
-    notification();
+    handleUpdateInstalled();
   };
 
   if (!('serviceWorker' in navigator)) return;
-  navigator.serviceWorker.addEventListener('message', () => notification());
+  navigator.serviceWorker.addEventListener('message', () =>
+    handleUpdateInstalled()
+  );
 }

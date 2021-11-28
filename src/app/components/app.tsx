@@ -1,5 +1,6 @@
 import { MapIcon, MenuIcon } from './icons.js';
 import { colors, dimensions, strings } from '../style.js';
+import { useFlipMenuVisible, useIsMenuVisible } from '../hooks/menu.js';
 import { Diagnostics } from './static-pages/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Global } from './static-pages/global.js';
@@ -11,7 +12,6 @@ import { Titlebar } from './titlebar.js';
 import { styled } from 'goober';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useEffect } from 'preact/hooks';
-import { useFlipMenuVisible } from '../hooks/menu.js';
 import { useMediaQuery } from '../style/main.js';
 import { useStaticPage } from '../hooks/navigation.js';
 
@@ -28,19 +28,29 @@ export const App: FunctionComponent = () => {
 
   const backgroundColor = colors.backgroundSecondary()();
   const flipMenuVisible = useFlipMenuVisible();
+  const isMenuVisible = useIsMenuVisible();
 
   const { state: staticPage } = useStaticPage();
 
   useEffect(() => {
-    const documentStyle = document.documentElement.style;
-    const memo = documentStyle.backgroundColor;
+    const { style } = document.documentElement;
 
-    documentStyle.backgroundColor = backgroundColor;
+    style.backgroundColor = backgroundColor;
 
     return () => {
-      documentStyle.backgroundColor = memo;
+      style.backgroundColor = '';
     };
   }, [backgroundColor]);
+
+  useEffect(() => {
+    const { style } = document.body;
+
+    style.scrollBehavior = isMenuVisible ? 'auto' : '';
+
+    return () => {
+      style.scrollBehavior = '';
+    };
+  }, [isMenuVisible]);
 
   return (
     <_App>
