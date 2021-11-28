@@ -67,8 +67,7 @@ async function precacheIndex() {
 
     const entries = await readdir(path);
     const lists = await Promise.all(
-      // eslint-disable-next-line no-return-await
-      entries.map(async (entry) => await walk(join(path, entry), root))
+      entries.map(async (entry) => walk(join(path, entry), root))
     );
 
     return lists.flat();
@@ -79,8 +78,7 @@ async function precacheIndex() {
       [DIST_DIR, STATIC_DIR].map(async (path) => {
         const absolutePath = join(process.cwd(), path);
 
-        // eslint-disable-next-line no-return-await
-        return await walk(absolutePath, absolutePath);
+        return walk(absolutePath, absolutePath);
       })
     )
   )

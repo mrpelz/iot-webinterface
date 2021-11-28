@@ -1,16 +1,23 @@
 import { colors, dimensions } from '../style.js';
-import { staticPages, useRoom, useStaticPage } from '../hooks/navigation.js';
+import {
+  staticPagesBottom,
+  staticPagesTop,
+  useRoom,
+  useStaticPage,
+} from '../hooks/navigation.js';
 import { FunctionComponent } from 'preact';
 import { Translation } from '../hooks/i18n.js';
 import { dependentValue } from '../style/main.js';
 import { styled } from 'goober';
+import { useSetMenuVisible } from '../hooks/menu.js';
 
 const _Menu = styled('nav')`
   background-color: ${colors.backgroundSecondary()};
   border-inline-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
-  min-height: ${dimensions.appHeight};
+  height: ${dimensions.appHeight};
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
   padding: ${dimensions.titlebarHeight} 0;
-  width: ${dimensions.menuWidth};
 `;
 
 const _MenuContent = styled('ul')`
@@ -68,6 +75,8 @@ export const Menu: FunctionComponent = () => {
   const { setState: selectStaticPage, state: selectedStaticPage } =
     useStaticPage();
 
+  const setMenuVisible = useSetMenuVisible();
+
   const {
     elements: floors,
     setState: selectRoom,
@@ -78,19 +87,22 @@ export const Menu: FunctionComponent = () => {
     <_Menu>
       <_MenuContent>
         <_MenuSubdivision>
-          <_MenuSubdivisionHeader>static</_MenuSubdivisionHeader>
           <_MenuList>
-            {staticPages.map((staticPage, key) => (
+            {staticPagesTop.map((staticPage, key) => (
               <_MenuListItem
                 key={key}
                 active={staticPage === selectedStaticPage}
-                onClick={() => selectStaticPage(staticPage)}
+                onClick={() => {
+                  selectStaticPage(staticPage);
+                  setMenuVisible(false);
+                }}
               >
                 <Translation i18nKey={staticPage} />
               </_MenuListItem>
             ))}
           </_MenuList>
         </_MenuSubdivision>
+
         <_MenuSubdivision>
           {floors.map(({ elements, floor }, outerKey) => (
             <>
@@ -102,7 +114,10 @@ export const Menu: FunctionComponent = () => {
                   <_MenuListItem
                     key={innerKey}
                     active={room === selectedRoom}
-                    onClick={() => selectRoom(room)}
+                    onClick={() => {
+                      selectRoom(room);
+                      setMenuVisible(false);
+                    }}
                   >
                     <Translation i18nKey={room.meta.name} />
                   </_MenuListItem>
@@ -110,6 +125,23 @@ export const Menu: FunctionComponent = () => {
               </_MenuList>
             </>
           ))}
+        </_MenuSubdivision>
+
+        <_MenuSubdivision>
+          <_MenuList>
+            {staticPagesBottom.map((staticPage, key) => (
+              <_MenuListItem
+                key={key}
+                active={staticPage === selectedStaticPage}
+                onClick={() => {
+                  selectStaticPage(staticPage);
+                  setMenuVisible(false);
+                }}
+              >
+                <Translation i18nKey={staticPage} />
+              </_MenuListItem>
+            ))}
+          </_MenuList>
         </_MenuSubdivision>
       </_MenuContent>
     </_Menu>

@@ -1,9 +1,14 @@
 import { FunctionComponent, JSX } from 'preact';
-import { MenuVisible, useIsMenuVisible } from '../hooks/menu.js';
+import {
+  MenuVisible,
+  useIsMenuVisible,
+  useSetMenuVisible,
+} from '../hooks/menu.js';
 import { colors, dimensions } from '../style.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
 import { breakpointValue } from '../style/breakpoint.js';
 import { styled } from 'goober';
+import { useMemo } from 'preact/hooks';
 import { useNotification } from '../hooks/notification.js';
 
 const _Header = styled('header')`
@@ -20,7 +25,7 @@ const _Aside = styled('aside')<{ isVisible: MenuVisible; shiftDown: boolean }>`
   height: ${dimensions.appHeight};
   left: 0;
   position: fixed;
-  touch-action: ${dependentValue('isVisible', 'none', 'auto')};
+  touch-action: auto;
   transition: height 0.3s ease-out, transform 0.3s ease-out, top 0.3s ease-out;
   width: ${dimensions.menuWidth};
   z-index: 4;
@@ -42,7 +47,7 @@ const _Aside = styled('aside')<{ isVisible: MenuVisible; shiftDown: boolean }>`
   )};
 `;
 
-const _Main = styled('main')<{
+const _Main = styled('article')<{
   isAsideVisible: MenuVisible;
   shiftDown: boolean;
 }>`
@@ -51,6 +56,7 @@ const _Main = styled('main')<{
     dimensions.appHeightShiftDown,
     dimensions.appHeight
   )};
+
   overflow-x: hidden;
   touch-action: ${dependentValue('isAsideVisible', 'none', 'auto')};
   transition: height 0.3s ease-out, margin-top 0.3s ease-out;
@@ -75,9 +81,22 @@ export const Layout: FunctionComponent<{
   header: JSX.Element;
 }> = ({ aside, children, header }) => {
   const isAsideVisible = useIsMenuVisible();
+  const setAsideVisible = useSetMenuVisible();
 
   const fallbackNotification = useNotification();
   const hasNotification = Boolean(fallbackNotification);
+
+  const handleAsideOutsideClick = useMemo<
+    JSX.UIEventHandler<HTMLElement> | undefined
+  >(() => {
+    return isAsideVisible
+      ? (event) => {
+          setAsideVisible(false);
+          event.preventDefault();
+        }
+      : undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAsideVisible]);
 
   return (
     <>
@@ -85,7 +104,11 @@ export const Layout: FunctionComponent<{
       <_Aside isVisible={isAsideVisible} shiftDown={hasNotification}>
         {aside}
       </_Aside>
-      <_Main isAsideVisible={isAsideVisible} shiftDown={hasNotification}>
+      <_Main
+        isAsideVisible={isAsideVisible}
+        shiftDown={hasNotification}
+        onClickCapture={handleAsideOutsideClick}
+      >
         {children}
       </_Main>
     </>

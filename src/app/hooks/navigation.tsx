@@ -20,8 +20,16 @@ import {
 } from 'preact/hooks';
 import { useWebApi } from './web-api.js';
 
-export const staticPages = ['global', 'map', 'technical'] as const;
-type StaticPage = typeof staticPages[number];
+export const staticPagesTop = ['global', 'map'] as const;
+export const staticPagesBottom = [
+  'technical',
+  'settings',
+  'diagnostics',
+] as const;
+
+type StaticPage =
+  | typeof staticPagesTop[number]
+  | typeof staticPagesBottom[number];
 
 type NavigationElement<T, E = T> = {
   elements: E[];

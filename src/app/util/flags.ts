@@ -5,7 +5,6 @@ export type Flags = {
   apiBaseUrl: string;
   autoReloadInterval: number;
   debug: boolean;
-  diagnostics: boolean;
   enableNotifications: boolean;
   language: string | null;
   pageOverride: number | null;
@@ -17,7 +16,6 @@ const defaultFlags: Flags = {
   apiBaseUrl: new URL('/', location.href).href,
   autoReloadInterval: CHECK_INTERVAL,
   debug: false,
-  diagnostics: false,
   enableNotifications: true,
   language: null,
   pageOverride: null,
@@ -56,9 +54,6 @@ export function getFlags(): Flags {
       (input) => Number.parseInt(input, 10)
     ),
     debug: getFlag(hashFlags, queryFlags, 'debug', (input) =>
-      Boolean(Number.parseInt(input, 10))
-    ),
-    diagnostics: getFlag(hashFlags, queryFlags, 'diagnostics', (input) =>
       Boolean(Number.parseInt(input, 10))
     ),
     enableNotifications: getFlag(
