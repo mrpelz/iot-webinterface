@@ -33,6 +33,8 @@ const _Aside = styled('aside', forwardRef)<{
   width: ${dimensions.menuWidth};
   z-index: 4;
 
+  opacity: 0.5;
+
   top: ${dependentValue(
     'shiftDown',
     dimensions.headerHeightShiftDown,
@@ -129,6 +131,7 @@ export const Layout: FunctionComponent<{
       if (x > 20) return;
 
       setTransform(x);
+      setAsideVisible(true);
     };
 
     const onTouchMove: (
@@ -151,8 +154,8 @@ export const Layout: FunctionComponent<{
     ) => void = () => {
       if (!lastX || isAsideVisible) return;
 
-      if (lastX > asideCurrent.offsetWidth / 3) {
-        setAsideVisible(true);
+      if (lastX < asideCurrent.offsetWidth / 3) {
+        setAsideVisible(false);
       }
 
       setTransform(0);

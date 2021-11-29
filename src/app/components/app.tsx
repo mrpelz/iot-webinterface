@@ -23,16 +23,6 @@ const _App = styled('main')`
   font-size: ${dimensions.fontSize};
 `;
 
-const _Image = styled('img')`
-  height: ${dimension(100)};
-  margin-top: ${add(dimensions.headerHeight, dimension(20))};
-  object-fit: contain;
-  object-position: center;
-  position: fixed;
-  width: 100vw;
-  z-index: 1;
-`;
-
 export const App: FunctionComponent = () => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
@@ -53,18 +43,38 @@ export const App: FunctionComponent = () => {
   }, [backgroundColor]);
 
   useEffect(() => {
+    const { style } = document.documentElement;
+
+    const previousScrollY = (() => {
+      if (isMenuVisible) return 0;
+
+      const value = Number.parseInt(style.top.replace('px', ''), 10);
+
+      return Number.isNaN(value) ? 0 : value;
+    })();
+
+    style.top = isMenuVisible ? `-${scrollY}px` : '';
+    style.position = isMenuVisible ? 'fixed' : '';
+
+    if (!isMenuVisible) {
+      scrollTo({
+        behavior: 'instant' as ScrollBehavior,
+        top: -previousScrollY,
+      });
+    }
+  }, [isMenuVisible]);
+
+  useEffect(() => {
     const { style } = document.body;
 
-    style.scrollBehavior = isMenuVisible ? 'auto' : '';
-
     return () => {
-      style.scrollBehavior = '';
+      style.top = '';
+      style.position = '';
     };
-  }, [isMenuVisible]);
+  }, []);
 
   return (
     <_App>
-      <_Image src="/images/icons/ufi.svg" />
       <Layout
         header={
           <>
