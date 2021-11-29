@@ -36,10 +36,7 @@ const _DiagnosticsContainer = styled('section')`
   display: flex;
   flex-direction: column;
   font-size: 0.75rem;
-  height: ${dimensions.appHeight};
-  overflow: scroll;
   padding: 0.5rem;
-  z-index: 10;
 
   &,
   & * {
@@ -77,6 +74,10 @@ const _DiagnosticsContainer = styled('section')`
 
 const _GetterValue = styled('pre')`
   word-break: break-all;
+`;
+
+export const _Summary = styled('summary')`
+  cursor: pointer;
 `;
 
 const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
@@ -128,10 +129,6 @@ const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
     </tr>
   );
 };
-
-export const _Summary = styled('summary')`
-  cursor: pointer;
-`;
 
 const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
   element,

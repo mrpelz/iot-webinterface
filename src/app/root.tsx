@@ -55,8 +55,8 @@ export const Root: FunctionComponent<{
     useInitWebApi(webApi),
     useInitFallbackNotification(notifications),
     I18nProvider,
-    NavigationProvider,
-    MenuVisibleProvider
+    MenuVisibleProvider,
+    NavigationProvider
   );
 
   return (

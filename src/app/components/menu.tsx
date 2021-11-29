@@ -5,11 +5,13 @@ import {
   useRoom,
   useStaticPage,
 } from '../hooks/navigation.js';
+import { useEffect, useRef } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { Translation } from '../hooks/i18n.js';
 import { dependentValue } from '../style/main.js';
+import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
-import { useSetMenuVisible } from '../hooks/menu.js';
+import { useIsMenuVisible } from '../hooks/menu.js';
 
 const _Menu = styled('nav')`
   background-color: ${colors.backgroundSecondary()};
@@ -47,7 +49,7 @@ const _MenuList = styled('ul')`
   padding: 0;
 `;
 
-const _MenuListItem = styled('li')<{ active: boolean }>`
+const _MenuListItem = styled('li', forwardRef)<{ active: boolean }>`
   background-color: ${dependentValue(
     'active',
     colors.selection(),
@@ -72,11 +74,32 @@ const _MenuListItem = styled('li')<{ active: boolean }>`
   }
 `;
 
+const MenuListItem: FunctionComponent<{
+  active: boolean;
+  onClick: () => void;
+}> = ({ active, onClick, children }) => {
+  const isMenuVisible = useIsMenuVisible();
+
+  const ref = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    const { current } = ref;
+    if (!current || !active || !isMenuVisible) return;
+
+    current.scrollIntoView({ block: 'nearest' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMenuVisible]);
+
+  return (
+    <_MenuListItem active={active} onClick={onClick} ref={ref}>
+      {children}
+    </_MenuListItem>
+  );
+};
+
 export const Menu: FunctionComponent = () => {
   const { setState: selectStaticPage, state: selectedStaticPage } =
     useStaticPage();
-
-  const setMenuVisible = useSetMenuVisible();
 
   const {
     elements: floors,
@@ -90,16 +113,13 @@ export const Menu: FunctionComponent = () => {
         <_MenuSubdivision>
           <_MenuList>
             {staticPagesTop.map((staticPage, key) => (
-              <_MenuListItem
+              <MenuListItem
                 key={key}
                 active={staticPage === selectedStaticPage}
-                onClick={() => {
-                  selectStaticPage(staticPage);
-                  setMenuVisible(false);
-                }}
+                onClick={() => selectStaticPage(staticPage)}
               >
                 <Translation i18nKey={staticPage} />
-              </_MenuListItem>
+              </MenuListItem>
             ))}
           </_MenuList>
         </_MenuSubdivision>
@@ -112,16 +132,13 @@ export const Menu: FunctionComponent = () => {
               </_MenuSubdivisionHeader>
               <_MenuList key={outerKey}>
                 {elements.map((room, innerKey) => (
-                  <_MenuListItem
+                  <MenuListItem
                     key={innerKey}
                     active={room === selectedRoom}
-                    onClick={() => {
-                      selectRoom(room);
-                      setMenuVisible(false);
-                    }}
+                    onClick={() => selectRoom(room)}
                   >
                     <Translation i18nKey={room.meta.name} />
-                  </_MenuListItem>
+                  </MenuListItem>
                 ))}
               </_MenuList>
             </>
@@ -131,16 +148,13 @@ export const Menu: FunctionComponent = () => {
         <_MenuSubdivision>
           <_MenuList>
             {staticPagesBottom.map((staticPage, key) => (
-              <_MenuListItem
+              <MenuListItem
                 key={key}
                 active={staticPage === selectedStaticPage}
-                onClick={() => {
-                  selectStaticPage(staticPage);
-                  setMenuVisible(false);
-                }}
+                onClick={() => selectStaticPage(staticPage)}
               >
                 <Translation i18nKey={staticPage} />
-              </_MenuListItem>
+              </MenuListItem>
             ))}
           </_MenuList>
         </_MenuSubdivision>

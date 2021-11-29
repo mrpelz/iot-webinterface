@@ -1,7 +1,7 @@
 import { MapIcon, MenuIcon } from './icons.js';
-import { add, dimension } from '../style/dimensions.js';
 import { colors, dimensions, strings } from '../style.js';
 import { useFlipMenuVisible, useIsMenuVisible } from '../hooks/menu.js';
+import { useRoom, useStaticPage } from '../hooks/navigation.js';
 import { Diagnostics } from './static-pages/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Global } from './static-pages/global.js';
@@ -14,7 +14,6 @@ import { styled } from 'goober';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useEffect } from 'preact/hooks';
 import { useMediaQuery } from '../style/main.js';
-import { useStaticPage } from '../hooks/navigation.js';
 
 const _App = styled('main')`
   color-scheme: ${strings.colorScheme};
@@ -22,6 +21,10 @@ const _App = styled('main')`
   font-family: ${strings.font};
   font-size: ${dimensions.fontSize};
 `;
+
+let previousScrollY = 0;
+let previousStaticPage: string | undefined;
+let previousRoom: string | undefined;
 
 export const App: FunctionComponent = () => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
@@ -31,6 +34,7 @@ export const App: FunctionComponent = () => {
   const isMenuVisible = useIsMenuVisible();
 
   const { state: staticPage } = useStaticPage();
+  const { state: room } = useRoom();
 
   useEffect(() => {
     const { style } = document.documentElement;
@@ -45,13 +49,9 @@ export const App: FunctionComponent = () => {
   useEffect(() => {
     const { style } = document.documentElement;
 
-    const previousScrollY = (() => {
-      if (isMenuVisible) return 0;
-
-      const value = Number.parseInt(style.top.replace('px', ''), 10);
-
-      return Number.isNaN(value) ? 0 : value;
-    })();
+    if (isMenuVisible) {
+      previousScrollY = scrollY;
+    }
 
     style.top = isMenuVisible ? `-${scrollY}px` : '';
     style.position = isMenuVisible ? 'fixed' : '';
@@ -59,9 +59,16 @@ export const App: FunctionComponent = () => {
     if (!isMenuVisible) {
       scrollTo({
         behavior: 'instant' as ScrollBehavior,
-        top: -previousScrollY,
+        top:
+          staticPage !== previousStaticPage || room?.meta.name !== previousRoom
+            ? 0
+            : previousScrollY,
       });
     }
+
+    previousStaticPage = staticPage || undefined;
+    previousRoom = room?.meta.name;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMenuVisible]);
 
   useEffect(() => {
@@ -70,6 +77,10 @@ export const App: FunctionComponent = () => {
     return () => {
       style.top = '';
       style.position = '';
+
+      previousScrollY = 0;
+      previousStaticPage = undefined;
+      previousRoom = undefined;
     };
   }, []);
 

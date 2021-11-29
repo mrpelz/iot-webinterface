@@ -18,6 +18,7 @@ import {
   useMemo,
   useState,
 } from 'preact/hooks';
+import { useSetMenuVisible } from './menu.js';
 import { useWebApi } from './web-api.js';
 
 export const staticPagesTop = ['global', 'map'] as const;
@@ -27,7 +28,7 @@ export const staticPagesBottom = [
   'diagnostics',
 ] as const;
 
-type StaticPage =
+export type StaticPage =
   | typeof staticPagesTop[number]
   | typeof staticPagesBottom[number];
 
@@ -123,6 +124,8 @@ function useNavigationElementsSubdivided<
 export const NavigationProvider: FunctionComponent = ({ children }) => {
   const { hierarchy } = useWebApi();
 
+  const setMenuVisible = useSetMenuVisible();
+
   const allElements = useMemo(
     () => (hierarchy ? flatten(hierarchy) : null),
     [hierarchy]
@@ -164,6 +167,11 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value.room.state]);
+
+  useEffect(() => {
+    setMenuVisible(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value.room.state, value.staticPage.state]);
 
   return (
     <NavigationContext.Provider value={value}>
