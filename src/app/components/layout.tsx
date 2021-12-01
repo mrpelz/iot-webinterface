@@ -33,6 +33,8 @@ const _Aside = styled('aside', forwardRef)<{
   width: ${dimensions.menuWidth};
   z-index: 4;
 
+  opacity: 0.5;
+
   top: ${dependentValue(
     'shiftDown',
     dimensions.headerHeightShiftDown,
@@ -96,6 +98,12 @@ export const Layout: FunctionComponent<{
   const asideRef = useRef<HTMLElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
+  const isAsideVisibleRef = useRef<MenuVisible>(isAsideVisible);
+
+  useEffect(() => {
+    isAsideVisibleRef.current = isAsideVisible;
+  }, [isAsideVisible]);
+
   useEffect(() => {
     const { current: asideCurrent } = asideRef;
     const { current: mainCurrent } = mainRef;
@@ -119,9 +127,9 @@ export const Layout: FunctionComponent<{
 
     const onTouchStart: (
       this: HTMLElement,
-      ev: HTMLElementEventMap['touchstart']
+      event: HTMLElementEventMap['touchstart']
     ) => void = ({ targetTouches }) => {
-      if (isAsideVisible) return;
+      if (isAsideVisibleRef.current) return;
 
       const x = targetTouches.item(0)?.pageX || 0;
 
@@ -129,31 +137,33 @@ export const Layout: FunctionComponent<{
       if (x > 20) return;
 
       setTransform(x);
-      setAsideVisible(true);
     };
 
     const onTouchMove: (
       this: HTMLElement,
-      ev: HTMLElementEventMap['touchmove']
-    ) => void = ({ targetTouches }) => {
-      if (!lastX || isAsideVisible) return;
+      event: HTMLElementEventMap['touchmove']
+    ) => void = (event) => {
+      const { targetTouches } = event;
+
+      if (!lastX || isAsideVisibleRef.current) return;
 
       const x = targetTouches.item(0)?.pageX || 0;
 
       if (!x) return;
       if (x > asideCurrent.offsetWidth) return;
 
+      event.preventDefault();
       setTransform(x);
     };
 
     const onTouchEnd: (
       this: HTMLElement,
-      ev: HTMLElementEventMap['touchend']
+      event: HTMLElementEventMap['touchend']
     ) => void = () => {
-      if (!lastX || isAsideVisible) return;
+      if (!lastX || isAsideVisibleRef.current) return;
 
-      if (lastX < asideCurrent.offsetWidth / 3) {
-        setAsideVisible(false);
+      if (lastX > asideCurrent.offsetWidth / 3) {
+        setAsideVisible(true);
       }
 
       setTransform(0);
@@ -161,15 +171,15 @@ export const Layout: FunctionComponent<{
 
     const onTouchCancel: (
       this: HTMLElement,
-      ev: HTMLElementEventMap['touchcancel']
+      event: HTMLElementEventMap['touchcancel']
     ) => void = () => {
-      if (!lastX || isAsideVisible) return;
+      if (!lastX || isAsideVisibleRef.current) return;
 
       setTransform(0);
     };
 
     mainCurrent.addEventListener('touchstart', onTouchStart);
-    mainCurrent.addEventListener('touchmove', onTouchMove);
+    mainCurrent.addEventListener('touchmove', onTouchMove, { passive: false });
     mainCurrent.addEventListener('touchend', onTouchEnd);
     mainCurrent.addEventListener('touchcancel', onTouchCancel);
 
@@ -182,7 +192,7 @@ export const Layout: FunctionComponent<{
       mainCurrent.removeEventListener('touchcancel', onTouchCancel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [asideRef, mainRef]);
 
   useEffect(() => {
     if (!asideRef.current) return;
@@ -200,8 +210,7 @@ export const Layout: FunctionComponent<{
           event.preventDefault();
         }
       : undefined;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAsideVisible]);
+  }, [isAsideVisible, setAsideVisible]);
 
   return (
     <>

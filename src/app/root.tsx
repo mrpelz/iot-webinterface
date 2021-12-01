@@ -26,21 +26,22 @@ const GlobalStyles = createGlobalStyle`
     scroll-behavior: smooth;
     scrollbar-width: none;
     user-select: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   :root,
   body {
     margin: 0;
+    overflow-x: hidden;
     overscroll-behavior-y: none;
     padding: 0;
   }
 
   :root {
     /* --safe-area-inset-top: 20px; */
-  }
-
-  body::-webkit-scrollbar {
-    display: none;
   }
 `;
 

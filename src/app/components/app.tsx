@@ -1,6 +1,11 @@
 import { MapIcon, MenuIcon } from './icons.js';
+import {
+  MenuVisible,
+  useFlipMenuVisible,
+  useIsMenuVisible,
+} from '../hooks/menu.js';
 import { colors, dimensions, strings } from '../style.js';
-import { useFlipMenuVisible, useIsMenuVisible } from '../hooks/menu.js';
+import { useEffect, useRef } from 'preact/hooks';
 import { useRoom, useStaticPage } from '../hooks/navigation.js';
 import { Diagnostics } from './static-pages/diagnostics.js';
 import { FunctionComponent } from 'preact';
@@ -12,7 +17,6 @@ import { StatusBar } from './status-bar.js';
 import { Titlebar } from './titlebar.js';
 import { styled } from 'goober';
 import { useBreakpoint } from '../style/breakpoint.js';
-import { useEffect } from 'preact/hooks';
 import { useMediaQuery } from '../style/main.js';
 
 const _App = styled('main')`
@@ -21,10 +25,6 @@ const _App = styled('main')`
   font-family: ${strings.font};
   font-size: ${dimensions.fontSize};
 `;
-
-let previousScrollY = 0;
-let previousStaticPage: string | undefined;
-let previousRoom: string | undefined;
 
 export const App: FunctionComponent = () => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
@@ -35,6 +35,16 @@ export const App: FunctionComponent = () => {
 
   const { state: staticPage } = useStaticPage();
   const { state: room } = useRoom();
+
+  const isMenuVisibleRef = useRef<MenuVisible>(isMenuVisible);
+
+  const previousScrollY = useRef(0);
+  const previousStaticPage = useRef<string | undefined>();
+  const previousRoom = useRef<string | undefined>();
+
+  useEffect(() => {
+    isMenuVisibleRef.current = isMenuVisible;
+  }, [isMenuVisible]);
 
   useEffect(() => {
     const { style } = document.documentElement;
@@ -50,37 +60,51 @@ export const App: FunctionComponent = () => {
     const { style } = document.documentElement;
 
     if (isMenuVisible) {
-      previousScrollY = scrollY;
+      previousScrollY.current = scrollY;
     }
 
-    style.top = isMenuVisible ? `-${scrollY}px` : '';
-    style.position = isMenuVisible ? 'fixed' : '';
+    style.overflowY = isMenuVisible ? 'hidden' : '';
 
-    if (!isMenuVisible) {
-      scrollTo({
-        behavior: 'instant' as ScrollBehavior,
-        top:
-          staticPage !== previousStaticPage || room?.meta.name !== previousRoom
-            ? 0
-            : previousScrollY,
-      });
-    }
+    scrollTo({
+      behavior: 'instant' as ScrollBehavior,
+      top:
+        !isMenuVisible &&
+        (staticPage !== previousStaticPage.current ||
+          room?.meta.name !== previousRoom.current)
+          ? 0
+          : previousScrollY.current,
+    });
 
-    previousStaticPage = staticPage || undefined;
-    previousRoom = room?.meta.name;
+    previousStaticPage.current = staticPage || undefined;
+    previousRoom.current = room?.meta.name;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMenuVisible]);
 
   useEffect(() => {
-    const { style } = document.body;
+    const onScroll: (
+      this: HTMLElement,
+      event: HTMLElementEventMap['scroll']
+    ) => void = () => {
+      if (!isMenuVisibleRef.current) return;
+
+      scrollTo({
+        behavior: 'instant' as ScrollBehavior,
+        top: previousScrollY.current,
+      });
+    };
+
+    document.addEventListener('scroll', onScroll);
 
     return () => {
-      style.top = '';
-      style.position = '';
+      document.removeEventListener('scroll', onScroll);
+    };
+  }, []);
 
-      previousScrollY = 0;
-      previousStaticPage = undefined;
-      previousRoom = undefined;
+  useEffect(() => {
+    const { style } = document.documentElement;
+
+    return () => {
+      style.overflowY = '';
     };
   }, []);
 

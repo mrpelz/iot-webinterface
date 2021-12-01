@@ -46,6 +46,8 @@ const _DiagnosticsContainer = styled('section')`
     -webkit-touch-callout: text;
     -webkit-user-select: text;
     user-select: text;
+    white-space: break-spaces;
+    word-break: break-all;
   }
 
   table,
@@ -70,10 +72,6 @@ const _DiagnosticsContainer = styled('section')`
   thead {
     font-weight: bold;
   }
-`;
-
-const _GetterValue = styled('pre')`
-  word-break: break-all;
 `;
 
 export const _Summary = styled('summary')`
@@ -153,7 +151,7 @@ const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
         <b>Getter</b> <i>{get}</i>
       </td>
       <td>
-        <_GetterValue>{state}</_GetterValue>
+        <pre>{state}</pre>
       </td>
     </tr>
   );

@@ -84,7 +84,7 @@ const MenuListItem: FunctionComponent<{
 
   useEffect(() => {
     const { current } = ref;
-    if (!current || !active || !isMenuVisible) return;
+    if (!active || !current || !isMenuVisible) return;
 
     current.scrollIntoView({ block: 'nearest' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
