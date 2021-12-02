@@ -1,90 +1,111 @@
 import { FunctionComponent, createContext } from 'preact';
 import { HierarchyElement, WebApi } from '../web-api.js';
-import { useContext, useEffect, useState } from 'preact/hooks';
+import { useContext, useEffect, useMemo, useState } from 'preact/hooks';
 
 type SetterFunction<T> = (value: T) => void;
 
 type TWebApiContext = {
   hierarchy: HierarchyElement | null;
-  streamOnline: boolean;
   useGetterIndex: <T>(index?: number) => T | null;
   useSetterIndex: <T>(index?: number) => SetterFunction<T>;
 };
 
 const WebApiContext = createContext<TWebApiContext>({
   hierarchy: null,
-  streamOnline: false,
   useGetterIndex: () => null,
   useSetterIndex: () => () => undefined,
 });
+const StreamOnlineContext = createContext(false);
 
-export function useInitWebApi(webApi: WebApi): FunctionComponent {
+function useGetterIndexFactory<T>(webApi: WebApi, index?: number) {
+  const [state, setState] = useState<T | null>(null);
+
+  useEffect(() => {
+    const getter =
+      index === undefined
+        ? null
+        : webApi.createGetter<T>(index, (value) => setState(value));
+
+    return () => getter?.remove();
+  }, [index, webApi]);
+
+  return state;
+}
+
+function useSetterIndexFactory<T>(webApi: WebApi, index?: number) {
+  const [setterFn, setSetterFn] = useState<SetterFunction<T>>(() => () => {
+    // eslint-disable-next-line no-console
+    console.warn(`cannot send value for index ${index}, setter not yet ready`);
+  });
+
+  useEffect(() => {
+    const setter = index === undefined ? null : webApi.createSetter<T>(index);
+
+    setSetterFn(
+      () => (value: T) =>
+        setter?.set(value === undefined ? (null as unknown as T) : value)
+    );
+
+    return () => setter?.remove();
+  }, [index, webApi]);
+
+  return setterFn;
+}
+
+const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
+  children,
+  webApi,
+}) => {
   const [hierarchy, setHierarchy] = useState<HierarchyElement>(
     null as unknown as HierarchyElement
   );
-
-  const [streamOnline, setStreamOnline] = useState(false);
 
   useEffect(() => {
     webApi.onHierarchy((value) => {
       setHierarchy(value);
     });
-
-    webApi.onStreamOnline((value) => {
-      setStreamOnline(value);
-    });
   }, [webApi]);
 
-  // eslint-disable-next-line comma-spacing
-  const useGetterIndex = <T,>(index?: number) => {
-    const [state, setState] = useState<T | null>(null);
+  const value = useMemo(
+    () => ({
+      hierarchy,
+      // eslint-disable-next-line comma-spacing
+      useGetterIndex: <T,>(index?: number) =>
+        useGetterIndexFactory<T>(webApi, index),
+      // eslint-disable-next-line comma-spacing
+      useSetterIndex: <T,>(index?: number) =>
+        useSetterIndexFactory<T>(webApi, index),
+    }),
+    [hierarchy, webApi]
+  );
 
-    useEffect(() => {
-      const getter =
-        index === undefined
-          ? null
-          : webApi.createGetter<T>(index, (value) => setState(value));
+  return (
+    <WebApiContext.Provider value={value}>{children}</WebApiContext.Provider>
+  );
+};
 
-      return () => getter?.remove();
-    }, [index]);
+const StreamOnlineProvider: FunctionComponent<{ webApi: WebApi }> = ({
+  children,
+  webApi,
+}) => {
+  const [streamOnline, setStreamOnline] = useState(false);
 
-    return state;
-  };
+  useEffect(() => {
+    webApi.onStreamOnline((value) => setStreamOnline(value));
+  }, [webApi]);
 
-  // eslint-disable-next-line comma-spacing
-  const useSetterIndex = <T,>(index?: number) => {
-    const [setterFn, setSetterFn] = useState<SetterFunction<T>>(() => () => {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `cannot send value for index ${index}, setter not yet ready`
-      );
-    });
-
-    useEffect(() => {
-      const setter = index === undefined ? null : webApi.createSetter<T>(index);
-
-      setSetterFn(
-        () => (value: T) =>
-          setter?.set(value === undefined ? (null as unknown as T) : value)
-      );
-
-      return () => setter?.remove();
-    }, [index]);
-
-    return setterFn;
-  };
-
-  return ({ children }) => (
-    <WebApiContext.Provider
-      value={{
-        hierarchy,
-        streamOnline,
-        useGetterIndex,
-        useSetterIndex,
-      }}
-    >
+  return (
+    <StreamOnlineContext.Provider value={streamOnline}>
       {children}
-    </WebApiContext.Provider>
+    </StreamOnlineContext.Provider>
+  );
+};
+
+export function useInitWebApi(webApi: WebApi): FunctionComponent {
+  return ({ children }) => (
+    <WebApiProvider webApi={webApi}>
+      <StreamOnlineProvider webApi={webApi}>{children}</StreamOnlineProvider>
+    </WebApiProvider>
   );
 }
 
@@ -102,4 +123,8 @@ export function useSetter<T>({ set }: HierarchyElement): SetterFunction<T> {
   const { useSetterIndex } = useWebApi();
 
   return useSetterIndex(set);
+}
+
+export function useStreamOnline(): boolean {
+  return useContext(StreamOnlineContext);
 }

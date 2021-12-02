@@ -18,7 +18,12 @@ import {
   staticPagesTop,
   useNavigation,
 } from '../../hooks/navigation.js';
-import { useGetter, useSetter, useWebApi } from '../../hooks/web-api.js';
+import {
+  useGetter,
+  useSetter,
+  useStreamOnline,
+  useWebApi,
+} from '../../hooks/web-api.js';
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
@@ -283,7 +288,8 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
 };
 
 export const Diagnostics: FunctionComponent = () => {
-  const { hierarchy, streamOnline } = useWebApi();
+  const { hierarchy } = useWebApi();
+  const streamOnline = useStreamOnline();
 
   const flags = useFlags();
   const menuVisible = useIsMenuVisible();

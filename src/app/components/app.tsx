@@ -77,6 +77,10 @@ export const App: FunctionComponent = () => {
 
     previousStaticPage.current = staticPage || undefined;
     previousRoom.current = room?.meta.name;
+
+    if (!isMenuVisible) {
+      previousScrollY.current = 0;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMenuVisible]);
 

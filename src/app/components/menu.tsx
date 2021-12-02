@@ -1,3 +1,5 @@
+import { HierarchyElementFloor, HierarchyElementRoom } from '../web-api.js';
+import { StateUpdater, useEffect, useMemo, useRef } from 'preact/hooks';
 import { colors, dimensions } from '../style.js';
 import {
   staticPagesBottom,
@@ -5,11 +7,11 @@ import {
   useRoom,
   useStaticPage,
 } from '../hooks/navigation.js';
-import { useEffect, useRef } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { Translation } from '../hooks/i18n.js';
 import { dependentValue } from '../style/main.js';
 import { forwardRef } from 'preact/compat';
+import { rooms } from '../i18n/sorting.js';
 import { styled } from 'goober';
 import { useIsMenuVisible } from '../hooks/menu.js';
 
@@ -97,6 +99,51 @@ const MenuListItem: FunctionComponent<{
   );
 };
 
+export const Floor: FunctionComponent<{
+  elements: HierarchyElementRoom[];
+  floor: HierarchyElementFloor;
+  selectRoom: StateUpdater<HierarchyElementRoom | null>;
+  selectedRoom: HierarchyElementRoom | null;
+}> = ({ elements, floor, selectRoom, selectedRoom }) => {
+  const sortedElements = useMemo(() => {
+    const result: HierarchyElementRoom[] = [];
+
+    for (const room of rooms) {
+      const match = elements.find(({ meta }) => meta.name === room);
+      if (!match) continue;
+
+      result.push(match);
+    }
+
+    result.push(
+      ...elements.filter(
+        ({ meta }) => !rooms.includes(meta.name as typeof rooms[number])
+      )
+    );
+
+    return result;
+  }, [elements]);
+
+  return (
+    <>
+      <_MenuSubdivisionHeader>
+        <Translation i18nKey={floor.meta.name} />
+      </_MenuSubdivisionHeader>
+      <_MenuList>
+        {sortedElements.map((room, key) => (
+          <MenuListItem
+            key={key}
+            active={room === selectedRoom}
+            onClick={() => selectRoom(room)}
+          >
+            <Translation i18nKey={room.meta.name} />
+          </MenuListItem>
+        ))}
+      </_MenuList>
+    </>
+  );
+};
+
 export const Menu: FunctionComponent = () => {
   const { setState: selectStaticPage, state: selectedStaticPage } =
     useStaticPage();
@@ -125,23 +172,11 @@ export const Menu: FunctionComponent = () => {
         </_MenuSubdivision>
 
         <_MenuSubdivision>
-          {floors.map(({ elements, floor }, outerKey) => (
-            <>
-              <_MenuSubdivisionHeader key={outerKey}>
-                <Translation i18nKey={floor.meta.name} />
-              </_MenuSubdivisionHeader>
-              <_MenuList key={outerKey}>
-                {elements.map((room, innerKey) => (
-                  <MenuListItem
-                    key={innerKey}
-                    active={room === selectedRoom}
-                    onClick={() => selectRoom(room)}
-                  >
-                    <Translation i18nKey={room.meta.name} />
-                  </MenuListItem>
-                ))}
-              </_MenuList>
-            </>
+          {floors.map(({ elements, floor }, key) => (
+            <Floor
+              key={key}
+              {...{ elements, floor, selectRoom, selectedRoom }}
+            />
           ))}
         </_MenuSubdivision>
 

@@ -33,8 +33,6 @@ const _Aside = styled('aside', forwardRef)<{
   width: ${dimensions.menuWidth};
   z-index: 4;
 
-  opacity: 0.5;
-
   top: ${dependentValue(
     'shiftDown',
     dimensions.headerHeightShiftDown,
