@@ -6,16 +6,17 @@ type SetterFunction<T> = (value: T) => void;
 
 type TWebApiContext = {
   hierarchy: HierarchyElement | null;
+  isStreamOnline: boolean;
   useGetterIndex: <T>(index?: number) => T | null;
   useSetterIndex: <T>(index?: number) => SetterFunction<T>;
 };
 
 const WebApiContext = createContext<TWebApiContext>({
   hierarchy: null,
+  isStreamOnline: false,
   useGetterIndex: () => null,
   useSetterIndex: () => () => undefined,
 });
-const StreamOnlineContext = createContext(false);
 
 function useGetterIndexFactory<T>(webApi: WebApi, index?: number) {
   const [state, setState] = useState<T | null>(null);
@@ -52,23 +53,25 @@ function useSetterIndexFactory<T>(webApi: WebApi, index?: number) {
   return setterFn;
 }
 
-const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
-  children,
-  webApi,
-}) => {
+export function useInitWebApi(webApi: WebApi): FunctionComponent {
   const [hierarchy, setHierarchy] = useState<HierarchyElement>(
     null as unknown as HierarchyElement
   );
+
+  const [isStreamOnline, setStreamOnline] = useState(false);
 
   useEffect(() => {
     webApi.onHierarchy((value) => {
       setHierarchy(value);
     });
+
+    webApi.onStreamOnline((value) => setStreamOnline(value));
   }, [webApi]);
 
   const value = useMemo(
     () => ({
       hierarchy,
+      isStreamOnline,
       // eslint-disable-next-line comma-spacing
       useGetterIndex: <T,>(index?: number) =>
         useGetterIndexFactory<T>(webApi, index),
@@ -76,41 +79,28 @@ const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
       useSetterIndex: <T,>(index?: number) =>
         useSetterIndexFactory<T>(webApi, index),
     }),
-    [hierarchy, webApi]
+    [hierarchy, isStreamOnline, webApi]
   );
 
-  return (
-    <WebApiContext.Provider value={value}>{children}</WebApiContext.Provider>
-  );
-};
-
-const StreamOnlineProvider: FunctionComponent<{ webApi: WebApi }> = ({
-  children,
-  webApi,
-}) => {
-  const [streamOnline, setStreamOnline] = useState(false);
-
-  useEffect(() => {
-    webApi.onStreamOnline((value) => setStreamOnline(value));
-  }, [webApi]);
-
-  return (
-    <StreamOnlineContext.Provider value={streamOnline}>
-      {children}
-    </StreamOnlineContext.Provider>
-  );
-};
-
-export function useInitWebApi(webApi: WebApi): FunctionComponent {
   return ({ children }) => (
-    <WebApiProvider webApi={webApi}>
-      <StreamOnlineProvider webApi={webApi}>{children}</StreamOnlineProvider>
-    </WebApiProvider>
+    <WebApiContext.Provider value={value}>{children}</WebApiContext.Provider>
   );
 }
 
 export function useWebApi(): TWebApiContext {
   return useContext(WebApiContext);
+}
+
+export function useHierarchy(): TWebApiContext['hierarchy'] {
+  const { hierarchy } = useWebApi();
+
+  return useMemo(() => hierarchy, [hierarchy]);
+}
+
+export function useStreamOnline(): TWebApiContext['isStreamOnline'] {
+  const { isStreamOnline } = useWebApi();
+
+  return useMemo(() => isStreamOnline, [isStreamOnline]);
 }
 
 export function useGetter<T>({ get }: HierarchyElement): T | null {
@@ -123,8 +113,4 @@ export function useSetter<T>({ set }: HierarchyElement): SetterFunction<T> {
   const { useSetterIndex } = useWebApi();
 
   return useSetterIndex(set);
-}
-
-export function useStreamOnline(): boolean {
-  return useContext(StreamOnlineContext);
 }

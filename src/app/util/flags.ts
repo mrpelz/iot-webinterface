@@ -8,7 +8,7 @@ export type Flags = {
   debug: boolean;
   enableNotifications: boolean;
   language: string | null;
-  pageOverride: number | null;
+  pageOverride: string | null;
   serviceWorker: boolean;
   theme: Theme | null;
 };
@@ -74,7 +74,7 @@ export function getFlags(): Flags {
       input.trim()
     ),
     pageOverride: getFlag(hashFlags, queryFlags, 'pageOverride', (input) =>
-      Number.parseInt(input, 10)
+      input.trim()
     ),
     serviceWorker: getFlag(hashFlags, queryFlags, 'serviceWorker', (input) =>
       Boolean(Number.parseInt(input, 10))

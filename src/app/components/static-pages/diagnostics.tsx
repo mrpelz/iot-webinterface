@@ -18,13 +18,13 @@ import {
   staticPagesTop,
   useNavigation,
 } from '../../hooks/navigation.js';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import {
   useGetter,
   useSetter,
   useStreamOnline,
   useWebApi,
 } from '../../hooks/web-api.js';
-import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
 import { useBreakpoint } from '../../style/breakpoint.js';
@@ -288,17 +288,71 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
 };
 
 export const Diagnostics: FunctionComponent = () => {
-  const { hierarchy } = useWebApi();
-  const streamOnline = useStreamOnline();
+  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
   const flags = useFlags();
-  const menuVisible = useIsMenuVisible();
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
-  const theme = useTheme();
-  const { country, language, locale, translation, translationLanguage } =
-    useI18n();
-  const fallbackNotification = useNotification();
+
+  // prettier-ignore
+  const {
+    country,
+    language,
+    locale,
+    translation,
+    translationLanguage
+  } = useI18n();
+
+  const isMenuVisible = useIsMenuVisible();
+
   const { building, home, room, staticPage } = useNavigation();
+
+  const fallbackNotification = useNotification();
+
+  const theme = useTheme();
+
+  const { hierarchy } = useWebApi();
+  const isStreamOnline = useStreamOnline();
+
+  const [hookRenders, setHookRenders] = useState<[Date, string][]>([]);
+
+  useEffect(() => {
+    setHookRenders((value) => [
+      ...value,
+      [new Date(), `isDesktop ${JSON.stringify(isDesktop)}`],
+    ]);
+  }, [isDesktop]);
+  useEffect(() => {
+    setHookRenders((value) => [...value, [new Date(), 'flags']]);
+  }, [flags]);
+  useEffect(() => {
+    setHookRenders((value) => [...value, [new Date(), 'i18n']]);
+  }, [country, language, locale, translation, translationLanguage]);
+  useEffect(() => {
+    setHookRenders((value) => [
+      ...value,
+      [new Date(), `isMenuVisible ${JSON.stringify(isMenuVisible)}`],
+    ]);
+  }, [isMenuVisible]);
+  useEffect(() => {
+    setHookRenders((value) => [...value, [new Date(), 'navigation']]);
+  }, [building, home, room, staticPage]);
+  useEffect(() => {
+    setHookRenders((value) => [...value, [new Date(), 'fallbackNotification']]);
+  }, [fallbackNotification]);
+  useEffect(() => {
+    setHookRenders((value) => [
+      ...value,
+      [new Date(), `theme ${JSON.stringify(theme)}`],
+    ]);
+  }, [theme]);
+  useEffect(() => {
+    setHookRenders((value) => [...value, [new Date(), 'webApi']]);
+  }, [hierarchy]);
+  useEffect(() => {
+    setHookRenders((value) => [
+      ...value,
+      [new Date(), `isStreamOnline ${JSON.stringify(isStreamOnline)}`],
+    ]);
+  }, [isStreamOnline]);
 
   return (
     <_DiagnosticsContainer>
@@ -307,14 +361,14 @@ export const Diagnostics: FunctionComponent = () => {
           <td>
             <b>stream</b>
           </td>
-          <td>{JSON.stringify(streamOnline)}</td>
+          <td>{JSON.stringify(isStreamOnline)}</td>
         </tr>
 
         <tr>
           <td>
             <b>menu visible</b>
           </td>
-          <td>{JSON.stringify(menuVisible)}</td>
+          <td>{JSON.stringify(isMenuVisible)}</td>
         </tr>
 
         <tr>
@@ -492,7 +546,7 @@ export const Diagnostics: FunctionComponent = () => {
 
         {fallbackNotification ? (
           <tr>
-            <td>
+            <td colSpan={999}>
               <details>
                 <_Summary>
                   <b>fallback notification</b>
@@ -512,7 +566,29 @@ export const Diagnostics: FunctionComponent = () => {
             </td>
           </tr>
         ) : null}
+
+        <tr>
+          <td colSpan={999}>
+            <details>
+              <_Summary>
+                <b>hook calls</b>
+              </_Summary>
+
+              <button onClick={() => setHookRenders([])}>reset</button>
+
+              <pre>
+                {hookRenders
+                  .map(
+                    ([date, label]) =>
+                      `${date.toLocaleString(country || language)}: ${label}`
+                  )
+                  .join('\n')}
+              </pre>
+            </details>
+          </td>
+        </tr>
       </table>
+
       {hierarchy ? <Hierarchy element={hierarchy} /> : null}
     </_DiagnosticsContainer>
   );

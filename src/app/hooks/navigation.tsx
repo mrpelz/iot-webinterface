@@ -16,8 +16,10 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'preact/hooks';
+import { useFlags } from './flags.js';
 import { useSetMenuVisible } from './menu.js';
 import { useWebApi } from './web-api.js';
 
@@ -27,6 +29,8 @@ export const staticPagesBottom = [
   'settings',
   'diagnostics',
 ] as const;
+
+const staticPages: string[] = [...staticPagesTop, ...staticPagesBottom];
 
 export type StaticPage =
   | typeof staticPagesTop[number]
@@ -101,18 +105,35 @@ function useNavigationElementsSubdivided<
 >(
   allElements: HierarchyElement[] | null,
   level: T['meta']['level'],
-  divisionLevel: S['meta']['level']
+  divisionLevel: S['meta']['level'],
+  preselect: string | null = null
 ) {
+  const preselected = useRef<T>(null);
+
   const elements = useMemo(() => {
     if (!allElements) return [];
 
-    return getElementsFromLevel<S>(allElements, divisionLevel).map((floor) => ({
-      elements: getElementsFromLevel<T>(flatten(floor), level),
-      floor,
-    }));
-  }, [allElements, divisionLevel, level]);
+    return getElementsFromLevel<S>(allElements, divisionLevel).map((floor) => {
+      const innerElements = getElementsFromLevel<T>(flatten(floor), level);
 
-  const [state, setState] = useState<HierarchyElementRoom | null>(null);
+      for (const innerElement of innerElements) {
+        const { meta } = innerElement;
+
+        if (!('name' in meta)) continue;
+        if (meta.name !== preselect) continue;
+
+        preselected.current = innerElement;
+        break;
+      }
+
+      return {
+        elements: innerElements,
+        floor,
+      };
+    });
+  }, [allElements, divisionLevel, level, preselect]);
+
+  const [state, setState] = useState<T | null>(preselected.current || null);
 
   return {
     elements,
@@ -123,6 +144,9 @@ function useNavigationElementsSubdivided<
 
 export const NavigationProvider: FunctionComponent = ({ children }) => {
   const { hierarchy } = useWebApi();
+  const { pageOverride } = useFlags();
+
+  const staticPageFromFlag = pageOverride && staticPages.includes(pageOverride);
 
   const setMenuVisible = useSetMenuVisible();
 
@@ -142,17 +166,32 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   const room = useNavigationElementsSubdivided<
     HierarchyElementRoom,
     HierarchyElementFloor
-  >(allElements, Levels.ROOM, Levels.FLOOR);
+  >(
+    allElements,
+    Levels.ROOM,
+    Levels.FLOOR,
+    staticPageFromFlag ? null : pageOverride
+  );
 
-  const [state, setState] = useState<StaticPage | null>(START_PAGE);
-  const staticPage = { setState, state };
+  const [state, setState] = useState<StaticPage | null>(
+    (() => {
+      if (staticPageFromFlag) return pageOverride as StaticPage;
+      if (room.state) return null;
 
-  const value: TNavigationContext = {
-    building,
-    home,
-    room,
-    staticPage,
-  };
+      return START_PAGE;
+    })()
+  );
+
+  const value = useMemo<TNavigationContext>(() => {
+    const staticPage = { setState, state };
+
+    return {
+      building,
+      home,
+      room,
+      staticPage,
+    };
+  }, [building, home, room, state]);
 
   useEffect(() => {
     if (value.staticPage.state) {
@@ -185,17 +224,25 @@ export function useNavigation(): TNavigationContext {
 }
 
 export function useBuilding(): TNavigationContext['building'] {
-  return useNavigation().building;
+  const { building } = useNavigation();
+
+  return useMemo(() => building, [building]);
 }
 
 export function useHome(): TNavigationContext['home'] {
-  return useNavigation().home;
+  const { home } = useNavigation();
+
+  return useMemo(() => home, [home]);
 }
 
 export function useRoom(): TNavigationContext['room'] {
-  return useNavigation().room;
+  const { room } = useNavigation();
+
+  return useMemo(() => room, [room]);
 }
 
 export function useStaticPage(): TNavigationContext['staticPage'] {
-  return useNavigation().staticPage;
+  const { staticPage } = useNavigation();
+
+  return useMemo(() => staticPage, [staticPage]);
 }
