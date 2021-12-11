@@ -20,6 +20,7 @@ import {
   useState,
 } from 'preact/hooks';
 import { useFlags } from './flags.js';
+import { useHookDebug } from '../util/hook-debug.js';
 import { useSetMenuVisible } from './menu.js';
 import { useWebApi } from './web-api.js';
 
@@ -143,6 +144,8 @@ function useNavigationElementsSubdivided<
 }
 
 export const NavigationProvider: FunctionComponent = ({ children }) => {
+  useHookDebug('NavigationProvider');
+
   const { hierarchy } = useWebApi();
   const { pageOverride } = useFlags();
 
@@ -173,44 +176,42 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
     staticPageFromFlag ? null : pageOverride
   );
 
-  const [state, setState] = useState<StaticPage | null>(
-    (() => {
-      if (staticPageFromFlag) return pageOverride as StaticPage;
-      if (room.state) return null;
+  const [state, setState] = useState(() => {
+    if (staticPageFromFlag) return pageOverride as StaticPage;
+    if (room.state) return null;
 
-      return START_PAGE;
-    })()
-  );
+    return START_PAGE;
+  });
+
+  const staticPage = useMemo(() => ({ setState, state }), [state]);
+
+  useEffect(() => {
+    if (staticPage.state) {
+      room.setState(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [staticPage.state]);
+
+  useEffect(() => {
+    if (room.state) {
+      staticPage.setState(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room.state]);
+
+  useEffect(() => {
+    setMenuVisible(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room.state, staticPage.state]);
 
   const value = useMemo<TNavigationContext>(() => {
-    const staticPage = { setState, state };
-
     return {
       building,
       home,
       room,
       staticPage,
     };
-  }, [building, home, room, state]);
-
-  useEffect(() => {
-    if (value.staticPage.state) {
-      value.room.setState(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value.staticPage.state]);
-
-  useEffect(() => {
-    if (value.room.state) {
-      value.staticPage.setState(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value.room.state]);
-
-  useEffect(() => {
-    setMenuVisible(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value.room.state, value.staticPage.state]);
+  }, [building, home, room, staticPage]);
 
   return (
     <NavigationContext.Provider value={value}>
@@ -219,30 +220,30 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   );
 };
 
-export function useNavigation(): TNavigationContext {
+export const useNavigation = (): TNavigationContext => {
   return useContext(NavigationContext);
-}
+};
 
-export function useBuilding(): TNavigationContext['building'] {
-  const { building } = useNavigation();
+export const useBuilding = (): TNavigationContext['building'] => {
+  const { building } = useContext(NavigationContext);
 
   return useMemo(() => building, [building]);
-}
+};
 
-export function useHome(): TNavigationContext['home'] {
-  const { home } = useNavigation();
+export const useHome = (): TNavigationContext['home'] => {
+  const { home } = useContext(NavigationContext);
 
   return useMemo(() => home, [home]);
-}
+};
 
-export function useRoom(): TNavigationContext['room'] {
-  const { room } = useNavigation();
+export const useRoom = (): TNavigationContext['room'] => {
+  const { room } = useContext(NavigationContext);
 
   return useMemo(() => room, [room]);
-}
+};
 
-export function useStaticPage(): TNavigationContext['staticPage'] {
-  const { staticPage } = useNavigation();
+export const useStaticPage = (): TNavigationContext['staticPage'] => {
+  const { staticPage } = useContext(NavigationContext);
 
   return useMemo(() => staticPage, [staticPage]);
-}
+};

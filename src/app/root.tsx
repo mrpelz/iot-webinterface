@@ -1,5 +1,8 @@
 import { FunctionComponent, h, render as preactRender } from 'preact';
+import { bindComponent, combineComponents } from './util/combine-components.js';
 import { App } from './components/app.js';
+import { FallbackNotificationProvider } from './hooks/notification.js';
+import { FlagProvider } from './hooks/flags.js';
 import { Flags } from './util/flags.js';
 import { I18nProvider } from './hooks/i18n.js';
 import { MenuVisibleProvider } from './hooks/menu.js';
@@ -7,13 +10,10 @@ import { NavigationProvider } from './hooks/navigation.js';
 import { Notifications } from './util/notifications.js';
 import { ThemeProvider } from './hooks/theme.js';
 import { WebApi } from './web-api.js';
-import { combineComponents } from './util/combine-components.js';
+import { WebApiProvider } from './hooks/web-api.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
 import { prefix } from 'goober/prefixer';
 import { setup } from 'goober';
-import { useInitFallbackNotification } from './hooks/notification.js';
-import { useInitFlags } from './hooks/flags.js';
-import { useInitWebApi } from './hooks/web-api.js';
 
 const GlobalStyles = createGlobalStyle`
   * {
@@ -50,11 +50,18 @@ export const Root: FunctionComponent<{
   notifications: Notifications;
   webApi: WebApi;
 }> = ({ flags, notifications, webApi }) => {
-  const OuterState = combineComponents(useInitFlags(flags), ThemeProvider);
+  const _FlagProvider = bindComponent(FlagProvider, { flags });
+  const _WebApiProvider = bindComponent(WebApiProvider, { webApi });
+  const _FallbackNotificationProvider = bindComponent(
+    FallbackNotificationProvider,
+    { notifications }
+  );
+
+  const OuterState = combineComponents(_FlagProvider, ThemeProvider);
 
   const InnerState = combineComponents(
-    useInitWebApi(webApi),
-    useInitFallbackNotification(notifications),
+    _WebApiProvider,
+    _FallbackNotificationProvider,
     I18nProvider,
     MenuVisibleProvider,
     NavigationProvider

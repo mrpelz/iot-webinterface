@@ -16,6 +16,11 @@ export const webApiUrl = new URL('../../workers/web-api.js', import.meta.url)
 export async function removeServiceWorkers(): Promise<void> {
   if (!('serviceWorker' in navigator)) return;
 
+  const cacheKeys = await caches.keys();
+  for (const cacheKey of cacheKeys) {
+    caches.delete(cacheKey);
+  }
+
   try {
     const registrations = await navigator.serviceWorker.getRegistrations();
 

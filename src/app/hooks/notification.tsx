@@ -3,7 +3,14 @@ import {
   Notifications,
 } from '../util/notifications.js';
 import { FunctionComponent, createContext } from 'preact';
-import { StateUpdater, useContext, useState } from 'preact/hooks';
+import {
+  StateUpdater,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'preact/hooks';
+import { useHookDebug } from '../util/hook-debug.js';
 
 export type TFallbackNotificationContext = {
   fallbackNotification: FallbackNotificationOptions;
@@ -17,32 +24,42 @@ const FallbackNotificationContext = createContext<TFallbackNotificationContext>(
   }
 );
 
-export function useInitFallbackNotification(
-  notifications: Notifications
-): FunctionComponent {
+export const FallbackNotificationProvider: FunctionComponent<{
+  notifications: Notifications;
+}> = ({ children, notifications }) => {
+  useHookDebug('useInitFallbackNotification');
+
   const [fallbackNotification, setFallbackNotification] =
     useState<FallbackNotificationOptions>(null);
 
-  notifications.setFallbackNotificationCallback((options) =>
-    setFallbackNotification(options)
+  useEffect(() => {
+    notifications.setFallbackNotificationCallback((options) =>
+      setFallbackNotification(options)
+    );
+  }, [notifications]);
+
+  const value = useMemo(
+    () => ({
+      fallbackNotification,
+      setFallbackNotification,
+    }),
+    [fallbackNotification]
   );
 
-  return ({ children }) => (
-    <FallbackNotificationContext.Provider
-      value={{
-        fallbackNotification,
-        setFallbackNotification,
-      }}
-    >
+  return (
+    <FallbackNotificationContext.Provider value={value}>
       {children}
     </FallbackNotificationContext.Provider>
   );
-}
+};
 
-export function useNotification(): FallbackNotificationOptions {
-  return useContext(FallbackNotificationContext).fallbackNotification;
-}
+export const useNotification = (): FallbackNotificationOptions => {
+  const { fallbackNotification } = useContext(FallbackNotificationContext);
+  return useMemo(() => fallbackNotification, [fallbackNotification]);
+};
 
-export function useSetNotification(): StateUpdater<FallbackNotificationOptions> {
-  return useContext(FallbackNotificationContext).setFallbackNotification;
-}
+export const useSetNotification =
+  (): StateUpdater<FallbackNotificationOptions> => {
+    const { setFallbackNotification } = useContext(FallbackNotificationContext);
+    return useMemo(() => setFallbackNotification, [setFallbackNotification]);
+  };

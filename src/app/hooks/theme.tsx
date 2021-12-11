@@ -9,6 +9,7 @@ import {
 import { strings } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlags } from './flags.js';
+import { useHookDebug } from '../util/hook-debug.js';
 
 export const themes = ['light', 'dark', 'dim'] as const;
 
@@ -22,6 +23,8 @@ type InitTheme = {
 const ThemeContext = createContext<InitTheme>(null as unknown as InitTheme);
 
 export const ThemeProvider: FunctionComponent = ({ children }) => {
+  useHookDebug('ThemeProvider');
+
   const { theme: flagPreferredTheme } = useFlags();
 
   const prefersDarkTheme = useBreakpoint(strings.prefersDarkTheme);
@@ -39,28 +42,32 @@ export const ThemeProvider: FunctionComponent = ({ children }) => {
     [browserPreferredTheme, flagPreferredTheme]
   );
 
-  const [theme, setTheme] = useState<Theme>(preferredTheme);
+  const [theme, setTheme] = useState(preferredTheme);
 
   useEffect(() => {
     setTheme(preferredTheme);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferredTheme]);
 
+  const value = useMemo(
+    () => ({
+      setTheme,
+      theme,
+    }),
+    [theme]
+  );
+
   return (
-    <ThemeContext.Provider
-      value={{
-        setTheme,
-        theme,
-      }}
-    >
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 };
 
-export function useTheme(): Theme {
-  return useContext(ThemeContext).theme;
-}
+export const useTheme = (): Theme => {
+  const { theme } = useContext(ThemeContext);
+  return useMemo(() => theme, [theme]);
+};
 
-export function useSetTheme(): StateUpdater<Theme> {
-  return useContext(ThemeContext).setTheme;
-}
+export const useSetTheme = (): StateUpdater<Theme> => {
+  const { setTheme } = useContext(ThemeContext);
+  return useMemo(() => setTheme, [setTheme]);
+};

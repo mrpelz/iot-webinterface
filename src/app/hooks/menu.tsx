@@ -1,7 +1,15 @@
 import { FunctionComponent, createContext } from 'preact';
-import { StateUpdater, useContext, useEffect, useState } from 'preact/hooks';
+import {
+  StateUpdater,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'preact/hooks';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
+import { useHookDebug } from '../util/hook-debug.js';
 import { useMediaQuery } from '../style/main.js';
 
 export type MenuVisible = boolean | null;
@@ -16,6 +24,8 @@ const MenuVisibleContext = createContext<TMenuVisibleContext>(
 );
 
 export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
+  useHookDebug('MenuVisibleProvider');
+
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
   const [isMenuVisible, _setMenuVisible] = useState<MenuVisible>(
@@ -26,33 +36,38 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
     _setMenuVisible(isDesktop ? null : false);
   }, [isDesktop]);
 
+  const value = useMemo<TMenuVisibleContext>(
+    () => ({
+      isMenuVisible,
+      setMenuVisible: (...args) => {
+        if (isDesktop) return;
+        _setMenuVisible(...args);
+      },
+    }),
+    [isDesktop, isMenuVisible]
+  );
+
   return (
-    <MenuVisibleContext.Provider
-      value={{
-        isMenuVisible,
-        setMenuVisible: (...args) => {
-          if (isDesktop) return;
-          _setMenuVisible(...args);
-        },
-      }}
-    >
+    <MenuVisibleContext.Provider value={value}>
       {children}
     </MenuVisibleContext.Provider>
   );
 };
 
-export function useIsMenuVisible(): MenuVisible {
-  return useContext(MenuVisibleContext).isMenuVisible;
-}
+export const useIsMenuVisible = (): MenuVisible => {
+  const { isMenuVisible } = useContext(MenuVisibleContext);
+  return useMemo(() => isMenuVisible, [isMenuVisible]);
+};
 
-export function useSetMenuVisible(): StateUpdater<MenuVisible> {
-  return useContext(MenuVisibleContext).setMenuVisible;
-}
+export const useSetMenuVisible = (): StateUpdater<MenuVisible> => {
+  const { setMenuVisible } = useContext(MenuVisibleContext);
+  return useMemo(() => setMenuVisible, [setMenuVisible]);
+};
 
-export function useFlipMenuVisible(): () => void {
+export const useFlipMenuVisible = (): (() => void) => {
   const setMenuVisible = useSetMenuVisible();
 
-  return () => {
+  return useCallback(() => {
     setMenuVisible((value) => !value);
-  };
-}
+  }, [setMenuVisible]);
+};
