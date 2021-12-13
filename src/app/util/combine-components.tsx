@@ -1,4 +1,5 @@
 import { FunctionComponent, PreactDOMAttributes } from 'preact';
+import { useMemo } from 'preact/hooks';
 
 export const combineComponents = (
   ...components: FunctionComponent[]
@@ -24,5 +25,6 @@ export const bindComponent = <T,>(
   Component: FunctionComponent<T>,
   props: T
 ): FunctionComponent => {
-  return ({ children }) => <Component {...props}>{children}</Component>;
+  return ({ children }) =>
+    useMemo(() => <Component {...props}>{children}</Component>, [children]);
 };

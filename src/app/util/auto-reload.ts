@@ -1,6 +1,8 @@
 import {
   autoReloadUrl,
   connectWorker,
+  onServiceWorkerActivated,
+  onServiceWorkerReload,
   refreshServiceWorker,
 } from './workers.js';
 import { Notifications } from './notifications.js';
@@ -69,14 +71,17 @@ export function autoReload(
       await serviceWorker.update();
     }
 
-    refreshServiceWorker();
-
     if ('serviceWorker' in navigator) return;
     handleUpdateInstalled();
   };
 
   if (!('serviceWorker' in navigator)) return;
-  navigator.serviceWorker.addEventListener('message', () =>
-    handleUpdateInstalled()
-  );
+
+  onServiceWorkerActivated(() => {
+    refreshServiceWorker();
+  });
+
+  onServiceWorkerReload(() => {
+    handleUpdateInstalled();
+  });
 }

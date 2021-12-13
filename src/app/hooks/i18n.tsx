@@ -8,6 +8,7 @@ import {
 import { Locale, getLocale } from '../util/locale.js';
 import { useContext, useMemo } from 'preact/hooks';
 import { useFlags } from './flags.js';
+import { useHookDebug } from '../util/hook-debug.js';
 
 type TI18nContext = {
   translation: I18nTranslation;
@@ -19,6 +20,8 @@ const I18nContext = createContext<TI18nContext>(
 );
 
 export const I18nProvider: FunctionComponent = ({ children }) => {
+  useHookDebug('I18nProvider');
+
   const { language: languageOverride } = useFlags();
 
   const { country, language, locale } = useMemo(() => getLocale(), []);
@@ -33,21 +36,20 @@ export const I18nProvider: FunctionComponent = ({ children }) => {
     [translationLanguage]
   );
 
-  return (
-    <I18nContext.Provider
-      value={{ country, language, locale, translation, translationLanguage }}
-    >
-      {children}
-    </I18nContext.Provider>
+  const value = useMemo(
+    () => ({ country, language, locale, translation, translationLanguage }),
+    [country, language, locale, translation, translationLanguage]
   );
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 };
 
-export function useI18n(): TI18nContext {
+export const useI18n = (): TI18nContext => {
   return useContext(I18nContext);
-}
+};
 
-export function useI18nKey(key?: string): string {
-  const { translation } = useI18n();
+export const useI18nKey = (key?: string): string => {
+  const { translation } = useContext(I18nContext);
 
   return useMemo(() => {
     if (!key) return '<[empty]>';
@@ -58,7 +60,7 @@ export function useI18nKey(key?: string): string {
 
     return `<${key}>`;
   }, [key, translation]);
-}
+};
 
 export const Translation: FunctionComponent<{ i18nKey?: string }> = ({
   i18nKey,

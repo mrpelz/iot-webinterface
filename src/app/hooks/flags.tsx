@@ -1,10 +1,16 @@
 import { Flags, getFlags } from '../util/flags.js';
 import { FunctionComponent, createContext } from 'preact';
-import { useContext, useEffect, useState } from 'preact/hooks';
+import { useContext, useEffect, useMemo, useState } from 'preact/hooks';
+import { useHookDebug } from '../util/hook-debug.js';
 
 const FlagsContext = createContext<Flags>(null as unknown as Flags);
 
-export function useInitFlags(initialFlags: Flags): FunctionComponent {
+export const FlagProvider: FunctionComponent<{ flags: Flags }> = ({
+  children,
+  flags: initialFlags,
+}) => {
+  useHookDebug('useInitFlags');
+
   const [flags, setFlags] = useState(initialFlags);
 
   useEffect(() => {
@@ -23,11 +29,16 @@ export function useInitFlags(initialFlags: Flags): FunctionComponent {
     return () => removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  return ({ children }) => (
+  return (
     <FlagsContext.Provider value={flags}>{children}</FlagsContext.Provider>
   );
-}
+};
 
-export function useFlags(): Flags {
+export const useFlags = (): Flags => {
   return useContext(FlagsContext);
-}
+};
+
+export const useFlag = <T extends keyof Flags>(key: T): Flags[T] => {
+  const value = useContext(FlagsContext)[key];
+  return useMemo(() => value, [value]);
+};

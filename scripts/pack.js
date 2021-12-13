@@ -13,6 +13,12 @@ const STATIC_DIR = './static';
 const ID_FILE = './id.txt';
 const INDEX_FILE = './index.json';
 
+const HASH_EXCLUSIONS = [
+  new RegExp('.js.map$'),
+  new RegExp('^\\/id.txt$'),
+  new RegExp('^\\/index.json$'),
+];
+
 const INDEX_EXCLUSIONS = [
   new RegExp('.js.map$'),
   new RegExp('^\\/id.txt$'),
@@ -47,18 +53,24 @@ async function precacheIndex() {
       const prefixedPath = `/${relativePath}`;
 
       if (
+        !HASH_EXCLUSIONS.find((exclusion) => {
+          return exclusion.test(prefixedPath);
+        })
+      ) {
+        hashes.push(
+          createHash('md5')
+            .update(await readFile(path))
+            .digest('hex')
+        );
+      }
+
+      if (
         INDEX_EXCLUSIONS.find((exclusion) => {
           return exclusion.test(prefixedPath);
         })
       ) {
         return [];
       }
-
-      hashes.push(
-        createHash('md5')
-          .update(await readFile(path))
-          .digest('hex')
-      );
 
       return [prefixedPath];
     }

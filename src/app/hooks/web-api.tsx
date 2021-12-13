@@ -1,6 +1,7 @@
 import { FunctionComponent, createContext } from 'preact';
 import { HierarchyElement, WebApi } from '../web-api.js';
 import { useContext, useEffect, useMemo, useState } from 'preact/hooks';
+import { useHookDebug } from '../util/hook-debug.js';
 
 type SetterFunction<T> = (value: T) => void;
 
@@ -53,7 +54,12 @@ function useSetterIndexFactory<T>(webApi: WebApi, index?: number) {
   return setterFn;
 }
 
-export function useInitWebApi(webApi: WebApi): FunctionComponent {
+export const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
+  children,
+  webApi,
+}) => {
+  useHookDebug('useInitWebApi');
+
   const [hierarchy, setHierarchy] = useState<HierarchyElement>(
     null as unknown as HierarchyElement
   );
@@ -82,35 +88,37 @@ export function useInitWebApi(webApi: WebApi): FunctionComponent {
     [hierarchy, isStreamOnline, webApi]
   );
 
-  return ({ children }) => (
+  return (
     <WebApiContext.Provider value={value}>{children}</WebApiContext.Provider>
   );
-}
+};
 
-export function useWebApi(): TWebApiContext {
+export const useWebApi = (): TWebApiContext => {
   return useContext(WebApiContext);
-}
+};
 
-export function useHierarchy(): TWebApiContext['hierarchy'] {
-  const { hierarchy } = useWebApi();
+export const useHierarchy = (): TWebApiContext['hierarchy'] => {
+  const { hierarchy } = useContext(WebApiContext);
 
   return useMemo(() => hierarchy, [hierarchy]);
-}
+};
 
-export function useStreamOnline(): TWebApiContext['isStreamOnline'] {
-  const { isStreamOnline } = useWebApi();
+export const useStreamOnline = (): TWebApiContext['isStreamOnline'] => {
+  const { isStreamOnline } = useContext(WebApiContext);
 
   return useMemo(() => isStreamOnline, [isStreamOnline]);
-}
+};
 
-export function useGetter<T>({ get }: HierarchyElement): T | null {
-  const { useGetterIndex } = useWebApi();
+// eslint-disable-next-line comma-spacing
+export const useGetter = <T,>({ get }: HierarchyElement): T | null => {
+  const { useGetterIndex } = useContext(WebApiContext);
 
   return useGetterIndex(get);
-}
+};
 
-export function useSetter<T>({ set }: HierarchyElement): SetterFunction<T> {
-  const { useSetterIndex } = useWebApi();
+// eslint-disable-next-line comma-spacing
+export const useSetter = <T,>({ set }: HierarchyElement): SetterFunction<T> => {
+  const { useSetterIndex } = useContext(WebApiContext);
 
   return useSetterIndex(set);
-}
+};
