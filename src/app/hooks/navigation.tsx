@@ -19,7 +19,7 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
-import { useFlags } from './flags.js';
+import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/hook-debug.js';
 import { useSetMenuVisible } from './menu.js';
 import { useWebApi } from './web-api.js';
@@ -147,7 +147,7 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   useHookDebug('NavigationProvider');
 
   const { hierarchy } = useWebApi();
-  const { pageOverride } = useFlags();
+  const pageOverride = useFlag('pageOverride');
 
   const staticPageFromFlag = pageOverride && staticPages.includes(pageOverride);
 

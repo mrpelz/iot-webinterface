@@ -7,7 +7,7 @@ import {
 } from '../i18n/main.js';
 import { Locale, getLocale } from '../util/locale.js';
 import { useContext, useMemo } from 'preact/hooks';
-import { useFlags } from './flags.js';
+import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/hook-debug.js';
 
 type TI18nContext = {
@@ -22,7 +22,7 @@ const I18nContext = createContext<TI18nContext>(
 export const I18nProvider: FunctionComponent = ({ children }) => {
   useHookDebug('I18nProvider');
 
-  const { language: languageOverride } = useFlags();
+  const languageOverride = useFlag('language');
 
   const { country, language, locale } = useMemo(() => getLocale(), []);
 

@@ -38,7 +38,9 @@ export const useFlags = (): Flags => {
   return useContext(FlagsContext);
 };
 
-export const useFlag = <T extends keyof Flags>(key: T): Flags[T] => {
-  const value = useContext(FlagsContext)[key];
+export const useFlag = <T extends keyof Flags>(key: T): Flags[T] | null => {
+  const context = useContext(FlagsContext);
+  const value = context && key in context ? context[key] : null;
+
   return useMemo(() => value, [value]);
 };

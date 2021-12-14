@@ -1,16 +1,16 @@
 import {
   autoReloadUrl,
   connectWorker,
-  onServiceWorkerActivated,
-  onServiceWorkerReload,
   refreshServiceWorker,
 } from './workers.js';
 import { Notifications } from './notifications.js';
 
 type SetupMessage = { initialId: string | null; interval: number };
 
-export const CHECK_INTERVAL = 2000;
+export const CHECK_INTERVAL = 5000;
 const ID_STORAGE_KEY = 'autoReloadId';
+
+export let triggerUpdate: (() => void) | undefined;
 
 export function autoReload(
   interval: number,
@@ -32,11 +32,14 @@ export function autoReload(
 
   if (!port) return;
 
+  const onReloadConfirm = () => {
+    notifications.clear();
+    location.reload();
+  };
+
   const handleUpdateInstalled = () => {
-    const onReloadConfirm = () => {
-      notifications.clear();
-      location.reload();
-    };
+    // eslint-disable-next-line no-console
+    console.log('service worker cache has been refreshed');
 
     if (unattended) {
       onReloadConfirm();
@@ -56,6 +59,15 @@ export function autoReload(
     );
   };
 
+  triggerUpdate = () => {
+    if (!('serviceWorker' in navigator)) {
+      handleUpdateInstalled();
+      return;
+    }
+
+    refreshServiceWorker();
+  };
+
   port.onmessage = async ({ data: storedId }) => {
     if (debug) {
       // eslint-disable-next-line no-console
@@ -71,17 +83,9 @@ export function autoReload(
       await serviceWorker.update();
     }
 
-    if ('serviceWorker' in navigator) return;
-    handleUpdateInstalled();
+    triggerUpdate?.();
   };
 
   if (!('serviceWorker' in navigator)) return;
-
-  onServiceWorkerActivated(() => {
-    refreshServiceWorker();
-  });
-
-  onServiceWorkerReload(() => {
-    handleUpdateInstalled();
-  });
+  navigator.serviceWorker.addEventListener('message', handleUpdateInstalled);
 }

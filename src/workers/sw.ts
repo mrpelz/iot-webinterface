@@ -25,9 +25,6 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   /* eslint-enable no-console */
 
   const ERROR_OUT_STATUS_TEXT = '25C2A7B7-8004-4180-A3D5-0C6FA51FFECA';
-  const SERVICEWORKER_ACTIVATED = '5D3F853A-2EC0-429A-B4C4-034FE39AAB85';
-  const REQUEST_RELOAD = '7DD71FF3-35CC-46B4-A821-B197FC4C4149';
-
   const INDEX_ENDPOINT = '/index.json';
   const CACHE_KEY = 'cache';
 
@@ -155,9 +152,9 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     }
   };
 
-  const sendMessage = async (message: string) => {
+  const sendMessage = async () => {
     for (const client of await scope.clients.matchAll({ type: 'window' })) {
-      client.postMessage(message);
+      client.postMessage(null);
     }
   };
 
@@ -180,7 +177,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     await cache.add('/');
     await cache.addAll((await response.json()) || []);
 
-    await sendMessage(REQUEST_RELOAD);
+    await sendMessage();
   };
 
   scope.onfetch = (fetchEvent) => {
@@ -237,7 +234,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
       (async () => {
         try {
           await scope.clients.claim();
-          await sendMessage(SERVICEWORKER_ACTIVATED);
+          await refreshCache();
         } catch (error) {
           wsConsole.error(`onactivate error: ${error}`);
         }

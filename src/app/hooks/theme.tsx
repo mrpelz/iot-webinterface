@@ -8,7 +8,7 @@ import {
 } from 'preact/hooks';
 import { strings } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
-import { useFlags } from './flags.js';
+import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/hook-debug.js';
 
 export const themes = ['light', 'dark', 'dim'] as const;
@@ -25,7 +25,7 @@ const ThemeContext = createContext<InitTheme>(null as unknown as InitTheme);
 export const ThemeProvider: FunctionComponent = ({ children }) => {
   useHookDebug('ThemeProvider');
 
-  const { theme: flagPreferredTheme } = useFlags();
+  const flagPreferredTheme = useFlag('theme');
 
   const prefersDarkTheme = useBreakpoint(strings.prefersDarkTheme);
   const prefersLightTheme = useBreakpoint(strings.prefersLightTheme);

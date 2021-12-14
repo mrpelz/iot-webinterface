@@ -1,6 +1,6 @@
 import { getCountry } from './locale.js';
 import { useEffect } from 'preact/hooks';
-import { useFlags } from '../hooks/flags.js';
+import { useFlag } from '../hooks/flags.js';
 
 const country = getCountry() || undefined;
 
@@ -8,7 +8,7 @@ const memo: unknown[] = [];
 let rerenderCount = 0;
 
 export const useHookDebug = (label: string): void => {
-  const { debug } = useFlags() || {};
+  const debug = useFlag('debug');
 
   useEffect(() => {
     const now = new Date().toLocaleTimeString(country);

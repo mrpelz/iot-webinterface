@@ -7,9 +7,6 @@ enum WorkerCommands {
   UNLOAD,
 }
 
-const SERVICEWORKER_ACTIVATED = '5D3F853A-2EC0-429A-B4C4-034FE39AAB85';
-const REQUEST_RELOAD = '7DD71FF3-35CC-46B4-A821-B197FC4C4149';
-
 export const autoReloadUrl = new URL(
   '../../workers/auto-reload.js',
   import.meta.url
@@ -84,52 +81,13 @@ export async function installServiceWorker(
   }
 }
 
-export function refreshServiceWorker(): boolean {
-  if (!('serviceWorker' in navigator)) return false;
+export function refreshServiceWorker(): void {
+  if (!('serviceWorker' in navigator)) return;
 
   const { controller } = navigator.serviceWorker;
-  if (!controller) return false;
+  if (!controller) return;
 
   controller.postMessage(null);
-  return true;
-}
-
-export function onServiceWorkerActivated(
-  callback: () => void
-): Subscription | null {
-  if (!('serviceWorker' in navigator)) return null;
-  const { serviceWorker } = navigator;
-
-  const handler = ({ data }: MessageEvent) => {
-    if (data !== SERVICEWORKER_ACTIVATED) return;
-
-    callback();
-  };
-
-  serviceWorker.addEventListener('message', handler);
-
-  return {
-    remove: () => serviceWorker.removeEventListener('message', handler),
-  };
-}
-
-export function onServiceWorkerReload(
-  callback: () => void
-): Subscription | null {
-  if (!('serviceWorker' in navigator)) return null;
-  const { serviceWorker } = navigator;
-
-  const handler = ({ data }: MessageEvent) => {
-    if (data !== REQUEST_RELOAD) return;
-
-    callback();
-  };
-
-  serviceWorker.addEventListener('message', handler);
-
-  return {
-    remove: () => serviceWorker.removeEventListener('message', handler),
-  };
 }
 
 export function connectWorker<T>(

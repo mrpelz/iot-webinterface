@@ -65,7 +65,7 @@ export const useSetMenuVisible = (): StateUpdater<MenuVisible> => {
 };
 
 export const useFlipMenuVisible = (): (() => void) => {
-  const setMenuVisible = useSetMenuVisible();
+  const { setMenuVisible } = useContext(MenuVisibleContext);
 
   return useCallback(() => {
     setMenuVisible((value) => !value);
