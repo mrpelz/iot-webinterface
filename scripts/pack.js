@@ -22,13 +22,13 @@ const HASH_EXCLUSIONS = [
 const INDEX_EXCLUSIONS = [
   new RegExp('.js.map$'),
   new RegExp('^\\/id.txt$'),
+  new RegExp('^\\/index.html$'),
   new RegExp('^\\/index.json$'),
   new RegExp('^\\/js\\/workers\\/sw.js$'),
+  new RegExp('^\\/manifest.json$'),
 ];
 
 const INDEX_TIERS = [
-  new RegExp('^\\/manifest.json$'),
-  new RegExp('^\\/index.html$'),
   new RegExp('^\\/js\\/'),
   new RegExp('^\\/images\\/icons\\/'),
   new RegExp('^\\/images\\/splash\\/'),
@@ -97,10 +97,6 @@ async function precacheIndex() {
     .flat()
     .sort();
 
-  const globalHash = createHash('md5')
-    .update(hashes.sort().join(''))
-    .digest('hex');
-
   const result = [
     ...INDEX_TIERS.map((tier) => fileList.filter((file) => tier.test(file))),
     fileList.filter((file) => {
@@ -112,6 +108,12 @@ async function precacheIndex() {
   ].flat();
 
   const filePayload = JSON.stringify(result, null, 2);
+
+  hashes.push(createHash('md5').update(filePayload, 'utf8').digest('hex'));
+
+  const globalHash = createHash('md5')
+    .update(hashes.sort().join(':'))
+    .digest('hex');
 
   await Promise.all([
     writeFile(indexFile, `${filePayload}\n`),

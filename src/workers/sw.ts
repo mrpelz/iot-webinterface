@@ -131,7 +131,9 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 
   const getCached = async (event: FetchEvent, task: string) => {
     try {
-      const cachedResponse = await caches.match(event.request);
+      const cachedResponse = await caches.match(event.request, {
+        ignoreSearch: true,
+      });
       if (cachedResponse) return cachedResponse;
 
       return getLive(event, task);
