@@ -47,7 +47,7 @@
     const url = new URL(ID_URL, apiBaseUrl);
 
     const getLiveId = () =>
-      fetch(url.href)
+      fetch(url.href, { credentials: 'include', redirect: 'follow' })
         .then((response) => (response.ok ? response.text() : null))
         .then((text) => text?.trim() || null)
         .catch(() => null);
@@ -77,7 +77,10 @@
     const url = new URL(HIERARCHY_URL, apiBaseUrl);
     url.searchParams.append('id', id);
 
-    const hierarchy = await fetch(url.href)
+    const hierarchy = await fetch(url.href, {
+      credentials: 'include',
+      redirect: 'follow',
+    })
       .then((response) => response.json())
       .catch(() => null);
 

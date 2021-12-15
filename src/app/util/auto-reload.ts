@@ -43,6 +43,8 @@ export function autoReload(
       console.log('service worker cache has been refreshed');
     }
 
+    if (initialId === null) return;
+
     if (unattended) {
       onReloadConfirm();
 

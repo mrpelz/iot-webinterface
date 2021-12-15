@@ -169,7 +169,10 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     await scope.caches.delete(CACHE_KEY);
     await scope.caches.delete(CACHE_KEY);
 
-    const response = await fetch(new URL(INDEX_ENDPOINT, scope.origin).href);
+    const response = await fetch(new URL(INDEX_ENDPOINT, scope.origin).href, {
+      credentials: 'include',
+      redirect: 'follow',
+    });
     if (!response.ok || response.redirected) {
       return;
     }

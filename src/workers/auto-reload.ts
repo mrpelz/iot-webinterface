@@ -22,7 +22,7 @@
     if (!interval) return;
 
     const getLiveId = () =>
-      fetch(ID_URL)
+      fetch(ID_URL, { credentials: 'include', redirect: 'follow' })
         .then((response) => (response.ok ? response.text() : null))
         .then((text) => text?.trim() || null)
         .catch(() => null);
@@ -43,11 +43,7 @@
         `id changed from "${storedId}" to "${liveId}", requesting reload`
       );
 
-      const skipReload = storedId === null;
-
       storedId = liveId;
-
-      if (skipReload) return;
 
       port.postMessage(storedId);
     }, interval);
