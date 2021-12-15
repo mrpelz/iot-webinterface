@@ -143,8 +143,6 @@ async function nginx() {
       process.cwd(),
       '-c',
       config,
-      '-e',
-      '/dev/null',
       '-g',
       `pid ${join(tmpdir(), 'nginx.pid')};`,
     ]);

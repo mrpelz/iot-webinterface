@@ -102,7 +102,7 @@
       if (!storedId) return;
 
       const url = new URL(WS_URL, apiBaseUrl);
-      url.protocol = 'ws';
+      url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
       url.searchParams.append('id', storedId);
 
       try {

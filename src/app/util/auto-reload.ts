@@ -38,8 +38,10 @@ export function autoReload(
   };
 
   const handleUpdateInstalled = () => {
-    // eslint-disable-next-line no-console
-    console.log('service worker cache has been refreshed');
+    if (debug) {
+      // eslint-disable-next-line no-console
+      console.log('service worker cache has been refreshed');
+    }
 
     if (unattended) {
       onReloadConfirm();

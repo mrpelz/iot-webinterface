@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ssh root@hermes.net.wurstsalat.cloud << EOF
-  cd /var/www/html/
+ssh root@iot-webinterface.mgmt.wurstsalat.cloud << EOF
+  cd /opt/iot-webinterface/
   scripts/pull.sh
 EOF
