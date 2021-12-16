@@ -32,6 +32,8 @@ export function autoReload(
 
   if (!port) return;
 
+  let primeForUpdate = false;
+
   const onReloadConfirm = () => {
     notifications.clear();
     location.reload();
@@ -42,6 +44,9 @@ export function autoReload(
       // eslint-disable-next-line no-console
       console.log('service worker cache has been refreshed');
     }
+
+    if (!primeForUpdate) return;
+    primeForUpdate = false;
 
     if (initialId === null) return;
 
@@ -64,6 +69,8 @@ export function autoReload(
   };
 
   triggerUpdate = () => {
+    primeForUpdate = true;
+
     if (!('serviceWorker' in navigator)) {
       handleUpdateInstalled();
       return;
