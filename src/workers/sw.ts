@@ -24,140 +24,148 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   };
   /* eslint-enable no-console */
 
-  const ERROR_OUT_STATUS_TEXT = '25C2A7B7-8004-4180-A3D5-0C6FA51FFECA';
   const INDEX_ENDPOINT = '/index.json';
   const CACHE_KEY = 'cache';
 
   const errorMessage = 'service worker synthesized response';
 
+  const laxCacheUrls: RegExp[] = [new RegExp('^\\/$')];
+
   const unhandledRequestUrls: RegExp[] = [
-    new RegExp('^\\/api(?!\\/hierarchy|\\/id)'),
-    new RegExp('^\\/id.txt'),
+    new RegExp('^\\/api(?!\\/hierarchy|\\/id)$'),
+    new RegExp('^\\/id.txt$'),
   ];
   const denyRequestUrls: RegExp[] = [new RegExp('^\\/favicon')];
-  const networkPreferredUrls: RegExp[] = [
-    new RegExp('^\\/api\\/id'),
-    new RegExp('^\\/index.json'),
-    new RegExp('^\\/manifest.json'),
+  const livePreferredUrls: RegExp[] = [
+    new RegExp('^\\/api\\/id$'),
+    new RegExp('^\\/index.json$'),
+    new RegExp('^\\/manifest.json$'),
   ];
+  const cachePreferredUrls: RegExp[] = [new RegExp('^\\/api\\/hierarchy$')];
 
-  const testUrl = (url: string, list: RegExp[]) => {
-    const { pathname: urlPath } = new URL(url, scope.origin);
-    return Boolean(
-      list.find((listEntry) => {
-        return listEntry.test(urlPath);
-      })
-    );
+  const testPath = (path: string, list: RegExp[]) => {
+    for (const regex of list) {
+      if (regex.test(path)) return true;
+    }
+
+    return false;
   };
 
-  const errorOut = (status: number, msg: string) => {
-    return new Response(
+  const syntheticError = (status: number, label: string, message: string) => {
+    const response = new Response(
       multiline`
         Status: ${status.toString()}
         ${errorMessage}
 
+        <label>
+          ${label}
+        </label>
+
         <msg>
-        ${msg}
+        ${message}
         </msg>
       `,
-      {
-        status,
-        statusText: ERROR_OUT_STATUS_TEXT,
-      }
+      { status }
+    );
+
+    return response;
+  };
+
+  scope.onfetch = (fetchEvent) => {
+    const { request } = fetchEvent;
+    const { pathname } = new URL(request.url, scope.origin);
+
+    const isUnhandled = testPath(pathname, unhandledRequestUrls);
+    if (isUnhandled) return;
+
+    fetchEvent.respondWith(
+      (async () => {
+        const isDenied = testPath(pathname, denyRequestUrls);
+        if (isDenied) {
+          return syntheticError(403, 'denied', 'denied resource');
+        }
+
+        const isLaxCache = testPath(pathname, laxCacheUrls);
+
+        const cachedResponse = await caches
+          .match(request, { ignoreSearch: isLaxCache })
+          .catch(() => undefined);
+
+        const isLivePreferred = testPath(pathname, livePreferredUrls);
+        if (isLivePreferred) {
+          const liveResponse = await fetch(request, {
+            credentials: 'include',
+            redirect: 'follow',
+          })
+            .then((response) => (response.ok ? response : undefined))
+            .catch(() => undefined);
+
+          if (liveResponse) {
+            const cloned = liveResponse.clone();
+            const cache = await scope.caches.open(CACHE_KEY);
+            await cache.put(cloned.url, cloned);
+
+            return liveResponse;
+          }
+
+          if (cachedResponse) return cachedResponse;
+
+          return syntheticError(
+            500,
+            'livePreferred',
+            'live-preferred resource not available from live or from cache'
+          );
+        }
+
+        const isCachePreferred = testPath(pathname, cachePreferredUrls);
+        if (isCachePreferred) {
+          if (cachedResponse) return cachedResponse;
+
+          const liveResponse = await fetch(request, {
+            credentials: 'include',
+            redirect: 'follow',
+          })
+            .then((response) => (response.ok ? response : undefined))
+            .catch(() => undefined);
+
+          if (liveResponse) {
+            const cloned = liveResponse.clone();
+            const cache = await scope.caches.open(CACHE_KEY);
+            await cache.put(cloned.url, cloned);
+
+            return liveResponse;
+          }
+
+          return syntheticError(
+            500,
+            'cachePreferred',
+            'cache-preferred resource not available from cache or from live'
+          );
+        }
+
+        if (cachedResponse) return cachedResponse;
+
+        return syntheticError(
+          500,
+          'cacheOnly',
+          'cache-only resource not found in cache'
+        );
+      })()
     );
   };
 
-  const getLive = async (
-    event: FetchEvent,
-    task: string,
-    produceErrorResponse = true
-  ) => {
-    return fetch(event.request)
-      .then(async (response) => {
-        if (!response.ok || response.redirected) {
-          const message = multiline`
-            error fetching live request
-            * for url "${event.request.url}"
-            * while running task "${task}"
-            
-            <response-text>
-            ${await response.text()}
-            </response-text>
-          `;
+  scope.oninstall = (installEvent) => {
+    wsConsole.debug('oninstall');
 
-          wsConsole.info(message);
-
-          return produceErrorResponse
-            ? errorOut(response.status, message)
-            : null;
+    installEvent.waitUntil(
+      (async () => {
+        try {
+          await scope.skipWaiting();
+        } catch (error) {
+          wsConsole.error(`oninstall error: ${error}`);
         }
-
-        return response;
-      })
-      .catch((error) => {
-        const message = multiline`
-          error fetching live request
-          * for url "${event.request.url}"
-          * while running task "${task}"
-          
-          <error>
-          ${error?.toString()}
-          </error>
-        `;
-
-        wsConsole.info(message);
-
-        return errorOut(500, message);
-      });
-  };
-
-  const setCached = async (response: Response) => {
-    try {
-      if (!response) return response;
-      if (!response.ok) return response;
-      if (response.statusText === ERROR_OUT_STATUS_TEXT) return response;
-
-      const cloned = response.clone();
-      const cache = await scope.caches.open(CACHE_KEY);
-      await cache.put(cloned.url, cloned);
-
-      return response;
-    } catch (error) {
-      wsConsole.error(`setCached error: ${error}`);
-
-      return response;
-    }
-  };
-
-  const getCached = async (event: FetchEvent, task: string) => {
-    try {
-      const cachedResponse = await caches.match(event.request, {
-        ignoreSearch: true,
-      });
-      if (cachedResponse) return cachedResponse;
-
-      return getLive(event, task);
-    } catch (error) {
-      const message = multiline`
-        error getting cached response
-        * for url "${event.request.url}"
-        * while running task "${task}"
-        
-        <error>
-        ${error?.toString()}
-        </error>
-      `;
-
-      wsConsole.info(message);
-
-      return errorOut(500, message);
-    }
-  };
-
-  const sendMessage = async () => {
-    for (const client of await scope.clients.matchAll({ type: 'window' })) {
-      client.postMessage(null);
-    }
+      })()
+    );
   };
 
   const refreshCache = async () => {
@@ -182,54 +190,9 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     await cache.add('/');
     await cache.addAll((await response.json()) || []);
 
-    await sendMessage();
-  };
-
-  scope.onfetch = (fetchEvent) => {
-    const { url } = fetchEvent.request;
-
-    const unhandled = testUrl(url, unhandledRequestUrls);
-    if (unhandled) return;
-
-    fetchEvent.respondWith(
-      (async () => {
-        const deny = testUrl(url, denyRequestUrls);
-        if (deny) {
-          return errorOut(403, 'denyRequest');
-        }
-
-        const preferred = testUrl(url, networkPreferredUrls);
-        if (preferred) {
-          return getLive(fetchEvent, 'networkPreferred/getLive', false).then(
-            (response) => {
-              if (!response || response.statusText === ERROR_OUT_STATUS_TEXT) {
-                return getCached(fetchEvent, 'networkPreferred/getCache');
-              }
-
-              return setCached(response);
-            }
-          ) as Promise<Response>;
-        }
-
-        return getCached(fetchEvent, 'cachePreferred').then(
-          setCached
-        ) as Promise<Response>;
-      })()
-    );
-  };
-
-  scope.oninstall = (installEvent) => {
-    wsConsole.debug('oninstall');
-
-    installEvent.waitUntil(
-      (async () => {
-        try {
-          await scope.skipWaiting();
-        } catch (error) {
-          wsConsole.error(`oninstall error: ${error}`);
-        }
-      })()
-    );
+    for (const client of await scope.clients.matchAll({ type: 'window' })) {
+      client.postMessage(null);
+    }
   };
 
   scope.onactivate = (activateEvent) => {

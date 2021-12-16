@@ -79,7 +79,9 @@ export function autoReload(
     refreshServiceWorker();
   };
 
-  port.onmessage = async ({ data: storedId }) => {
+  port.onmessage = async ({ data }) => {
+    const storedId = data as string;
+
     if (debug) {
       // eslint-disable-next-line no-console
       console.info(`received reload request with new id "${storedId}"`);
@@ -87,7 +89,7 @@ export function autoReload(
 
     notifications.clear();
 
-    localStorage.setItem(ID_STORAGE_KEY, String(storedId));
+    localStorage.setItem(ID_STORAGE_KEY, storedId);
 
     if ('serviceWorker' in navigator) {
       const serviceWorker = await navigator.serviceWorker.ready;
