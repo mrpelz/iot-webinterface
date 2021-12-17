@@ -27,6 +27,9 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   const INDEX_ENDPOINT = '/index.json';
   const CACHE_KEY = 'cache';
 
+  const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
+  const BACKFILL_URL = '/35BF75F5-4827-4F54-912B-002082F8615F';
+
   const errorMessage = 'service worker synthesized response';
 
   const laxCacheUrls: RegExp[] = [new RegExp('^\\/$')];
@@ -62,7 +65,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
         </label>
 
         <msg>
-        ${message}
+          ${message}
         </msg>
       `,
       { status }
@@ -71,13 +74,24 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     return response;
   };
 
-  const fetchLive = (request: Request) => {
+  const fetchLive = (request: RequestInfo) => {
     return fetch(request, {
       credentials: 'include',
       redirect: 'follow',
     })
       .then((response) => (response.ok ? response : undefined))
       .catch(() => undefined);
+  };
+
+  const putInCache = async (response: Response) => {
+    const cloned = response.clone();
+    const cache = await scope.caches.open(CACHE_KEY);
+
+    try {
+      await cache.put(cloned.url, cloned);
+    } catch {
+      // noop
+    }
   };
 
   const refreshCache = async () => {
@@ -89,21 +103,49 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     await scope.caches.delete(CACHE_KEY);
     await scope.caches.delete(CACHE_KEY);
 
-    const response = await fetch(new URL(INDEX_ENDPOINT, scope.origin).href, {
-      credentials: 'include',
-      redirect: 'follow',
-    });
-    if (!response.ok || response.redirected) {
-      return;
-    }
+    const response = await fetchLive(
+      new URL(INDEX_ENDPOINT, scope.origin).href
+    );
+    if (!response) return;
+
+    const paths = ['/'].concat((await response.json()) || []);
 
     const cache = await scope.caches.open(CACHE_KEY);
 
-    await cache.add('/');
-    await cache.addAll((await response.json()) || []);
+    for (const path of paths) {
+      /* eslint-disable no-await-in-loop */
+      try {
+        await cache.add(path);
+      } catch {
+        // noop
+      }
+      /* eslint-enable no-await-in-loop */
+    }
+  };
 
-    for (const client of await scope.clients.matchAll({ type: 'window' })) {
-      client.postMessage(null);
+  const backfillCache = async () => {
+    wsConsole.debug('backfillCache');
+
+    const response = await fetchLive(
+      new URL(INDEX_ENDPOINT, scope.origin).href
+    );
+    if (!response) return;
+
+    const paths = ['/'].concat((await response.json()) || []);
+
+    const cache = await scope.caches.open(CACHE_KEY);
+
+    for (const path of paths) {
+      /* eslint-disable no-await-in-loop */
+      try {
+        const match = await cache.match(path);
+        if (match) continue;
+
+        await cache.add(path);
+      } catch {
+        // noop
+      }
+      /* eslint-enable no-await-in-loop */
     }
   };
 
@@ -114,10 +156,21 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     const isUnhandled = testPath(pathname, unhandledRequestUrls);
     if (isUnhandled) return;
 
-    let needsRefresh = false;
-
     fetchEvent.respondWith(
       (async () => {
+        if (pathname === REFRESH_URL) {
+          await scope.registration.update();
+          await refreshCache();
+
+          return new Response(undefined, { status: 204 });
+        }
+
+        if (pathname === BACKFILL_URL) {
+          await backfillCache();
+
+          return new Response(undefined, { status: 204 });
+        }
+
         const isDenied = testPath(pathname, denyRequestUrls);
         if (isDenied) {
           return syntheticError(403, 'denied', 'denied resource');
@@ -134,9 +187,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
           const liveResponse = await fetchLive(request);
 
           if (liveResponse) {
-            const cloned = liveResponse.clone();
-            const cache = await scope.caches.open(CACHE_KEY);
-            await cache.put(cloned.url, cloned);
+            await putInCache(liveResponse);
 
             return liveResponse;
           }
@@ -157,9 +208,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
           const liveResponse = await fetchLive(request);
 
           if (liveResponse) {
-            const cloned = liveResponse.clone();
-            const cache = await scope.caches.open(CACHE_KEY);
-            await cache.put(cloned.url, cloned);
+            await putInCache(liveResponse);
 
             return liveResponse;
           }
@@ -173,13 +222,6 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 
         if (cachedResponse) return cachedResponse;
 
-        // eslint-disable-next-line no-console
-        console.log(pathname);
-
-        if (pathname === '/') {
-          needsRefresh = true;
-        }
-
         const liveResponse = await fetchLive(request);
         if (liveResponse) return liveResponse;
 
@@ -188,13 +230,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
           'cacheOnly',
           'cache-only resource not found in cache and not fetchable from live'
         );
-      })().then(async (response) => {
-        if (needsRefresh) {
-          await refreshCache();
-        }
-
-        return response;
-      })
+      })()
     );
   };
 
@@ -204,6 +240,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     installEvent.waitUntil(
       (async () => {
         try {
+          await refreshCache();
           await scope.skipWaiting();
         } catch (error) {
           wsConsole.error(`oninstall error: ${error}`);
@@ -219,23 +256,10 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
       (async () => {
         try {
           await scope.clients.claim();
-          await refreshCache();
         } catch (error) {
           wsConsole.error(`onactivate error: ${error}`);
         }
       })()
     );
-  };
-
-  scope.onmessage = () => {
-    wsConsole.debug('received refreshRequest from client');
-
-    (async () => {
-      try {
-        await refreshCache();
-      } catch (error) {
-        wsConsole.error(`onmessage error: ${error}`);
-      }
-    })();
   };
 })(self as unknown as ServiceWorkerGlobalScope);

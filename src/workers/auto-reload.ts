@@ -8,6 +8,8 @@
   importScripts('./util/worker-scaffold.js');
 
   const ID_URL = '/id.txt';
+  const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
+  const BACKFILL_URL = '/35BF75F5-4827-4F54-912B-002082F8615F';
 
   type SetupMessage = {
     debug: boolean;
@@ -19,6 +21,13 @@
     if (!setup) return;
 
     const { initialId, interval } = setup;
+
+    setTimeout(async () => {
+      await fetch(BACKFILL_URL, { method: 'POST' })
+        .then((response) => response.text())
+        .catch(() => undefined);
+    }, interval || 10000);
+
     if (!interval) return;
 
     const getLiveId = () =>
@@ -30,6 +39,16 @@
     workerConsole.info(`initial id: "${initialId}", interval: ${interval}`);
 
     let storedId = initialId;
+
+    const handleUpdate = async () => {
+      await fetch(REFRESH_URL, { method: 'POST' })
+        .then((response) => response.text())
+        .catch(() => undefined);
+
+      port.postMessage(storedId);
+    };
+
+    port.onmessage = () => handleUpdate();
 
     setInterval(async () => {
       const liveId = await getLiveId();
@@ -45,7 +64,7 @@
 
       storedId = liveId;
 
-      port.postMessage(storedId);
+      handleUpdate();
     }, interval);
   })(...(await scaffold<SetupMessage>(self)));
 })();

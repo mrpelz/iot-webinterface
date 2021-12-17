@@ -1,7 +1,6 @@
 import { colors, shadow } from '../../style.js';
 import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
-import { triggerUpdate } from '../../util/auto-reload.js';
 
 const _Surface = styled('div')`
   align-items: center;
@@ -42,7 +41,6 @@ const _Text2 = styled(_Text)`
 
 export const Global: FunctionComponent = () => (
   <>
-    <button onClick={() => triggerUpdate?.()}>Refresh</button>
     <_Surface0>0</_Surface0>
     <_Surface1>1</_Surface1>
     <_Surface2>2</_Surface2>

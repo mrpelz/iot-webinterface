@@ -71,6 +71,14 @@ const _MenuListItem = styled('li', forwardRef)<{ active: boolean }>`
   height: ${dimensions.titlebarHeight};
   line-height: ${dimensions.fontSize};
 
+  &:hover {
+    background-color: ${dependentValue(
+      'active',
+      colors.selection(),
+      colors.fontTertiary()
+    )};
+  }
+
   * + & {
     margin-top: -${dimensions.hairline};
   }

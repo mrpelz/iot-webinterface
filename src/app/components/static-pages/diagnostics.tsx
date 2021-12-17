@@ -18,15 +18,16 @@ import {
   staticPagesTop,
   useNavigation,
 } from '../../hooks/navigation.js';
-import { useEffect, useMemo, useState } from 'preact/hooks';
 import {
   useGetter,
   useSetter,
   useStreamOnline,
   useWebApi,
 } from '../../hooks/web-api.js';
+import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
+import { triggerUpdate } from '../../util/auto-reload.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { useFlags } from '../../hooks/flags.js';
 import { useI18n } from '../../hooks/i18n.js';
@@ -77,6 +78,11 @@ const _DiagnosticsContainer = styled('section')`
   thead {
     font-weight: bold;
   }
+`;
+
+export const _RefreshButton = styled('button')`
+  color-scheme: initial;
+  padding: ${dimensions.fontSize} 0;
 `;
 
 export const _Summary = styled('summary')`
@@ -312,50 +318,10 @@ export const Diagnostics: FunctionComponent = () => {
   const { hierarchy } = useWebApi();
   const isStreamOnline = useStreamOnline();
 
-  const [hookRenders, setHookRenders] = useState<[Date, string][]>([]);
-
-  useEffect(() => {
-    setHookRenders((value) => [
-      ...value,
-      [new Date(), `isDesktop ${JSON.stringify(isDesktop)}`],
-    ]);
-  }, [isDesktop]);
-  useEffect(() => {
-    setHookRenders((value) => [...value, [new Date(), 'flags']]);
-  }, [flags]);
-  useEffect(() => {
-    setHookRenders((value) => [...value, [new Date(), 'i18n']]);
-  }, [country, language, locale, translation, translationLanguage]);
-  useEffect(() => {
-    setHookRenders((value) => [
-      ...value,
-      [new Date(), `isMenuVisible ${JSON.stringify(isMenuVisible)}`],
-    ]);
-  }, [isMenuVisible]);
-  useEffect(() => {
-    setHookRenders((value) => [...value, [new Date(), 'navigation']]);
-  }, [building, home, room, staticPage]);
-  useEffect(() => {
-    setHookRenders((value) => [...value, [new Date(), 'fallbackNotification']]);
-  }, [fallbackNotification]);
-  useEffect(() => {
-    setHookRenders((value) => [
-      ...value,
-      [new Date(), `theme ${JSON.stringify(theme)}`],
-    ]);
-  }, [theme]);
-  useEffect(() => {
-    setHookRenders((value) => [...value, [new Date(), 'webApi']]);
-  }, [hierarchy]);
-  useEffect(() => {
-    setHookRenders((value) => [
-      ...value,
-      [new Date(), `isStreamOnline ${JSON.stringify(isStreamOnline)}`],
-    ]);
-  }, [isStreamOnline]);
-
   return (
     <_DiagnosticsContainer>
+      <_RefreshButton onClick={() => triggerUpdate?.()}>Refresh</_RefreshButton>
+
       <table>
         <tr>
           <td>
@@ -566,27 +532,6 @@ export const Diagnostics: FunctionComponent = () => {
             </td>
           </tr>
         ) : null}
-
-        <tr>
-          <td colSpan={999}>
-            <details>
-              <_Summary>
-                <b>hook calls</b>
-              </_Summary>
-
-              <button onClick={() => setHookRenders([])}>reset</button>
-
-              <pre>
-                {hookRenders
-                  .map(
-                    ([date, label]) =>
-                      `${date.toLocaleString(country || language)}: ${label}`
-                  )
-                  .join('\n')}
-              </pre>
-            </details>
-          </td>
-        </tr>
       </table>
 
       {hierarchy ? <Hierarchy element={hierarchy} /> : null}

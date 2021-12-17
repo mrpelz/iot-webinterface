@@ -1,7 +1,3 @@
-type Subscription = {
-  remove: () => void;
-};
-
 enum WorkerCommands {
   SETUP,
   UNLOAD,
@@ -79,15 +75,6 @@ export async function installServiceWorker(
     // eslint-disable-next-line no-console
     console.error(`error registering ServiceWorker (${debugUrl}): ${error}`);
   }
-}
-
-export function refreshServiceWorker(): void {
-  if (!('serviceWorker' in navigator)) return;
-
-  const { controller } = navigator.serviceWorker;
-  if (!controller) return;
-
-  controller.postMessage(null);
 }
 
 export function connectWorker<T>(
