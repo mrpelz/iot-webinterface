@@ -71,101 +71,13 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     return response;
   };
 
-  scope.onfetch = (fetchEvent) => {
-    const { request } = fetchEvent;
-    const { pathname } = new URL(request.url, scope.origin);
-
-    const isUnhandled = testPath(pathname, unhandledRequestUrls);
-    if (isUnhandled) return;
-
-    fetchEvent.respondWith(
-      (async () => {
-        const isDenied = testPath(pathname, denyRequestUrls);
-        if (isDenied) {
-          return syntheticError(403, 'denied', 'denied resource');
-        }
-
-        const isLaxCache = testPath(pathname, laxCacheUrls);
-
-        const cachedResponse = await caches
-          .match(request, { ignoreSearch: isLaxCache })
-          .catch(() => undefined);
-
-        const isLivePreferred = testPath(pathname, livePreferredUrls);
-        if (isLivePreferred) {
-          const liveResponse = await fetch(request, {
-            credentials: 'include',
-            redirect: 'follow',
-          })
-            .then((response) => (response.ok ? response : undefined))
-            .catch(() => undefined);
-
-          if (liveResponse) {
-            const cloned = liveResponse.clone();
-            const cache = await scope.caches.open(CACHE_KEY);
-            await cache.put(cloned.url, cloned);
-
-            return liveResponse;
-          }
-
-          if (cachedResponse) return cachedResponse;
-
-          return syntheticError(
-            500,
-            'livePreferred',
-            'live-preferred resource not available from live or from cache'
-          );
-        }
-
-        const isCachePreferred = testPath(pathname, cachePreferredUrls);
-        if (isCachePreferred) {
-          if (cachedResponse) return cachedResponse;
-
-          const liveResponse = await fetch(request, {
-            credentials: 'include',
-            redirect: 'follow',
-          })
-            .then((response) => (response.ok ? response : undefined))
-            .catch(() => undefined);
-
-          if (liveResponse) {
-            const cloned = liveResponse.clone();
-            const cache = await scope.caches.open(CACHE_KEY);
-            await cache.put(cloned.url, cloned);
-
-            return liveResponse;
-          }
-
-          return syntheticError(
-            500,
-            'cachePreferred',
-            'cache-preferred resource not available from cache or from live'
-          );
-        }
-
-        if (cachedResponse) return cachedResponse;
-
-        return syntheticError(
-          500,
-          'cacheOnly',
-          'cache-only resource not found in cache'
-        );
-      })()
-    );
-  };
-
-  scope.oninstall = (installEvent) => {
-    wsConsole.debug('oninstall');
-
-    installEvent.waitUntil(
-      (async () => {
-        try {
-          await scope.skipWaiting();
-        } catch (error) {
-          wsConsole.error(`oninstall error: ${error}`);
-        }
-      })()
-    );
+  const fetchLive = (request: Request) => {
+    return fetch(request, {
+      credentials: 'include',
+      redirect: 'follow',
+    })
+      .then((response) => (response.ok ? response : undefined))
+      .catch(() => undefined);
   };
 
   const refreshCache = async () => {
@@ -193,6 +105,111 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     for (const client of await scope.clients.matchAll({ type: 'window' })) {
       client.postMessage(null);
     }
+  };
+
+  scope.onfetch = (fetchEvent) => {
+    const { request } = fetchEvent;
+    const { pathname } = new URL(request.url, scope.origin);
+
+    const isUnhandled = testPath(pathname, unhandledRequestUrls);
+    if (isUnhandled) return;
+
+    let needsRefresh = false;
+
+    fetchEvent.respondWith(
+      (async () => {
+        const isDenied = testPath(pathname, denyRequestUrls);
+        if (isDenied) {
+          return syntheticError(403, 'denied', 'denied resource');
+        }
+
+        const isLaxCache = testPath(pathname, laxCacheUrls);
+
+        const cachedResponse = await caches
+          .match(request, { ignoreSearch: isLaxCache })
+          .catch(() => undefined);
+
+        const isLivePreferred = testPath(pathname, livePreferredUrls);
+        if (isLivePreferred) {
+          const liveResponse = await fetchLive(request);
+
+          if (liveResponse) {
+            const cloned = liveResponse.clone();
+            const cache = await scope.caches.open(CACHE_KEY);
+            await cache.put(cloned.url, cloned);
+
+            return liveResponse;
+          }
+
+          if (cachedResponse) return cachedResponse;
+
+          return syntheticError(
+            500,
+            'livePreferred',
+            'live-preferred resource not available from live or from cache'
+          );
+        }
+
+        const isCachePreferred = testPath(pathname, cachePreferredUrls);
+        if (isCachePreferred) {
+          if (cachedResponse) return cachedResponse;
+
+          const liveResponse = await fetchLive(request);
+
+          if (liveResponse) {
+            const cloned = liveResponse.clone();
+            const cache = await scope.caches.open(CACHE_KEY);
+            await cache.put(cloned.url, cloned);
+
+            return liveResponse;
+          }
+
+          return syntheticError(
+            500,
+            'cachePreferred',
+            'cache-preferred resource not available from cache or from live'
+          );
+        }
+
+        if (cachedResponse) return cachedResponse;
+
+        // eslint-disable-next-line no-console
+        console.log(pathname);
+
+        if (pathname === '/') {
+          needsRefresh = true;
+        }
+
+        const liveResponse = await fetchLive(request);
+        if (liveResponse) return liveResponse;
+
+        return syntheticError(
+          500,
+          'cacheOnly',
+          'cache-only resource not found in cache and not fetchable from live'
+        );
+      })().then(async (response) => {
+        if (needsRefresh) {
+          await refreshCache();
+        }
+
+        return response;
+      })
+    );
+  };
+
+  scope.oninstall = (installEvent) => {
+    wsConsole.debug('oninstall');
+
+    installEvent.waitUntil(
+      (async () => {
+        try {
+          await scope.skipWaiting();
+        } catch (error) {
+          wsConsole.error(`oninstall error: ${error}`);
+        }
+      })()
+    );
   };
 
   scope.onactivate = (activateEvent) => {
