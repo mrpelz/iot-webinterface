@@ -7,7 +7,7 @@ import {
 import { breakpointValue, useBreakpoint } from '../style/breakpoint.js';
 import { colors, dimensions } from '../style.js';
 import { dependentValue, mediaQuery, useMediaQuery } from '../style/main.js';
-import { useEffect, useMemo, useRef } from 'preact/hooks';
+import { useLayoutEffect, useMemo, useRef } from 'preact/hooks';
 import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 import { useNotification } from '../hooks/notification.js';
@@ -98,11 +98,11 @@ export const Layout: FunctionComponent<{
 
   const isAsideVisibleRef = useRef<MenuVisible>(isAsideVisible);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     isAsideVisibleRef.current = isAsideVisible;
   }, [isAsideVisible]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const { current: asideCurrent } = asideRef;
     const { current: mainCurrent } = mainRef;
 
@@ -192,7 +192,7 @@ export const Layout: FunctionComponent<{
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asideRef, mainRef]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!asideRef.current) return;
 
     const { style } = asideRef.current;

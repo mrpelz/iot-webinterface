@@ -1,6 +1,6 @@
 import { FunctionComponent, JSX, createContext } from 'preact';
 import { colors, dimensions } from '../style.js';
-import { useContext, useEffect, useRef, useState } from 'preact/hooks';
+import { useContext, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { useRoom, useStaticPage } from '../hooks/navigation.js';
 import { Translation } from '../hooks/i18n.js';
 import { add } from '../style/dimensions.js';
@@ -54,7 +54,7 @@ export const IconContainer: FunctionComponent<{ right?: true }> = ({
 
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!ref.current) return;
 
     setPadding(ref.current.clientWidth);
@@ -73,7 +73,7 @@ export const Titlebar: FunctionComponent<{
 }> = ({ iconsLeft, iconsRight }) => {
   const [padding, setPadding] = useState(0);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setPadding(0);
   }, [iconsLeft, iconsRight]);
 

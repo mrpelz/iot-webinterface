@@ -193,7 +193,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 
         const isDenied = testPath(pathname, denyRequestUrls);
         if (isDenied) {
-          return syntheticError(403, 'denied', 'denied resource');
+          return syntheticError(403, request.url, 'denied resource');
         }
 
         const isLaxCache = testPath(pathname, laxCacheUrls);
@@ -216,7 +216,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 
           return syntheticError(
             500,
-            'livePreferred',
+            request.url,
             'live-preferred resource not available from live or from cache'
           );
         }
@@ -235,7 +235,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 
           return syntheticError(
             500,
-            'cachePreferred',
+            request.url,
             'cache-preferred resource not available from cache or from live'
           );
         }
@@ -247,7 +247,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 
         return syntheticError(
           500,
-          'cacheOnly',
+          request.url,
           'cache-only resource not found in cache and not fetchable from live'
         );
       })()

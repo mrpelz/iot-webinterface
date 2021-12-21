@@ -5,7 +5,7 @@ import {
   useIsMenuVisible,
 } from '../hooks/menu.js';
 import { colors, dimensions, strings } from '../style.js';
-import { useEffect, useRef } from 'preact/hooks';
+import { useLayoutEffect, useRef } from 'preact/hooks';
 import { useRoom, useStaticPage } from '../hooks/navigation.js';
 import { Diagnostics } from './static-pages/diagnostics.js';
 import { FunctionComponent } from 'preact';
@@ -42,11 +42,11 @@ export const App: FunctionComponent = () => {
   const previousStaticPage = useRef<string | undefined>();
   const previousRoom = useRef<string | undefined>();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     isMenuVisibleRef.current = isMenuVisible;
   }, [isMenuVisible]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const { style } = document.documentElement;
 
     style.background = backgroundColor;
@@ -56,7 +56,7 @@ export const App: FunctionComponent = () => {
     };
   }, [backgroundColor]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const { style } = document.documentElement;
 
     if (isMenuVisible) {
@@ -84,7 +84,7 @@ export const App: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMenuVisible]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const onScroll: (
       this: HTMLElement,
       event: HTMLElementEventMap['scroll']
@@ -104,7 +104,7 @@ export const App: FunctionComponent = () => {
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const { style } = document.documentElement;
 
     return () => {

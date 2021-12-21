@@ -1,7 +1,7 @@
 import { HierarchyElementFloor, HierarchyElementRoom } from '../web-api.js';
 import {
   StateUpdater,
-  useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -100,7 +100,7 @@ const MenuListItem: FunctionComponent<{
 
   const ref = useRef<HTMLLIElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const { current } = ref;
     if (!active || !current || !isMenuVisible) return;
 
