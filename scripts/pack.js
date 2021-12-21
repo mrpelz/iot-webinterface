@@ -28,12 +28,14 @@ const INDEX_EXCLUSIONS = [
   new RegExp('^\\/manifest.json$'),
 ];
 
-const INDEX_TIERS = [
-  new RegExp('^\\/js\\/'),
-  new RegExp('^\\/images\\/icons\\/'),
-  new RegExp('^\\/images\\/splash\\/'),
-  new RegExp('^\\/images\\/background\\/'),
-];
+const INDEX_TIERS = {
+  critical: [
+    new RegExp('^\\/js\\/'),
+    new RegExp('^\\/images\\/icons\\/'),
+    new RegExp('^\\/images\\/splash\\/'),
+  ],
+  optional: [new RegExp('^\\/images\\/background\\/')],
+};
 
 const NGINX_CONFIG = './nginx.conf';
 
@@ -97,17 +99,22 @@ async function precacheIndex() {
     .flat()
     .sort();
 
-  const result = [
-    ...INDEX_TIERS.map((tier) => fileList.filter((file) => tier.test(file))),
-    fileList.filter((file) => {
-      for (const tier of INDEX_TIERS) {
-        if (tier.test(file)) return false;
-      }
-      return true;
-    }),
-  ].flat();
+  const result = Object.fromEntries(
+    Object.entries(INDEX_TIERS).map(([tier, matchers]) => {
+      const matchingFiles = [];
 
-  const filePayload = JSON.stringify(result, null, 2);
+      for (const matcher of matchers) {
+        for (const file of fileList) {
+          if (!matcher.test(file)) continue;
+          matchingFiles.push(file);
+        }
+      }
+
+      return [tier, matchingFiles];
+    })
+  );
+
+  const filePayload = JSON.stringify(result);
 
   hashes.push(createHash('md5').update(filePayload, 'utf8').digest('hex'));
 

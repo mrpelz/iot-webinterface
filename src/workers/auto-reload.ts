@@ -24,7 +24,10 @@
 
     setTimeout(async () => {
       await fetch(BACKFILL_URL, { method: 'POST' })
-        .then((response) => response.text())
+        .then((response) => {
+          response.arrayBuffer();
+          return undefined;
+        })
         .catch(() => undefined);
     }, interval || 10000);
 
@@ -41,11 +44,12 @@
     let storedId = initialId;
 
     const handleUpdate = async () => {
-      await fetch(REFRESH_URL, { method: 'POST' })
-        .then((response) => response.text())
-        .catch(() => undefined);
+      const ok = await fetch(REFRESH_URL, { method: 'POST' })
+        .then((response) => (response.ok ? response.text() : null))
+        .then((responseText) => responseText === REFRESH_URL)
+        .catch(() => false);
 
-      port.postMessage(storedId);
+      port.postMessage(ok ? storedId : null);
     };
 
     port.onmessage = () => handleUpdate();

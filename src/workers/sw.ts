@@ -108,11 +108,30 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     );
     if (!response) return;
 
-    const paths = ['/'].concat((await response.json()) || []);
-
     const cache = await scope.caches.open(CACHE_KEY);
 
+    const { critical = [], optional = [] } = (await response.json()) || {};
+    const paths = ['/'].concat(critical);
+
     for (const path of paths) {
+      /* eslint-disable no-await-in-loop */
+      try {
+        await cache.add(path);
+      } catch {
+        // noop
+      }
+      /* eslint-enable no-await-in-loop */
+    }
+
+    if (
+      scope.navigator.userAgent.includes('iPad') ||
+      scope.navigator.userAgent.includes('iPhone') ||
+      scope.navigator.userAgent.includes('iPod')
+    ) {
+      return;
+    }
+
+    for (const path of optional) {
       /* eslint-disable no-await-in-loop */
       try {
         await cache.add(path);
@@ -131,9 +150,10 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     );
     if (!response) return;
 
-    const paths = ['/'].concat((await response.json()) || []);
-
     const cache = await scope.caches.open(CACHE_KEY);
+
+    const { critical = [] } = (await response.json()) || {};
+    const paths = ['/'].concat(critical);
 
     for (const path of paths) {
       /* eslint-disable no-await-in-loop */
@@ -162,13 +182,13 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
           await scope.registration.update();
           await refreshCache();
 
-          return new Response(undefined, { status: 204 });
+          return new Response(REFRESH_URL);
         }
 
         if (pathname === BACKFILL_URL) {
           await backfillCache();
 
-          return new Response(undefined, { status: 204 });
+          return new Response(BACKFILL_URL);
         }
 
         const isDenied = testPath(pathname, denyRequestUrls);

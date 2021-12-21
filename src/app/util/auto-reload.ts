@@ -36,15 +36,43 @@ export function autoReload(
   };
 
   port.onmessage = async ({ data }) => {
-    const storedId = data as string;
+    const newId = data as string | null;
+
+    if (newId === null) {
+      if (debug) {
+        // eslint-disable-next-line no-console
+        console.info(
+          'received reload request indicating no service worker is present'
+        );
+      }
+
+      if (unattended) {
+        onReloadConfirm();
+
+        return;
+      }
+
+      notifications.trigger(
+        'No new App version installed',
+        {
+          body: 'Service worker not present',
+          requireInteraction: true,
+          tag: 'versionUpdate',
+        },
+        onReloadConfirm,
+        () => notifications.clear()
+      );
+
+      return;
+    }
 
     if (debug) {
       // eslint-disable-next-line no-console
-      console.info(`received reload request with new id "${storedId}"`);
+      console.info(`received reload request with new id "${newId}"`);
     }
 
     notifications.clear();
-    localStorage.setItem(ID_STORAGE_KEY, storedId);
+    localStorage.setItem(ID_STORAGE_KEY, newId);
 
     if (initialId === null) return;
 

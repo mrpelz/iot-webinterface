@@ -1,5 +1,11 @@
 import { HierarchyElementFloor, HierarchyElementRoom } from '../web-api.js';
-import { StateUpdater, useEffect, useMemo, useRef } from 'preact/hooks';
+import {
+  StateUpdater,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 import { colors, dimensions } from '../style.js';
 import {
   staticPagesBottom,
@@ -51,16 +57,25 @@ const _MenuList = styled('ul')`
   padding: 0;
 `;
 
-const _MenuListItem = styled('li', forwardRef)<{ active: boolean }>`
-  background-color: ${dependentValue(
-    'active',
-    colors.selection(),
-    colors.backgroundPrimary()
-  )};
+const _MenuListItem = styled('li', forwardRef)<{
+  isActive: boolean;
+  isHovered: boolean;
+}>`
+  background-color: ${(...args) =>
+    dependentValue(
+      'isActive',
+      colors.selection(),
+      dependentValue(
+        'isHovered',
+        colors.fontTertiary(),
+        colors.backgroundPrimary()
+      )(...args)
+    )(...args)};
+
   border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
   border-block-start: ${dimensions.hairline} solid ${colors.fontTertiary()};
   color: ${dependentValue(
-    'active',
+    'isActive',
     colors.backgroundPrimary(),
     colors.fontPrimary()
   )};
@@ -71,24 +86,17 @@ const _MenuListItem = styled('li', forwardRef)<{ active: boolean }>`
   height: ${dimensions.titlebarHeight};
   line-height: ${dimensions.fontSize};
 
-  &:hover {
-    background-color: ${dependentValue(
-      'active',
-      colors.selection(),
-      colors.fontTertiary()
-    )};
-  }
-
   * + & {
     margin-top: -${dimensions.hairline};
   }
 `;
 
 const MenuListItem: FunctionComponent<{
-  active: boolean;
+  isActive: boolean;
   onClick: () => void;
-}> = ({ active, onClick, children }) => {
+}> = ({ isActive: active, onClick, children }) => {
   const isMenuVisible = useIsMenuVisible();
+  const [isHovered, setHovered] = useState(false);
 
   const ref = useRef<HTMLLIElement>(null);
 
@@ -101,7 +109,14 @@ const MenuListItem: FunctionComponent<{
   }, [isMenuVisible]);
 
   return (
-    <_MenuListItem active={active} onClick={onClick} ref={ref}>
+    <_MenuListItem
+      isActive={active}
+      isHovered={isHovered}
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      ref={ref}
+    >
       {children}
     </_MenuListItem>
   );
@@ -141,7 +156,7 @@ export const Floor: FunctionComponent<{
         {sortedElements.map((room, key) => (
           <MenuListItem
             key={key}
-            active={room === selectedRoom}
+            isActive={room === selectedRoom}
             onClick={() => selectRoom(room)}
           >
             <Translation i18nKey={room.meta.name} />
@@ -170,7 +185,7 @@ export const Menu: FunctionComponent = () => {
             {staticPagesTop.map((staticPage, key) => (
               <MenuListItem
                 key={key}
-                active={staticPage === selectedStaticPage}
+                isActive={staticPage === selectedStaticPage}
                 onClick={() => selectStaticPage(staticPage)}
               >
                 <Translation i18nKey={staticPage} />
@@ -193,7 +208,7 @@ export const Menu: FunctionComponent = () => {
             {staticPagesBottom.map((staticPage, key) => (
               <MenuListItem
                 key={key}
-                active={staticPage === selectedStaticPage}
+                isActive={staticPage === selectedStaticPage}
                 onClick={() => selectStaticPage(staticPage)}
               >
                 <Translation i18nKey={staticPage} />
