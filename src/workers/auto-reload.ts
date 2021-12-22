@@ -9,7 +9,6 @@
 
   const ID_URL = '/id.txt';
   const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
-  const BACKFILL_URL = '/35BF75F5-4827-4F54-912B-002082F8615F';
 
   type SetupMessage = {
     debug: boolean;
@@ -21,15 +20,6 @@
     if (!setup) return;
 
     const { initialId, interval } = setup;
-
-    setTimeout(async () => {
-      await fetch(BACKFILL_URL, { method: 'POST' })
-        .then((response) => {
-          response.arrayBuffer();
-          return undefined;
-        })
-        .catch(() => undefined);
-    }, interval || 10000);
 
     if (!interval) return;
 

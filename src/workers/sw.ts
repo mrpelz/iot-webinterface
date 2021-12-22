@@ -28,7 +28,6 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   const CACHE_KEY = 'cache';
 
   const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
-  const BACKFILL_URL = '/35BF75F5-4827-4F54-912B-002082F8615F';
 
   const errorMessage = 'service worker synthesized response';
 
@@ -97,30 +96,21 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   const refreshCache = async () => {
     wsConsole.debug('refreshCache');
 
-    await scope.caches.delete(CACHE_KEY);
-    await scope.caches.delete(CACHE_KEY);
-    await scope.caches.delete(CACHE_KEY);
-    await scope.caches.delete(CACHE_KEY);
-    await scope.caches.delete(CACHE_KEY);
-
     const response = await fetchLive(
       new URL(INDEX_ENDPOINT, scope.origin).href
     );
     if (!response) return;
 
+    await scope.caches.delete(CACHE_KEY);
     const cache = await scope.caches.open(CACHE_KEY);
 
     const { critical = [], optional = [] } = (await response.json()) || {};
     const paths = ['/'].concat(critical);
 
-    for (const path of paths) {
-      /* eslint-disable no-await-in-loop */
-      try {
-        await cache.add(path);
-      } catch {
-        // noop
-      }
-      /* eslint-enable no-await-in-loop */
+    try {
+      await cache.addAll(paths);
+    } catch {
+      // noop
     }
 
     if (
@@ -131,41 +121,10 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
       return;
     }
 
-    for (const path of optional) {
-      /* eslint-disable no-await-in-loop */
-      try {
-        await cache.add(path);
-      } catch {
-        // noop
-      }
-      /* eslint-enable no-await-in-loop */
-    }
-  };
-
-  const backfillCache = async () => {
-    wsConsole.debug('backfillCache');
-
-    const response = await fetchLive(
-      new URL(INDEX_ENDPOINT, scope.origin).href
-    );
-    if (!response) return;
-
-    const cache = await scope.caches.open(CACHE_KEY);
-
-    const { critical = [] } = (await response.json()) || {};
-    const paths = ['/'].concat(critical);
-
-    for (const path of paths) {
-      /* eslint-disable no-await-in-loop */
-      try {
-        const match = await cache.match(path);
-        if (match) continue;
-
-        await cache.add(path);
-      } catch {
-        // noop
-      }
-      /* eslint-enable no-await-in-loop */
+    try {
+      await cache.addAll(optional);
+    } catch {
+      // noop
     }
   };
 
@@ -178,17 +137,11 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 
     fetchEvent.respondWith(
       (async () => {
-        if (pathname === REFRESH_URL) {
+        if (request.method === 'POST' && pathname === REFRESH_URL) {
           await scope.registration.update();
           await refreshCache();
 
           return new Response(REFRESH_URL);
-        }
-
-        if (pathname === BACKFILL_URL) {
-          await backfillCache();
-
-          return new Response(BACKFILL_URL);
         }
 
         const isDenied = testPath(pathname, denyRequestUrls);
