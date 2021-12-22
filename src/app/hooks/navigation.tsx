@@ -16,9 +16,12 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'preact/hooks';
+import {
+  useGetLocalStorage,
+  useSetLocalStorage,
+} from '../util/local-storage.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/hook-debug.js';
 import { useSetMenuVisible } from './menu.js';
@@ -49,8 +52,8 @@ type TNavigationContext = {
   room: NavigationElement<
     HierarchyElementRoom,
     {
-      elements: HierarchyElementRoom[];
-      floor: HierarchyElementFloor;
+      children: HierarchyElementRoom[];
+      element: HierarchyElementFloor;
     }
   >;
   staticPage: {
@@ -70,28 +73,36 @@ function useNavigationElements<
     | HierarchyElementBuilding
     | HierarchyElementHome
     | HierarchyElementRoom
->(allElements: HierarchyElement[] | null, level: T['meta']['level']) {
+>(
+  allElements: HierarchyElement[] | null,
+  level: T['meta']['level'],
+  preselect: string | null = null
+) {
+  const [state, setState] = useState<T | null>(null);
+
   const elements = useMemo(() => {
     if (!allElements) return [];
 
     return getElementsFromLevel<T>(allElements, level);
   }, [allElements, level]);
 
-  const primaryElement = useMemo(() => {
-    if (level === Levels.ROOM) return null;
+  useEffect(() => {
+    if (level === Levels.ROOM) return;
 
     if (elements.length === 1) {
-      return elements[0];
+      setState(elements[0]);
+      return;
     }
 
-    return (
-      elements.find(
-        ({ meta }) => (meta as Exclude<T['meta'], MetaRoom>).isPrimary
-      ) || null
-    );
-  }, [elements, level]);
+    for (const element of elements) {
+      const { isPrimary, name } = element.meta as Exclude<T['meta'], MetaRoom>;
 
-  const [state, setState] = useState(primaryElement);
+      if (name === preselect || isPrimary) {
+        setState(element);
+        break;
+      }
+    }
+  }, [elements, level, preselect]);
 
   return {
     elements,
@@ -109,32 +120,35 @@ function useNavigationElementsSubdivided<
   divisionLevel: S['meta']['level'],
   preselect: string | null = null
 ) {
-  const preselected = useRef<T>(null);
+  const [state, setState] = useState<T | null>(null);
 
   const elements = useMemo(() => {
     if (!allElements) return [];
 
-    return getElementsFromLevel<S>(allElements, divisionLevel).map((floor) => {
-      const innerElements = getElementsFromLevel<T>(flatten(floor), level);
+    return getElementsFromLevel<S>(allElements, divisionLevel).map(
+      (outerElement) => {
+        const innerElements = getElementsFromLevel<T>(
+          flatten(outerElement),
+          level
+        );
 
-      for (const innerElement of innerElements) {
-        const { meta } = innerElement;
+        for (const innerElement of innerElements) {
+          const { meta } = innerElement;
 
-        if (!('name' in meta)) continue;
-        if (meta.name !== preselect) continue;
+          if (!('name' in meta)) continue;
+          if (meta.name !== preselect) continue;
 
-        preselected.current = innerElement;
-        break;
+          setState(innerElement);
+          break;
+        }
+
+        return {
+          children: innerElements,
+          element: outerElement,
+        };
       }
-
-      return {
-        elements: innerElements,
-        floor,
-      };
-    });
+    );
   }, [allElements, divisionLevel, level, preselect]);
-
-  const [state, setState] = useState<T | null>(preselected.current || null);
 
   return {
     elements,
@@ -153,35 +167,50 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
 
   const setMenuVisible = useSetMenuVisible();
 
-  const allElements = useMemo(
-    () => (hierarchy ? flatten(hierarchy) : null),
-    [hierarchy]
-  );
-
   const home = useNavigationElements<HierarchyElementHome>(
-    allElements,
-    Levels.HOME
+    useMemo(() => {
+      if (!hierarchy) return null;
+      return flatten(hierarchy);
+    }, [hierarchy]),
+    Levels.HOME,
+    useGetLocalStorage('home')
   );
+  useSetLocalStorage('home', home.state?.meta.name || null);
+
   const building = useNavigationElements<HierarchyElementBuilding>(
-    allElements,
-    Levels.BUILDING
+    useMemo(() => {
+      if (!home.state?.children) return null;
+      return Object.values(home.state.children);
+    }, [home.state]),
+    Levels.BUILDING,
+    useGetLocalStorage('building')
   );
+  useSetLocalStorage('building', building.state?.meta.name || null);
+
+  const storedRoom = useGetLocalStorage('room');
   const room = useNavigationElementsSubdivided<
     HierarchyElementRoom,
     HierarchyElementFloor
   >(
-    allElements,
+    useMemo(() => {
+      if (!building.state?.children) return null;
+      return Object.values(building.state.children);
+    }, [building.state]),
     Levels.ROOM,
     Levels.FLOOR,
-    staticPageFromFlag ? null : pageOverride
+    staticPageFromFlag ? null : storedRoom || pageOverride
   );
+  useSetLocalStorage('room', room.state?.meta.name || null);
 
+  const storedStaticPage = useGetLocalStorage('staticPage');
   const [state, setState] = useState(() => {
     if (staticPageFromFlag) return pageOverride as StaticPage;
+    if (storedStaticPage) return storedStaticPage as StaticPage;
     if (room.state) return null;
 
     return START_PAGE;
   });
+  useSetLocalStorage('staticPage', state);
 
   const staticPage = useMemo(() => ({ setState, state }), [state]);
 

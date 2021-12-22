@@ -195,7 +195,7 @@ export const Menu: FunctionComponent = () => {
         </_MenuSubdivision>
 
         <_MenuSubdivision>
-          {floors.map(({ elements, floor }, key) => (
+          {floors.map(({ children: elements, element: floor }, key) => (
             <Floor
               key={key}
               {...{ elements, floor, selectRoom, selectedRoom }}

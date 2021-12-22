@@ -428,7 +428,7 @@ export const Diagnostics: FunctionComponent = () => {
                           JSON.stringify(
                             {
                               elements: home.elements.map(({ meta }) => meta),
-                              state: home.state?.meta,
+                              state: home.state?.meta || null,
                             },
                             undefined,
                             2
@@ -449,7 +449,7 @@ export const Diagnostics: FunctionComponent = () => {
                               elements: building.elements.map(
                                 ({ meta }) => meta
                               ),
-                              state: building.state?.meta,
+                              state: building.state?.meta || null,
                             },
                             undefined,
                             2
@@ -468,9 +468,9 @@ export const Diagnostics: FunctionComponent = () => {
                           JSON.stringify(
                             {
                               elements: room.elements.map(
-                                ({ elements, floor }) => ({
-                                  floor: floor.meta,
-                                  rooms: elements.map(({ meta }) => meta),
+                                ({ children, element }) => ({
+                                  children: children.map(({ meta }) => meta),
+                                  element: element.meta,
                                 })
                               ),
                               state: room.state?.meta || null,

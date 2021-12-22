@@ -360,7 +360,18 @@ export function levelToString(input: Levels): string | null {
   }
 }
 
-export function valueTypeToType(input: ValueType): string {
+export function valueTypeToType(
+  input: ValueType
+):
+  | 'null'
+  | 'string'
+  | 'number'
+  | 'bigint'
+  | 'boolean'
+  | 'symbol'
+  | 'undefined'
+  | 'object'
+  | 'function' {
   switch (input) {
     case ValueType.NULL:
       return 'null';
