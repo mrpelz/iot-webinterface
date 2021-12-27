@@ -9,6 +9,7 @@ import { WebApi } from './web-api.js';
 import { autoReload } from './util/auto-reload.js';
 import { getFlags } from './util/flags.js';
 import { render } from './root.js';
+import { swPrerender } from './util/sw-prerender.js';
 
 onerror = () => removeServiceWorkers();
 onunhandledrejection = () => removeServiceWorkers();
@@ -47,6 +48,8 @@ const fn = async () => {
       debug
     );
   }
+
+  await swPrerender();
 };
 
 (() => {
