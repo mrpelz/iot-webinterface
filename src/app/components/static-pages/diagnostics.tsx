@@ -36,7 +36,7 @@ import { useMediaQuery } from '../../style/main.js';
 import { useNotification } from '../../hooks/notification.js';
 import { useTheme } from '../../hooks/theme.js';
 
-const _DiagnosticsContainer = styled('section')`
+export const _DiagnosticsContainer = styled('section')`
   background-color: white;
   color: ${colors.black()};
   display: flex;

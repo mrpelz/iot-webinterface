@@ -1,3 +1,8 @@
+import {
+  Diagnostics,
+  Hierarchy,
+  _DiagnosticsContainer,
+} from './static-pages/diagnostics.js';
 import { MapIcon, MenuIcon } from './icons.js';
 import {
   MenuVisible,
@@ -7,13 +12,13 @@ import {
 import { colors, dimensions, strings } from '../style.js';
 import { useLayoutEffect, useRef } from 'preact/hooks';
 import { useRoom, useStaticPage } from '../hooks/navigation.js';
-import { Diagnostics } from './static-pages/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Global } from './static-pages/global.js';
 import { Layout } from './layout.js';
 import { Menu } from './menu.js';
 import { Notification } from './notification.js';
 import { StatusBar } from './status-bar.js';
+import { Technical } from './static-pages/technical.js';
 import { Titlebar } from './titlebar.js';
 import { styled } from 'goober';
 import { useBreakpoint } from '../style/breakpoint.js';
@@ -135,9 +140,15 @@ export const App: FunctionComponent = () => {
               global: <Global />,
               map: null,
               settings: null,
-              technical: null,
+              technical: <Technical />,
             }[staticPage]
           : null}
+
+        {room ? (
+          <_DiagnosticsContainer>
+            <Hierarchy element={room} />
+          </_DiagnosticsContainer>
+        ) : null}
       </Layout>
     </_App>
   );

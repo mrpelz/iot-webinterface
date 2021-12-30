@@ -176,10 +176,12 @@ export const Layout: FunctionComponent<{
       setTransform(0);
     };
 
-    mainCurrent.addEventListener('touchstart', onTouchStart);
+    mainCurrent.addEventListener('touchstart', onTouchStart, { passive: true });
     mainCurrent.addEventListener('touchmove', onTouchMove, { passive: false });
-    mainCurrent.addEventListener('touchend', onTouchEnd);
-    mainCurrent.addEventListener('touchcancel', onTouchCancel);
+    mainCurrent.addEventListener('touchend', onTouchEnd, { passive: true });
+    mainCurrent.addEventListener('touchcancel', onTouchCancel, {
+      passive: true,
+    });
 
     return () => {
       setTransform(0);
