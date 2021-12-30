@@ -7,14 +7,10 @@
 (async () => {
   importScripts('./util/worker-scaffold.js');
 
+  type SetupMessage = { initialId: string | null; interval: number };
+
   const ID_URL = '/id.txt';
   const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
-
-  type SetupMessage = {
-    debug: boolean;
-    initialId: string | null;
-    interval: number;
-  };
 
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;

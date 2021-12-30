@@ -12,12 +12,56 @@
     interval: number;
   };
 
-  enum ChildChannelType {
+  enum ChildType {
     GETTER,
     SETTER,
   }
 
-  type ChildChannelRequest = [ChildChannelType, number];
+  enum WorkerMessageType {
+    STREAM,
+    HIERARCHY,
+    CHILD_REQUEST,
+  }
+
+  type WorkerMessageOutbound =
+    | {
+        online: boolean;
+        type: WorkerMessageType.STREAM;
+      }
+    | {
+        hierarchy: unknown;
+        type: WorkerMessageType.HIERARCHY;
+      };
+
+  type WorkerMessageInbound = {
+    childType: ChildType;
+    index: number;
+    type: WorkerMessageType.CHILD_REQUEST;
+  };
+
+  enum ChildMessageType {
+    CLOSE,
+    GET,
+    SET,
+  }
+
+  type GetterMessageInbound = {
+    type: ChildMessageType.CLOSE;
+  };
+
+  type GetterMessageOutbound = {
+    type: ChildMessageType.GET;
+    value: unknown;
+  };
+
+  type SetterMessageInbound =
+    | {
+        type: ChildMessageType.CLOSE;
+      }
+    | {
+        type: ChildMessageType.SET;
+        value: unknown;
+      };
 
   type Getter = (value: unknown) => void;
 
@@ -27,10 +71,6 @@
     sendMessage: WebSocketHandler;
     setId: (id: string) => void;
   };
-
-  const CLOSE_CHILD = '880E1EE9-15A2-462D-BCBC-E09630A1CFBB';
-  const STREAM_ONLINE = 'B41F5C2A-3F67-449F-BF91-37A3153FFFE9';
-  const STREAM_OFFLINE = '4A999429-B64A-4426-9818-E68039EF022D';
 
   const HIERARCHY_URL = '/api/hierarchy';
   const ID_URL = '/api/id';
@@ -192,7 +232,12 @@
     })();
 
     const getter: Getter = (value) => {
-      port.postMessage(value);
+      const message: GetterMessageOutbound = {
+        type: ChildMessageType.GET,
+        value,
+      };
+
+      port.postMessage(message);
     };
 
     gettersForIndex.add(getter);
@@ -202,8 +247,9 @@
       getter(existingValue);
     }
 
-    port.onmessage = ({ data: value }) => {
-      if (value !== CLOSE_CHILD) return;
+    port.onmessage = ({ data }) => {
+      const { type } = data as GetterMessageInbound;
+      if (type !== ChildMessageType.CLOSE) return;
 
       workerConsole.info(`removing getter for index ${index}`);
 
@@ -215,22 +261,26 @@
   const createSetter = (
     index: number,
     port: MessagePort,
-    callback: WebSocketHandler
+    handler: WebSocketHandler
   ) => {
     workerConsole.info(`creating setter for index ${index}`);
 
-    port.onmessage = ({ data: value }) => {
-      if (value === CLOSE_CHILD) {
-        workerConsole.info(`removing setter for index ${index}`);
+    port.onmessage = ({ data }) => {
+      const message = data as SetterMessageInbound;
+      const { type } = message;
 
-        port.close();
-
-        return;
+      // eslint-disable-next-line default-case
+      switch (type) {
+        case ChildMessageType.CLOSE:
+          workerConsole.info(`removing setter for index ${index}`);
+          port.close();
+          return;
+        case ChildMessageType.SET:
+          workerConsole.debug(
+            `got setter call from index ${index}: "${message.value}"`
+          );
+          handler([index, message.value]);
       }
-
-      workerConsole.debug(`got setter call from index ${index}: "${value}"`);
-
-      callback([index, value]);
     };
   };
 
@@ -244,7 +294,12 @@
 
     const handleStreamOnline = (online: boolean) => {
       _handleStreamOnline = (childPort) => {
-        childPort.postMessage(online ? STREAM_ONLINE : STREAM_OFFLINE);
+        const message: WorkerMessageOutbound = {
+          online,
+          type: WorkerMessageType.STREAM,
+        };
+
+        childPort.postMessage(message);
       };
 
       _handleStreamOnline(port);
@@ -262,13 +317,14 @@
 
       childPort.start();
 
-      const [cmd, index] = data as ChildChannelRequest;
+      const { childType, index, type } = data as WorkerMessageInbound;
+      if (type !== WorkerMessageType.CHILD_REQUEST) return;
 
-      switch (cmd) {
-        case ChildChannelType.GETTER:
+      switch (childType) {
+        case ChildType.GETTER:
           createGetter(index, childPort);
           return;
-        case ChildChannelType.SETTER:
+        case ChildType.SETTER:
           createSetter(index, childPort, (value) => sendMessage(value));
           return;
         default:
@@ -280,7 +336,12 @@
       const hierarchy = await getHierarchy(apiBaseUrl, id);
 
       _handleHierachy = (childPort) => {
-        childPort.postMessage(hierarchy);
+        const message: WorkerMessageOutbound = {
+          hierarchy,
+          type: WorkerMessageType.HIERARCHY,
+        };
+
+        childPort.postMessage(message);
       };
 
       _handleHierachy(port);

@@ -5,13 +5,6 @@ type SetupMessage = {
   interval: number;
 };
 
-enum ChildChannelType {
-  GETTER,
-  SETTER,
-}
-
-type ChildChannelRequest = [ChildChannelType, number];
-
 type GetterCallback<T> = (value: T) => void;
 type HierarchyCallback = (value: HierarchyElement) => void;
 type StreamOnlineCallback = (online: boolean) => void;
@@ -156,9 +149,56 @@ export type HierarchyElementPropertySensor =
 export type HierarchyElementPropertyActuator =
   HierarchyElementWithMeta<MetaPropertyActuator>;
 
-const CLOSE_CHILD = '880E1EE9-15A2-462D-BCBC-E09630A1CFBB';
-const STREAM_ONLINE = 'B41F5C2A-3F67-449F-BF91-37A3153FFFE9';
-const STREAM_OFFLINE = '4A999429-B64A-4426-9818-E68039EF022D';
+enum ChildType {
+  GETTER,
+  SETTER,
+}
+
+enum WorkerMessageType {
+  STREAM,
+  HIERARCHY,
+  CHILD_REQUEST,
+}
+
+type WorkerMessageInbound =
+  | {
+      online: boolean;
+      type: WorkerMessageType.STREAM;
+    }
+  | {
+      hierarchy: HierarchyElement;
+      type: WorkerMessageType.HIERARCHY;
+    };
+
+type WorkerMessageOutbound = {
+  childType: ChildType;
+  index: number;
+  type: WorkerMessageType.CHILD_REQUEST;
+};
+
+enum ChildMessageType {
+  CLOSE,
+  GET,
+  SET,
+}
+
+type GetterMessageOutbound = {
+  type: ChildMessageType.CLOSE;
+};
+
+type GetterMessageInbound<T> = {
+  type: ChildMessageType.GET;
+  value: T;
+};
+
+type SetterMessageOutbound<T> =
+  | {
+      type: ChildMessageType.CLOSE;
+    }
+  | {
+      type: ChildMessageType.SET;
+      value: T;
+    };
 
 export class WebApi {
   private _hierarchy?: HierarchyElement;
@@ -182,35 +222,29 @@ export class WebApi {
       if (!this._port) return;
 
       this._port.onmessage = ({ data }) => {
-        if (data === STREAM_ONLINE) {
-          if (debug) {
-            // eslint-disable-next-line no-console
-            console.info('stream online');
-          }
+        const message = data as WorkerMessageInbound;
 
-          this._isStreamOnline = true;
-          this._streamOnlineCallback?.(true);
-          return;
+        // eslint-disable-next-line default-case
+        switch (message.type) {
+          case WorkerMessageType.STREAM:
+            if (debug) {
+              // eslint-disable-next-line no-console
+              console.info(`stream ${message.online ? 'online' : 'offline'}`);
+            }
+
+            this._isStreamOnline = message.online;
+            this._streamOnlineCallback?.(message.online);
+            return;
+
+          case WorkerMessageType.HIERARCHY:
+            if (debug) {
+              // eslint-disable-next-line no-console
+              console.info('web-api hierarchy:', message.hierarchy);
+            }
+
+            this._hierarchy = message.hierarchy;
+            this._hierarchyCallback?.(message.hierarchy);
         }
-
-        if (data === STREAM_OFFLINE) {
-          if (debug) {
-            // eslint-disable-next-line no-console
-            console.info('stream offline');
-          }
-
-          this._isStreamOnline = false;
-          this._streamOnlineCallback?.(false);
-          return;
-        }
-
-        if (debug) {
-          // eslint-disable-next-line no-console
-          console.info('web-api hierarchy:', data);
-        }
-
-        this._hierarchy = data;
-        this._hierarchyCallback?.(data);
       };
     })();
   }
@@ -220,12 +254,19 @@ export class WebApi {
 
     const { port1, port2 } = new MessageChannel();
 
-    const request: ChildChannelRequest = [ChildChannelType.GETTER, index];
+    const request: WorkerMessageOutbound = {
+      childType: ChildType.GETTER,
+      index,
+      type: WorkerMessageType.CHILD_REQUEST,
+    };
 
     this._port.postMessage(request, [port2]);
     port1.start();
 
-    const remove = () => port1.postMessage(CLOSE_CHILD);
+    const remove = () => {
+      const message: GetterMessageOutbound = { type: ChildMessageType.CLOSE };
+      port1.postMessage(message);
+    };
 
     addEventListener('unload', remove, {
       once: true,
@@ -233,7 +274,10 @@ export class WebApi {
     });
 
     port1.onmessage = ({ data }) => {
-      callback(data as T);
+      const { type, value } = data as GetterMessageInbound<T>;
+      if (type !== ChildMessageType.GET) return;
+
+      callback(value);
     };
 
     return {
@@ -246,16 +290,29 @@ export class WebApi {
 
     const { port1, port2 } = new MessageChannel();
 
-    const request: ChildChannelRequest = [ChildChannelType.SETTER, index];
+    const request: WorkerMessageOutbound = {
+      childType: ChildType.SETTER,
+      index,
+      type: WorkerMessageType.CHILD_REQUEST,
+    };
 
     this._port.postMessage(request, [port2]);
     port1.start();
 
     const set = (value: T) => {
-      port1.postMessage(value);
+      const message: SetterMessageOutbound<T> = {
+        type: ChildMessageType.SET,
+        value,
+      };
+      port1.postMessage(message);
     };
 
-    const remove = () => port1.postMessage(CLOSE_CHILD);
+    const remove = () => {
+      const message: SetterMessageOutbound<T> = {
+        type: ChildMessageType.CLOSE,
+      };
+      port1.postMessage(message);
+    };
 
     addEventListener('unload', remove, {
       once: true,
