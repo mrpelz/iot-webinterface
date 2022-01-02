@@ -20,9 +20,10 @@ import {
 } from '../../hooks/navigation.js';
 import {
   useGetter,
+  useHierarchy,
+  useLevel,
   useSetter,
   useStreamOnline,
-  useWebApi,
 } from '../../hooks/web-api.js';
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
@@ -143,16 +144,18 @@ const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
 }) => {
   const { get, meta } = element;
-  const isLastSeen = isMetaPropertySensor(meta) && meta.name === 'lastSeen';
+  const isDate =
+    isMetaPropertySensor(meta) &&
+    (meta.name === 'lastSeen' || meta.name === 'nextExecution');
 
   const { country } = useI18n();
 
   const rawState = useGetter<unknown>(element);
   const state = useMemo(() => {
-    return isLastSeen && country && rawState
+    return isDate && country && rawState
       ? new Date(rawState as number).toLocaleString(country)
       : JSON.stringify(rawState, undefined, 2);
-  }, [isLastSeen, country, rawState]);
+  }, [isDate, country, rawState]);
 
   if (get === undefined) return null;
 
@@ -309,13 +312,24 @@ export const Diagnostics: FunctionComponent = () => {
 
   const isMenuVisible = useIsMenuVisible();
 
-  const { building, home, room, staticPage } = useNavigation();
+  const hierarchy = useHierarchy();
+  const {
+    building: [building],
+    home: [home],
+    floor: [floor],
+    room: [room],
+    staticPage: [staticPage],
+  } = useNavigation();
+
+  const homes = useLevel(Levels.HOME, hierarchy);
+  const buildings = useLevel(Levels.BUILDING, home);
+  const floors = useLevel(Levels.FLOOR, building);
+  const rooms = useLevel(Levels.ROOM, floor);
 
   const fallbackNotification = useNotification();
 
   const theme = useTheme();
 
-  const { hierarchy } = useWebApi();
   const isStreamOnline = useStreamOnline();
 
   return (
@@ -427,13 +441,13 @@ export const Diagnostics: FunctionComponent = () => {
                         () =>
                           JSON.stringify(
                             {
-                              elements: home.elements.map(({ meta }) => meta),
-                              state: home.state?.meta || null,
+                              elements: homes.map(({ meta }) => meta),
+                              state: home?.meta || null,
                             },
                             undefined,
                             2
                           ),
-                        [home]
+                        [home, homes]
                       )}
                     </pre>
                   </td>
@@ -446,15 +460,32 @@ export const Diagnostics: FunctionComponent = () => {
                         () =>
                           JSON.stringify(
                             {
-                              elements: building.elements.map(
-                                ({ meta }) => meta
-                              ),
-                              state: building.state?.meta || null,
+                              elements: buildings.map(({ meta }) => meta),
+                              state: building?.meta || null,
                             },
                             undefined,
                             2
                           ),
-                        [building]
+                        [building, buildings]
+                      )}
+                    </pre>
+                  </td>
+                </tr>
+                <tr>
+                  <td>floor</td>
+                  <td>
+                    <pre>
+                      {useMemo(
+                        () =>
+                          JSON.stringify(
+                            {
+                              elements: floors.map(({ meta }) => meta),
+                              state: floor?.meta || null,
+                            },
+                            undefined,
+                            2
+                          ),
+                        [floor, floors]
                       )}
                     </pre>
                   </td>
@@ -467,18 +498,13 @@ export const Diagnostics: FunctionComponent = () => {
                         () =>
                           JSON.stringify(
                             {
-                              elements: room.elements.map(
-                                ({ children, element }) => ({
-                                  children: children.map(({ meta }) => meta),
-                                  element: element.meta,
-                                })
-                              ),
-                              state: room.state?.meta || null,
+                              elements: rooms.map(({ meta }) => meta),
+                              state: room?.meta || null,
                             },
                             undefined,
                             2
                           ),
-                        [room]
+                        [room, rooms]
                       )}
                     </pre>
                   </td>
@@ -495,12 +521,12 @@ export const Diagnostics: FunctionComponent = () => {
                                 staticPagesBottom,
                                 staticPagesTop,
                               },
-                              state: staticPage.state,
+                              state: staticPage,
                             },
                             undefined,
                             2
                           ),
-                        [staticPage.state]
+                        [staticPage]
                       )}
                     </pre>
                   </td>

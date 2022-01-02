@@ -1,12 +1,18 @@
 import { FunctionComponent, createContext } from 'preact';
-import { HierarchyElement, WebApi } from '../web-api.js';
+import {
+  HierarchyElement,
+  HierarchyElementSystem,
+  HierarchyElementWithMeta,
+  WebApi,
+  getElementsFromLevel,
+} from '../web-api.js';
 import { useContext, useEffect, useMemo, useState } from 'preact/hooks';
 import { useHookDebug } from '../util/hook-debug.js';
 
 type SetterFunction<T> = (value: T) => void;
 
 type TWebApiContext = {
-  hierarchy: HierarchyElement | null;
+  hierarchy: HierarchyElementSystem | null;
   isStreamOnline: boolean;
   useGetterIndex: <T>(index?: number) => T | null;
   useSetterIndex: <T>(index?: number) => SetterFunction<T>;
@@ -60,8 +66,8 @@ export const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
 }) => {
   useHookDebug('useInitWebApi');
 
-  const [hierarchy, setHierarchy] = useState<HierarchyElement>(
-    null as unknown as HierarchyElement
+  const [hierarchy, setHierarchy] = useState<HierarchyElementSystem>(
+    null as unknown as HierarchyElementSystem
   );
 
   const [isStreamOnline, setStreamOnline] = useState(false);
@@ -101,6 +107,15 @@ export const useHierarchy = (): TWebApiContext['hierarchy'] => {
   const { hierarchy } = useContext(WebApiContext);
 
   return useMemo(() => hierarchy, [hierarchy]);
+};
+
+export const useLevel = <T extends HierarchyElementWithMeta>(
+  level: T['meta']['level'],
+  ...parents: (HierarchyElement | null)[]
+): T[] => {
+  return useMemo(() => {
+    return getElementsFromLevel<T>(parents, level);
+  }, [level, parents]);
 };
 
 export const useStreamOnline = (): TWebApiContext['isStreamOnline'] => {

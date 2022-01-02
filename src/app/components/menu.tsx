@@ -1,18 +1,17 @@
-import { HierarchyElementFloor, HierarchyElementRoom } from '../web-api.js';
 import {
-  StateUpdater,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'preact/hooks';
+  HierarchyElementFloor,
+  HierarchyElementRoom,
+  Levels,
+} from '../web-api.js';
 import { colors, dimensions } from '../style.js';
 import {
   staticPagesBottom,
   staticPagesTop,
-  useRoom,
-  useStaticPage,
+  useNavigationBuilding,
+  useNavigationRoom,
+  useNavigationStaticPage,
 } from '../hooks/navigation.js';
+import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { Translation } from '../hooks/i18n.js';
 import { dependentValue } from '../style/main.js';
@@ -20,6 +19,7 @@ import { forwardRef } from 'preact/compat';
 import { rooms } from '../i18n/sorting.js';
 import { styled } from 'goober';
 import { useIsMenuVisible } from '../hooks/menu.js';
+import { useLevel } from '../hooks/web-api.js';
 
 const _Menu = styled('nav')`
   background-color: ${colors.backgroundSecondary()};
@@ -123,11 +123,9 @@ const MenuListItem: FunctionComponent<{
 };
 
 export const Floor: FunctionComponent<{
-  elements: HierarchyElementRoom[];
   floor: HierarchyElementFloor;
-  selectRoom: StateUpdater<HierarchyElementRoom | null>;
-  selectedRoom: HierarchyElementRoom | null;
-}> = ({ elements, floor, selectRoom, selectedRoom }) => {
+}> = ({ floor }) => {
+  const elements = useLevel<HierarchyElementRoom>(Levels.ROOM, floor);
   const sortedElements = useMemo(() => {
     const result: HierarchyElementRoom[] = [];
 
@@ -146,6 +144,8 @@ export const Floor: FunctionComponent<{
 
     return result;
   }, [elements]);
+
+  const [selectedRoom, selectRoom] = useNavigationRoom();
 
   return (
     <>
@@ -168,14 +168,10 @@ export const Floor: FunctionComponent<{
 };
 
 export const Menu: FunctionComponent = () => {
-  const { setState: selectStaticPage, state: selectedStaticPage } =
-    useStaticPage();
+  const [selectedStaticPage, selectStaticPage] = useNavigationStaticPage();
 
-  const {
-    elements: floors,
-    setState: selectRoom,
-    state: selectedRoom,
-  } = useRoom();
+  const [building] = useNavigationBuilding();
+  const floors = useLevel<HierarchyElementFloor>(Levels.FLOOR, building);
 
   return (
     <_Menu>
@@ -195,11 +191,8 @@ export const Menu: FunctionComponent = () => {
         </_MenuSubdivision>
 
         <_MenuSubdivision>
-          {floors.map(({ children: elements, element: floor }, key) => (
-            <Floor
-              key={key}
-              {...{ elements, floor, selectRoom, selectedRoom }}
-            />
+          {floors.map((floor, key) => (
+            <Floor key={key} floor={floor} />
           ))}
         </_MenuSubdivision>
 

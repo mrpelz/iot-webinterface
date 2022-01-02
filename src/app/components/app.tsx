@@ -11,7 +11,10 @@ import {
 } from '../hooks/menu.js';
 import { colors, dimensions, strings } from '../style.js';
 import { useLayoutEffect, useRef } from 'preact/hooks';
-import { useRoom, useStaticPage } from '../hooks/navigation.js';
+import {
+  useNavigationRoom,
+  useNavigationStaticPage,
+} from '../hooks/navigation.js';
 import { FunctionComponent } from 'preact';
 import { Global } from './static-pages/global.js';
 import { Layout } from './layout.js';
@@ -38,8 +41,8 @@ export const App: FunctionComponent = () => {
   const flipMenuVisible = useFlipMenuVisible();
   const isMenuVisible = useIsMenuVisible();
 
-  const { state: staticPage } = useStaticPage();
-  const { state: room } = useRoom();
+  const [staticPage] = useNavigationStaticPage();
+  const [room] = useNavigationRoom();
 
   const isMenuVisibleRef = useRef<MenuVisible>(isMenuVisible);
 
@@ -144,7 +147,7 @@ export const App: FunctionComponent = () => {
             }[staticPage]
           : null}
 
-        {room ? (
+        {room && !staticPage ? (
           <_DiagnosticsContainer>
             <Hierarchy element={room} />
           </_DiagnosticsContainer>

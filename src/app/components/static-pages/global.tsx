@@ -1,35 +1,31 @@
 import { Hierarchy, _DiagnosticsContainer } from './diagnostics.js';
-import { Levels, getElementsFromLevel } from '../../web-api.js';
+import { HierarchyElementProperty, Levels } from '../../web-api.js';
+import { useHierarchy, useLevel } from '../../hooks/web-api.js';
 import { FunctionComponent } from 'preact';
-import { useBuilding } from '../../hooks/navigation.js';
-import { useHierarchy } from '../../hooks/web-api.js';
 import { useMemo } from 'preact/hooks';
+import { useNavigationBuilding } from '../../hooks/navigation.js';
 
 export const Global: FunctionComponent = () => {
   const hierarchy = useHierarchy();
-  const { state: building } = useBuilding();
+  const [building] = useNavigationBuilding();
+
+  const globalProperties = useLevel<HierarchyElementProperty>(
+    Levels.PROPERTY,
+    hierarchy
+  );
+  const firstFloorProperties = useLevel<HierarchyElementProperty>(
+    Levels.PROPERTY,
+    ...useLevel(Levels.FLOOR, building)
+  );
 
   const globalElements = useMemo(
     () =>
-      [
-        getElementsFromLevel(
-          Object.values(hierarchy?.children || {}),
-          Levels.PROPERTY
-        ),
-        getElementsFromLevel(
-          Object.values(building?.children || {}),
-          Levels.FLOOR
-        )
-          .map((floor) =>
-            getElementsFromLevel(
-              Object.values(floor.children || {}),
-              Levels.PROPERTY
-            )
-          )
-          .flat(),
-      ].flat(),
-    [building?.children, hierarchy?.children]
+      [...globalProperties, ...firstFloorProperties].filter(
+        (element): element is HierarchyElementProperty => Boolean(element)
+      ),
+    [firstFloorProperties, globalProperties]
   );
+
   return (
     <_DiagnosticsContainer>
       {globalElements.map((element) => (

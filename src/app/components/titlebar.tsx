@@ -1,7 +1,10 @@
 import { FunctionComponent, JSX, createContext } from 'preact';
 import { colors, dimensions } from '../style.js';
 import { useContext, useLayoutEffect, useRef, useState } from 'preact/hooks';
-import { useRoom, useStaticPage } from '../hooks/navigation.js';
+import {
+  useNavigationRoom,
+  useNavigationStaticPage,
+} from '../hooks/navigation.js';
 import { Translation } from '../hooks/i18n.js';
 import { add } from '../style/dimensions.js';
 import { forwardRef } from 'preact/compat';
@@ -77,13 +80,13 @@ export const Titlebar: FunctionComponent<{
     setPadding(0);
   }, [iconsLeft, iconsRight]);
 
-  const { state: selectedRoom } = useRoom();
-  const { state: selectedStaticPage } = useStaticPage();
+  const [room] = useNavigationRoom();
+  const [staticPage] = useNavigationStaticPage();
 
   return (
     <_Titlebar padding={padding}>
       <_Title>
-        <Translation i18nKey={selectedStaticPage || selectedRoom?.meta.name} />
+        <Translation i18nKey={staticPage || room?.meta.name} />
       </_Title>
       <ProgrammaticPaddingContext.Provider
         value={(number) =>

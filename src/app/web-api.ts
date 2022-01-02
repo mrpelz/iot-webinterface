@@ -6,7 +6,7 @@ type SetupMessage = {
 };
 
 type GetterCallback<T> = (value: T) => void;
-type HierarchyCallback = (value: HierarchyElement) => void;
+type HierarchyCallback = (value: HierarchyElementSystem) => void;
 type StreamOnlineCallback = (online: boolean) => void;
 
 type Getter = {
@@ -149,6 +149,10 @@ export type HierarchyElementPropertySensor =
 export type HierarchyElementPropertyActuator =
   HierarchyElementWithMeta<MetaPropertyActuator>;
 
+export type HierarchyElementProperty =
+  | HierarchyElementPropertySensor
+  | HierarchyElementPropertyActuator;
+
 enum ChildType {
   GETTER,
   SETTER,
@@ -166,7 +170,7 @@ type WorkerMessageInbound =
       type: WorkerMessageType.STREAM;
     }
   | {
-      hierarchy: HierarchyElement;
+      hierarchy: HierarchyElementSystem;
       type: WorkerMessageType.HIERARCHY;
     };
 
@@ -201,7 +205,7 @@ type SetterMessageOutbound<T> =
     };
 
 export class WebApi {
-  private _hierarchy?: HierarchyElement;
+  private _hierarchy?: HierarchyElementSystem;
   private _hierarchyCallback?: HierarchyCallback;
   private _isStreamOnline?: boolean;
   private readonly _port: MessagePort | null;
@@ -477,32 +481,25 @@ export function parentRelationToString(input: ParentRelation): string | null {
   }
 }
 
-export function flatten<T extends HierarchyElement>(
-  input: HierarchyElement
-): T[] {
-  const result = new Set<HierarchyElement>();
-
-  const getChildren = (element: HierarchyElement) => {
-    result.add(element);
-
-    const { children } = element;
-    if (!children) return;
-
-    for (const child of Object.values(children)) {
-      if (!('meta' in child)) return;
-
-      getChildren(child);
-    }
-  };
-
-  getChildren(input);
-
-  return Array.from(result) as unknown as T[];
-}
-
 export function getElementsFromLevel<T extends HierarchyElementWithMeta>(
-  input: HierarchyElement[],
+  input: (HierarchyElement | null)[],
   level: T['meta']['level']
 ): T[] {
-  return input.filter((element): element is T => element.meta?.level === level);
+  const result = new Set<T>();
+
+  for (const element of input) {
+    if (element?.meta?.level !== level) continue;
+    result.add(element as T);
+  }
+
+  if (!result.size) {
+    for (const element of input) {
+      getElementsFromLevel(
+        Object.values(element?.children || {}),
+        level
+      ).forEach((childResult) => result.add(childResult));
+    }
+  }
+
+  return Array.from(result);
 }
