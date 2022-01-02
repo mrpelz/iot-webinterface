@@ -63,15 +63,17 @@ function useNavigationElements<
   level: T['meta']['level'],
   persistenceKey: string
 ) {
-  const elements = useLevel<T>(level, parent);
+  const [init, setInit] = useState<boolean>(false);
 
+  const elements = useLevel<T>(level, parent);
   const [state, setState] = useState<T | null>(null);
 
   const preselect = useGetLocalStorage(persistenceKey);
   useSetLocalStorage(persistenceKey, state?.meta.name || null);
 
   useEffect(() => {
-    if (level === Levels.ROOM) return;
+    if (init || !parent) return;
+    setInit(true);
 
     if (elements.length === 1) {
       setState(elements[0]);
@@ -95,7 +97,7 @@ function useNavigationElements<
         break;
       }
     }
-  }, [elements, level, preselect]);
+  }, [elements, init, level, parent, preselect]);
 
   return [state, setState] as const;
 }
@@ -106,7 +108,9 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   const { hierarchy } = useWebApi();
   const pageOverride = useFlag('pageOverride');
 
-  const staticPageFromFlag = pageOverride && staticPages.includes(pageOverride);
+  const staticPageFromFlag = pageOverride
+    ? staticPages.includes(pageOverride)
+    : false;
 
   const setMenuVisible = useSetMenuVisible();
 

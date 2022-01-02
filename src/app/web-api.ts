@@ -398,6 +398,14 @@ export function isMetaPropertyActuator(
   return meta?.level === Levels.PROPERTY && meta.type === 'actuator';
 }
 
+export function isMetaPropertySensorDate(
+  meta: Meta | undefined
+): meta is MetaPropertyActuator {
+  return isMetaPropertySensor(meta) && meta.name
+    ? ['lastSeen', 'nextExecution'].includes(meta.name)
+    : false;
+}
+
 export function levelToString(input: Levels): string | null {
   switch (input) {
     case Levels.SYSTEM:
@@ -502,4 +510,28 @@ export function getElementsFromLevel<T extends HierarchyElementWithMeta>(
   }
 
   return Array.from(result);
+}
+
+export function sortByName<T extends HierarchyElementWithMeta>(
+  input: T[],
+  list: readonly string[]
+): T[] {
+  const result: T[] = [];
+
+  for (const listItem of list) {
+    const match = input.find(
+      ({ meta }) => 'name' in meta && meta.name === listItem
+    );
+    if (!match) continue;
+
+    result.push(match);
+  }
+
+  result.push(
+    ...input.filter(
+      ({ meta }) => 'name' in meta && meta.name && !list.includes(meta.name)
+    )
+  );
+
+  return result;
 }

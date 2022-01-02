@@ -6,7 +6,7 @@ import {
   ValueType,
   isElementWithMeta,
   isMetaPropertyActuator,
-  isMetaPropertySensor,
+  isMetaPropertySensorDate,
   levelToString,
   parentRelationToString,
   typeToValueType,
@@ -144,9 +144,7 @@ const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
 }) => {
   const { get, meta } = element;
-  const isDate =
-    isMetaPropertySensor(meta) &&
-    (meta.name === 'lastSeen' || meta.name === 'nextExecution');
+  const isDate = isMetaPropertySensorDate(meta);
 
   const { country } = useI18n();
 

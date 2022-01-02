@@ -2,6 +2,7 @@ import {
   HierarchyElementFloor,
   HierarchyElementRoom,
   Levels,
+  sortByName,
 } from '../web-api.js';
 import { colors, dimensions } from '../style.js';
 import {
@@ -126,24 +127,7 @@ export const Floor: FunctionComponent<{
   floor: HierarchyElementFloor;
 }> = ({ floor }) => {
   const elements = useLevel<HierarchyElementRoom>(Levels.ROOM, floor);
-  const sortedElements = useMemo(() => {
-    const result: HierarchyElementRoom[] = [];
-
-    for (const room of rooms) {
-      const match = elements.find(({ meta }) => meta.name === room);
-      if (!match) continue;
-
-      result.push(match);
-    }
-
-    result.push(
-      ...elements.filter(
-        ({ meta }) => !rooms.includes(meta.name as typeof rooms[number])
-      )
-    );
-
-    return result;
-  }, [elements]);
+  const sortedElements = useMemo(() => sortByName(elements, rooms), [elements]);
 
   const [selectedRoom, selectRoom] = useNavigationRoom();
 
