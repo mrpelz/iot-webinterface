@@ -9,11 +9,13 @@ const ID_STORAGE_KEY = 'autoReloadId';
 export let triggerUpdate: (() => void) | undefined;
 
 export function autoReload(
-  interval: number,
+  interval: number | null,
   unattended: boolean,
   notifications: Notifications,
   debug: boolean
 ): void {
+  if (interval === 0) return;
+
   const initialId = localStorage.getItem(ID_STORAGE_KEY);
 
   const port = connectWorker<SetupMessage>(
@@ -21,7 +23,7 @@ export function autoReload(
     'auto-reload',
     {
       initialId,
-      interval,
+      interval: interval === null ? CHECK_INTERVAL : interval,
     },
     debug
   );

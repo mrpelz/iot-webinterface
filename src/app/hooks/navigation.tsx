@@ -9,6 +9,7 @@ import {
 } from '../web-api.js';
 import {
   StateUpdater,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -30,7 +31,7 @@ export const staticPagesBottom = [
   'diagnostics',
 ] as const;
 
-const staticPages: string[] = [...staticPagesTop, ...staticPagesBottom];
+export const staticPages = [...staticPagesTop, ...staticPagesBottom];
 
 export type StaticPage =
   | typeof staticPagesTop[number]
@@ -61,7 +62,9 @@ function useNavigationElements<
 >(
   parent: HierarchyElement | null,
   level: T['meta']['level'],
-  persistenceKey: string
+  persistenceKey: string,
+  ignorePersistenceInit = false,
+  override?: string
 ) {
   const [init, setInit] = useState<boolean>(false);
 
@@ -80,12 +83,25 @@ function useNavigationElements<
       return;
     }
 
-    for (const element of elements) {
-      const { meta } = element;
+    if (override) {
+      for (const element of elements) {
+        const { meta } = element;
 
-      if (meta.name === preselect) {
-        setState(element);
-        break;
+        if (meta.name === override) {
+          setState(element);
+          return;
+        }
+      }
+    }
+
+    if (!ignorePersistenceInit) {
+      for (const element of elements) {
+        const { meta } = element;
+
+        if (meta.name === preselect) {
+          setState(element);
+          return;
+        }
       }
     }
 
@@ -94,64 +110,119 @@ function useNavigationElements<
 
       if ('isPrimary' in meta && meta.isPrimary) {
         setState(element);
-        break;
+        return;
       }
     }
-  }, [elements, init, level, parent, preselect]);
+  }, [
+    elements,
+    ignorePersistenceInit,
+    init,
+    level,
+    override,
+    parent,
+    preselect,
+  ]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!override) return;
+
+      const visible = document.visibilityState === 'visible';
+      if (!visible) return;
+
+      setInit(false);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () =>
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [override]);
 
   return [state, setState] as const;
+}
+
+function useStaticPage(
+  staticPageFromFlag: boolean,
+  startPage: string | null,
+  stateRoom: HierarchyElementRoom | null
+) {
+  const storedStaticPage = useGetLocalStorage('n_staticPage');
+
+  const determineStaticPage = useCallback(() => {
+    if (staticPageFromFlag) return startPage as StaticPage;
+    if (storedStaticPage) return storedStaticPage as StaticPage;
+    if (stateRoom) return null;
+
+    return START_PAGE;
+  }, [startPage, stateRoom, staticPageFromFlag, storedStaticPage]);
+
+  const staticPage = useState(determineStaticPage);
+  const [stateStaticPage, setStaticPage] = staticPage;
+
+  useSetLocalStorage('n_staticPage', stateStaticPage);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!startPage || !staticPageFromFlag) return;
+
+      const visible = document.visibilityState === 'visible';
+      if (!visible) return;
+
+      setStaticPage(determineStaticPage);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () =>
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [determineStaticPage, setStaticPage, startPage, staticPageFromFlag]);
+
+  return staticPage;
 }
 
 export const NavigationProvider: FunctionComponent = ({ children }) => {
   useHookDebug('NavigationProvider');
 
   const { hierarchy } = useWebApi();
-  const pageOverride = useFlag('pageOverride');
+  const startPage = useFlag('startPage');
 
-  const staticPageFromFlag = pageOverride
-    ? staticPages.includes(pageOverride)
-    : false;
+  const staticPageFromFlag = useMemo(() => {
+    return startPage ? staticPages.includes(startPage as StaticPage) : false;
+  }, [startPage]);
 
   const setMenuVisible = useSetMenuVisible();
 
   const home = useNavigationElements<HierarchyElementHome>(
     hierarchy,
     Levels.HOME,
-    'home'
+    'n_home'
   );
   const [stateHome] = home;
 
   const building = useNavigationElements<HierarchyElementBuilding>(
     stateHome,
     Levels.BUILDING,
-    'building'
+    'n_building'
   );
   const [stateBuilding] = building;
 
   const floor = useNavigationElements<HierarchyElementFloor>(
     stateBuilding,
     Levels.FLOOR,
-    'floor'
+    'n_floor'
   );
   const [stateFloor] = floor;
 
   const room = useNavigationElements<HierarchyElementRoom>(
     stateFloor,
     Levels.ROOM,
-    'room'
+    'n_room',
+    staticPageFromFlag,
+    staticPageFromFlag || !startPage ? undefined : startPage
   );
   const [stateRoom, setRoom] = room;
 
-  const storedStaticPage = useGetLocalStorage('staticPage');
-  const staticPage = useState(() => {
-    if (staticPageFromFlag) return pageOverride as StaticPage;
-    if (storedStaticPage) return storedStaticPage as StaticPage;
-    if (stateRoom) return null;
-
-    return START_PAGE;
-  });
+  const staticPage = useStaticPage(staticPageFromFlag, startPage, stateRoom);
   const [stateStaticPage, setStaticPage] = staticPage;
-  useSetLocalStorage('staticPage', stateStaticPage);
 
   useEffect(() => {
     if (stateStaticPage) {

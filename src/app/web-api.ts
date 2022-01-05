@@ -1,4 +1,5 @@
 import { connectWorker, webApiUrl } from './util/workers.js';
+import { CHECK_INTERVAL } from './util/auto-reload.js';
 
 type SetupMessage = {
   apiBaseUrl: string;
@@ -211,13 +212,18 @@ export class WebApi {
   private readonly _port: MessagePort | null;
   private _streamOnlineCallback?: StreamOnlineCallback;
 
-  constructor(apiBaseUrl: string, interval: number, debug: boolean) {
+  constructor(
+    apiBaseUrl: string | null,
+    interval: number | null,
+    debug: boolean
+  ) {
     this._port = connectWorker<SetupMessage>(
       webApiUrl,
       'web-api',
       {
-        apiBaseUrl,
-        interval,
+        apiBaseUrl:
+          apiBaseUrl === null ? new URL('/', location.href).href : apiBaseUrl,
+        interval: interval === null ? CHECK_INTERVAL : interval,
       },
       debug
     );
@@ -491,23 +497,25 @@ export function parentRelationToString(input: ParentRelation): string | null {
 
 export function getElementsFromLevel<T extends HierarchyElementWithMeta>(
   input: (HierarchyElement | null)[],
-  level: T['meta']['level']
+  level: T['meta']['level'],
+  deep = false
 ): T[] {
   const result = new Set<T>();
 
-  for (const element of input) {
-    if (element?.meta?.level !== level) continue;
-    result.add(element as T);
-  }
-
-  if (!result.size) {
-    for (const element of input) {
-      getElementsFromLevel(
-        Object.values(element?.children || {}),
-        level
-      ).forEach((childResult) => result.add(childResult));
+  const get = (elements: (HierarchyElement | null)[]) => {
+    for (const element of elements) {
+      if (element?.meta?.level !== level) continue;
+      result.add(element as T);
     }
-  }
+
+    if (!result.size || deep) {
+      for (const element of elements) {
+        get(Object.values(element?.children || {}));
+      }
+    }
+  };
+
+  get(input);
 
   return Array.from(result);
 }

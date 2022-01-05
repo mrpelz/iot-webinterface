@@ -48,7 +48,7 @@ export const useI18n = (): TI18nContext => {
   return useContext(I18nContext);
 };
 
-export const useI18nKey = (key?: string): string => {
+export const useI18nKey = (key?: keyof I18nTranslation | string): string => {
   const { translation } = useContext(I18nContext);
 
   return useMemo(() => {
@@ -62,9 +62,9 @@ export const useI18nKey = (key?: string): string => {
   }, [key, translation]);
 };
 
-export const Translation: FunctionComponent<{ i18nKey?: string }> = ({
-  i18nKey,
-}) => {
+export const Translation: FunctionComponent<{
+  i18nKey?: keyof I18nTranslation | string;
+}> = ({ i18nKey }) => {
   const translation = useI18nKey(i18nKey);
 
   return <>{translation}</>;

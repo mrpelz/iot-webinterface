@@ -56,6 +56,7 @@ const _Main = styled('article', forwardRef)<{
 }>`
   background-color: ${colors.backgroundPrimary()};
   color: ${colors.fontPrimary()};
+  display: flow-root;
   position: relative;
   touch-action: ${dependentValue('isAsideVisible', 'none', 'auto')};
   transition: height 0.3s ease-out, margin-top 0.3s ease-out;

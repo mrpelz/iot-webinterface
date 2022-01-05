@@ -1,11 +1,5 @@
 import { FunctionComponent, createContext } from 'preact';
-import {
-  StateUpdater,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'preact/hooks';
+import { useContext, useMemo } from 'preact/hooks';
 import { strings } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlag } from './flags.js';
@@ -15,12 +9,7 @@ export const themes = ['light', 'dark', 'dim'] as const;
 
 export type Theme = typeof themes[number];
 
-type InitTheme = {
-  setTheme: StateUpdater<Theme>;
-  theme: Theme;
-};
-
-const ThemeContext = createContext<InitTheme>(null as unknown as InitTheme);
+const ThemeContext = createContext(null as unknown as Theme);
 
 export const ThemeProvider: FunctionComponent = ({ children }) => {
   useHookDebug('ThemeProvider');
@@ -37,24 +26,15 @@ export const ThemeProvider: FunctionComponent = ({ children }) => {
     return null;
   }, [prefersDarkTheme, prefersLightTheme]);
 
-  const preferredTheme = useMemo(
-    () => flagPreferredTheme || browserPreferredTheme || 'light',
-    [browserPreferredTheme, flagPreferredTheme]
-  );
-
-  const [theme, setTheme] = useState(preferredTheme);
-
-  useEffect(() => {
-    setTheme(preferredTheme);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preferredTheme]);
-
   const value = useMemo(
-    () => ({
-      setTheme,
-      theme,
-    }),
-    [theme]
+    () =>
+      (themes.includes(flagPreferredTheme as Theme)
+        ? (flagPreferredTheme as Theme)
+        : null) ||
+      browserPreferredTheme ||
+      'light',
+
+    [browserPreferredTheme, flagPreferredTheme]
   );
 
   return (
@@ -63,11 +43,5 @@ export const ThemeProvider: FunctionComponent = ({ children }) => {
 };
 
 export const useTheme = (): Theme => {
-  const { theme } = useContext(ThemeContext);
-  return useMemo(() => theme, [theme]);
-};
-
-export const useSetTheme = (): StateUpdater<Theme> => {
-  const { setTheme } = useContext(ThemeContext);
-  return useMemo(() => setTheme, [setTheme]);
+  return useContext(ThemeContext);
 };

@@ -20,6 +20,7 @@ import { Global } from './static-pages/global.js';
 import { Layout } from './layout.js';
 import { Menu } from './menu.js';
 import { Notification } from './notification.js';
+import { Settings } from './static-pages/settings.js';
 import { StatusBar } from './status-bar.js';
 import { Technical } from './static-pages/technical.js';
 import { Titlebar } from './titlebar.js';
@@ -41,7 +42,7 @@ export const App: FunctionComponent = () => {
   const flipMenuVisible = useFlipMenuVisible();
   const isMenuVisible = useIsMenuVisible();
 
-  const [staticPage] = useNavigationStaticPage();
+  const [staticPage, setStaticPage] = useNavigationStaticPage();
   const [room] = useNavigationRoom();
 
   const isMenuVisibleRef = useRef<MenuVisible>(isMenuVisible);
@@ -130,7 +131,7 @@ export const App: FunctionComponent = () => {
               iconsLeft={
                 isDesktop ? [] : [<MenuIcon onClick={flipMenuVisible} />]
               }
-              iconsRight={[<MapIcon />]}
+              iconsRight={[<MapIcon onClick={() => setStaticPage('map')} />]}
             />
             <Notification />
           </>
@@ -142,7 +143,7 @@ export const App: FunctionComponent = () => {
               diagnostics: <Diagnostics />,
               global: <Global />,
               map: null,
-              settings: null,
+              settings: <Settings />,
               technical: <Technical />,
             }[staticPage]
           : null}

@@ -1,9 +1,20 @@
-import { Flags, getFlags } from '../util/flags.js';
+import { Flags, getFlags, setFlag } from '../util/flags.js';
 import { FunctionComponent, createContext } from 'preact';
-import { useContext, useEffect, useMemo, useState } from 'preact/hooks';
+import {
+  StateUpdater,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 import { useHookDebug } from '../util/hook-debug.js';
 
-const FlagsContext = createContext<Flags>(null as unknown as Flags);
+type TFlagsContext = readonly [Flags, StateUpdater<Flags>];
+
+const FlagsContext = createContext<TFlagsContext>(
+  [] as unknown as TFlagsContext
+);
 
 export const FlagProvider: FunctionComponent<{ flags: Flags }> = ({
   children,
@@ -11,11 +22,16 @@ export const FlagProvider: FunctionComponent<{ flags: Flags }> = ({
 }) => {
   useHookDebug('useInitFlags');
 
+  const hashChange = useRef(false);
   const [flags, setFlags] = useState(initialFlags);
 
   useEffect(() => {
     const handleHashChange = () => {
+      hashChange.current = true;
+
       setFlags(getFlags());
+
+      hashChange.current = false;
 
       if (location.hash.trim().length) return;
 
@@ -29,18 +45,36 @@ export const FlagProvider: FunctionComponent<{ flags: Flags }> = ({
     return () => removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  const value = useMemo(() => [flags, setFlags] as const, [flags]);
+
   return (
-    <FlagsContext.Provider value={flags}>{children}</FlagsContext.Provider>
+    <FlagsContext.Provider value={value}>{children}</FlagsContext.Provider>
   );
 };
 
 export const useFlags = (): Flags => {
-  return useContext(FlagsContext);
+  const [flags] = useContext(FlagsContext);
+
+  return useMemo(() => flags, [flags]);
 };
 
 export const useFlag = <T extends keyof Flags>(key: T): Flags[T] | null => {
-  const context = useContext(FlagsContext);
-  const value = context && key in context ? context[key] : null;
+  const [flags] = useContext(FlagsContext);
+  const value = flags && key in flags ? flags[key] : null;
 
   return useMemo(() => value, [value]);
+};
+
+export const useSetFlag = <P extends keyof Flags>(
+  key: P
+): StateUpdater<Flags[P]> => {
+  const [flags, setFlags] = useContext(FlagsContext);
+  const [value, setValue] = useState(flags[key]);
+
+  useEffect(() => {
+    setFlags(setFlag(key, value));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, value]);
+
+  return setValue;
 };

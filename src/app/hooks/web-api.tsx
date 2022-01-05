@@ -118,6 +118,15 @@ export const useLevel = <T extends HierarchyElementWithMeta>(
   }, [level, parents]);
 };
 
+export const useDeepLevel = <T extends HierarchyElementWithMeta>(
+  level: T['meta']['level'],
+  ...parents: (HierarchyElement | null)[]
+): T[] => {
+  return useMemo(() => {
+    return getElementsFromLevel<T>(parents, level, true);
+  }, [level, parents]);
+};
+
 export const useStreamOnline = (): TWebApiContext['isStreamOnline'] => {
   const { isStreamOnline } = useContext(WebApiContext);
 

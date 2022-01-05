@@ -2,7 +2,7 @@ import { de } from './de.js';
 import { en } from './en.js';
 
 const i18nLanguageDefault = 'en' as const;
-const i18nLanguages = [i18nLanguageDefault, 'de'] as const;
+export const i18nLanguages = [i18nLanguageDefault, 'de'] as const;
 
 export type I18nLanguage = typeof i18nLanguages[number];
 

@@ -40,14 +40,12 @@ const fn = async () => {
     await removeServiceWorkers();
   }
 
-  if (flags.autoReloadCheckInterval) {
-    autoReload(
-      autoReloadCheckInterval,
-      autoReloadUnattended,
-      notifications,
-      debug
-    );
-  }
+  autoReload(
+    autoReloadCheckInterval,
+    autoReloadUnattended,
+    notifications,
+    debug
+  );
 
   await swPrerender();
 };
