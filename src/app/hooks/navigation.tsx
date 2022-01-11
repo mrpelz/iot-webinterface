@@ -23,6 +23,7 @@ import { useLevel, useWebApi } from './web-api.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/hook-debug.js';
 import { useSetMenuVisible } from './menu.js';
+import { useVisibility } from './visibility.js';
 
 export const staticPagesTop = ['global', 'map'] as const;
 export const staticPagesBottom = [
@@ -66,6 +67,8 @@ function useNavigationElements<
   ignorePersistenceInit = false,
   override?: string
 ) {
+  const isVisible = useVisibility();
+
   const [init, setInit] = useState<boolean>(false);
 
   const elements = useLevel<T>(level, parent);
@@ -124,19 +127,10 @@ function useNavigationElements<
   ]);
 
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!override) return;
+    if (isVisible) return;
 
-      const visible = document.visibilityState === 'visible';
-      if (!visible) return;
-
-      setInit(false);
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () =>
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [override]);
+    setInit(false);
+  }, [isVisible, override]);
 
   return [state, setState] as const;
 }
@@ -146,6 +140,8 @@ function useStaticPage(
   startPage: string | null,
   stateRoom: HierarchyElementRoom | null
 ) {
+  const isVisible = useVisibility();
+
   const storedStaticPage = useGetLocalStorage('n_staticPage');
 
   const determineStaticPage = useCallback(() => {
@@ -162,19 +158,16 @@ function useStaticPage(
   useSetLocalStorage('n_staticPage', stateStaticPage);
 
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!startPage || !staticPageFromFlag) return;
+    if (!startPage || !staticPageFromFlag || isVisible) return;
 
-      const visible = document.visibilityState === 'visible';
-      if (!visible) return;
-
-      setStaticPage(determineStaticPage);
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () =>
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [determineStaticPage, setStaticPage, startPage, staticPageFromFlag]);
+    setStaticPage(determineStaticPage);
+  }, [
+    determineStaticPage,
+    isVisible,
+    setStaticPage,
+    startPage,
+    staticPageFromFlag,
+  ]);
 
   return staticPage;
 }

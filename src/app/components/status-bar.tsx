@@ -1,11 +1,8 @@
 import { colors, strings } from '../style.js';
-import { FunctionComponent } from 'preact';
 import { dependentValue } from '../style/main.js';
 import { styled } from 'goober';
-import { useStreamOnline } from '../hooks/web-api.js';
-import { useTheme } from '../hooks/theme.js';
 
-const _StatusBar = styled('section')<{
+export const StatusBar = styled('section')<{
   isConnected: boolean;
   isLight: boolean;
 }>`
@@ -44,10 +41,3 @@ const _StatusBar = styled('section')<{
     z-index: -1;
   }
 `;
-
-export const StatusBar: FunctionComponent = () => {
-  const streamOnline = useStreamOnline();
-  const theme = useTheme();
-
-  return <_StatusBar isConnected={streamOnline} isLight={theme === 'light'} />;
-};

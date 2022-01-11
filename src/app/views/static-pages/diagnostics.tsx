@@ -37,7 +37,7 @@ import { useMediaQuery } from '../../style/main.js';
 import { useNotification } from '../../hooks/notification.js';
 import { useTheme } from '../../hooks/theme.js';
 
-export const _DiagnosticsContainer = styled('section')`
+export const DiagnosticsContainer = styled('section')`
   background-color: white;
   color: ${colors.black()};
   display: flex;
@@ -81,12 +81,12 @@ export const _DiagnosticsContainer = styled('section')`
   }
 `;
 
-export const _RefreshButton = styled('button')`
+export const RefreshButton = styled('button')`
   color-scheme: initial;
   padding: ${dimensions.fontSize} 0;
 `;
 
-export const _Summary = styled('summary')`
+export const Summary = styled('summary')`
   cursor: pointer;
 `;
 
@@ -256,9 +256,9 @@ const Child: FunctionComponent<{
     <tr>
       <td colSpan={999}>
         <details open={open}>
-          <_Summary>
+          <Summary>
             <b>Child:</b> {name}
-          </_Summary>
+          </Summary>
 
           {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
           <Hierarchy element={element} />
@@ -331,8 +331,8 @@ export const Diagnostics: FunctionComponent = () => {
   const isStreamOnline = useStreamOnline();
 
   return (
-    <_DiagnosticsContainer>
-      <_RefreshButton onClick={() => triggerUpdate?.()}>Refresh</_RefreshButton>
+    <DiagnosticsContainer>
+      <RefreshButton onClick={() => triggerUpdate?.()}>Refresh</RefreshButton>
 
       <table>
         <tr>
@@ -366,9 +366,9 @@ export const Diagnostics: FunctionComponent = () => {
         <tr>
           <td colSpan={999}>
             <details>
-              <_Summary>
+              <Summary>
                 <b>i18n</b>
-              </_Summary>
+              </Summary>
 
               <table>
                 <tr>
@@ -407,9 +407,9 @@ export const Diagnostics: FunctionComponent = () => {
         <tr>
           <td colSpan={999}>
             <details>
-              <_Summary>
+              <Summary>
                 <b>flags</b>
-              </_Summary>
+              </Summary>
 
               <table>
                 {Object.entries(flags).map(([key, value]) => (
@@ -426,9 +426,9 @@ export const Diagnostics: FunctionComponent = () => {
         <tr>
           <td colSpan={999}>
             <details>
-              <_Summary>
+              <Summary>
                 <b>navigation</b>
-              </_Summary>
+              </Summary>
 
               <table>
                 <tr>
@@ -538,9 +538,9 @@ export const Diagnostics: FunctionComponent = () => {
           <tr>
             <td colSpan={999}>
               <details>
-                <_Summary>
+                <Summary>
                   <b>fallback notification</b>
-                </_Summary>
+                </Summary>
 
                 <table>
                   <tr>
@@ -559,6 +559,6 @@ export const Diagnostics: FunctionComponent = () => {
       </table>
 
       {hierarchy ? <Hierarchy element={hierarchy} /> : null}
-    </_DiagnosticsContainer>
+    </DiagnosticsContainer>
   );
 };

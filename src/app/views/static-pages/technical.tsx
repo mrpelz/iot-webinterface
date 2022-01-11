@@ -14,40 +14,40 @@ const _Surface = styled('div')`
   margin: 50px;
   width: 100px;
 `;
-const _Surface0 = styled(_Surface)`
+const Surface0 = styled(_Surface)`
   background-color: ${colors.surface0()};
 `;
-const _Surface1 = styled(_Surface)`
+const Surface1 = styled(_Surface)`
   background-color: ${colors.surface1()};
 `;
-const _Surface2 = styled(_Surface)`
+const Surface2 = styled(_Surface)`
   background-color: ${colors.surface2()};
 `;
-const _Surface3 = styled(_Surface)`
+const Surface3 = styled(_Surface)`
   background-color: ${colors.surface3()};
 `;
-const _Surface4 = styled(_Surface)`
+const Surface4 = styled(_Surface)`
   background-color: ${colors.surface4()};
 `;
 const _Text = styled('div')`
   font-size: 35px;
 `;
-const _Text1 = styled(_Text)`
+const Text1 = styled(_Text)`
   color: ${colors.text1()};
 `;
-const _Text2 = styled(_Text)`
+const Text2 = styled(_Text)`
   color: ${colors.text2()};
 `;
 
 export const Technical: FunctionComponent = () => (
   <>
-    <_Surface0>0</_Surface0>
-    <_Surface1>1</_Surface1>
-    <_Surface2>2</_Surface2>
-    <_Surface3>3</_Surface3>
-    <_Surface4>4</_Surface4>
-    <_Text1>Text 1</_Text1>
-    <_Text2>Text 2</_Text2>
+    <Surface0>0</Surface0>
+    <Surface1>1</Surface1>
+    <Surface2>2</Surface2>
+    <Surface3>3</Surface3>
+    <Surface4>4</Surface4>
+    <Text1>Text 1</Text1>
+    <Text2>Text 2</Text2>
     <section>main</section>
     <section>main</section>
     <section>main</section>

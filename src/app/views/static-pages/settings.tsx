@@ -6,7 +6,7 @@ import {
 } from '../../web-api.js';
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
 import { Theme, themes } from '../../hooks/theme.js';
-import { Translation, useI18nKey } from '../../hooks/i18n.js';
+import { Translation, useI18nKeyFallback } from '../../hooks/i18n.js';
 import { colors, dimensions } from '../../style.js';
 import {
   staticPages,
@@ -19,7 +19,7 @@ import { useHierarchy, useLevel } from '../../hooks/web-api.js';
 import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
 
-const _Settings = styled('ul')`
+const SettingsWrapper = styled('ul')`
   list-style: none;
   margin: ${dimensions.fontPadding} auto;
   max-width: max-content;
@@ -38,7 +38,7 @@ const _Settings = styled('ul')`
   }
 `;
 
-const _Section = styled('li')`
+const Section = styled('li')`
   border-bottom: ${dimensions.hairline} solid ${colors.fontSecondary()};
   display: flex;
   font-size: ${dimensions.fontSize};
@@ -95,8 +95,8 @@ export const Settings: FunctionComponent = () => {
   const setApiBaseUrl = useSetFlag('apiBaseUrl');
 
   return (
-    <_Settings>
-      <_Section>
+    <SettingsWrapper>
+      <Section>
         <label for="home">
           <Translation i18nKey="home" />
         </label>
@@ -124,8 +124,8 @@ export const Settings: FunctionComponent = () => {
             </option>
           ))}
         </select>
-      </_Section>
-      <_Section>
+      </Section>
+      <Section>
         <label for="building">
           <Translation i18nKey="building" />
         </label>
@@ -156,8 +156,8 @@ export const Settings: FunctionComponent = () => {
             </option>
           ))}
         </select>
-      </_Section>
-      <_Section>
+      </Section>
+      <Section>
         <label for="startPage">
           <Translation i18nKey="startPage" />
         </label>
@@ -183,7 +183,7 @@ export const Settings: FunctionComponent = () => {
           <option value="auto" selected={startPage === null}>
             <Translation i18nKey="auto" />
           </option>
-          <optgroup label={useI18nKey('staticPage')}>
+          <optgroup label={useI18nKeyFallback('staticPage')}>
             {staticPages.map((aStaticPage) => {
               return (
                 <option
@@ -195,7 +195,7 @@ export const Settings: FunctionComponent = () => {
               );
             })}
           </optgroup>
-          <optgroup label={useI18nKey('room')}>
+          <optgroup label={useI18nKeyFallback('room')}>
             {roomNames.map((aRoom) => {
               return (
                 <option value={aRoom} selected={aRoom === startPage}>
@@ -205,8 +205,8 @@ export const Settings: FunctionComponent = () => {
             })}
           </optgroup>
         </select>
-      </_Section>
-      <_Section>
+      </Section>
+      <Section>
         <label for="theme">
           <Translation i18nKey="theme" />
         </label>
@@ -241,8 +241,8 @@ export const Settings: FunctionComponent = () => {
             );
           })}
         </select>
-      </_Section>
-      <_Section>
+      </Section>
+      <Section>
         <label for="language">
           <Translation i18nKey="language" />
         </label>
@@ -274,14 +274,14 @@ export const Settings: FunctionComponent = () => {
           </option>
           {i18nLanguages.map((aLanguage) => {
             return (
-              <option value={aLanguage} selected={aLanguage === theme}>
+              <option value={aLanguage} selected={aLanguage === language}>
                 <Translation i18nKey={aLanguage} />
               </option>
             );
           })}
         </select>
-      </_Section>
-      <_Section>
+      </Section>
+      <Section>
         <label for="enableNotifications">
           <Translation i18nKey="enableNotifications" />
         </label>
@@ -297,8 +297,8 @@ export const Settings: FunctionComponent = () => {
             [setEnableNotifications]
           )}
         />
-      </_Section>
-      <_Section>
+      </Section>
+      <Section>
         <label for="debug">
           <Translation i18nKey="debug" />
         </label>
@@ -314,8 +314,8 @@ export const Settings: FunctionComponent = () => {
             [setDebug]
           )}
         />
-      </_Section>
-      <_Section>
+      </Section>
+      <Section>
         <label for="autoReloadCheckInterval">
           <Translation i18nKey="autoReloadCheckInterval" />
         </label>
@@ -324,7 +324,7 @@ export const Settings: FunctionComponent = () => {
           inputMode="numeric"
           name="autoReloadCheckInterval"
           pattern="[0-9]*"
-          placeholder={useI18nKey('auto')}
+          placeholder={useI18nKeyFallback('auto')}
           value={autoReloadCheckInterval || ''}
           onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
             ({ currentTarget: { value } }) => {
@@ -346,8 +346,8 @@ export const Settings: FunctionComponent = () => {
             [setAutoReloadCheckInterval]
           )}
         />
-      </_Section>
-      <_Section>
+      </Section>
+      <Section>
         <label for="autoReloadUnattended">
           <Translation i18nKey="autoReloadUnattended" />
         </label>
@@ -363,8 +363,8 @@ export const Settings: FunctionComponent = () => {
             [setAutoReloadUnattended]
           )}
         />
-      </_Section>
-      <_Section>
+      </Section>
+      <Section>
         <label for="serviceWorker">
           <Translation i18nKey="serviceWorker" />
         </label>
@@ -380,15 +380,15 @@ export const Settings: FunctionComponent = () => {
             [setServiceWorker]
           )}
         />
-      </_Section>
-      <_Section>
+      </Section>
+      <Section>
         <label for="apiBaseUrl">
           <Translation i18nKey="apiBaseUrl" />
         </label>
         <input
           id="apiBaseUrl"
           name="apiBaseUrl"
-          placeholder={useI18nKey('auto')}
+          placeholder={useI18nKeyFallback('auto')}
           type="url"
           value={apiBaseUrl || ''}
           onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
@@ -409,7 +409,7 @@ export const Settings: FunctionComponent = () => {
             [setApiBaseUrl]
           )}
         />
-      </_Section>
-    </_Settings>
+      </Section>
+    </SettingsWrapper>
   );
 };

@@ -1,4 +1,4 @@
-import { Hierarchy, _DiagnosticsContainer } from './diagnostics.js';
+import { DiagnosticsContainer, Hierarchy } from './diagnostics.js';
 import { HierarchyElementProperty, Levels } from '../../web-api.js';
 import { useHierarchy, useLevel } from '../../hooks/web-api.js';
 import { FunctionComponent } from 'preact';
@@ -27,10 +27,10 @@ export const Global: FunctionComponent = () => {
   );
 
   return (
-    <_DiagnosticsContainer>
+    <DiagnosticsContainer>
       {globalElements.map((element) => (
         <Hierarchy element={element} />
       ))}
-    </_DiagnosticsContainer>
+    </DiagnosticsContainer>
   );
 };

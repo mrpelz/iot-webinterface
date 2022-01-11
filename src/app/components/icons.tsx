@@ -1,49 +1,49 @@
 import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
 
-const _SVG = styled('svg')`
+const SVG = styled('svg')`
   max-height: 100%;
 
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
 `;
 
-const _Back = styled(_SVG)`
+const Back = styled(SVG)`
   fill: currentColor;
 `;
 
 export const BackIcon: FunctionComponent<JSX.SVGAttributes<SVGSVGElement>> = (
   props
 ) => (
-  <_Back {...props} viewBox="1 4 50 44">
+  <Back {...props} viewBox="1 4 50 44">
     <path d="M22 16V4L1 24l21 20V32s17-4 29 16c0 0 3-15-10-27 0 0-6-5-19-5z"></path>
-  </_Back>
+  </Back>
 );
 
-const _Map = styled(_SVG)`
+const Map = styled(SVG)`
   fill: currentColor;
 `;
 
 export const MapIcon: FunctionComponent<JSX.SVGAttributes<SVGSVGElement>> = (
   props
 ) => (
-  <_Map {...props} viewBox="5 5 90 90">
+  <Map {...props} viewBox="5 5 90 90">
     <path d="M75 30h-7v13H45v5h10v17h5V48h28v40H60v-8h-5v8H13V48h17v-5H13V13h55v7h7V5H5v90h90V40H75z"></path>
-  </_Map>
+  </Map>
 );
 
-const _Menu = styled(_SVG)`
+const Menu = styled(SVG)`
   fill: currentColor;
 `;
 
 export const MenuIcon: FunctionComponent<JSX.SVGAttributes<SVGSVGElement>> = (
   props
 ) => (
-  <_Menu {...props} viewBox="10 12 30 24">
+  <Menu {...props} viewBox="10 12 30 24">
     <path d="M10 12h30v4H10zM10 22h30v4H10zM10 32h30v4H10z"></path>
-  </_Menu>
+  </Menu>
 );
 
-const _Wait = styled(_SVG)`
+const Wait = styled(SVG)`
   animation: 2s linear infinite wait-outer-animation;
   stroke: currentColor;
 
@@ -57,7 +57,7 @@ const _Wait = styled(_SVG)`
   }
 `;
 
-const _Circle = styled('circle')`
+const Circle = styled('circle')`
   animation: 1.4s ease-in-out infinite both wait-circle-animation;
   fill: transparent;
   stroke-dasharray: 283;
@@ -88,7 +88,7 @@ const _Circle = styled('circle')`
 export const WaitIcon: FunctionComponent<JSX.SVGAttributes<SVGSVGElement>> = (
   props
 ) => (
-  <_Wait {...props} viewBox="0 0 100 100">
-    <_Circle cx="50" cy="50" r="45" />
-  </_Wait>
+  <Wait {...props} viewBox="0 0 100 100">
+    <Circle cx="50" cy="50" r="45" />
+  </Wait>
 );

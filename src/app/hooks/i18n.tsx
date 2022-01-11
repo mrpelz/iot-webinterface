@@ -48,17 +48,27 @@ export const useI18n = (): TI18nContext => {
   return useContext(I18nContext);
 };
 
-export const useI18nKey = (key?: keyof I18nTranslation | string): string => {
+export const useI18nKey = (
+  key?: keyof I18nTranslation | string
+): string | null => {
   const { translation } = useContext(I18nContext);
 
   return useMemo(() => {
-    if (!key) return '<[empty]>';
+    if (!key || !(key in translation)) return null;
 
-    if (key in translation) {
-      return translation[key as unknown as keyof I18nTranslation];
-    }
+    return translation[key as unknown as keyof I18nTranslation];
+  }, [key, translation]);
+};
 
-    return `<${key}>`;
+export const useI18nKeyFallback = (
+  key?: keyof I18nTranslation | string
+): string => {
+  const translation = useI18nKey(key);
+
+  return useMemo(() => {
+    if (translation) return translation;
+    if (key) return `<${key}>`;
+    return '<[empty]>';
   }, [key, translation]);
 };
 
