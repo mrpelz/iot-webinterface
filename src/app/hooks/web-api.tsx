@@ -7,6 +7,7 @@ import {
   getElementsFromLevel,
 } from '../web-api.js';
 import { useContext, useEffect, useMemo, useState } from 'preact/hooks';
+import { useArray } from '../util/array-compare.js';
 import { useHookDebug } from '../util/hook-debug.js';
 
 type SetterFunction<T> = (value: T) => void;
@@ -113,18 +114,22 @@ export const useLevel = <T extends HierarchyElementWithMeta>(
   level: T['meta']['level'],
   ...parents: (HierarchyElement | null)[]
 ): T[] => {
+  const memoizedParents = useArray(parents);
+
   return useMemo(() => {
-    return getElementsFromLevel<T>(parents, level);
-  }, [level, parents]);
+    return getElementsFromLevel<T>(memoizedParents, level);
+  }, [level, memoizedParents]);
 };
 
 export const useDeepLevel = <T extends HierarchyElementWithMeta>(
   level: T['meta']['level'],
   ...parents: (HierarchyElement | null)[]
 ): T[] => {
+  const memoizedParents = useArray(parents);
+
   return useMemo(() => {
-    return getElementsFromLevel<T>(parents, level, true);
-  }, [level, parents]);
+    return getElementsFromLevel<T>(memoizedParents, level, true);
+  }, [level, memoizedParents]);
 };
 
 export const useStreamOnline = (): TWebApiContext['isStreamOnline'] => {

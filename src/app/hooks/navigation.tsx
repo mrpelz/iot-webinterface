@@ -69,41 +69,19 @@ function useNavigationElements<
 ) {
   const isVisible = useVisibility();
 
-  const [init, setInit] = useState<boolean>(false);
-
   const elements = useLevel<T>(level, parent);
-  const [state, setState] = useState<T | null>(null);
 
-  const preselect = useGetLocalStorage(persistenceKey);
-  useSetLocalStorage(persistenceKey, state?.meta.name || null);
+  const storedElement = useGetLocalStorage(persistenceKey);
 
-  useEffect(() => {
-    if (init || !parent) return;
-    setInit(true);
-
-    if (elements.length === 1) {
-      setState(elements[0]);
-      return;
-    }
+  const determineElement = useCallback(() => {
+    if (ignorePersistenceInit) return null;
 
     if (override) {
       for (const element of elements) {
         const { meta } = element;
 
         if (meta.name === override) {
-          setState(element);
-          return;
-        }
-      }
-    }
-
-    if (!ignorePersistenceInit) {
-      for (const element of elements) {
-        const { meta } = element;
-
-        if (meta.name === preselect) {
-          setState(element);
-          return;
+          return element;
         }
       }
     }
@@ -111,63 +89,73 @@ function useNavigationElements<
     for (const element of elements) {
       const { meta } = element;
 
-      if ('isPrimary' in meta && meta.isPrimary) {
-        setState(element);
-        return;
+      if (meta.name === storedElement) {
+        return element;
       }
     }
-  }, [
-    elements,
-    ignorePersistenceInit,
-    init,
-    level,
-    override,
-    parent,
-    preselect,
-  ]);
+
+    if (elements.length === 1) {
+      return elements[0];
+    }
+
+    for (const element of elements) {
+      const { meta } = element;
+
+      if ('isPrimary' in meta && meta.isPrimary) {
+        return element;
+      }
+    }
+
+    return null;
+  }, [elements, ignorePersistenceInit, override, storedElement]);
+
+  const element = useState<T | null>(null);
+  const [state, setState] = element;
 
   useEffect(() => {
-    if (isVisible) return;
+    setState(determineElement);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [elements]);
 
-    setInit(false);
+  useSetLocalStorage(persistenceKey, state?.meta.name || null);
+
+  useEffect(() => {
+    if (!override || isVisible) return;
+
+    setState(determineElement);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, override]);
 
-  return [state, setState] as const;
+  return element;
 }
 
 function useStaticPage(
-  staticPageFromFlag: boolean,
-  startPage: string | null,
-  stateRoom: HierarchyElementRoom | null
+  stateRoom: HierarchyElementRoom | null,
+  override: string | null
 ) {
   const isVisible = useVisibility();
 
   const storedStaticPage = useGetLocalStorage('n_staticPage');
 
   const determineStaticPage = useCallback(() => {
-    if (staticPageFromFlag) return startPage as StaticPage;
-    if (storedStaticPage) return storedStaticPage as StaticPage;
+    if (override) return override as StaticPage;
     if (stateRoom) return null;
+    if (storedStaticPage) return storedStaticPage as StaticPage;
 
     return START_PAGE;
-  }, [startPage, stateRoom, staticPageFromFlag, storedStaticPage]);
+  }, [override, stateRoom, storedStaticPage]);
 
   const staticPage = useState(determineStaticPage);
-  const [stateStaticPage, setStaticPage] = staticPage;
+  const [state, setState] = staticPage;
 
-  useSetLocalStorage('n_staticPage', stateStaticPage);
+  useSetLocalStorage('n_staticPage', state);
 
   useEffect(() => {
-    if (!startPage || !staticPageFromFlag || isVisible) return;
+    if (!override || isVisible) return;
 
-    setStaticPage(determineStaticPage);
-  }, [
-    determineStaticPage,
-    isVisible,
-    setStaticPage,
-    startPage,
-    staticPageFromFlag,
-  ]);
+    setState(determineStaticPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [determineStaticPage, isVisible, override]);
 
   return staticPage;
 }
@@ -214,7 +202,10 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   );
   const [stateRoom, setRoom] = room;
 
-  const staticPage = useStaticPage(staticPageFromFlag, startPage, stateRoom);
+  const staticPage = useStaticPage(
+    stateRoom,
+    staticPageFromFlag ? startPage : null
+  );
   const [stateStaticPage, setStaticPage] = staticPage;
 
   useEffect(() => {

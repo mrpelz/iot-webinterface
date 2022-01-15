@@ -37,8 +37,7 @@ export const App: FunctionComponent = () => {
   const roomName = useI18nKey(room?.meta.name);
 
   useEffect(() => {
-    const title = isVisible ? [staticPageName || roomName] : [];
-    document.title = [...title, 'wurstsalat IoT'].join(' | ');
+    document.title = [staticPageName || roomName, 'wurstsalat IoT'].join(' | ');
   }, [isVisible, roomName, staticPageName]);
 
   useLayoutEffect(() => {
