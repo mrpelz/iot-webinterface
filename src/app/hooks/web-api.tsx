@@ -139,15 +139,17 @@ export const useStreamOnline = (): TWebApiContext['isStreamOnline'] => {
 };
 
 // eslint-disable-next-line comma-spacing
-export const useGetter = <T,>({ get }: HierarchyElement): T | null => {
+export const useGetter = <T,>(element?: HierarchyElement): T | null => {
   const { useGetterIndex } = useContext(WebApiContext);
 
-  return useGetterIndex(get);
+  return useGetterIndex(element?.get);
 };
 
 // eslint-disable-next-line comma-spacing
-export const useSetter = <T,>({ set }: HierarchyElement): SetterFunction<T> => {
+export const useSetter = <T,>(
+  element?: HierarchyElement
+): SetterFunction<T> => {
   const { useSetterIndex } = useContext(WebApiContext);
 
-  return useSetterIndex(set);
+  return useSetterIndex(element?.set);
 };

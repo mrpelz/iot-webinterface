@@ -73,47 +73,60 @@ function useNavigationElements<
 
   const storedElement = useGetLocalStorage(persistenceKey);
 
-  const determineElement = useCallback(() => {
-    if (ignorePersistenceInit) return null;
+  const determineElement = useCallback(
+    (previousState: T | null) => {
+      if (previousState) {
+        for (const element of elements) {
+          const { meta } = element;
 
-    if (override) {
+          if (meta.name === previousState.meta.name) {
+            return element;
+          }
+        }
+      }
+
+      if (ignorePersistenceInit) return null;
+
+      if (override) {
+        for (const element of elements) {
+          const { meta } = element;
+
+          if (meta.name === override) {
+            return element;
+          }
+        }
+      }
+
       for (const element of elements) {
         const { meta } = element;
 
-        if (meta.name === override) {
+        if (meta.name === storedElement) {
           return element;
         }
       }
-    }
 
-    for (const element of elements) {
-      const { meta } = element;
-
-      if (meta.name === storedElement) {
-        return element;
+      if (elements.length === 1) {
+        return elements[0];
       }
-    }
 
-    if (elements.length === 1) {
-      return elements[0];
-    }
+      for (const element of elements) {
+        const { meta } = element;
 
-    for (const element of elements) {
-      const { meta } = element;
-
-      if ('isPrimary' in meta && meta.isPrimary) {
-        return element;
+        if ('isPrimary' in meta && meta.isPrimary) {
+          return element;
+        }
       }
-    }
 
-    return null;
-  }, [elements, ignorePersistenceInit, override, storedElement]);
+      return null;
+    },
+    [elements, ignorePersistenceInit, override, storedElement]
+  );
 
   const element = useState<T | null>(null);
   const [state, setState] = element;
 
   useEffect(() => {
-    setState(determineElement);
+    setState(() => determineElement(state));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [elements]);
 
@@ -122,7 +135,7 @@ function useNavigationElements<
   useEffect(() => {
     if (!override || isVisible) return;
 
-    setState(determineElement);
+    setState(() => determineElement(null));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, override]);
 

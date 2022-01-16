@@ -17,7 +17,6 @@ import { Settings } from './static-pages/settings.js';
 import { Technical } from './static-pages/technical.js';
 import { colors } from '../style.js';
 import { useI18nKey } from '../hooks/i18n.js';
-import { useVisibility } from '../hooks/visibility.js';
 
 export const App: FunctionComponent = () => {
   const backgroundColor = colors.backgroundPrimary()();
@@ -32,13 +31,12 @@ export const App: FunctionComponent = () => {
   const previousStaticPage = useRef<string | undefined>();
   const previousRoom = useRef<string | undefined>();
 
-  const isVisible = useVisibility();
   const staticPageName = useI18nKey(staticPage || undefined);
   const roomName = useI18nKey(room?.meta.name);
 
   useEffect(() => {
     document.title = [staticPageName || roomName, 'wurstsalat IoT'].join(' | ');
-  }, [isVisible, roomName, staticPageName]);
+  }, [roomName, staticPageName]);
 
   useLayoutEffect(() => {
     isMenuVisibleRef.current = isMenuVisible;
