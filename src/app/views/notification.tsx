@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'preact';
 import { Notification as NotificationComponent } from '../components/notification.js';
-import { useNotification } from '../hooks/notification.js';
+import { useNotification } from '../state/notification.js';
 
 export type TNotification = {
   content: string | null;

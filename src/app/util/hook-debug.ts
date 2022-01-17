@@ -1,6 +1,6 @@
 import { getCountry } from './locale.js';
 import { useEffect } from 'preact/hooks';
-import { useFlag } from '../hooks/flags.js';
+import { useFlag } from '../state/flags.js';
 
 const country = getCountry() || undefined;
 

@@ -1,8 +1,16 @@
 export async function swPrerender(): Promise<void> {
   if (!('serviceWorker' in navigator) || !('caches' in window)) return;
 
+  if (
+    navigator.userAgent.includes('iPad') ||
+    navigator.userAgent.includes('iPhone') ||
+    navigator.userAgent.includes('iPod')
+  ) {
+    return;
+  }
+
   try {
-    const cache = await caches.open('cache');
+    const cache = await caches.open('a_ssr');
 
     addEventListener('beforeunload', async () => {
       await cache.put(

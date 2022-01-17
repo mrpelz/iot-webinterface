@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import { Theme, useTheme } from './hooks/theme.js';
+import { Theme, useTheme } from './state/theme.js';
 import { add, dimension, subtract } from './style/dimensions.js';
 import { color, useThemedValue } from './style/colors.js';
 import { cssEnv, cssVar, useMediaQuery } from './style/main.js';

@@ -1,6 +1,6 @@
 import { colors, dimensions } from '../style.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
-import { MenuVisible } from '../hooks/menu.js';
+import { MenuVisible } from '../state/menu.js';
 import { breakpointValue } from '../style/breakpoint.js';
 import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';

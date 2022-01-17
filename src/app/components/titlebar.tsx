@@ -1,6 +1,8 @@
 import { colors, dimensions } from '../style.js';
 import { add } from '../style/dimensions.js';
+import { breakpointValue } from '../style/breakpoint.js';
 import { forwardRef } from 'preact/compat';
+import { mediaQuery } from '../style/main.js';
 import { styled } from 'goober';
 
 export const Titlebar = styled('section')<{ padding: number }>`
@@ -13,7 +15,17 @@ export const Titlebar = styled('section')<{ padding: number }>`
   position: relative;
   word-break: break-all;
 
-  padding-inline: ${({ padding }) =>
+  padding-inline-start: ${({ padding }) =>
+    add(
+      breakpointValue(
+        mediaQuery(dimensions.breakpoint),
+        dimensions.menuWidth,
+        '0px'
+      )(),
+      dimensions.fontPadding,
+      `${padding}px`
+    )};
+  padding-inline-end: ${({ padding }) =>
     add(dimensions.fontPadding, `${padding}px`)};
 `;
 

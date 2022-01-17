@@ -25,7 +25,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   /* eslint-enable no-console */
 
   const INDEX_ENDPOINT = '/index.json';
-  const CACHE_KEY = 'cache';
+  const CACHE_KEY = 'b_cache';
 
   const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
 

@@ -1,6 +1,6 @@
 import { DiagnosticsContainer, Hierarchy } from './diagnostics.js';
 import { HierarchyElementDevice, Levels } from '../../web-api.js';
-import { useDeepLevel, useGetter, useHierarchy } from '../../hooks/web-api.js';
+import { useDeepLevel, useGetter, useHierarchy } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
 import { dependentValue } from '../../style/main.js';
 import { styled } from 'goober';
@@ -17,12 +17,10 @@ const OnlineOffline = styled('section')<{ isConnected: boolean }>`
 export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   device,
 }) => {
-  const onlineGetter = device.children?.online;
-  const isConnected = Boolean(useGetter(onlineGetter));
-
+  const isConnected = useGetter(device.children?.online);
   const element = useMemo(() => <Hierarchy element={device} />, [device]);
 
-  return onlineGetter ? (
+  return typeof isConnected === 'boolean' ? (
     <OnlineOffline isConnected={isConnected}>{element}</OnlineOffline>
   ) : (
     element

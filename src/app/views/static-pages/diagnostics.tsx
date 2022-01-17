@@ -17,25 +17,25 @@ import {
   staticPagesBottom,
   staticPagesTop,
   useNavigation,
-} from '../../hooks/navigation.js';
+} from '../../state/navigation.js';
 import {
   useGetter,
   useHierarchy,
   useLevel,
   useSetter,
   useStreamOnline,
-} from '../../hooks/web-api.js';
+} from '../../state/web-api.js';
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
 import { triggerUpdate } from '../../util/auto-reload.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
-import { useFlags } from '../../hooks/flags.js';
-import { useI18n } from '../../hooks/i18n.js';
-import { useIsMenuVisible } from '../../hooks/menu.js';
+import { useFlags } from '../../state/flags.js';
+import { useI18n } from '../../state/i18n.js';
+import { useIsMenuVisible } from '../../state/menu.js';
 import { useMediaQuery } from '../../style/main.js';
-import { useNotification } from '../../hooks/notification.js';
-import { useTheme } from '../../hooks/theme.js';
+import { useNotification } from '../../state/notification.js';
+import { useTheme } from '../../state/theme.js';
 
 export const DiagnosticsContainer = styled('section')`
   background-color: white;

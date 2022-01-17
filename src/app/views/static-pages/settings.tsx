@@ -5,17 +5,17 @@ import {
   Levels,
 } from '../../web-api.js';
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
-import { Theme, themes } from '../../hooks/theme.js';
-import { Translation, useI18nKeyFallback } from '../../hooks/i18n.js';
+import { Theme, themes } from '../../state/theme.js';
+import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
 import { colors, dimensions } from '../../style.js';
 import {
   staticPages,
   useNavigationBuilding,
   useNavigationHome,
-} from '../../hooks/navigation.js';
+} from '../../state/navigation.js';
 import { useCallback, useMemo } from 'preact/hooks';
-import { useFlag, useSetFlag } from '../../hooks/flags.js';
-import { useHierarchy, useLevel } from '../../hooks/web-api.js';
+import { useFlag, useSetFlag } from '../../state/flags.js';
+import { useHierarchy, useLevel } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
 

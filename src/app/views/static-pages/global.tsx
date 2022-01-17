@@ -1,9 +1,9 @@
 import { DiagnosticsContainer, Hierarchy } from './diagnostics.js';
 import { HierarchyElementProperty, Levels } from '../../web-api.js';
-import { useHierarchy, useLevel } from '../../hooks/web-api.js';
+import { useHierarchy, useLevel } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
-import { useNavigationBuilding } from '../../hooks/navigation.js';
+import { useNavigationBuilding } from '../../state/navigation.js';
 
 export const Global: FunctionComponent = () => {
   const hierarchy = useHierarchy();

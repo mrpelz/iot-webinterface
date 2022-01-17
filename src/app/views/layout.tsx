@@ -4,7 +4,7 @@ import {
   MenuVisible,
   useIsMenuVisible,
   useSetMenuVisible,
-} from '../hooks/menu.js';
+} from '../state/menu.js';
 import { useLayoutEffect, useMemo, useRef } from 'preact/hooks';
 import { Menu } from './menu.js';
 import { Notification } from './notification.js';
@@ -13,7 +13,7 @@ import { Titlebar } from './titlebar.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useMediaQuery } from '../style/main.js';
-import { useNotification } from '../hooks/notification.js';
+import { useNotification } from '../state/notification.js';
 
 export const Layout: FunctionComponent = ({ children }) => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));

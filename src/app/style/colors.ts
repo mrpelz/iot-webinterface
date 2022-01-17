@@ -1,4 +1,4 @@
-import { Theme, useTheme } from '../hooks/theme.js';
+import { Theme, useTheme } from '../state/theme.js';
 
 export type Color = (a?: number) => string;
 
