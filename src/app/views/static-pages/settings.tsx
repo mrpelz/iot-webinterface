@@ -5,9 +5,9 @@ import {
   Levels,
 } from '../../web-api.js';
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
+import { Section, SettingsWrapper } from '../../components/settings.js';
 import { Theme, themes } from '../../state/theme.js';
 import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
-import { colors, dimensions } from '../../style.js';
 import {
   staticPages,
   useNavigationBuilding,
@@ -17,39 +17,6 @@ import { useCallback, useMemo } from 'preact/hooks';
 import { useFlag, useSetFlag } from '../../state/flags.js';
 import { useHierarchy, useLevel } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
-import { styled } from 'goober';
-
-const SettingsWrapper = styled('ul')`
-  list-style: none;
-  margin: ${dimensions.fontPadding} auto;
-  max-width: max-content;
-  padding: 0;
-
-  input,
-  label,
-  select {
-    -moz-user-select: text;
-    -ms-user-select: text;
-    -webkit-tap-highlight-color: text;
-    -webkit-touch-callout: text;
-    -webkit-user-select: text;
-    user-select: text;
-    margin-bottom: auto;
-  }
-`;
-
-const Section = styled('li')`
-  border-bottom: ${dimensions.hairline} solid ${colors.fontSecondary()};
-  display: flex;
-  font-size: ${dimensions.fontSize};
-  gap: 1ch;
-  justify-content: space-between;
-  padding: ${dimensions.fontPadding} 1ch;
-
-  &:last-of-type {
-    border-bottom: none;
-  }
-`;
 
 export const Settings: FunctionComponent = () => {
   const hierarchy = useHierarchy();

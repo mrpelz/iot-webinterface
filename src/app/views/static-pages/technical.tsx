@@ -1,18 +1,10 @@
-import { DiagnosticsContainer, Hierarchy } from './diagnostics.js';
 import { HierarchyElementDevice, Levels } from '../../web-api.js';
 import { useDeepLevel, useGetter, useHierarchy } from '../../state/web-api.js';
+import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
-import { dependentValue } from '../../style/main.js';
-import { styled } from 'goober';
+import { Hierarchy } from './diagnostics.js';
+import { OnlineOffline } from '../../components/technical.js';
 import { useMemo } from 'preact/hooks';
-
-const OnlineOffline = styled('section')<{ isConnected: boolean }>`
-  background-color: ${dependentValue(
-    'isConnected',
-    'rgba(0, 255, 0, 0.4)',
-    'rgba(255, 0, 0, 0.8)'
-  )};
-`;
 
 export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   device,

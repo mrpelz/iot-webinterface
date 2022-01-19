@@ -47,5 +47,9 @@ export const IconContainer = styled('div', forwardRef)<{ right?: true }>`
   & > * {
     height: ${dimensions.titlebarHeight};
     padding: ${dimensions.fontPadding};
+
+    & + * {
+      margin-left: calc(${dimensions.fontPadding} * -1);
+    }
   }
 `;

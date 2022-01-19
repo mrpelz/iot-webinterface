@@ -45,16 +45,16 @@ export const Titlebar: FunctionComponent = () => {
   const goToMap = useCallback(() => setStaticPage('map'), [setStaticPage]);
 
   const iconsLeft = useMemo(
-    () => [
-      ...(isDesktop ? [] : [<MenuIcon onClick={flipMenuVisible} />]),
-      ...(isStreamOnline ? [] : [<WaitIcon />]),
-    ],
-    [flipMenuVisible, isDesktop, isStreamOnline]
+    () => [...(isDesktop ? [] : [<MenuIcon onClick={flipMenuVisible} />])],
+    [flipMenuVisible, isDesktop]
   );
 
   const iconsRight = useMemo(() => {
-    return [<MapIcon onClick={goToMap} />];
-  }, [goToMap]);
+    return [
+      ...(isStreamOnline ? [] : [<WaitIcon />]),
+      <MapIcon onClick={goToMap} />,
+    ];
+  }, [goToMap, isStreamOnline]);
 
   useLayoutEffect(() => {
     setPadding(0);

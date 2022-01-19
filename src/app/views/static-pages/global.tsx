@@ -1,7 +1,8 @@
-import { DiagnosticsContainer, Hierarchy } from './diagnostics.js';
 import { HierarchyElementProperty, Levels } from '../../web-api.js';
 import { useHierarchy, useLevel } from '../../state/web-api.js';
+import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
+import { Hierarchy } from './diagnostics.js';
 import { useMemo } from 'preact/hooks';
 import { useNavigationBuilding } from '../../state/navigation.js';
 

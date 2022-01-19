@@ -1,8 +1,4 @@
-import {
-  Diagnostics,
-  DiagnosticsContainer,
-  Hierarchy,
-} from './static-pages/diagnostics.js';
+import { Diagnostics, Hierarchy } from './static-pages/diagnostics.js';
 import { MenuVisible, useIsMenuVisible } from '../state/menu.js';
 import { useEffect, useLayoutEffect, useRef } from 'preact/hooks';
 import {
@@ -10,6 +6,7 @@ import {
   useNavigationStaticPage,
 } from '../state/navigation.js';
 import { App as AppComponent } from '../components/app.js';
+import { DiagnosticsContainer } from '../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Global } from './static-pages/global.js';
 import { Layout } from './layout.js';
