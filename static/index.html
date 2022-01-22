@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" style="background-color: rgb(0, 0, 0);">
+<html lang="en" style="background-color: rgb(0, 0, 0);" static="">
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -46,6 +46,20 @@
   <link rel="apple-touch-startup-image" href="/images/splash/launch-2732x2048.png" media="(min-device-width: 1024px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape)">
 
   <script type="module" src="/js/app/index.js" crossorigin="use-credentials"></script>
+
+  <style>
+    html[static] > body {
+      background-image: url('/images/icons/favicon-192.png');
+      background-position: center;
+      background-repeat: no-repeat;
+      margin: 0;
+      position: absolute;
+      top: env(safe-area-inset-top);
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+  </style>
 </head>
 <body></body>
 </html>

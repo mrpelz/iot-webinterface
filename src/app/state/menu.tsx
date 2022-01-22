@@ -11,6 +11,7 @@ import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useHookDebug } from '../util/hook-debug.js';
 import { useMediaQuery } from '../style/main.js';
+import { useVisibility } from './visibility.js';
 
 export type MenuVisible = boolean | null;
 
@@ -27,6 +28,7 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
   useHookDebug('MenuVisibleProvider');
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
+  const isVisible = useVisibility();
 
   const [isMenuVisible, _setMenuVisible] = useState<MenuVisible>(
     isDesktop ? null : false
@@ -36,15 +38,25 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
     _setMenuVisible(isDesktop ? null : false);
   }, [isDesktop]);
 
+  const setMenuVisible = useCallback<StateUpdater<MenuVisible>>(
+    (...args) => {
+      if (isDesktop) return;
+      _setMenuVisible(...args);
+    },
+    [isDesktop]
+  );
+
+  useEffect(() => {
+    if (isVisible) return;
+    setMenuVisible(false);
+  }, [isVisible, setMenuVisible]);
+
   const value = useMemo<TMenuVisibleContext>(
     () => ({
       isMenuVisible,
-      setMenuVisible: (...args) => {
-        if (isDesktop) return;
-        _setMenuVisible(...args);
-      },
+      setMenuVisible,
     }),
-    [isDesktop, isMenuVisible]
+    [isMenuVisible, setMenuVisible]
   );
 
   return (

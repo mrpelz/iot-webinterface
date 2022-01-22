@@ -9,7 +9,6 @@ import { WebApi } from './web-api.js';
 import { autoReload } from './util/auto-reload.js';
 import { getFlags } from './util/flags.js';
 import { render } from './root.js';
-import { swPrerender } from './util/sw-prerender.js';
 
 onerror = () => removeServiceWorkers();
 onunhandledrejection = () => removeServiceWorkers();
@@ -29,6 +28,7 @@ const webApi = new WebApi(apiBaseUrl, autoReloadCheckInterval, debug);
 const notifications = new Notifications(enableNotifications);
 
 render(flags, notifications, webApi);
+document.documentElement.removeAttribute('static');
 
 const fn = async () => {
   iOSHoverStyles();
@@ -46,8 +46,6 @@ const fn = async () => {
     notifications,
     debug
   );
-
-  await swPrerender();
 };
 
 (() => {

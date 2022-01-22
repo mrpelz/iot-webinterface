@@ -40,6 +40,7 @@ import { useIsMenuVisible } from '../../state/menu.js';
 import { useMediaQuery } from '../../style/main.js';
 import { useNotification } from '../../state/notification.js';
 import { useTheme } from '../../state/theme.js';
+import { useVisibility } from '../../state/visibility.js';
 
 const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
@@ -248,6 +249,8 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
 export const Diagnostics: FunctionComponent = () => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
+  const isVisible = useVisibility();
+
   const flags = useFlags();
 
   // prettier-ignore
@@ -305,6 +308,13 @@ export const Diagnostics: FunctionComponent = () => {
             <b>isDesktop</b>
           </td>
           <td>{JSON.stringify(isDesktop)}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>isVisible</b>
+          </td>
+          <td>{JSON.stringify(isVisible)}</td>
         </tr>
 
         <tr>

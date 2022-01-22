@@ -18,7 +18,8 @@ export async function removeServiceWorkers(): Promise<void> {
 
   const cacheKeys = await caches.keys();
   for (const cacheKey of cacheKeys) {
-    caches.delete(cacheKey);
+    // eslint-disable-next-line no-await-in-loop
+    await caches.delete(cacheKey);
   }
 
   try {

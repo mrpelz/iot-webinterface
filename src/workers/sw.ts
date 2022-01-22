@@ -25,11 +25,25 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
   /* eslint-enable no-console */
 
   const INDEX_ENDPOINT = '/index.json';
-  const CACHE_KEY = 'b_cache';
+  const CACHE_KEY = 'cache';
 
   const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
 
-  const errorMessage = 'service worker synthesized response';
+  const ERROR_MESSAGE = 'service worker synthesized response';
+  const FALLBACK_HTML = `
+    <!DOCTYPE html>
+    <html lang="en" style="background-color: #000000; color: #FFFFFF; padding-top: env(safe-area-inset-top);">
+    <head>
+      <meta charset="utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <title>Offline…</title>
+      <meta name="viewport" content="viewport-fit=cover, width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    </head>
+    <body>
+      <button onclick="location.reload();">reload</button>
+    </body>
+    </html>
+  `;
 
   const laxCacheUrls: RegExp[] = [new RegExp('^\\/$')];
 
@@ -43,7 +57,6 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     new RegExp('^\\/index.json$'),
     new RegExp('^\\/manifest.json$'),
   ];
-  const cachePreferredUrls: RegExp[] = [new RegExp('^\\/api\\/hierarchy$')];
 
   const testPath = (path: string, list: RegExp[]) => {
     for (const regex of list) {
@@ -57,7 +70,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     const response = new Response(
       multiline`
         Status: ${status.toString()}
-        ${errorMessage}
+        ${ERROR_MESSAGE}
 
         <label>
           ${label}
@@ -67,19 +80,29 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
           ${message}
         </msg>
       `,
-      { status }
+      {
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'Content-Type': 'text/plain; charset=utf-8',
+        },
+        status,
+      }
     );
 
     return response;
   };
 
-  const fetchLive = (request: RequestInfo) => {
-    return fetch(request, {
-      credentials: 'include',
-      redirect: 'follow',
-    })
-      .then((response) => (response.ok ? response : undefined))
-      .catch(() => undefined);
+  const fetchLive = async (request: RequestInfo) => {
+    try {
+      return fetch(request, {
+        credentials: 'include',
+        redirect: 'follow',
+      })
+        .then((response) => (response.ok ? response : undefined))
+        .catch(() => undefined);
+    } catch {
+      return undefined;
+    }
   };
 
   const putInCache = async (response: Response) => {
@@ -101,16 +124,23 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     );
     if (!response) return;
 
-    await scope.caches.delete(CACHE_KEY);
+    const cacheKeys = await caches.keys();
+    for (const cacheKey of cacheKeys) {
+      // eslint-disable-next-line no-await-in-loop
+      await caches.delete(cacheKey);
+    }
+
     const cache = await scope.caches.open(CACHE_KEY);
 
     const { critical = [], optional = [] } = (await response.json()) || {};
     const paths = ['/'].concat(critical);
 
-    try {
-      await cache.addAll(paths);
-    } catch {
-      // noop
+    for (const path of paths) {
+      try {
+        cache.add(path);
+      } catch {
+        // noop
+      }
     }
 
     if (
@@ -121,10 +151,12 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
       return;
     }
 
-    try {
-      await cache.addAll(optional);
-    } catch {
-      // noop
+    for (const path of optional) {
+      try {
+        cache.add(path);
+      } catch {
+        // noop
+      }
     }
   };
 
@@ -174,34 +206,30 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
           );
         }
 
-        const isCachePreferred = testPath(pathname, cachePreferredUrls);
-        if (isCachePreferred) {
-          if (cachedResponse) return cachedResponse;
-
-          const liveResponse = await fetchLive(request);
-
-          if (liveResponse) {
-            await putInCache(liveResponse);
-
-            return liveResponse;
-          }
-
-          return syntheticError(
-            500,
-            request.url,
-            'cache-preferred resource not available from cache or from live'
-          );
-        }
-
         if (cachedResponse) return cachedResponse;
 
         const liveResponse = await fetchLive(request);
-        if (liveResponse) return liveResponse;
+
+        if (liveResponse) {
+          await putInCache(liveResponse);
+
+          return liveResponse;
+        }
+
+        if (pathname === '/') {
+          return new Response(FALLBACK_HTML, {
+            headers: {
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              'Content-Type': 'text/html; charset=utf-8',
+            },
+            status: 500,
+          });
+        }
 
         return syntheticError(
           500,
           request.url,
-          'cache-only resource not found in cache and not fetchable from live'
+          'cache-preferred resource not available from cache or from live'
         );
       })()
     );

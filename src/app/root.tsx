@@ -26,6 +26,7 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
     scroll-behavior: smooth;
     scrollbar-width: none;
+    touch-action: manipulation;
     user-select: none;
 
     &::-webkit-scrollbar {
