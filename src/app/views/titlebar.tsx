@@ -12,6 +12,7 @@ import {
 import { FunctionComponent } from 'preact';
 import { Translation } from '../state/i18n.js';
 import { dimensions } from '../style.js';
+import { useAwaitEvent } from '../util/await-event.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlipMenuVisible } from '../state/menu.js';
 import { useMediaQuery } from '../style/main.js';
@@ -32,11 +33,35 @@ export const IconContainer: FunctionComponent<{
   </IconContainerComponent>
 );
 
+const WaitIconView: FunctionComponent = () => {
+  const isStreamOnline = useStreamOnline();
+
+  const [isStreamOnlineDelayed, handleEvent] = useAwaitEvent(
+    isStreamOnline,
+    true,
+    2
+  );
+
+  const onAnimationIteration = useCallback<
+    JSX.AnimationEventHandler<SVGSVGElement>
+  >(
+    ({ animationName }) => {
+      if (animationName !== 'wait-circle-animation') return;
+
+      handleEvent();
+    },
+    [handleEvent]
+  );
+
+  if (isStreamOnlineDelayed) return null;
+
+  return <WaitIcon onAnimationIteration={onAnimationIteration} />;
+};
+
 export const Titlebar: FunctionComponent = () => {
   const [padding, setPadding] = useState(0);
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
-  const isStreamOnline = useStreamOnline();
 
   const [room] = useNavigationRoom();
   const [staticPage, setStaticPage] = useNavigationStaticPage();
@@ -50,11 +75,8 @@ export const Titlebar: FunctionComponent = () => {
   );
 
   const iconsRight = useMemo(() => {
-    return [
-      ...(isStreamOnline ? [] : [<WaitIcon />]),
-      <MapIcon onClick={goToMap} />,
-    ];
-  }, [goToMap, isStreamOnline]);
+    return [<WaitIconView />, <MapIcon onClick={goToMap} />];
+  }, [goToMap]);
 
   useLayoutEffect(() => {
     setPadding(0);
