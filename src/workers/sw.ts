@@ -135,13 +135,15 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     const { critical = [], optional = [] } = (await response.json()) || {};
     const paths = ['/'].concat(critical);
 
-    for (const path of paths) {
-      try {
-        cache.add(path);
-      } catch {
-        // noop
-      }
-    }
+    await Promise.all(
+      paths.map(async (path) => {
+        try {
+          await cache.add(path);
+        } catch {
+          // noop
+        }
+      })
+    );
 
     if (
       scope.navigator.userAgent.includes('iPad') ||
@@ -151,13 +153,15 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
       return;
     }
 
-    for (const path of optional) {
-      try {
-        cache.add(path);
-      } catch {
-        // noop
-      }
-    }
+    await Promise.all(
+      (optional as string[]).map(async (path) => {
+        try {
+          await cache.add(path);
+        } catch {
+          // noop
+        }
+      })
+    );
   };
 
   scope.onfetch = (fetchEvent) => {

@@ -38,8 +38,7 @@ const WaitIconView: FunctionComponent = () => {
 
   const [isStreamOnlineDelayed, handleEvent] = useAwaitEvent(
     isStreamOnline,
-    true,
-    2
+    true
   );
 
   const onAnimationIteration = useCallback<
