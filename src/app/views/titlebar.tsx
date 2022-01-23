@@ -4,7 +4,13 @@ import {
   Titlebar as TitlebarComponent,
 } from '../components/titlebar.js';
 import { MapIcon, MenuIcon, WaitIcon } from '../components/icons.js';
-import { useCallback, useLayoutEffect, useMemo, useState } from 'preact/hooks';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 import {
   useNavigationRoom,
   useNavigationStaticPage,
@@ -21,17 +27,33 @@ import { useStreamOnline } from '../state/web-api.js';
 export const IconContainer: FunctionComponent<{
   paddingSetter: (input: number) => void;
   right?: true;
-}> = ({ children, right, paddingSetter }) => (
-  <IconContainerComponent
-    ref={(element) => {
-      if (!element) return;
-      paddingSetter(element.clientWidth);
-    }}
-    right={right}
-  >
-    {children}
-  </IconContainerComponent>
-);
+}> = ({ children, right, paddingSetter }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const observerCallback = useCallback(() => {
+    if (!ref.current) return;
+
+    paddingSetter(ref.current.clientWidth);
+  }, [paddingSetter, ref]);
+
+  const observerRef = useRef(new MutationObserver(observerCallback));
+
+  useEffect(() => {
+    const observer = observerRef.current;
+
+    if (ref.current) {
+      observer.observe(ref.current, { childList: true, subtree: true });
+    }
+
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return (
+    <IconContainerComponent ref={ref} right={right}>
+      {children}
+    </IconContainerComponent>
+  );
+};
 
 const WaitIconView: FunctionComponent = () => {
   const isStreamOnline = useStreamOnline();
@@ -58,7 +80,13 @@ const WaitIconView: FunctionComponent = () => {
 };
 
 export const Titlebar: FunctionComponent = () => {
-  const [padding, setPadding] = useState(0);
+  const [paddingLeft, setPaddingLeft] = useState(0);
+  const [paddingRight, setPaddingRight] = useState(0);
+
+  const padding = useMemo(
+    () => Math.max(paddingLeft, paddingRight),
+    [paddingLeft, paddingRight]
+  );
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
 
@@ -73,36 +101,20 @@ export const Titlebar: FunctionComponent = () => {
     [flipMenuVisible, isDesktop]
   );
 
-  const iconsRight = useMemo(() => {
-    return [<WaitIconView />, <MapIcon onClick={goToMap} />];
-  }, [goToMap]);
-
-  useLayoutEffect(() => {
-    setPadding(0);
-  }, [iconsLeft, iconsRight]);
-
-  const paddingSetter = useCallback(
-    (input: number) =>
-      setPadding((previous) => {
-        if (previous > input) return previous;
-        return input;
-      }),
-    []
-  );
-
   return (
     <TitlebarComponent padding={padding}>
       <Title>
         <Translation i18nKey={staticPage || room?.meta.name} />
       </Title>
       {iconsLeft?.length ? (
-        <IconContainer paddingSetter={paddingSetter}>{iconsLeft}</IconContainer>
-      ) : null}
-      {iconsRight?.length ? (
-        <IconContainer paddingSetter={paddingSetter} right>
-          {iconsRight}
+        <IconContainer paddingSetter={setPaddingLeft}>
+          {iconsLeft}
         </IconContainer>
       ) : null}
+      <IconContainer paddingSetter={setPaddingRight} right>
+        <WaitIconView />
+        <MapIcon onClick={goToMap} />
+      </IconContainer>
     </TitlebarComponent>
   );
 };

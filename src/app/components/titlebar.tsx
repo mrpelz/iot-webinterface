@@ -1,8 +1,8 @@
 import { colors, dimensions } from '../style.js';
+import { dependentValue, mediaQuery } from '../style/main.js';
 import { add } from '../style/dimensions.js';
 import { breakpointValue } from '../style/breakpoint.js';
 import { forwardRef } from 'preact/compat';
-import { mediaQuery } from '../style/main.js';
 import { styled } from 'goober';
 
 export const Titlebar = styled('section')<{ padding: number }>`
@@ -37,9 +37,10 @@ export const Title = styled('h1')`
 `;
 
 export const IconContainer = styled('div', forwardRef)<{ right?: true }>`
-  display: flex;
-  position: absolute;
   color: ${colors.fontPrimary()};
+  display: flex;
+  justify-content: ${dependentValue('right', 'flex-end', 'flex-start')};
+  position: absolute;
   top: 0;
 
   ${({ right }) => (right ? 'right' : 'left')}: 0;
