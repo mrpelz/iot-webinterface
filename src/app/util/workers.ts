@@ -42,7 +42,7 @@ export async function installServiceWorker(
 ): Promise<void> {
   if (!('serviceWorker' in navigator)) return;
 
-  const debugUrl = (() => {
+  const aUrl = (() => {
     const _url = new URL(url);
     if (debug) _url.searchParams.append('debug', '1');
 
@@ -50,31 +50,43 @@ export async function installServiceWorker(
   })();
 
   try {
-    const existingWorker = await navigator.serviceWorker.getRegistration(
-      debugUrl
+    const existingServiceWorkers =
+      await navigator.serviceWorker.getRegistrations();
+
+    const existingMatch = existingServiceWorkers.find(
+      (serviceWorker) => serviceWorker.active?.scriptURL === aUrl
     );
 
-    if (existingWorker?.active?.scriptURL === debugUrl) {
+    const otherServiceWorkers = existingServiceWorkers.filter(
+      (serviceWorker) => serviceWorker !== existingMatch
+    );
+
+    for (const serviceWorker of otherServiceWorkers) {
       if (debug) {
         // eslint-disable-next-line no-console
-        console.debug('service worker registration already in place');
+        console.debug(
+          `removing stale service worker "${
+            serviceWorker.active?.scriptURL ||
+            serviceWorker.installing?.scriptURL ||
+            serviceWorker.waiting?.scriptURL
+          }"`
+        );
       }
 
-      return;
+      serviceWorker.unregister();
     }
 
     if (debug) {
       // eslint-disable-next-line no-console
-      console.debug('no service worker registration found, registering');
+      console.debug(`registering service worker "${aUrl}"`);
     }
 
-    await removeServiceWorkers();
-    await navigator.serviceWorker.register(debugUrl, {
+    await navigator.serviceWorker.register(aUrl, {
       scope: '/',
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(`error registering ServiceWorker (${debugUrl}): ${error}`);
+    console.error(`error registering ServiceWorker (${aUrl}): ${error}`);
   }
 }
 
