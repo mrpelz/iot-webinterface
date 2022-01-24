@@ -57,9 +57,11 @@ export async function installServiceWorker(
       (serviceWorker) => serviceWorker.active?.scriptURL === aUrl
     );
 
-    const otherServiceWorkers = existingServiceWorkers.filter(
-      (serviceWorker) => serviceWorker !== existingMatch
-    );
+    const otherServiceWorkers = existingMatch
+      ? existingServiceWorkers.filter(
+          (serviceWorker) => serviceWorker !== existingMatch
+        )
+      : existingServiceWorkers;
 
     for (const serviceWorker of otherServiceWorkers) {
       if (debug) {
@@ -75,6 +77,8 @@ export async function installServiceWorker(
 
       serviceWorker.unregister();
     }
+
+    if (existingMatch) return;
 
     if (debug) {
       // eslint-disable-next-line no-console
