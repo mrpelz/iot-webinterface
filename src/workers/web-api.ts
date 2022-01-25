@@ -86,11 +86,16 @@
   ) => {
     const url = new URL(ID_URL, apiBaseUrl);
 
-    const getLiveId = () =>
-      fetch(url.href, { credentials: 'include', redirect: 'follow' })
-        .then((response) => (response.ok ? response.text() : null))
-        .then((text) => text?.trim() || null)
-        .catch(() => null);
+    const getLiveId = () => {
+      try {
+        return fetch(url.href, { credentials: 'include', redirect: 'follow' })
+          .then((response) => (response.ok ? response.text() : null))
+          .then((text) => text?.trim() || null)
+          .catch(() => null);
+      } catch {
+        return Promise.resolve(null);
+      }
+    };
 
     let storedId: string | null = null;
 
@@ -117,12 +122,21 @@
     const url = new URL(HIERARCHY_URL, apiBaseUrl);
     url.searchParams.append('id', id);
 
-    const hierarchy = await fetch(url.href, {
-      credentials: 'include',
-      redirect: 'follow',
-    })
-      .then((response) => response.json())
-      .catch(() => null);
+    const hierarchy = await (() => {
+      try {
+        return (
+          fetch(url.href, {
+            credentials: 'include',
+            redirect: 'follow',
+          })
+            // eslint-disable-next-line @typescript-eslint/ban-types
+            .then((response) => response.json() as Object)
+            .catch(() => null)
+        );
+      } catch {
+        return Promise.resolve(null);
+      }
+    })();
 
     if (hierarchy) {
       workerConsole.debug('hierarchy request success');

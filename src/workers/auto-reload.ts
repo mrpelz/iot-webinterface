@@ -19,21 +19,32 @@
 
     if (!interval) return;
 
-    const getLiveId = () =>
-      fetch(ID_URL, { credentials: 'include', redirect: 'follow' })
-        .then((response) => (response.ok ? response.text() : null))
-        .then((text) => text?.trim() || null)
-        .catch(() => null);
+    const getLiveId = () => {
+      try {
+        return fetch(ID_URL, { credentials: 'include', redirect: 'follow' })
+          .then((response) => (response.ok ? response.text() : null))
+          .then((text) => text?.trim() || null)
+          .catch(() => null);
+      } catch {
+        return Promise.resolve(null);
+      }
+    };
 
     workerConsole.info(`initial id: "${initialId}", interval: ${interval}`);
 
     let storedId = initialId;
 
     const handleUpdate = async () => {
-      const ok = await fetch(REFRESH_URL, { method: 'POST' })
-        .then((response) => (response.ok ? response.text() : null))
-        .then((responseText) => responseText === REFRESH_URL)
-        .catch(() => false);
+      const ok = await (() => {
+        try {
+          return fetch(REFRESH_URL, { method: 'POST' })
+            .then((response) => (response.ok ? response.text() : null))
+            .then((responseText) => responseText === REFRESH_URL)
+            .catch(() => false);
+        } catch {
+          return Promise.resolve(false);
+        }
+      })();
 
       port.postMessage(ok ? storedId : null);
     };
