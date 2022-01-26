@@ -6,6 +6,8 @@ type SetupMessage = { initialId: string | null; interval: number };
 export const CHECK_INTERVAL = 5000;
 const ID_STORAGE_KEY = 'autoReloadId';
 
+const getInitialId = () => localStorage.getItem(ID_STORAGE_KEY);
+
 export let triggerUpdate: (() => void) | undefined;
 
 export function autoReload(
@@ -16,13 +18,11 @@ export function autoReload(
 ): void {
   if (interval === 0) return;
 
-  const initialId = localStorage.getItem(ID_STORAGE_KEY);
-
   const port = connectWorker<SetupMessage>(
     autoReloadUrl,
     'auto-reload',
     {
-      initialId,
+      initialId: getInitialId(),
       interval: interval === null ? CHECK_INTERVAL : interval,
     },
     debug
@@ -73,10 +73,12 @@ export function autoReload(
       console.info(`received reload request with new id "${newId}"`);
     }
 
-    notifications.clear();
+    const initialId = getInitialId();
     localStorage.setItem(ID_STORAGE_KEY, newId);
 
     if (initialId === null) return;
+
+    notifications.clear();
 
     if (unattended) {
       onReloadConfirm();
