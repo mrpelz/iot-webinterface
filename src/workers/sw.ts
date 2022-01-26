@@ -5,6 +5,15 @@
 
 const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 
+const isSafari = (() => {
+  const ua = navigator.userAgent.toLowerCase();
+
+  if (!ua.includes('chrome')) return false;
+  if (!ua.includes('safari')) return false;
+
+  return true;
+})();
+
 ((scope) => {
   importScripts('./util/main.js');
 
@@ -35,7 +44,6 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     <html lang="en" style="background-color: #000000; color: #FFFFFF; padding-top: env(safe-area-inset-top);">
     <head>
       <meta charset="utf-8" />
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <title>Offline…</title>
       <meta name="viewport" content="viewport-fit=cover, width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
     </head>
@@ -92,18 +100,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     return response;
   };
 
-  const fetchLive = async (request: RequestInfo) => {
-    try {
-      return fetch(request, {
-        credentials: 'include',
-        redirect: 'follow',
-      })
-        .then((response) => (response.ok ? response : undefined))
-        .catch(() => undefined);
-    } catch {
-      return undefined;
-    }
-  };
+  const fetchLive = (request: RequestInfo) => fetchFallback(request, 2000);
 
   const putInCache = async (response: Response) => {
     const cloned = response.clone();
@@ -118,6 +115,16 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 
   const refreshCache = async () => {
     wsConsole.debug('refreshCache');
+
+    await scope.clients.claim();
+
+    try {
+      if (scope.registration.active) {
+        await scope.registration.update();
+      }
+    } catch {
+      // noop
+    }
 
     const response = await fetchLive(
       new URL(INDEX_ENDPOINT, scope.origin).href
@@ -145,13 +152,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
       })
     );
 
-    if (
-      scope.navigator.userAgent.includes('iPad') ||
-      scope.navigator.userAgent.includes('iPhone') ||
-      scope.navigator.userAgent.includes('iPod')
-    ) {
-      return;
-    }
+    if (isSafari) return;
 
     await Promise.all(
       (optional as string[]).map(async (path) => {
@@ -174,7 +175,6 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
     fetchEvent.respondWith(
       (async () => {
         if (request.method === 'POST' && pathname === REFRESH_URL) {
-          await scope.registration.update();
           await refreshCache();
 
           return new Response(REFRESH_URL);

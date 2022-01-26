@@ -3,9 +3,12 @@
 /// <reference lib="WebWorker" />
 // eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
 /// <reference path="util/worker-scaffold.ts" />
+// eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
+/// <reference path="util/main.ts" />
 
 (async () => {
   importScripts('./util/worker-scaffold.js');
+  importScripts('./util/main.js');
 
   type SetupMessage = {
     apiBaseUrl: string;
@@ -86,15 +89,12 @@
   ) => {
     const url = new URL(ID_URL, apiBaseUrl);
 
-    const getLiveId = () => {
-      try {
-        return fetch(url.href, { credentials: 'include', redirect: 'follow' })
-          .then((response) => (response.ok ? response.text() : null))
-          .then((text) => text?.trim() || null)
-          .catch(() => null);
-      } catch {
-        return Promise.resolve(null);
-      }
+    const getLiveId = async () => {
+      const response = await fetchFallback(url.href, interval);
+      if (!response) return null;
+
+      const responseText = await response.text();
+      return responseText.trim() || null;
     };
 
     let storedId: string | null = null;
@@ -118,23 +118,23 @@
     setInterval(fn, interval);
   };
 
-  const getHierarchy = async (apiBaseUrl: string, id: string) => {
+  const getHierarchy = async (
+    apiBaseUrl: string,
+    interval: number,
+    id: string
+  ) => {
     const url = new URL(HIERARCHY_URL, apiBaseUrl);
     url.searchParams.append('id', id);
 
-    const hierarchy = await (() => {
+    const hierarchy = await (async () => {
+      const response = await fetchFallback(url.href, interval);
+      if (!response) return null;
+
       try {
-        return (
-          fetch(url.href, {
-            credentials: 'include',
-            redirect: 'follow',
-          })
-            // eslint-disable-next-line @typescript-eslint/ban-types
-            .then((response) => response.json() as Object)
-            .catch(() => null)
-        );
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        return (await response.json()) as Object;
       } catch {
-        return Promise.resolve(null);
+        return null;
       }
     })();
 
@@ -347,7 +347,7 @@
     };
 
     await getId(apiBaseUrl, interval, async (id) => {
-      const hierarchy = await getHierarchy(apiBaseUrl, id);
+      const hierarchy = await getHierarchy(apiBaseUrl, interval, id);
 
       _handleHierachy = (childPort) => {
         const message: WorkerMessageOutbound = {

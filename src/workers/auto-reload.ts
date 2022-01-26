@@ -3,9 +3,12 @@
 /// <reference lib="WebWorker" />
 // eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
 /// <reference path="util/worker-scaffold.ts" />
+// eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
+/// <reference path="util/main.ts" />
 
 (async () => {
   importScripts('./util/worker-scaffold.js');
+  importScripts('./util/main.js');
 
   type SetupMessage = { initialId: string | null; interval: number };
 
@@ -19,15 +22,12 @@
 
     if (!interval) return;
 
-    const getLiveId = () => {
-      try {
-        return fetch(ID_URL, { credentials: 'include', redirect: 'follow' })
-          .then((response) => (response.ok ? response.text() : null))
-          .then((text) => text?.trim() || null)
-          .catch(() => null);
-      } catch {
-        return Promise.resolve(null);
-      }
+    const getLiveId = async () => {
+      const response = await fetchFallback(ID_URL, interval);
+      if (!response) return null;
+
+      const responseText = await response.text();
+      return responseText.trim() || null;
     };
 
     workerConsole.info(`initial id: "${initialId}", interval: ${interval}`);
@@ -35,15 +35,15 @@
     let storedId = initialId;
 
     const handleUpdate = async () => {
-      const ok = await (() => {
-        try {
-          return fetch(REFRESH_URL, { method: 'POST' })
-            .then((response) => (response.ok ? response.text() : null))
-            .then((responseText) => responseText === REFRESH_URL)
-            .catch(() => false);
-        } catch {
-          return Promise.resolve(false);
-        }
+      const ok = await (async () => {
+        const response = await fetchFallback(REFRESH_URL, 20000, {
+          method: 'POST',
+        });
+        if (!response) return false;
+
+        const responseText = await response.text();
+
+        return responseText.trim() === REFRESH_URL;
       })();
 
       port.postMessage(ok ? storedId : null);

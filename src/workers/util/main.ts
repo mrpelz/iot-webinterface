@@ -1,10 +1,40 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const fetchFallback = async (
+  input: RequestInfo,
+  timeout = 5000,
+  init?: RequestInit
+): Promise<Response | null> => {
+  const abortController = new AbortController();
+
+  const aTimeout = setTimeout(() => abortController.abort(), timeout);
+  const clear = () => clearTimeout(aTimeout);
+
+  try {
+    const response = await fetch(input, {
+      ...init,
+      credentials: 'include',
+      redirect: 'follow',
+      signal: abortController.signal,
+    }).catch(() => undefined);
+
+    clear();
+
+    if (!response || !response.ok) return null;
+    return response;
+  } catch {
+    clear();
+
+    return null;
+  }
+};
+
 const indentMatcher = new RegExp('\\s*');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function multiline(
+const multiline = (
   strings: TemplateStringsArray | string,
   ...tags: string[]
-): string {
+): string => {
   const _strings = [...strings];
   const parts: string[] = [];
 
@@ -32,4 +62,4 @@ function multiline(
     .join('\n');
 
   return `${text}\n`;
-}
+};

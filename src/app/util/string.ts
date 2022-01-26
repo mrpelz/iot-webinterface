@@ -1,9 +1,9 @@
 const indentMatcher = new RegExp('\\s*');
 
-export function multiline(
+export const multiline = (
   strings: TemplateStringsArray | string,
   ...tags: string[]
-): string {
+): string => {
   const _strings = [...strings];
   const parts: string[] = [];
 
@@ -31,4 +31,4 @@ export function multiline(
     .join('\n');
 
   return `${text}\n`;
-}
+};
