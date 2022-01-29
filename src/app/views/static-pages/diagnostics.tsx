@@ -268,7 +268,6 @@ export const Diagnostics: FunctionComponent = () => {
   const {
     building: [building],
     home: [home],
-    floor: [floor],
     room: [room],
     staticPage: [staticPage],
   } = useNavigation();
@@ -276,7 +275,7 @@ export const Diagnostics: FunctionComponent = () => {
   const homes = useLevel(Levels.HOME, hierarchy);
   const buildings = useLevel(Levels.BUILDING, home);
   const floors = useLevel(Levels.FLOOR, building);
-  const rooms = useLevel(Levels.ROOM, floor);
+  const rooms = useLevel(Levels.ROOM, building);
 
   const fallbackNotification = useNotification();
 
@@ -437,14 +436,11 @@ export const Diagnostics: FunctionComponent = () => {
                       {useMemo(
                         () =>
                           JSON.stringify(
-                            {
-                              elements: floors.map(({ meta }) => meta),
-                              state: floor?.meta || null,
-                            },
+                            floors.map(({ meta }) => meta),
                             undefined,
                             2
                           ),
-                        [floor, floors]
+                        [floors]
                       )}
                     </pre>
                   </td>

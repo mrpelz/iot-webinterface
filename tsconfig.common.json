@@ -4,6 +4,7 @@
     "alwaysStrict": true,
     "checkJs": false,
     "esModuleInterop": true,
+    "incremental": true,
     "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
@@ -12,7 +13,7 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "target": "esnext",
-    "useDefineForClassFields": true,
+    "useDefineForClassFields": true
   },
   "include": [
     "./src/**/*"

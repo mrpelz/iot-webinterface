@@ -42,7 +42,6 @@ type NavigationElement<T> = readonly [T | null, StateUpdater<T | null>];
 
 type TNavigationContext = {
   building: NavigationElement<HierarchyElementBuilding>;
-  floor: NavigationElement<HierarchyElementFloor>;
   home: NavigationElement<HierarchyElementHome>;
   room: NavigationElement<HierarchyElementRoom>;
   staticPage: NavigationElement<StaticPage>;
@@ -199,15 +198,8 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   );
   const [stateBuilding] = building;
 
-  const floor = useNavigationElements<HierarchyElementFloor>(
-    stateBuilding,
-    Levels.FLOOR,
-    'n_floor'
-  );
-  const [stateFloor] = floor;
-
   const room = useNavigationElements<HierarchyElementRoom>(
-    stateFloor,
+    stateBuilding,
     Levels.ROOM,
     'n_room',
     staticPageFromFlag,
@@ -243,12 +235,11 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   const value = useMemo<TNavigationContext>(() => {
     return {
       building,
-      floor,
       home,
       room,
       staticPage,
     };
-  }, [building, floor, home, room, staticPage]);
+  }, [building, home, room, staticPage]);
 
   return (
     <NavigationContext.Provider value={value}>
@@ -271,12 +262,6 @@ export const useNavigationHome = (): TNavigationContext['home'] => {
   const { home } = useContext(NavigationContext);
 
   return useMemo(() => home, [home]);
-};
-
-export const useNavigationFloor = (): TNavigationContext['floor'] => {
-  const { floor } = useContext(NavigationContext);
-
-  return useMemo(() => floor, [floor]);
 };
 
 export const useNavigationRoom = (): TNavigationContext['room'] => {

@@ -406,10 +406,8 @@ export function isMetaPropertyActuator(
 
 export function isMetaPropertySensorDate(
   meta: Meta | undefined
-): meta is MetaPropertyActuator {
-  return isMetaPropertySensor(meta) && meta.name
-    ? ['lastSeen', 'nextExecution'].includes(meta.name)
-    : false;
+): meta is MetaPropertySensor {
+  return isMetaPropertySensor(meta) && meta.unit === 'date';
 }
 
 export function levelToString(input: Levels): string | null {
