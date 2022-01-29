@@ -1,5 +1,6 @@
 import { HierarchyElementDevice, Levels } from '../../web-api.js';
 import { useDeepLevel, useGetter, useHierarchy } from '../../state/web-api.js';
+import { Category } from '../category.js';
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from './diagnostics.js';
@@ -27,11 +28,18 @@ export const Technical: FunctionComponent = () => {
     hierarchy
   );
 
-  return (
-    <DiagnosticsContainer>
-      {devices.map((device) => (
-        <Device device={device} />
-      ))}
-    </DiagnosticsContainer>
+  return useMemo(
+    () => (
+      <>
+        {devices.map((device) => (
+          <Category header={device.meta.name}>
+            <DiagnosticsContainer>
+              <Device device={device} />
+            </DiagnosticsContainer>
+          </Category>
+        ))}
+      </>
+    ),
+    [devices]
   );
 };
