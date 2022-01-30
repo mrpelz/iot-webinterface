@@ -7,14 +7,14 @@ const country = getCountry() || undefined;
 const memo: unknown[] = [];
 let rerenderCount = 0;
 
-export const useHookDebug = (label: string): void => {
+export const useHookDebug = (label: string, force = false): void => {
   const debug = useFlag('debug');
 
   useEffect(() => {
     const now = new Date().toLocaleTimeString(country);
     const memoized = memo.pop();
 
-    if (debug) {
+    if (debug || force) {
       // eslint-disable-next-line no-console
       console.log(`${now}\t→${memoized || 'null'}\trender\t${label}`);
     }
@@ -22,7 +22,7 @@ export const useHookDebug = (label: string): void => {
     if (memoized && !memo.length) {
       rerenderCount += 1;
 
-      if (debug) {
+      if (debug || force) {
         // eslint-disable-next-line no-console
         console.log(`${now}\t${rerenderCount}\trerender done`);
       }
@@ -31,7 +31,7 @@ export const useHookDebug = (label: string): void => {
     return () => {
       const salt = Math.floor(Math.random() * 100000).toString(16);
 
-      if (debug) {
+      if (debug || force) {
         // eslint-disable-next-line no-console
         console.log(
           `${new Date().toLocaleTimeString(

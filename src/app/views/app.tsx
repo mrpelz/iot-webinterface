@@ -6,6 +6,7 @@ import {
   useNavigationStaticPage,
 } from '../state/navigation.js';
 import { App as AppComponent } from '../components/app.js';
+import { Background } from './background.js';
 import { DiagnosticsContainer } from '../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Global } from './static-pages/global.js';
@@ -108,6 +109,7 @@ export const App: FunctionComponent = () => {
   return (
     <AppComponent>
       <Layout>
+        <Background />
         {staticPage
           ? {
               diagnostics: <Diagnostics />,

@@ -1,6 +1,6 @@
 import { HierarchyElementDevice, Levels } from '../../web-api.js';
 import { useDeepLevel, useGetter, useHierarchy } from '../../state/web-api.js';
-import { Category } from '../category.js';
+import { Category } from '../../components/category.js';
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from './diagnostics.js';
