@@ -20,6 +20,7 @@ import {
   useSetLocalStorage,
 } from '../util/local-storage.js';
 import { useLevel, useWebApi } from './web-api.js';
+import { useDefer } from '../util/defer.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/hook-debug.js';
 import { useSetMenuVisible } from './menu.js';
@@ -48,6 +49,7 @@ type TNavigationContext = {
 };
 
 const START_PAGE: StaticPage = 'global';
+const STATIC_PAGE_KEY = 'n_staticPage';
 
 const NavigationContext = createContext<TNavigationContext>(
   null as unknown as TNavigationContext
@@ -143,31 +145,40 @@ function useNavigationElements<
 
 function useStaticPage(
   stateRoom: HierarchyElementRoom | null,
-  override: string | null
+  override: string | null,
+  defer = false
 ) {
+  const fallback = useDefer(defer ? null : START_PAGE, 300);
   const isVisible = useVisibility();
 
-  const storedStaticPage = useGetLocalStorage('n_staticPage');
+  const storedStaticPage = useGetLocalStorage(STATIC_PAGE_KEY);
 
   const determineStaticPage = useCallback(() => {
     if (override) return override as StaticPage;
     if (stateRoom) return null;
     if (storedStaticPage) return storedStaticPage as StaticPage;
 
-    return START_PAGE;
-  }, [override, stateRoom, storedStaticPage]);
+    return fallback;
+  }, [fallback, override, stateRoom, storedStaticPage]);
 
   const staticPage = useState(determineStaticPage);
   const [state, setState] = staticPage;
 
-  useSetLocalStorage('n_staticPage', state);
+  useSetLocalStorage(STATIC_PAGE_KEY, state);
 
   useEffect(() => {
     if (!override || isVisible) return;
 
     setState(determineStaticPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [determineStaticPage, isVisible, override]);
+  }, [isVisible, override]);
+
+  useEffect(() => {
+    if (!fallback) return;
+
+    setState(determineStaticPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fallback]);
 
   return staticPage;
 }
@@ -209,7 +220,8 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
 
   const staticPage = useStaticPage(
     stateRoom,
-    staticPageFromFlag ? startPage : null
+    staticPageFromFlag ? startPage : null,
+    !hierarchy
   );
   const [stateStaticPage, setStaticPage] = staticPage;
 

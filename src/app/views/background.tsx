@@ -38,27 +38,33 @@ export const Background: FunctionComponent = () => {
 
     const previous = wrapper.firstElementChild;
 
-    const fadeOut = async () => {
-      if (!previous) return;
+    const fade = async (current: HTMLElement | null) => {
+      const animation = await (async () => {
+        try {
+          if (previous) {
+            return previous.animate([{ opacity: 1 }, { opacity: 0 }], {
+              duration: 1000,
+              fill: 'forwards',
+            }).finished;
+          }
 
-      const animation = await previous
-        .animate([{ opacity: 1 }, { opacity: 0 }], {
-          duration: 1000,
-          fill: 'forwards',
-        })
-        .finished.catch(() => undefined);
+          if (current) {
+            return current.animate([{ opacity: 0 }, { opacity: 1 }], {
+              duration: 1000,
+              fill: 'forwards',
+            }).finished;
+          }
 
-      previous.remove();
+          return null;
+        } catch {
+          return null;
+        }
+      })();
+
+      previous?.remove();
+
+      if (!previous && current) animation?.commitStyles();
       animation?.cancel();
-    };
-
-    const fallback = () => {
-      const div = document.createElement('div');
-      div.classList.add('fallback');
-
-      wrapper.prepend(div);
-
-      fadeOut();
     };
 
     const img = path ? new Image() : null;
@@ -71,14 +77,14 @@ export const Background: FunctionComponent = () => {
 
         wrapper.prepend(img);
 
-        fadeOut();
+        fade(img);
       };
 
       img.onerror = () => {
-        fallback();
+        fade(null);
       };
     } else {
-      fallback();
+      fade(null);
     }
 
     for (const child of Array.from(wrapper.childNodes)) {

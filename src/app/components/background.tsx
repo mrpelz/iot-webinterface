@@ -1,4 +1,3 @@
-import { colors } from '../style.js';
 import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 
@@ -13,9 +12,5 @@ export const Background = styled('div', forwardRef)`
     position: fixed;
     width: 100%;
     z-index: -1;
-  }
-
-  & > .fallback {
-    background-color: ${colors.backgroundPrimary()};
   }
 `;
