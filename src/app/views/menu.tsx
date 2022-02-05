@@ -86,13 +86,20 @@ export const Floor: FunctionComponent<{
 };
 
 export const Menu: FunctionComponent = () => {
-  const [selectedStaticPage, selectStaticPage] = useNavigationStaticPage();
+  const isMenuVisible = useIsMenuVisible();
 
+  const [selectedStaticPage, selectStaticPage] = useNavigationStaticPage();
   const [building] = useNavigationBuilding();
+
   const floors = useLevel<HierarchyElementFloor>(Levels.FLOOR, building);
 
+  const isVisible = useMemo(
+    () => (isMenuVisible === null ? true : isMenuVisible),
+    [isMenuVisible]
+  );
+
   return (
-    <MenuComponent>
+    <MenuComponent isVisible={isVisible}>
       <MenuContent>
         <MenuSubdivision>
           <MenuList>

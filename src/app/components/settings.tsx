@@ -21,12 +21,12 @@ export const SettingsWrapper = styled('ul')`
 `;
 
 export const Section = styled('li')`
-  border-bottom: ${dimensions.hairline} solid ${colors.fontSecondary()};
+  border-bottom: ${dimensions.hairline} solid ${colors.fontTertiary()};
   display: flex;
   font-size: ${dimensions.fontSize};
   gap: 1ch;
   justify-content: space-between;
-  padding: ${dimensions.fontPadding} 1ch;
+  padding: ${dimensions.fontPadding};
 
   &:last-of-type {
     border-bottom: none;

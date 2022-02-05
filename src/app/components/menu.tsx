@@ -3,13 +3,14 @@ import { dependentValue } from '../style/main.js';
 import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 
-export const Menu = styled('nav')`
+export const Menu = styled('nav')<{ isVisible: boolean }>`
   background-color: ${colors.backgroundSecondary()};
   border-inline-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
   height: ${dimensions.appHeight};
   overflow-y: auto;
   overscroll-behavior-y: contain;
   padding: ${dimensions.titlebarHeight} 0;
+  pointer-events: ${dependentValue('isVisible', 'auto', 'none')};
   scroll-behavior: smooth;
 `;
 
@@ -63,7 +64,7 @@ export const MenuListItem = styled('li', forwardRef)<{
   )};
   cursor: pointer;
   margin: 0;
-  padding: ${dimensions.fontPadding} 0.75rem;
+  padding: ${dimensions.fontPadding};
   font-size: ${dimensions.fontSize};
   height: ${dimensions.titlebarHeight};
   line-height: ${dimensions.fontSize};

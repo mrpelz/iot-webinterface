@@ -12,7 +12,7 @@ export const CategoryHeader = styled('header')`
   font-weight: 600;
   height: ${dimensions.fontSizeLarge};
   line-height: ${dimensions.fontSizeLarge};
-  padding: 0 1ch;
+  padding: 0 ${dimensions.fontPadding};
   position: sticky;
   top: ${dimensions.headerHeight};
 `;
