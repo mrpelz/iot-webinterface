@@ -3,12 +3,10 @@ enum WorkerCommands {
   UNLOAD,
 }
 
-export const autoReloadUrl = new URL(
-  '../../workers/auto-reload.js',
-  import.meta.url
-).href;
-
 export const swUrl = new URL('../../workers/sw.js', import.meta.url).href;
+
+export const updateUrl = new URL('../../workers/update.js', import.meta.url)
+  .href;
 
 export const webApiUrl = new URL('../../workers/web-api.js', import.meta.url)
   .href;

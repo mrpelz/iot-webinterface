@@ -32,7 +32,7 @@ import {
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { dimensions } from '../../style.js';
-import { triggerUpdate } from '../../util/auto-reload.js';
+import { triggerUpdate } from '../../util/update.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { useFlags } from '../../state/flags.js';
 import { useI18n } from '../../state/i18n.js';

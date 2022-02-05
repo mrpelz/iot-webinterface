@@ -1,5 +1,4 @@
 import { connectWorker, webApiUrl } from './util/workers.js';
-import { CHECK_INTERVAL } from './util/auto-reload.js';
 
 type SetupMessage = {
   apiBaseUrl: string;
@@ -204,6 +203,8 @@ type SetterMessageOutbound<T> =
       type: ChildMessageType.SET;
       value: T;
     };
+
+const CHECK_INTERVAL = 5000;
 
 export class WebApi {
   private _hierarchy?: HierarchyElementSystem;

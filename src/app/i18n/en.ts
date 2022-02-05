@@ -2,8 +2,6 @@ export const en = {
   apiBaseUrl: 'API base-URL',
   area: 'area',
   auto: 'auto',
-  autoReloadCheckInterval: 'auto reload check-interval',
-  autoReloadUnattended: 'auto reload unattended',
   bathtubBathroom: 'Bathtub Bathroom',
   bedroom: 'Bedroom',
   building: 'building',
@@ -42,5 +40,7 @@ export const en = {
   technical: 'Technical',
   testRoom: 'Test Room',
   theme: 'theme',
+  updateCheckInterval: 'update check-interval',
+  updateUnattended: 'update unattended',
   wurstHome: 'Wurst Home',
 };

@@ -6,29 +6,30 @@ import {
 } from './util/workers.js';
 import { Notifications } from './util/notifications.js';
 import { WebApi } from './web-api.js';
-import { autoReload } from './util/auto-reload.js';
+import { defer } from './util/defer.js';
 import { getFlags } from './util/flags.js';
 import { render } from './root.js';
+import { update } from './util/update.js';
 
 try {
   const flags = getFlags();
   const {
     apiBaseUrl,
-    autoReloadCheckInterval,
-    autoReloadUnattended,
     debug,
     enableNotifications,
     serviceWorker,
+    updateCheckInterval,
+    updateUnattended,
   } = flags;
 
-  const webApi = new WebApi(apiBaseUrl, autoReloadCheckInterval, debug);
+  const webApi = new WebApi(apiBaseUrl, updateCheckInterval, debug);
 
   const notifications = new Notifications(enableNotifications);
 
   render(flags, notifications, webApi);
   document.documentElement.removeAttribute('static');
 
-  const deferred = async () => {
+  defer(async () => {
     iOSHoverStyles();
     iOSScrollToTop();
 
@@ -38,29 +39,8 @@ try {
       await removeServiceWorkers();
     }
 
-    autoReload(
-      autoReloadCheckInterval,
-      autoReloadUnattended,
-      notifications,
-      debug
-    );
-  };
-
-  (() => {
-    if ('requestIdleCallback' in window) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      requestIdleCallback(deferred);
-      return;
-    }
-
-    if ('queueMicrotask' in window) {
-      queueMicrotask(deferred);
-      return;
-    }
-
-    setTimeout(deferred, 0);
-  })();
+    update(updateCheckInterval, updateUnattended, notifications, debug);
+  });
 } catch (error) {
   removeServiceWorkers();
   throw error;

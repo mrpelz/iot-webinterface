@@ -49,11 +49,11 @@ export const Settings: FunctionComponent = () => {
   const debug = useFlag('debug');
   const setDebug = useSetFlag('debug');
 
-  const autoReloadCheckInterval = useFlag('autoReloadCheckInterval');
-  const setAutoReloadCheckInterval = useSetFlag('autoReloadCheckInterval');
+  const updateCheckInterval = useFlag('updateCheckInterval');
+  const setAutoReloadCheckInterval = useSetFlag('updateCheckInterval');
 
-  const autoReloadUnattended = useFlag('autoReloadUnattended');
-  const setAutoReloadUnattended = useSetFlag('autoReloadUnattended');
+  const updateUnattended = useFlag('updateUnattended');
+  const setAutoReloadUnattended = useSetFlag('updateUnattended');
 
   const serviceWorker = useFlag('serviceWorker');
   const setServiceWorker = useSetFlag('serviceWorker');
@@ -283,16 +283,16 @@ export const Settings: FunctionComponent = () => {
         />
       </Section>
       <Section>
-        <label for="autoReloadCheckInterval">
-          <Translation i18nKey="autoReloadCheckInterval" />
+        <label for="updateCheckInterval">
+          <Translation i18nKey="updateCheckInterval" />
         </label>
         <input
-          id="autoReloadCheckInterval"
+          id="updateCheckInterval"
           inputMode="numeric"
-          name="autoReloadCheckInterval"
+          name="updateCheckInterval"
           pattern="[0-9]*"
           placeholder={useI18nKeyFallback('auto')}
-          value={autoReloadCheckInterval || ''}
+          value={updateCheckInterval || ''}
           onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
             ({ currentTarget: { value } }) => {
               const selectedAutoReloadCheckInterval = Number.parseInt(
@@ -315,13 +315,13 @@ export const Settings: FunctionComponent = () => {
         />
       </Section>
       <Section>
-        <label for="autoReloadUnattended">
-          <Translation i18nKey="autoReloadUnattended" />
+        <label for="updateUnattended">
+          <Translation i18nKey="updateUnattended" />
         </label>
         <input
-          checked={Boolean(autoReloadUnattended)}
-          id="autoReloadUnattended"
-          name="autoReloadUnattended"
+          checked={Boolean(updateUnattended)}
+          id="updateUnattended"
+          name="updateUnattended"
           type="checkbox"
           onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
             ({ currentTarget: { checked: selectedAutoReloadUnattended } }) => {

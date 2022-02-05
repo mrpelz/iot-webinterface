@@ -49,9 +49,7 @@
       port.postMessage(ok ? storedId : null);
     };
 
-    port.onmessage = () => handleUpdate();
-
-    setInterval(async () => {
+    const checkForUpdate = async () => {
       const liveId = await getLiveId();
 
       workerConsole.info(`live id: "${liveId}"`);
@@ -66,6 +64,11 @@
       storedId = liveId;
 
       handleUpdate();
-    }, interval);
+    };
+
+    port.onmessage = () => handleUpdate();
+
+    setInterval(() => checkForUpdate(), interval);
+    defer(() => checkForUpdate());
   })(...(await scaffold<SetupMessage>(self)));
 })();

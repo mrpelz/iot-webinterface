@@ -1,16 +1,18 @@
-import { autoReloadUrl, connectWorker } from './workers.js';
+import { connectWorker, updateUrl } from './workers.js';
 import { Notifications } from './notifications.js';
 
 type SetupMessage = { initialId: string | null; interval: number };
 
-export const CHECK_INTERVAL = 5000;
-const ID_STORAGE_KEY = 'autoReloadId';
+const isProd = !['localhost', '127.0.0.1'].includes(location.hostname);
+
+export const CHECK_INTERVAL = isProd ? 60000 : 2500;
+const ID_STORAGE_KEY = 'updateId';
 
 const getInitialId = () => localStorage.getItem(ID_STORAGE_KEY);
 
 export let triggerUpdate: (() => void) | undefined;
 
-export function autoReload(
+export function update(
   interval: number | null,
   unattended: boolean,
   notifications: Notifications,
@@ -19,8 +21,8 @@ export function autoReload(
   if (interval === 0) return;
 
   const port = connectWorker<SetupMessage>(
-    autoReloadUrl,
-    'auto-reload',
+    updateUrl,
+    'update',
     {
       initialId: getInitialId(),
       interval: interval === null ? CHECK_INTERVAL : interval,
@@ -58,7 +60,7 @@ export function autoReload(
         'No new App version installed',
         {
           body: 'Service worker not present',
-          requireInteraction: true,
+          requireInteraction: false,
           tag: 'versionUpdate',
         },
         onReloadConfirm,
@@ -89,7 +91,7 @@ export function autoReload(
     notifications.trigger(
       'New App version installed',
       {
-        body: 'Click to reload',
+        body: newId,
         requireInteraction: true,
         tag: 'versionUpdate',
       },

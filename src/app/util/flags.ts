@@ -1,25 +1,25 @@
 export type Flags = {
   apiBaseUrl: string | null;
-  autoReloadCheckInterval: number | null;
-  autoReloadUnattended: boolean;
   debug: boolean;
   enableNotifications: boolean;
   language: string | null;
   serviceWorker: boolean;
   startPage: string | null;
   theme: string | null;
+  updateCheckInterval: number | null;
+  updateUnattended: boolean;
 };
 
 const defaultFlags: Flags = {
   apiBaseUrl: null,
-  autoReloadCheckInterval: null,
-  autoReloadUnattended: false,
   debug: false,
   enableNotifications: true,
   language: null,
   serviceWorker: true,
   startPage: null,
   theme: null,
+  updateCheckInterval: null,
+  updateUnattended: false,
 };
 
 export let flags: Flags | null = null;
@@ -60,18 +60,6 @@ export function getFlags(): Flags {
     apiBaseUrl: getFlag(hashFlags, queryFlags, 'apiBaseUrl', (input) => {
       return typeof input === 'string' ? input.trim() : undefined;
     }),
-    autoReloadCheckInterval: getFlag(
-      hashFlags,
-      queryFlags,
-      'autoReloadCheckInterval',
-      (input) => Number.parseInt(String(input), 10)
-    ),
-    autoReloadUnattended: getFlag(
-      hashFlags,
-      queryFlags,
-      'autoReloadUnattended',
-      (input) => Boolean(input)
-    ),
     debug: getFlag(hashFlags, queryFlags, 'debug', (input) => Boolean(input)),
     enableNotifications: getFlag(
       hashFlags,
@@ -91,6 +79,18 @@ export function getFlags(): Flags {
     theme: getFlag(hashFlags, queryFlags, 'theme', (input) => {
       return typeof input === 'string' ? input.trim() : undefined;
     }),
+    updateCheckInterval: getFlag(
+      hashFlags,
+      queryFlags,
+      'updateCheckInterval',
+      (input) => Number.parseInt(String(input), 10)
+    ),
+    updateUnattended: getFlag(
+      hashFlags,
+      queryFlags,
+      'updateUnattended',
+      (input) => Boolean(input)
+    ),
   };
 
   const filteredFlags: Partial<Flags> = Object.fromEntries(

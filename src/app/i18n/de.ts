@@ -4,8 +4,6 @@ export const de: Record<keyof typeof en, string> = {
   apiBaseUrl: 'API Base-URL',
   area: 'Area',
   auto: 'automatisch',
-  autoReloadCheckInterval: 'Auto-Reload Überprüfungsintervall',
-  autoReloadUnattended: 'Auto-Reload Bestätigung überspringen',
   bathtubBathroom: 'Wannenbad',
   bedroom: 'Schlafzimmer',
   building: 'Gebäude',
@@ -44,5 +42,7 @@ export const de: Record<keyof typeof en, string> = {
   technical: 'Technik',
   testRoom: 'Testraum',
   theme: 'Theme',
+  updateCheckInterval: 'Update-Intervall',
+  updateUnattended: 'unbestätigt updaten',
   wurstHome: 'Wurst Home',
 };

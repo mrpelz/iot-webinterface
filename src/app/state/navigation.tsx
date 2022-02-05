@@ -20,7 +20,7 @@ import {
   useSetLocalStorage,
 } from '../util/local-storage.js';
 import { useLevel, useWebApi } from './web-api.js';
-import { useDefer } from '../util/defer.js';
+import { useDelay } from '../util/delay.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/hook-debug.js';
 import { useSetMenuVisible } from './menu.js';
@@ -148,7 +148,7 @@ function useStaticPage(
   override: string | null,
   defer = false
 ) {
-  const fallback = useDefer(defer ? null : START_PAGE, 300);
+  const fallback = useDelay(defer ? null : START_PAGE, 300);
   const isVisible = useVisibility();
 
   const storedStaticPage = useGetLocalStorage(STATIC_PAGE_KEY);

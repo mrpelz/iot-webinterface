@@ -1,20 +1,15 @@
-import { useEffect, useRef, useState } from 'preact/hooks';
+export function defer(callback: () => void): void {
+  if ('requestIdleCallback' in window) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    requestIdleCallback(callback);
+    return;
+  }
 
-export const useDefer = <T>(value: T, delay: number): T | null => {
-  const [state, setState] = useState<T | null>(null);
+  if ('queueMicrotask' in window) {
+    queueMicrotask(callback);
+    return;
+  }
 
-  const timeoutRef = useRef<number>(null);
-
-  useEffect(() => {
-    timeoutRef.current = setTimeout(() => setState(value), delay);
-
-    const { current: timeout } = timeoutRef;
-
-    return () => {
-      if (!timeout) return;
-      clearTimeout(timeout);
-    };
-  }, [delay, value]);
-
-  return state;
-};
+  setTimeout(callback, 0);
+}
