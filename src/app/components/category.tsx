@@ -18,7 +18,7 @@ export const CategoryHeader = styled('header')`
 `;
 
 export const CategoryContent = styled('main')`
-  margin: 1ch;
+  margin: ${dimensions.fontPadding};
 `;
 
 export const Category: FunctionComponent<{ header: ComponentChild }> = ({
