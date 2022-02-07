@@ -78,6 +78,7 @@
   const HIERARCHY_URL = '/api/hierarchy';
   const ID_URL = '/api/id';
   const WS_URL = '/api/stream';
+  const WS_INTERVAL = 2000;
 
   const getters = new Map<number, Set<Getter>>();
   const existingValues = new Map<number, unknown>();
@@ -158,48 +159,77 @@
     const createWebSocket = () => {
       if (!storedId) return;
 
+      if (webSocket?.readyState === WebSocket.OPEN) return;
+      if (webSocket?.readyState === WebSocket.CONNECTING) return;
+
       const url = new URL(WS_URL, apiBaseUrl);
       url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
       url.searchParams.append('id', storedId);
 
-      try {
-        if (webSocket?.readyState === WebSocket.OPEN) return;
-        if (webSocket?.readyState === WebSocket.CONNECTING) return;
-
-        webSocket?.close();
-        webSocket = new WebSocket(url.href);
-
-        webSocket.onerror = () => {
-          throw new Error('webSocket onerror');
-        };
-
-        webSocket.onopen = () => {
-          workerConsole.debug('websocket opened');
-          handleOnline(true);
-        };
-        webSocket.onclose = () => {
-          workerConsole.error('websocket closed');
+      webSocket?.close();
+      webSocket = (() => {
+        try {
+          return new WebSocket(url.href);
+        } catch (error) {
+          workerConsole.error(error);
           handleOnline(false);
-        };
 
-        webSocket.onmessage = ({ data }) => {
-          if (!data) return;
+          return null;
+        }
+      })();
 
-          const payload = JSON.parse(data);
-          if (!payload) return;
+      if (!webSocket) return;
 
-          handleMessage(payload);
-        };
-      } catch (error) {
-        workerConsole.error(error);
+      webSocket.onopen = () => {
+        workerConsole.debug('websocket opened');
+        handleOnline(true);
+      };
+
+      webSocket.onclose = () => {
+        workerConsole.error('websocket closed');
         handleOnline(false);
-      }
+
+        webSocket = null;
+      };
+
+      webSocket.onerror = () => {
+        workerConsole.error('websocket error');
+        handleOnline(false);
+
+        webSocket = null;
+      };
+
+      webSocket.onmessage = ({ data }) => {
+        if (!data) return;
+
+        const payload = (() => {
+          try {
+            return JSON.parse(data);
+          } catch {
+            return null;
+          }
+        })();
+
+        if (!payload) return;
+
+        handleMessage(payload);
+      };
     };
 
     const sendMessage = (value: unknown) => {
       if (webSocket?.readyState !== WebSocket.OPEN) return;
 
-      webSocket.send(JSON.stringify(value));
+      const message = (() => {
+        try {
+          return JSON.stringify(value);
+        } catch {
+          return null;
+        }
+      })();
+
+      if (!message) return;
+
+      webSocket.send(message);
     };
 
     const setId = (id: string) => {
@@ -209,7 +239,7 @@
       createWebSocket();
     };
 
-    setInterval(() => createWebSocket(), 2000);
+    setInterval(() => createWebSocket(), WS_INTERVAL);
 
     return {
       sendMessage,
