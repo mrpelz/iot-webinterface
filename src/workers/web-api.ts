@@ -79,6 +79,8 @@
   const ID_URL = '/api/id';
   const WS_URL = '/api/stream';
   const WS_INTERVAL = 2000;
+  const WS_MARCOPOLO_PAYLOAD = '9B864FA5-F0DE-4182-A868-B4DBB81EEC16';
+  const WS_MARCOPOLO_INTERVAL = 5000;
 
   const getters = new Map<number, Set<Getter>>();
   const existingValues = new Map<number, unknown>();
@@ -155,6 +157,15 @@
   ): Stream => {
     let storedId: string | null = null;
     let webSocket: WebSocket | null = null;
+    let webSocketTimer: number | null = null;
+
+    const destroyWebSocket = () => {
+      webSocket?.close();
+      webSocket = null;
+
+      if (webSocketTimer) clearTimeout(webSocketTimer);
+      webSocketTimer = null;
+    };
 
     const createWebSocket = () => {
       if (!storedId) return;
@@ -189,18 +200,28 @@
         workerConsole.error('websocket closed');
         handleOnline(false);
 
-        webSocket = null;
+        destroyWebSocket();
       };
 
       webSocket.onerror = () => {
         workerConsole.error('websocket error');
         handleOnline(false);
 
-        webSocket = null;
+        destroyWebSocket();
       };
 
       webSocket.onmessage = ({ data }) => {
         if (!data) return;
+
+        if (data === WS_MARCOPOLO_PAYLOAD) {
+          if (webSocketTimer) clearTimeout(webSocketTimer);
+          webSocketTimer = setTimeout(
+            () => destroyWebSocket(),
+            WS_MARCOPOLO_INTERVAL * 5
+          );
+
+          return;
+        }
 
         const payload = (() => {
           try {
@@ -235,11 +256,16 @@
     const setId = (id: string) => {
       storedId = id;
 
-      webSocket?.close();
+      destroyWebSocket();
       createWebSocket();
     };
 
     setInterval(() => createWebSocket(), WS_INTERVAL);
+    setInterval(() => {
+      if (webSocket?.readyState !== WebSocket.OPEN) return;
+
+      webSocket.send(WS_MARCOPOLO_PAYLOAD);
+    }, WS_MARCOPOLO_INTERVAL);
 
     return {
       sendMessage,
