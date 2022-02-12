@@ -81,6 +81,7 @@
   const WS_INTERVAL = 2000;
   const WS_MARCOPOLO_PAYLOAD = '9B864FA5-F0DE-4182-A868-B4DBB81EEC16';
   const WS_MARCOPOLO_INTERVAL = 5000;
+  const WS_TIMEOUT_PADDING = 100;
 
   const getters = new Map<number, Set<Getter>>();
   const existingValues = new Map<number, unknown>();
@@ -156,29 +157,32 @@
     handleOnline: (online: boolean) => void
   ): Stream => {
     let storedId: string | null = null;
-    let webSocket: WebSocket | null = null;
-    let webSocketTimer: number | null = null;
+    let socket: WebSocket | null = null;
+    let timer: number | null = null;
+    let execTime: number | null = null;
 
     const destroyWebSocket = () => {
-      webSocket?.close();
-      webSocket = null;
+      socket?.close();
+      socket = null;
 
-      if (webSocketTimer) clearTimeout(webSocketTimer);
-      webSocketTimer = null;
+      if (timer) clearTimeout(timer);
+      timer = null;
+
+      handleOnline(false);
     };
 
     const createWebSocket = () => {
       if (!storedId) return;
 
-      if (webSocket?.readyState === WebSocket.OPEN) return;
-      if (webSocket?.readyState === WebSocket.CONNECTING) return;
+      if (socket?.readyState === WebSocket.OPEN) return;
+      if (socket?.readyState === WebSocket.CONNECTING) return;
 
       const url = new URL(WS_URL, apiBaseUrl);
       url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
       url.searchParams.append('id', storedId);
 
-      webSocket?.close();
-      webSocket = (() => {
+      socket?.close();
+      socket = (() => {
         try {
           return new WebSocket(url.href);
         } catch (error) {
@@ -189,35 +193,33 @@
         }
       })();
 
-      if (!webSocket) return;
+      if (!socket) return;
 
-      webSocket.onopen = () => {
+      socket.onopen = () => {
         workerConsole.debug('websocket opened');
         handleOnline(true);
       };
 
-      webSocket.onclose = () => {
+      socket.onclose = () => {
         workerConsole.error('websocket closed');
-        handleOnline(false);
 
         destroyWebSocket();
       };
 
-      webSocket.onerror = () => {
+      socket.onerror = () => {
         workerConsole.error('websocket error');
-        handleOnline(false);
 
         destroyWebSocket();
       };
 
-      webSocket.onmessage = ({ data }) => {
+      socket.onmessage = ({ data }) => {
         if (!data) return;
 
         if (data === WS_MARCOPOLO_PAYLOAD) {
-          if (webSocketTimer) clearTimeout(webSocketTimer);
-          webSocketTimer = setTimeout(
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(
             () => destroyWebSocket(),
-            WS_MARCOPOLO_INTERVAL * 5
+            WS_MARCOPOLO_INTERVAL + WS_TIMEOUT_PADDING
           );
 
           return;
@@ -238,7 +240,7 @@
     };
 
     const sendMessage = (value: unknown) => {
-      if (webSocket?.readyState !== WebSocket.OPEN) return;
+      if (socket?.readyState !== WebSocket.OPEN) return;
 
       const message = (() => {
         try {
@@ -250,7 +252,7 @@
 
       if (!message) return;
 
-      webSocket.send(message);
+      socket.send(message);
     };
 
     const setId = (id: string) => {
@@ -260,11 +262,22 @@
       createWebSocket();
     };
 
-    setInterval(() => createWebSocket(), WS_INTERVAL);
     setInterval(() => {
-      if (webSocket?.readyState !== WebSocket.OPEN) return;
+      const now = Date.now();
+      const timeSinceExec = execTime ? now - execTime : 0;
+      execTime = now;
 
-      webSocket.send(WS_MARCOPOLO_PAYLOAD);
+      // if worker was frozen (e.g. after PWA backgrounding on iOS),
+      // detect "wakeup" and restart websocket to avoid stale TCP connection issues
+      if (timeSinceExec > WS_INTERVAL + WS_TIMEOUT_PADDING) destroyWebSocket();
+
+      createWebSocket();
+    }, WS_INTERVAL);
+
+    setInterval(() => {
+      if (socket?.readyState !== WebSocket.OPEN) return;
+
+      socket.send(WS_MARCOPOLO_PAYLOAD);
     }, WS_MARCOPOLO_INTERVAL);
 
     return {
