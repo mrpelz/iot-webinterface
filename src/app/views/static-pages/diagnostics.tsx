@@ -247,7 +247,7 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
 };
 
 export const Diagnostics: FunctionComponent = () => {
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
+  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
   const isVisible = useVisibility();
 

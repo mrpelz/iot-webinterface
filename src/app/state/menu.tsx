@@ -27,7 +27,7 @@ const MenuVisibleContext = createContext<TMenuVisibleContext>(
 export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
   useHookDebug('MenuVisibleProvider');
 
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
+  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
   const isVisible = useVisibility();
 
   const [isMenuVisible, _setMenuVisible] = useState<MenuVisible>(

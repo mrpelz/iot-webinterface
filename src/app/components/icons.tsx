@@ -43,7 +43,7 @@ export const MenuIcon: FunctionComponent<JSX.SVGAttributes<SVGSVGElement>> = (
   </Menu>
 );
 
-const Wait = styled(SVG)`
+const WaitIconOuter = styled(SVG)`
   animation: 2s linear infinite wait-outer-animation;
   stroke: currentColor;
 
@@ -57,7 +57,7 @@ const Wait = styled(SVG)`
   }
 `;
 
-const Circle = styled('circle')`
+const WaitIconInner = styled('circle')`
   animation: 1.4s ease-in-out infinite both wait-circle-animation;
   fill: transparent;
   stroke-dasharray: 283;
@@ -88,7 +88,7 @@ const Circle = styled('circle')`
 export const WaitIcon: FunctionComponent<JSX.SVGAttributes<SVGSVGElement>> = (
   props
 ) => (
-  <Wait {...props} viewBox="0 0 100 100">
-    <Circle cx="50" cy="50" r="45" />
-  </Wait>
+  <WaitIconOuter {...props} viewBox="0 0 100 100">
+    <WaitIconInner cx="50" cy="50" r="45" />
+  </WaitIconOuter>
 );

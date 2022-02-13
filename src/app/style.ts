@@ -25,7 +25,8 @@ export const strings = {
 };
 
 const staticDimensions = {
-  breakpoint: dimension(1024),
+  breakpointDesktop: dimension(1024),
+  breakpointTablet: dimension(640),
   fontSize: dimension(17),
   fontSizeLarge: dimension(21),
   fontSizeSmall: dimension(14),
@@ -49,7 +50,7 @@ const dynamicDimensions = {
   get appWidth() {
     return () =>
       useBreakpointValue(
-        useMediaQuery(staticDimensions.breakpoint),
+        useMediaQuery(staticDimensions.breakpointDesktop),
         subtract(strings.viewportWidth, staticDimensions.menuWidth),
         strings.viewportWidth
       );

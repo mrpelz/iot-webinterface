@@ -2,11 +2,11 @@ import { ComponentChild, FunctionComponent } from 'preact';
 import { colors, dimensions } from '../style.js';
 import { styled } from 'goober';
 
-export const CategoryWrapper = styled('section')`
+const CategoryWrapper = styled('section')`
   display: flow-root;
 `;
 
-export const CategoryHeader = styled('header')`
+const CategoryHeader = styled('header')`
   background-color: ${colors.backgroundSecondary(80)};
   font-size: ${dimensions.fontSizeSmall};
   font-weight: 600;
@@ -17,16 +17,12 @@ export const CategoryHeader = styled('header')`
   top: ${dimensions.headerHeight};
 `;
 
-export const CategoryContent = styled('main')`
-  margin: ${dimensions.fontPadding};
-`;
-
 export const Category: FunctionComponent<{ header: ComponentChild }> = ({
   children,
   header,
 }) => (
   <CategoryWrapper>
     <CategoryHeader>{header}</CategoryHeader>
-    <CategoryContent>{children}</CategoryContent>
+    {children}
   </CategoryWrapper>
 );

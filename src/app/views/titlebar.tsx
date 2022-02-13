@@ -88,7 +88,7 @@ export const Titlebar: FunctionComponent = () => {
     [paddingLeft, paddingRight]
   );
 
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
+  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
   const [room] = useNavigationRoom();
   const [staticPage, setStaticPage] = useNavigationStaticPage();

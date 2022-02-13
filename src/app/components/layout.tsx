@@ -36,7 +36,7 @@ export const Aside = styled('aside', forwardRef)<{
     'isVisible',
     'translate3d(0, 0, 0)',
     breakpointValue(
-      mediaQuery(dimensions.breakpoint),
+      mediaQuery(dimensions.breakpointDesktop),
       'translate3d(0, 0, 0)',
       'translate3d(-100%, 0, 0)'
     )
@@ -69,7 +69,7 @@ export const Main = styled('article', forwardRef)<{
   )};
 
   margin-left: ${breakpointValue(
-    mediaQuery(dimensions.breakpoint),
+    mediaQuery(dimensions.breakpointDesktop),
     dimensions.menuWidth,
     'unset'
   )};

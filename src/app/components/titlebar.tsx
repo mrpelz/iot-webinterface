@@ -18,7 +18,7 @@ export const Titlebar = styled('section')<{ padding: number }>`
   padding-inline-start: ${({ padding }) =>
     add(
       breakpointValue(
-        mediaQuery(dimensions.breakpoint),
+        mediaQuery(dimensions.breakpointDesktop),
         dimensions.menuWidth,
         '0px'
       )(),

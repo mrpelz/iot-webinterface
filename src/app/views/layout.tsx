@@ -16,7 +16,7 @@ import { useMediaQuery } from '../style/main.js';
 import { useNotification } from '../state/notification.js';
 
 export const Layout: FunctionComponent = ({ children }) => {
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpoint));
+  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
   const isAsideVisible = useIsMenuVisible();
   const setAsideVisible = useSetMenuVisible();

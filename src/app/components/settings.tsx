@@ -1,11 +1,18 @@
 import { colors, dimensions } from '../style.js';
+import { breakpointValue } from '../style/breakpoint.js';
+import { mediaQuery } from '../style/main.js';
 import { styled } from 'goober';
 
 export const SettingsWrapper = styled('ul')`
   list-style: none;
   margin: ${dimensions.fontPadding} auto;
-  max-width: max-content;
   padding: 0;
+
+  width: ${breakpointValue(
+    mediaQuery(dimensions.breakpointTablet),
+    'max-content',
+    '100%'
+  )};
 
   input,
   label,
