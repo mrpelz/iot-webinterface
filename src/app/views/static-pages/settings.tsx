@@ -17,6 +17,8 @@ import { useCallback, useMemo } from 'preact/hooks';
 import { useFlag, useSetFlag } from '../../state/flags.js';
 import { useHierarchy, useLevel } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
+import { removeServiceWorkers } from '../../util/workers.js';
+import { triggerUpdate } from '../../util/update.js';
 
 export const Settings: FunctionComponent = () => {
   const hierarchy = useHierarchy();
@@ -376,6 +378,22 @@ export const Settings: FunctionComponent = () => {
             [setApiBaseUrl]
           )}
         />
+      </Section>
+      <Section>
+        <button onClick={useCallback(() => location.reload(), [])}>
+          reload
+        </button>
+        <button onClick={useCallback(() => triggerUpdate?.(), [])}>
+          refresh ServiceWorker
+        </button>
+        <button
+          onClick={useCallback(() => {
+            removeServiceWorkers();
+            localStorage.clear();
+          }, [])}
+        >
+          reset persistent storage
+        </button>
       </Section>
     </SettingsWrapper>
   );

@@ -1,4 +1,4 @@
-import { colors, dimensions } from '../style.js';
+import { colors } from '../style.js';
 import { styled } from 'goober';
 
 export const DiagnosticsContainer = styled('section')`
@@ -43,11 +43,6 @@ export const DiagnosticsContainer = styled('section')`
   thead {
     font-weight: bold;
   }
-`;
-
-export const RefreshButton = styled('button')`
-  color-scheme: initial;
-  padding: ${dimensions.fontSize} 0;
 `;
 
 export const Summary = styled('summary')`

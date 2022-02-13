@@ -1,8 +1,4 @@
-import {
-  DiagnosticsContainer,
-  RefreshButton,
-  Summary,
-} from '../../components/diagnostics.js';
+import { DiagnosticsContainer, Summary } from '../../components/diagnostics.js';
 import {
   HierarchyElement,
   Levels,
@@ -32,7 +28,6 @@ import {
 import { useMemo, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { dimensions } from '../../style.js';
-import { triggerUpdate } from '../../util/update.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { useFlags } from '../../state/flags.js';
 import { useI18n } from '../../state/i18n.js';
@@ -285,8 +280,6 @@ export const Diagnostics: FunctionComponent = () => {
 
   return (
     <DiagnosticsContainer>
-      <RefreshButton onClick={() => triggerUpdate?.()}>Refresh</RefreshButton>
-
       <table>
         <tr>
           <td>
