@@ -10,13 +10,20 @@ let rerenderCount = 0;
 export const useHookDebug = (label: string, force = false): void => {
   const debug = useFlag('debug');
 
+  if (debug || force) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `${new Date().toLocaleTimeString(country)}\t→\trender\t${label}`
+    );
+  }
+
   useEffect(() => {
     const now = new Date().toLocaleTimeString(country);
     const memoized = memo.pop();
 
     if (debug || force) {
       // eslint-disable-next-line no-console
-      console.log(`${now}\t→${memoized || 'null'}\trender\t${label}`);
+      console.log(`${now}\t→${memoized || 'null'}\tmount\t${label}`);
     }
 
     if (memoized && !memo.length) {
@@ -24,7 +31,7 @@ export const useHookDebug = (label: string, force = false): void => {
 
       if (debug || force) {
         // eslint-disable-next-line no-console
-        console.log(`${now}\t${rerenderCount}\trerender done`);
+        console.log(`${now}\t${rerenderCount}\tmount done`);
       }
     }
 

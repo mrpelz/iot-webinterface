@@ -59,8 +59,8 @@ export const Root: FunctionComponent<{
   );
 
   const OuterState = combineComponents(
-    VisibilityProvider,
     _FlagProvider,
+    VisibilityProvider,
     ThemeProvider
   );
 

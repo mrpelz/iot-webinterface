@@ -43,7 +43,7 @@ export const Background: FunctionComponent = () => {
         try {
           if (previous) {
             return previous.animate([{ opacity: 1 }, { opacity: 0 }], {
-              duration: 1000,
+              duration: current ? 1000 : 500,
               fill: 'forwards',
             }).finished;
           }

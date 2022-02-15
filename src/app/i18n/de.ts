@@ -21,6 +21,7 @@ export const de: Record<keyof typeof en, string> = {
   global: 'Global',
   hallway: 'Flur',
   home: 'Zuhause',
+  inactivityTimeout: 'Inaktivitäts-Timeout',
   kitchen: 'Küche',
   language: 'Sprache',
   light: 'hell',

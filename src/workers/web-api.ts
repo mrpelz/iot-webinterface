@@ -81,7 +81,7 @@
   const WS_INTERVAL = 2000;
   const WS_MARCOPOLO_PAYLOAD = '9B864FA5-F0DE-4182-A868-B4DBB81EEC16';
   const WS_MARCOPOLO_INTERVAL = 5000;
-  const WS_TIMEOUT_PADDING = 100;
+  const WS_TIMEOUT_PADDING = 250;
 
   const getters = new Map<number, Set<Getter>>();
   const existingValues = new Map<number, unknown>();

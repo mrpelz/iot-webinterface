@@ -2,6 +2,7 @@ export type Flags = {
   apiBaseUrl: string | null;
   debug: boolean;
   enableNotifications: boolean;
+  inactivityTimeout: number | null;
   language: string | null;
   serviceWorker: boolean;
   startPage: string | null;
@@ -14,6 +15,7 @@ const defaultFlags: Flags = {
   apiBaseUrl: null,
   debug: false,
   enableNotifications: true,
+  inactivityTimeout: null,
   language: null,
   serviceWorker: true,
   startPage: null,
@@ -28,7 +30,7 @@ function getFlag<P extends keyof Flags>(
   hashFlags: URLSearchParams,
   queryFlags: URLSearchParams,
   flag: P,
-  typeCast: (input: unknown) => Flags[P] | undefined
+  typeCast = (input: unknown) => input as Flags[P] | undefined
 ) {
   const storage =
     hashFlags.get(flag) ||
@@ -67,6 +69,12 @@ export function getFlags(): Flags {
       'enableNotifications',
       (input) => Boolean(input)
     ),
+    inactivityTimeout: getFlag(
+      hashFlags,
+      queryFlags,
+      'inactivityTimeout',
+      (input) => (typeof input === 'number' ? input : undefined)
+    ),
     language: getFlag(hashFlags, queryFlags, 'language', (input) => {
       return typeof input === 'string' ? input.trim() : undefined;
     }),
@@ -83,7 +91,7 @@ export function getFlags(): Flags {
       hashFlags,
       queryFlags,
       'updateCheckInterval',
-      (input) => Number.parseInt(String(input), 10)
+      (input) => (typeof input === 'number' ? input : undefined)
     ),
     updateUnattended: getFlag(
       hashFlags,

@@ -48,6 +48,9 @@ export const Settings: FunctionComponent = () => {
   const enableNotifications = useFlag('enableNotifications');
   const setEnableNotifications = useSetFlag('enableNotifications');
 
+  const inactivityTimeout = useFlag('inactivityTimeout');
+  const setInactivityTimeout = useSetFlag('inactivityTimeout');
+
   const debug = useFlag('debug');
   const setDebug = useSetFlag('debug');
 
@@ -264,6 +267,38 @@ export const Settings: FunctionComponent = () => {
               setEnableNotifications(selectedEnableNotifications);
             },
             [setEnableNotifications]
+          )}
+        />
+      </Section>
+      <Section>
+        <label for="inactivityTimeout">
+          <Translation i18nKey="inactivityTimeout" />
+        </label>
+        <input
+          id="inactivityTimeout"
+          inputMode="numeric"
+          name="inactivityTimeout"
+          pattern="[0-9]*"
+          placeholder="0"
+          value={inactivityTimeout || ''}
+          onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+            ({ currentTarget: { value } }) => {
+              const selectedInactivityTimeout = Number.parseInt(
+                value.trim(),
+                10
+              );
+              if (
+                !selectedInactivityTimeout ||
+                Number.isNaN(selectedInactivityTimeout) ||
+                !Number.isInteger(selectedInactivityTimeout)
+              ) {
+                setInactivityTimeout(null);
+                return;
+              }
+
+              setInactivityTimeout(selectedInactivityTimeout);
+            },
+            [setInactivityTimeout]
           )}
         />
       </Section>

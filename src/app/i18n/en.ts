@@ -19,6 +19,7 @@ export const en = {
   global: 'Global',
   hallway: 'Hallway',
   home: 'home',
+  inactivityTimeout: 'inactivity timeout',
   kitchen: 'Kitchen',
   language: 'language',
   light: 'light',
