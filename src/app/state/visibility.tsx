@@ -31,7 +31,7 @@ export const VisibilityProvider: FunctionComponent = ({ children }) => {
     };
 
     if (inactivityTimeout) {
-      const onInactivityTimeout = (event?: PointerEvent) => {
+      const onInactivityTimeout = (event?: Event) => {
         abortTimeout();
         setVisible(true);
 
@@ -49,6 +49,8 @@ export const VisibilityProvider: FunctionComponent = ({ children }) => {
       addEventListener('pointerdown', onInactivityTimeout, listenerOptions);
       addEventListener('pointerup', onInactivityTimeout, listenerOptions);
       addEventListener('pointermove', onInactivityTimeout, listenerOptions);
+      addEventListener('pointercancel', onInactivityTimeout, listenerOptions);
+      addEventListener('scroll', onInactivityTimeout, listenerOptions);
 
       onInactivityTimeout();
     }
