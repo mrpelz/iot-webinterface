@@ -26,7 +26,8 @@ const WebApiContext = createContext<TWebApiContext>({
   useSetterIndex: () => () => undefined,
 });
 
-function useGetterIndexFactory<T>(webApi: WebApi, index?: number) {
+// eslint-disable-next-line comma-spacing
+const useGetterIndexFactory = <T,>(webApi: WebApi, index?: number) => {
   const [state, setState] = useState<T | null>(null);
 
   useEffect(() => {
@@ -39,9 +40,10 @@ function useGetterIndexFactory<T>(webApi: WebApi, index?: number) {
   }, [index, webApi]);
 
   return state;
-}
+};
 
-function useSetterIndexFactory<T>(webApi: WebApi, index?: number) {
+// eslint-disable-next-line comma-spacing
+const useSetterIndexFactory = <T,>(webApi: WebApi, index?: number) => {
   const [setterFn, setSetterFn] = useState<SetterFunction<T>>(() => () => {
     // eslint-disable-next-line no-console
     console.warn(`cannot send value for index ${index}, setter not yet ready`);
@@ -59,7 +61,7 @@ function useSetterIndexFactory<T>(webApi: WebApi, index?: number) {
   }, [index, webApi]);
 
   return setterFn;
-}
+};
 
 export const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
   children,

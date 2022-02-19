@@ -55,7 +55,7 @@ const NavigationContext = createContext<TNavigationContext>(
   null as unknown as TNavigationContext
 );
 
-function useNavigationElements<
+const useNavigationElements = <
   T extends
     | HierarchyElementHome
     | HierarchyElementBuilding
@@ -67,7 +67,7 @@ function useNavigationElements<
   persistenceKey: string,
   ignorePersistenceInit = false,
   override?: string
-) {
+) => {
   const isVisible = useVisibility();
 
   const elements = useLevel<T>(level, parent);
@@ -141,13 +141,13 @@ function useNavigationElements<
   }, [isVisible, override]);
 
   return element;
-}
+};
 
-function useStaticPage(
+const useStaticPage = (
   stateRoom: HierarchyElementRoom | null,
   override: string | null,
   defer = false
-) {
+) => {
   const fallback = useDelay(defer ? null : START_PAGE, 300);
   const isVisible = useVisibility();
 
@@ -181,7 +181,7 @@ function useStaticPage(
   }, [fallback]);
 
   return staticPage;
-}
+};
 
 export const NavigationProvider: FunctionComponent = ({ children }) => {
   useHookDebug('NavigationProvider');

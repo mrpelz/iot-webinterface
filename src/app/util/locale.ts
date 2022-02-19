@@ -420,7 +420,7 @@ const localeMap = {
   ZW: ['Africa/Harare'],
 };
 
-export function getCountry(): string | null {
+export const getCountry = (): string | null => {
   const tzName = new Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   for (const [countryCode, locales] of Object.entries(localeMap)) {
@@ -428,17 +428,17 @@ export function getCountry(): string | null {
   }
 
   return null;
-}
+};
 
 const languageMatcher = new RegExp('^\\w+');
 
-export function getLanguage(): string {
+export const getLanguage = (): string => {
   return (
     languageMatcher.exec(navigator.language)?.[0] ||
     navigator.languages.find((aLanguage) => !aLanguage.includes('-')) ||
     navigator.language
   );
-}
+};
 
 export type Locale = {
   country: string | null;
@@ -446,7 +446,7 @@ export type Locale = {
   locale: string | null;
 };
 
-export function getLocale(): Locale {
+export const getLocale = (): Locale => {
   const language = getLanguage();
   const country = getCountry();
   const locale = country ? `${language}-${country}` : null;
@@ -456,4 +456,4 @@ export function getLocale(): Locale {
     language,
     locale,
   };
-}
+};

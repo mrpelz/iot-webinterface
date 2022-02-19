@@ -1,4 +1,4 @@
-export function defer(callback: () => void): void {
+export const defer = (callback: () => void): void => {
   if ('requestIdleCallback' in window) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -12,4 +12,4 @@ export function defer(callback: () => void): void {
   }
 
   setTimeout(callback, 0);
-}
+};

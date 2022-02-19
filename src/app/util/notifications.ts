@@ -1,4 +1,4 @@
-export function requestNotificationPermission(): void {
+export const requestNotificationPermission = (): void => {
   if (!('Notification' in window)) return;
   if (Notification.permission === 'granted') return;
   if (Notification.permission === 'denied') return;
@@ -12,11 +12,11 @@ export function requestNotificationPermission(): void {
     },
     { once: true, passive: true }
   );
-}
+};
 
-export function canNotify(): boolean {
+export const canNotify = (): boolean => {
   return 'Notification' in window && Notification.permission === 'granted';
-}
+};
 
 type VoidHandler = () => void;
 

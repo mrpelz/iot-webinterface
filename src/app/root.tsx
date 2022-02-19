@@ -82,15 +82,15 @@ export const Root: FunctionComponent<{
   );
 };
 
-export function render(
+export const render = (
   flags: Flags,
   notifications: Notifications,
   webApi: WebApi
-): void {
+): void => {
   setup(h, prefix);
 
   preactRender(
     <Root flags={flags} notifications={notifications} webApi={webApi} />,
     document.body
   );
-}
+};

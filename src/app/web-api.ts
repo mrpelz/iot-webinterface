@@ -359,59 +359,61 @@ export class WebApi {
   }
 }
 
-export function isElementWithMeta(
+export const isElementWithMeta = (
   element: HierarchyElement
-): element is HierarchyElementWithMeta {
+): element is HierarchyElementWithMeta => {
   return Boolean(element?.meta);
-}
+};
 
-export function isMetaSystem(meta: Meta | undefined): meta is MetaSystem {
+export const isMetaSystem = (meta: Meta | undefined): meta is MetaSystem => {
   return meta?.level === Levels.SYSTEM;
-}
+};
 
-export function isMetaHome(meta: Meta | undefined): meta is MetaHome {
+export const isMetaHome = (meta: Meta | undefined): meta is MetaHome => {
   return meta?.level === Levels.HOME;
-}
+};
 
-export function isMetaBuilding(meta: Meta | undefined): meta is MetaBuilding {
+export const isMetaBuilding = (
+  meta: Meta | undefined
+): meta is MetaBuilding => {
   return meta?.level === Levels.BUILDING;
-}
+};
 
-export function isMetaFloor(meta: Meta | undefined): meta is MetaFloor {
+export const isMetaFloor = (meta: Meta | undefined): meta is MetaFloor => {
   return meta?.level === Levels.FLOOR;
-}
+};
 
-export function isMetaRoom(meta: Meta | undefined): meta is MetaRoom {
+export const isMetaRoom = (meta: Meta | undefined): meta is MetaRoom => {
   return meta?.level === Levels.ROOM;
-}
+};
 
-export function isMetaArea(meta: Meta | undefined): meta is MetaArea {
+export const isMetaArea = (meta: Meta | undefined): meta is MetaArea => {
   return meta?.level === Levels.AREA;
-}
+};
 
-export function isMetaDevice(meta: Meta | undefined): meta is MetaDevice {
+export const isMetaDevice = (meta: Meta | undefined): meta is MetaDevice => {
   return meta?.level === Levels.DEVICE;
-}
+};
 
-export function isMetaPropertySensor(
+export const isMetaPropertySensor = (
   meta: Meta | undefined
-): meta is MetaPropertySensor {
+): meta is MetaPropertySensor => {
   return meta?.level === Levels.PROPERTY && meta.type === 'sensor';
-}
+};
 
-export function isMetaPropertyActuator(
+export const isMetaPropertyActuator = (
   meta: Meta | undefined
-): meta is MetaPropertyActuator {
+): meta is MetaPropertyActuator => {
   return meta?.level === Levels.PROPERTY && meta.type === 'actuator';
-}
+};
 
-export function isMetaPropertySensorDate(
+export const isMetaPropertySensorDate = (
   meta: Meta | undefined
-): meta is MetaPropertySensor {
+): meta is MetaPropertySensor => {
   return isMetaPropertySensor(meta) && meta.unit === 'date';
-}
+};
 
-export function levelToString(input: Levels): string | null {
+export const levelToString = (input: Levels): string | null => {
   switch (input) {
     case Levels.SYSTEM:
       return 'SYSTEM';
@@ -432,9 +434,9 @@ export function levelToString(input: Levels): string | null {
     default:
       return null;
   }
-}
+};
 
-export function valueTypeToType(
+export const valueTypeToType = (
   input: ValueType
 ):
   | 'null'
@@ -445,7 +447,7 @@ export function valueTypeToType(
   | 'symbol'
   | 'undefined'
   | 'object'
-  | 'function' {
+  | 'function' => {
   switch (input) {
     case ValueType.NULL:
       return 'null';
@@ -459,9 +461,9 @@ export function valueTypeToType(
     default:
       return 'object';
   }
-}
+};
 
-export function typeToValueType(input: unknown): ValueType {
+export const typeToValueType = (input: unknown): ValueType => {
   if (input === null) return ValueType.NULL;
 
   switch (typeof input) {
@@ -475,9 +477,11 @@ export function typeToValueType(input: unknown): ValueType {
     default:
       return ValueType.RAW;
   }
-}
+};
 
-export function parentRelationToString(input: ParentRelation): string | null {
+export const parentRelationToString = (
+  input: ParentRelation
+): string | null => {
   switch (input) {
     case ParentRelation.META_RELATION:
       return 'META_RELATION';
@@ -492,13 +496,13 @@ export function parentRelationToString(input: ParentRelation): string | null {
     default:
       return null;
   }
-}
+};
 
-export function getElementsFromLevel<T extends HierarchyElementWithMeta>(
+export const getElementsFromLevel = <T extends HierarchyElementWithMeta>(
   input: (HierarchyElement | null)[],
   level: T['meta']['level'],
   deep = false
-): T[] {
+): T[] => {
   const result = new Set<T>();
 
   const get = (elements: (HierarchyElement | null)[]) => {
@@ -517,12 +521,12 @@ export function getElementsFromLevel<T extends HierarchyElementWithMeta>(
   get(input);
 
   return Array.from(result);
-}
+};
 
-export function sortByName<T extends HierarchyElementWithMeta>(
+export const sortByName = <T extends HierarchyElementWithMeta>(
   input: T[],
   list: readonly string[]
-): T[] {
+): T[] => {
   const result: T[] = [];
 
   for (const listItem of list) {
@@ -541,4 +545,4 @@ export function sortByName<T extends HierarchyElementWithMeta>(
   );
 
   return result;
-}
+};

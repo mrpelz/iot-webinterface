@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function defer(callback: () => void): void {
+const defer = (callback: () => void): void => {
   if ('requestIdleCallback' in self) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -13,7 +13,7 @@ function defer(callback: () => void): void {
   }
 
   setTimeout(callback, 0);
-}
+};
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fetchFallback = async (

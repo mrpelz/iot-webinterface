@@ -12,12 +12,12 @@ const getInitialId = () => localStorage.getItem(ID_STORAGE_KEY);
 
 export let triggerUpdate: (() => void) | undefined;
 
-export function update(
+export const update = (
   interval: number | null,
   unattended: boolean,
   notifications: Notifications,
   debug: boolean
-): void {
+): void => {
   if (interval === 0) return;
 
   const port = connectWorker<SetupMessage>(
@@ -99,4 +99,4 @@ export function update(
       () => notifications.clear()
     );
   };
-}
+};

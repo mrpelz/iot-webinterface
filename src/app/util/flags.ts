@@ -26,12 +26,12 @@ const defaultFlags: Flags = {
 
 export let flags: Flags | null = null;
 
-function getFlag<P extends keyof Flags>(
+const getFlag = <P extends keyof Flags>(
   hashFlags: URLSearchParams,
   queryFlags: URLSearchParams,
   flag: P,
   typeCast = (input: unknown) => input as Flags[P] | undefined
-) {
+) => {
   const storage =
     hashFlags.get(flag) ||
     queryFlags.get(flag) ||
@@ -52,9 +52,9 @@ function getFlag<P extends keyof Flags>(
         })();
 
   return value;
-}
+};
 
-export function getFlags(): Flags {
+export const getFlags = (): Flags => {
   const hashFlags = new URLSearchParams(location.hash.slice(1));
   const queryFlags = new URLSearchParams(location.search);
 
@@ -135,9 +135,12 @@ export function getFlags(): Flags {
   }
 
   return flags;
-}
+};
 
-export function setFlag<P extends keyof Flags>(key: P, value: Flags[P]): Flags {
+export const setFlag = <P extends keyof Flags>(
+  key: P,
+  value: Flags[P]
+): Flags => {
   if (value === defaultFlags[key]) {
     localStorage.removeItem(`f_${key}`);
   } else {
@@ -150,4 +153,4 @@ export function setFlag<P extends keyof Flags>(key: P, value: Flags[P]): Flags {
   };
 
   return flags;
-}
+};

@@ -11,7 +11,7 @@ export const updateUrl = new URL('../../workers/update.js', import.meta.url)
 export const webApiUrl = new URL('../../workers/web-api.js', import.meta.url)
   .href;
 
-export async function removeServiceWorkers(): Promise<void> {
+export const removeServiceWorkers = async (): Promise<void> => {
   if (!('serviceWorker' in navigator)) return;
 
   const cacheKeys = await caches.keys();
@@ -32,12 +32,12 @@ export async function removeServiceWorkers(): Promise<void> {
     // eslint-disable-next-line no-console
     console.error(`error unregistering ServiceWorker: ${error}`);
   }
-}
+};
 
-export async function installServiceWorker(
+export const installServiceWorker = async (
   url: string,
   debug: boolean
-): Promise<void> {
+): Promise<void> => {
   if (!('serviceWorker' in navigator)) return;
 
   const aUrl = (() => {
@@ -90,14 +90,14 @@ export async function installServiceWorker(
     // eslint-disable-next-line no-console
     console.error(`error registering ServiceWorker (${aUrl}): ${error}`);
   }
-}
+};
 
-export function connectWorker<T>(
+export const connectWorker = <T>(
   url: string,
   name: string,
   setupMessage: T | null = null,
   debug: boolean
-): MessagePort | null {
+): MessagePort | null => {
   const { port1, port2 } = new MessageChannel();
 
   const debugUrl = (() => {
@@ -164,4 +164,4 @@ export function connectWorker<T>(
   }
 
   return null;
-}
+};

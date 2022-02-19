@@ -1,4 +1,4 @@
-export function iOSScrollToTop(): void {
+export const iOSScrollToTop = (): void => {
   document.body.addEventListener(
     'click',
     ({ currentTarget }) => {
@@ -11,8 +11,8 @@ export function iOSScrollToTop(): void {
     },
     { passive: true }
   );
-}
+};
 
-export function iOSHoverStyles(): void {
+export const iOSHoverStyles = (): void => {
   document.body.addEventListener('touchstart', () => null, { passive: true });
-}
+};

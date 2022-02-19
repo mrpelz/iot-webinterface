@@ -14,7 +14,7 @@ export const translations = {
 export type I18nKey = keyof typeof translations[I18nLanguage];
 export type I18nTranslation = Record<I18nKey, string>;
 
-export function reconcileLanguage(input: string): I18nLanguage {
+export const reconcileLanguage = (input: string): I18nLanguage => {
   const test = input as unknown as I18nLanguage;
 
   if (!i18nLanguages.includes(test)) {
@@ -22,4 +22,4 @@ export function reconcileLanguage(input: string): I18nLanguage {
   }
 
   return test;
-}
+};
