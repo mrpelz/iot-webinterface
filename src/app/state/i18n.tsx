@@ -75,7 +75,7 @@ export const useI18nKeyFallback = (
 export const Translation: FunctionComponent<{
   i18nKey?: keyof I18nTranslation | string;
 }> = ({ i18nKey }) => {
-  const translation = useI18nKeyFallback(i18nKey);
+  const translation = useI18nKey(i18nKey);
 
   return <>{translation}</>;
 };

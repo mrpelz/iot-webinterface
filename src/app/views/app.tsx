@@ -25,15 +25,16 @@ export const App: FunctionComponent = () => {
 
   const isMenuVisibleRef = useRef<MenuVisible>(isMenuVisible);
 
+  const previousPage = useRef<string | undefined>();
   const previousScrollY = useRef(0);
-  const previousStaticPage = useRef<string | undefined>();
-  const previousRoom = useRef<string | undefined>();
 
   const staticPageName = useI18nKey(staticPage || undefined);
   const roomName = useI18nKey(room?.meta.name);
 
   useEffect(() => {
-    document.title = [staticPageName || roomName, 'wurstsalat IoT'].join(' | ');
+    document.title = [staticPageName || roomName, 'wurstsalat IoT']
+      .filter(Boolean)
+      .join(' | ');
   }, [roomName, staticPageName]);
 
   useLayoutEffect(() => {
@@ -59,20 +60,18 @@ export const App: FunctionComponent = () => {
 
     style.overflowY = isMenuVisible ? 'hidden' : '';
 
+    const currentPage = room?.meta.name || staticPage || undefined;
+
     scrollTo({
       behavior: 'instant' as ScrollBehavior,
       top:
-        !isMenuVisible &&
-        (staticPage !== previousStaticPage.current ||
-          room?.meta.name !== previousRoom.current)
+        !isMenuVisible && previousPage.current !== currentPage
           ? 0
           : previousScrollY.current,
     });
 
-    previousStaticPage.current = staticPage || undefined;
-    previousRoom.current = room?.meta.name;
-
     if (!isMenuVisible) {
+      previousPage.current = currentPage;
       previousScrollY.current = 0;
     }
   }, [isMenuVisible, room, staticPage]);
