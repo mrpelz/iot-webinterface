@@ -23,6 +23,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { Translation } from '../state/i18n.js';
 import { rooms } from '../i18n/sorting.js';
+import { useArray } from '../util/array-compare.js';
 import { useIsMenuVisible } from '../state/menu.js';
 import { useLevel } from '../state/web-api.js';
 
@@ -61,7 +62,9 @@ export const Floor: FunctionComponent<{
   floor: HierarchyElementFloor;
 }> = ({ floor }) => {
   const elements = useLevel<HierarchyElementRoom>(Levels.ROOM, floor);
-  const sortedElements = useMemo(() => sortByName(elements, rooms), [elements]);
+  const sortedElements = useArray(
+    useMemo(() => sortByName(elements, rooms), [elements])
+  );
 
   const [selectedRoom, selectRoom] = useNavigationRoom();
 

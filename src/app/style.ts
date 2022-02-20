@@ -26,10 +26,12 @@ export const strings = {
 
 const staticDimensions = {
   breakpointDesktop: dimension(1024),
+  breakpointHuge: dimension(1440),
   breakpointTablet: dimension(640),
   fontSize: dimension(17),
   fontSizeLarge: dimension(21),
   fontSizeSmall: dimension(14),
+  gridCellWidth: dimension(100),
   menuHeight: dimension(44),
   menuWidth: dimension(200),
   titlebarHeight: dimension(44),
