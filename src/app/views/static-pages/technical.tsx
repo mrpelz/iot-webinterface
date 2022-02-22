@@ -4,6 +4,7 @@ import {
   Levels,
   sortByName,
 } from '../../web-api.js';
+import { useCallback, useMemo } from 'preact/hooks';
 import {
   useElementFilter,
   useHierarchy,
@@ -16,7 +17,7 @@ import { Grid } from '../../components/grid.js';
 import { rooms as roomsSorting } from '../../i18n/sorting.js';
 import { useArray } from '../../util/array-compare.js';
 import { useI18nKeyFallback } from '../../state/i18n.js';
-import { useMemo } from 'preact/hooks';
+import { useMemoShorthand } from '../../util/use-memo-shorthand.js';
 
 const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   const {
@@ -24,7 +25,7 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   } = room;
 
   const devices = useElementFilter(
-    ({ isSubDevice }) => !isSubDevice,
+    useCallback(({ isSubDevice }) => !isSubDevice, []),
     useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room)
   );
 
@@ -43,19 +44,18 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
 export const Technical: FunctionComponent = () => {
   const hierarchy = useHierarchy();
 
-  const rooms = useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy);
-  const sortedRooms = useArray(
-    useMemo(() => sortByName(rooms, roomsSorting), [rooms])
+  const rooms = useArray(
+    useMemoShorthand(
+      useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy),
+      useCallback((elements) => sortByName(elements, roomsSorting), [])
+    )
   );
 
-  return useMemo(
-    () => (
-      <>
-        {sortedRooms.map((room) => (
-          <Room room={room} />
-        ))}
-      </>
-    ),
-    [sortedRooms]
+  return (
+    <>
+      {rooms.map((room) => (
+        <Room room={room} />
+      ))}
+    </>
   );
 };

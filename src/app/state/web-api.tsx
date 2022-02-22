@@ -14,7 +14,6 @@ type SetterFunction<T> = (value: T) => void;
 
 type UseLevelParents = (
   | HierarchyElement
-  | Record<string, HierarchyElement>
   | null
   | (HierarchyElement | null)[]
 )[];
