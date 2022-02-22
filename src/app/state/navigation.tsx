@@ -19,7 +19,7 @@ import {
   useGetLocalStorage,
   useSetLocalStorage,
 } from '../util/local-storage.js';
-import { useLevel, useWebApi } from './web-api.js';
+import { useLevelShallow, useWebApi } from './web-api.js';
 import { useDelay } from '../util/delay.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/hook-debug.js';
@@ -70,7 +70,7 @@ const useNavigationElements = <
 ) => {
   const isVisible = useVisibility();
 
-  const elements = useLevel<T>(level, parent);
+  const elements = useLevelShallow<T>(level, parent);
 
   const storedElement = useGetLocalStorage(persistenceKey);
 

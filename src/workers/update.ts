@@ -10,20 +10,23 @@
   importScripts('./util/worker-scaffold.js');
   importScripts('./util/main.js');
 
-  type SetupMessage = { initialId: string | null; interval: number };
+  type SetupMessage = {
+    initialId: string | null;
+    interval: number;
+    serviceWorkerRefresh: boolean;
+  };
 
   const ID_URL = '/id.txt';
   const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
+  const INTERVAL = 5000;
 
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;
 
-    const { initialId, interval } = setup;
-
-    if (!interval) return;
+    const { initialId, interval, serviceWorkerRefresh } = setup;
 
     const getLiveId = async () => {
-      const response = await fetchFallback(ID_URL, interval);
+      const response = await fetchFallback(ID_URL, interval || INTERVAL);
       if (!response) return null;
 
       const responseText = await response.text();
@@ -36,6 +39,8 @@
 
     const handleUpdate = async () => {
       const ok = await (async () => {
+        if (!serviceWorkerRefresh) return false;
+
         const response = await fetchFallback(REFRESH_URL, 20000, {
           method: 'POST',
         });
@@ -68,7 +73,7 @@
 
     port.onmessage = () => handleUpdate();
 
-    setInterval(() => checkForUpdate(), interval);
+    if (interval) setInterval(() => checkForUpdate(), interval);
     defer(() => checkForUpdate());
   })(...(await scaffold<SetupMessage>(self)));
 })();

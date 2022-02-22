@@ -7,7 +7,7 @@ import {
 } from '../state/navigation.js';
 import { App as AppComponent } from '../components/app.js';
 import { Background } from './background.js';
-import { DiagnosticsContainer } from '../components/diagnostics.js';
+import { DiagnosticsContainer } from '../components/static-pages/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Global } from './static-pages/global.js';
 import { Layout } from './layout.js';

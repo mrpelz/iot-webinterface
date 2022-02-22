@@ -1,4 +1,4 @@
-import { dependentValue } from '../style/main.js';
+import { dependentValue } from '../../style/main.js';
 import { styled } from 'goober';
 
 export const OnlineOffline = styled('section')<{ isConnected: boolean }>`

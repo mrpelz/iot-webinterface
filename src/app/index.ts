@@ -39,7 +39,13 @@ try {
       await removeServiceWorkers();
     }
 
-    update(updateCheckInterval, updateUnattended, notifications, debug);
+    update(
+      updateCheckInterval,
+      updateUnattended,
+      notifications,
+      serviceWorker,
+      debug
+    );
   });
 } catch (error) {
   removeServiceWorkers();

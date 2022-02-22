@@ -25,7 +25,7 @@ import { Translation } from '../state/i18n.js';
 import { rooms } from '../i18n/sorting.js';
 import { useArray } from '../util/array-compare.js';
 import { useIsMenuVisible } from '../state/menu.js';
-import { useLevel } from '../state/web-api.js';
+import { useLevelShallow } from '../state/web-api.js';
 
 const MenuListItem: FunctionComponent<{
   isActive: boolean;
@@ -61,7 +61,7 @@ const MenuListItem: FunctionComponent<{
 export const Floor: FunctionComponent<{
   floor: HierarchyElementFloor;
 }> = ({ floor }) => {
-  const elements = useLevel<HierarchyElementRoom>(Levels.ROOM, floor);
+  const elements = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, floor);
   const sortedElements = useArray(
     useMemo(() => sortByName(elements, rooms), [elements])
   );
@@ -94,7 +94,7 @@ export const Menu: FunctionComponent = () => {
   const [selectedStaticPage, selectStaticPage] = useNavigationStaticPage();
   const [building] = useNavigationBuilding();
 
-  const floors = useLevel<HierarchyElementFloor>(Levels.FLOOR, building);
+  const floors = useLevelShallow<HierarchyElementFloor>(Levels.FLOOR, building);
 
   const isVisible = useMemo(
     () => (isMenuVisible === null ? true : isMenuVisible),

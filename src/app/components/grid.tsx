@@ -14,8 +14,4 @@ export const Grid = styled('grid')`
 export const GridCell = styled('grid-cell')<{ span?: number }>`
   display: block;
   grid-column-end: span ${({ span }) => `${span || 1}`};
-
-  & > * {
-    height: 100%;
-  }
 `;

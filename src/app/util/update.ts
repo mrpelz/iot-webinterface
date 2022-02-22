@@ -1,7 +1,11 @@
 import { connectWorker, updateUrl } from './workers.js';
 import { Notifications } from './notifications.js';
 
-type SetupMessage = { initialId: string | null; interval: number };
+type SetupMessage = {
+  initialId: string | null;
+  interval: number;
+  serviceWorkerRefresh: boolean;
+};
 
 const isProd = !['localhost', '127.0.0.1'].includes(location.hostname);
 
@@ -16,16 +20,16 @@ export const update = (
   interval: number | null,
   unattended: boolean,
   notifications: Notifications,
+  serviceWorkerRefresh: boolean,
   debug: boolean
 ): void => {
-  if (interval === 0) return;
-
   const port = connectWorker<SetupMessage>(
     updateUrl,
     'update',
     {
       initialId: getInitialId(),
       interval: interval === null ? CHECK_INTERVAL : interval,
+      serviceWorkerRefresh,
     },
     debug
   );

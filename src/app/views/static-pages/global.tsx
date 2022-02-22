@@ -1,6 +1,6 @@
 import { HierarchyElementProperty, Levels } from '../../web-api.js';
-import { useHierarchy, useLevel } from '../../state/web-api.js';
-import { DiagnosticsContainer } from '../../components/diagnostics.js';
+import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
+import { DiagnosticsContainer } from '../../components/static-pages/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from './diagnostics.js';
 import { useMemo } from 'preact/hooks';
@@ -10,13 +10,13 @@ export const Global: FunctionComponent = () => {
   const hierarchy = useHierarchy();
   const [building] = useNavigationBuilding();
 
-  const globalProperties = useLevel<HierarchyElementProperty>(
+  const globalProperties = useLevelShallow<HierarchyElementProperty>(
     Levels.PROPERTY,
     hierarchy
   );
-  const firstFloorProperties = useLevel<HierarchyElementProperty>(
+  const firstFloorProperties = useLevelShallow<HierarchyElementProperty>(
     Levels.PROPERTY,
-    ...useLevel(Levels.FLOOR, building)
+    ...useLevelShallow(Levels.FLOOR, building)
   );
 
   const globalElements = useMemo(

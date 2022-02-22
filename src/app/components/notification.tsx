@@ -4,7 +4,9 @@ import { styled } from 'goober';
 
 export const Notification = styled('section')<{ isVisible: boolean }>`
   cursor: ${dependentValue('onClick', 'pointer', 'default')};
+  display: flex;
   height: ${dependentValue('isVisible', dimensions.titlebarHeight, '0')};
+  justify-content: space-between;
   overflow: hidden;
   transition: background-color 0.3s ease-out, height 0.3s ease-out;
 

@@ -15,20 +15,23 @@ import {
 } from '../../state/navigation.js';
 import { useCallback, useMemo } from 'preact/hooks';
 import { useFlag, useSetFlag } from '../../state/flags.js';
-import { useHierarchy, useLevel } from '../../state/web-api.js';
+import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
 import { removeServiceWorkers } from '../../util/workers.js';
 import { triggerUpdate } from '../../util/update.js';
 
 export const Settings: FunctionComponent = () => {
   const hierarchy = useHierarchy();
-  const homes = useLevel<HierarchyElementHome>(Levels.HOME, hierarchy);
+  const homes = useLevelShallow<HierarchyElementHome>(Levels.HOME, hierarchy);
   const [home, setHome] = useNavigationHome();
 
-  const buildings = useLevel<HierarchyElementBuilding>(Levels.BUILDING, home);
+  const buildings = useLevelShallow<HierarchyElementBuilding>(
+    Levels.BUILDING,
+    home
+  );
   const [building, setBuilding] = useNavigationBuilding();
 
-  const rooms = useLevel<HierarchyElementRoom>(Levels.ROOM, hierarchy);
+  const rooms = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, hierarchy);
   const roomNames = useMemo(
     () => rooms.map(({ meta: { name } }) => name),
     [rooms]
@@ -329,7 +332,7 @@ export const Settings: FunctionComponent = () => {
           name="updateCheckInterval"
           pattern="[0-9]*"
           placeholder={useI18nKeyFallback('auto')}
-          value={updateCheckInterval || ''}
+          value={updateCheckInterval === null ? '' : updateCheckInterval}
           onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
             ({ currentTarget: { value } }) => {
               const selectedAutoReloadCheckInterval = Number.parseInt(
@@ -337,7 +340,7 @@ export const Settings: FunctionComponent = () => {
                 10
               );
               if (
-                !selectedAutoReloadCheckInterval ||
+                selectedAutoReloadCheckInterval < 0 ||
                 Number.isNaN(selectedAutoReloadCheckInterval) ||
                 !Number.isInteger(selectedAutoReloadCheckInterval)
               ) {

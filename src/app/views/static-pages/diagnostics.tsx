@@ -1,4 +1,7 @@
-import { DiagnosticsContainer, Summary } from '../../components/diagnostics.js';
+import {
+  DiagnosticsContainer,
+  Summary,
+} from '../../components/static-pages/diagnostics.js';
 import {
   HierarchyElement,
   Levels,
@@ -21,7 +24,7 @@ import {
 import {
   useGetter,
   useHierarchy,
-  useLevel,
+  useLevelShallow,
   useSetter,
   useStreamOnline,
 } from '../../state/web-api.js';
@@ -267,10 +270,10 @@ export const Diagnostics: FunctionComponent = () => {
     staticPage: [staticPage],
   } = useNavigation();
 
-  const homes = useLevel(Levels.HOME, hierarchy);
-  const buildings = useLevel(Levels.BUILDING, home);
-  const floors = useLevel(Levels.FLOOR, building);
-  const rooms = useLevel(Levels.ROOM, building);
+  const homes = useLevelShallow(Levels.HOME, hierarchy);
+  const buildings = useLevelShallow(Levels.BUILDING, home);
+  const floors = useLevelShallow(Levels.FLOOR, building);
+  const rooms = useLevelShallow(Levels.ROOM, building);
 
   const fallbackNotification = useNotification();
 

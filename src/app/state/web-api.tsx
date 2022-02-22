@@ -12,6 +12,13 @@ import { useHookDebug } from '../util/hook-debug.js';
 
 type SetterFunction<T> = (value: T) => void;
 
+type UseLevelParents = (
+  | HierarchyElement
+  | Record<string, HierarchyElement>
+  | null
+  | (HierarchyElement | null)[]
+)[];
+
 type TWebApiContext = {
   hierarchy: HierarchyElementSystem | null;
   isStreamOnline: boolean;
@@ -112,26 +119,56 @@ export const useHierarchy = (): TWebApiContext['hierarchy'] => {
   return useMemo(() => hierarchy, [hierarchy]);
 };
 
-export const useLevel = <T extends HierarchyElementWithMeta>(
+const useLevel = <T extends HierarchyElementWithMeta>(
   level: T['meta']['level'],
-  ...parents: (HierarchyElement | null)[]
-): T[] => {
-  const memoizedParents = useArray(parents);
+  parents: UseLevelParents,
+  deep?: boolean,
+  skipInput?: boolean
+) => {
+  const memoizedParents = useArray(parents.flat());
 
   return useMemo(() => {
-    return getElementsFromLevel<T>(memoizedParents, level);
-  }, [level, memoizedParents]);
+    return getElementsFromLevel<T>(memoizedParents, level, deep, skipInput);
+  }, [deep, level, memoizedParents, skipInput]);
 };
 
-export const useDeepLevel = <T extends HierarchyElementWithMeta>(
+export const useLevelShallow = <T extends HierarchyElementWithMeta>(
   level: T['meta']['level'],
-  ...parents: (HierarchyElement | null)[]
+  ...parents: UseLevelParents
 ): T[] => {
-  const memoizedParents = useArray(parents);
+  return useLevel(level, parents);
+};
+
+export const useLevelDeep = <T extends HierarchyElementWithMeta>(
+  level: T['meta']['level'],
+  ...parents: UseLevelParents
+): T[] => {
+  return useLevel(level, parents, true);
+};
+
+export const useLevelShallowSkipInput = <T extends HierarchyElementWithMeta>(
+  level: T['meta']['level'],
+  ...parents: UseLevelParents
+): T[] => {
+  return useLevel(level, parents, undefined, true);
+};
+
+export const useLevelDeepSkipInput = <T extends HierarchyElementWithMeta>(
+  level: T['meta']['level'],
+  ...parents: UseLevelParents
+): T[] => {
+  return useLevel(level, parents, true, true);
+};
+
+export const useElementFilter = <T extends HierarchyElementWithMeta>(
+  filter: (meta: T['meta']) => boolean,
+  input: T[]
+): T[] => {
+  const memoizedInput = useArray(input);
 
   return useMemo(() => {
-    return getElementsFromLevel<T>(memoizedParents, level, true);
-  }, [level, memoizedParents]);
+    return memoizedInput.filter(({ meta }) => filter(meta));
+  }, [filter, memoizedInput]);
 };
 
 export const useStreamOnline = (): TWebApiContext['isStreamOnline'] => {

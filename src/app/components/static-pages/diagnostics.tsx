@@ -1,4 +1,4 @@
-import { colors } from '../style.js';
+import { colors } from '../../style.js';
 import { styled } from 'goober';
 
 export const DiagnosticsContainer = styled('section')`

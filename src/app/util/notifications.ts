@@ -32,13 +32,15 @@ export type FallbackNotificationCallback = (
 ) => void;
 
 export class Notifications {
+  private readonly _enableNotifications: boolean;
   private _fallbackNotificationCallback: FallbackNotificationCallback | null;
   private readonly _isCapableOfNativeNotifications: boolean;
   private _nativeNotification: Notification | null;
 
-  constructor(enableNativeNotifications: boolean) {
+  constructor(enableNotifications: boolean) {
+    this._enableNotifications = enableNotifications;
+
     this._isCapableOfNativeNotifications = (() => {
-      if (!enableNativeNotifications) return false;
       if (!('Notification' in window)) return false;
       if (Notification.permission === 'denied') return false;
 
@@ -82,6 +84,8 @@ export class Notifications {
     onDismiss?: VoidHandler
   ): Promise<void> {
     this.clear();
+
+    if (!this._enableNotifications) return;
 
     if (!this._isCapableOfNativeNotifications) {
       this._fallbackNotificationCallback?.({

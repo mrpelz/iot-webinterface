@@ -224,7 +224,7 @@ export class WebApi {
       {
         apiBaseUrl:
           apiBaseUrl === null ? new URL('/', location.href).href : apiBaseUrl,
-        interval: interval === null ? CHECK_INTERVAL : interval,
+        interval: interval || CHECK_INTERVAL,
       },
       debug
     );
@@ -501,14 +501,17 @@ export const parentRelationToString = (
 export const getElementsFromLevel = <T extends HierarchyElementWithMeta>(
   input: (HierarchyElement | null)[],
   level: T['meta']['level'],
-  deep = false
+  deep = false,
+  skipInput = false
 ): T[] => {
   const result = new Set<T>();
 
   const get = (elements: (HierarchyElement | null)[]) => {
-    for (const element of elements) {
-      if (element?.meta?.level !== level) continue;
-      result.add(element as T);
+    if (elements !== input || !skipInput) {
+      for (const element of elements) {
+        if (element?.meta?.level !== level) continue;
+        result.add(element as T);
+      }
     }
 
     if (!result.size || deep) {
