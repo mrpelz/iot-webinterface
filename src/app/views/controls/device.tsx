@@ -25,10 +25,7 @@ export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   );
 
   const lastSeen = useMemoShorthand(
-    [
-      useGetter<number>(children?.hello?.children?.lastSeen),
-      useI18n(),
-    ] as const,
+    [useGetter<number>(children?.lastSeen), useI18n()] as const,
     useCallback(([seen, { locale }]) => {
       return seen
         ? new Date(seen).toLocaleTimeString(locale || undefined)
