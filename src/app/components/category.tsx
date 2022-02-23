@@ -14,7 +14,7 @@ const CategoryHeader = styled('header')`
   line-height: ${dimensions.fontSizeLarge};
   padding: 0 ${dimensions.fontPadding};
   position: sticky;
-  top: ${dimensions.headerHeight};
+  top: ${dimensions.headerHeightAdaptive};
 `;
 
 export const Category: FunctionComponent<{ header: ComponentChild }> = ({

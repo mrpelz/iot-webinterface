@@ -1,5 +1,8 @@
+import {
+  DismissButton,
+  Notification as NotificationComponent,
+} from '../components/notification.js';
 import { FunctionComponent } from 'preact';
-import { Notification as NotificationComponent } from '../components/notification.js';
 import { useNotification } from '../state/notification.js';
 
 export type TNotification = {
@@ -26,7 +29,7 @@ export const Notification: FunctionComponent = () => {
         <br />
         {body ? <i>{body}</i> : null}
       </section>
-      <button onClick={onDismiss}>✕</button>
+      <DismissButton onClick={onDismiss}>✕</DismissButton>
     </NotificationComponent>
   );
 };

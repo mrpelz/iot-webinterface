@@ -13,16 +13,12 @@ import { Titlebar } from './titlebar.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useMediaQuery } from '../style/main.js';
-import { useNotification } from '../state/notification.js';
 
 export const Layout: FunctionComponent = ({ children }) => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
   const isAsideVisible = useIsMenuVisible();
   const setAsideVisible = useSetMenuVisible();
-
-  const fallbackNotification = useNotification();
-  const hasNotification = Boolean(fallbackNotification);
 
   const asideRef = useRef<HTMLElement>(null);
   const mainRef = useRef<HTMLElement>(null);
@@ -150,16 +146,11 @@ export const Layout: FunctionComponent = ({ children }) => {
         <Titlebar />
         <Notification />
       </Header>
-      <Aside
-        isVisible={isAsideVisible}
-        shiftDown={hasNotification}
-        ref={asideRef}
-      >
+      <Aside isVisible={isAsideVisible} ref={asideRef}>
         <Menu />
       </Aside>
       <Main
         isAsideVisible={isAsideVisible}
-        shiftDown={hasNotification}
         ref={mainRef}
         onClickCapture={handleAsideOutsideClick}
       >

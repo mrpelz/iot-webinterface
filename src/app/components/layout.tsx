@@ -15,22 +15,14 @@ export const Header = styled('header')`
   z-index: 4;
 `;
 
-export const Aside = styled('aside', forwardRef)<{
-  isVisible: MenuVisible;
-  shiftDown: boolean;
-}>`
+export const Aside = styled('aside', forwardRef)<{ isVisible: MenuVisible }>`
   height: ${dimensions.appHeight};
   left: 0;
   position: fixed;
+  top: ${dimensions.headerHeightAdaptive};
   transition: height 0.3s ease-out, transform 0.3s ease-out, top 0.3s ease-out;
   width: ${dimensions.menuWidth};
   z-index: 4;
-
-  top: ${dependentValue(
-    'shiftDown',
-    dimensions.headerHeightShiftDown,
-    dimensions.headerHeight
-  )};
 
   transform: ${dependentValue(
     'isVisible',
@@ -45,28 +37,17 @@ export const Aside = styled('aside', forwardRef)<{
 
 export const Main = styled('article', forwardRef)<{
   isAsideVisible: MenuVisible;
-  shiftDown: boolean;
 }>`
   background-color: ${colors.backgroundPrimary()};
   color: ${colors.fontPrimary()};
   display: flow-root;
+  margin-top: ${dimensions.headerHeightAdaptive};
+  min-height: ${dimensions.appHeightAdaptive};
   position: relative;
   touch-action: ${dependentValue('isAsideVisible', 'none', 'auto')};
   transition: height 0.3s ease-out, margin-top 0.3s ease-out;
   width: ${dimensions.appWidth};
   z-index: 2;
-
-  min-height: ${dependentValue(
-    'shiftDown',
-    dimensions.appHeightShiftDown,
-    dimensions.appHeight
-  )};
-
-  margin-top: ${dependentValue(
-    'shiftDown',
-    dimensions.headerHeightShiftDown,
-    dimensions.headerHeight
-  )};
 
   margin-left: ${breakpointValue(
     mediaQuery(dimensions.breakpointDesktop),

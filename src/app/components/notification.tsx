@@ -3,6 +3,7 @@ import { dependentValue } from '../style/main.js';
 import { styled } from 'goober';
 
 export const Notification = styled('section')<{ isVisible: boolean }>`
+  align-items: center;
   cursor: ${dependentValue('onClick', 'pointer', 'default')};
   display: flex;
   height: ${dependentValue('isVisible', dimensions.titlebarHeight, '0')};
@@ -15,4 +16,8 @@ export const Notification = styled('section')<{ isVisible: boolean }>`
     colors.selection(),
     'rgba(0, 0, 0, 0)'
   )};
+`;
+
+export const DismissButton = styled('button')`
+  margin: ${dimensions.fontPadding};
 `;

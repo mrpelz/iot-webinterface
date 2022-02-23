@@ -6,6 +6,7 @@ import { color, useThemedValue } from './style/colors.js';
 import { cssEnv, cssVar, useMediaQuery } from './style/main.js';
 import { multiline } from './util/string.js';
 import { useBreakpointValue } from './style/breakpoint.js';
+import { useNotification } from './state/notification.js';
 
 export const strings = {
   get colorScheme() {
@@ -37,7 +38,7 @@ const staticDimensions = {
   titlebarHeight: dimension(44),
 };
 
-const dynamicDimensions = {
+const partialDynamicDimensions = {
   appHeight: subtract(
     strings.viewportHeight,
     strings.safeAreaInsetTop,
@@ -68,6 +69,24 @@ const dynamicDimensions = {
     staticDimensions.titlebarHeight,
     staticDimensions.titlebarHeight
   ),
+};
+
+const dynamicDimensions = {
+  ...partialDynamicDimensions,
+  get appHeightAdaptive() {
+    return () => {
+      return useNotification()
+        ? partialDynamicDimensions.appHeightShiftDown
+        : partialDynamicDimensions.appHeight;
+    };
+  },
+  get headerHeightAdaptive() {
+    return () => {
+      return useNotification()
+        ? partialDynamicDimensions.headerHeightShiftDown
+        : partialDynamicDimensions.headerHeight;
+    };
+  },
 };
 
 export const dimensions = {
