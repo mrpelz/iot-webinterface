@@ -8,7 +8,7 @@ import {
 import { Locale, getLocale } from '../util/locale.js';
 import { useContext, useMemo } from 'preact/hooks';
 import { useFlag } from './flags.js';
-import { useHookDebug } from '../util/hook-debug.js';
+import { useHookDebug } from '../util/use-hook-debug.js';
 
 type TI18nContext = {
   translation: I18nTranslation;

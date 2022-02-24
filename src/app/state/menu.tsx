@@ -9,7 +9,7 @@ import {
 } from 'preact/hooks';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
-import { useHookDebug } from '../util/hook-debug.js';
+import { useHookDebug } from '../util/use-hook-debug.js';
 import { useMediaQuery } from '../style/main.js';
 import { useVisibility } from './visibility.js';
 

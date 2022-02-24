@@ -7,8 +7,8 @@ import {
   getElementsFromLevel,
 } from '../web-api.js';
 import { useContext, useEffect, useMemo, useState } from 'preact/hooks';
-import { useArray } from '../util/array-compare.js';
-import { useHookDebug } from '../util/hook-debug.js';
+import { useArray } from '../util/use-array-compare.js';
+import { useHookDebug } from '../util/use-hook-debug.js';
 
 type SetterFunction<T> = (value: T) => void;
 

@@ -23,7 +23,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { Translation } from '../state/i18n.js';
 import { rooms } from '../i18n/sorting.js';
-import { useArray } from '../util/array-compare.js';
+import { useArray } from '../util/use-array-compare.js';
 import { useIsMenuVisible } from '../state/menu.js';
 import { useLevelShallow } from '../state/web-api.js';
 

@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
-import { useHookDebug } from '../util/hook-debug.js';
+import { useHookDebug } from '../util/use-hook-debug.js';
 
 type TFlagsContext = readonly [Flags, StateUpdater<Flags>];
 

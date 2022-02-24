@@ -10,7 +10,7 @@ import {
   useMemo,
   useState,
 } from 'preact/hooks';
-import { useHookDebug } from '../util/hook-debug.js';
+import { useHookDebug } from '../util/use-hook-debug.js';
 
 export type TFallbackNotificationContext = {
   fallbackNotification: FallbackNotificationOptions;

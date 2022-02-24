@@ -15,7 +15,7 @@ import { Device } from '../controls/device.js';
 import { FunctionComponent } from 'preact';
 import { Grid } from '../../components/grid.js';
 import { rooms as roomsSorting } from '../../i18n/sorting.js';
-import { useArray } from '../../util/array-compare.js';
+import { useArray } from '../../util/use-array-compare.js';
 import { useI18nKeyFallback } from '../../state/i18n.js';
 
 const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {

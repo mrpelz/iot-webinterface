@@ -1,7 +1,7 @@
 import { FunctionComponent, createContext } from 'preact';
 import { useContext, useEffect, useLayoutEffect, useState } from 'preact/hooks';
 import { useFlag } from './flags.js';
-import { useHookDebug } from '../util/hook-debug.js';
+import { useHookDebug } from '../util/use-hook-debug.js';
 
 const VisibilityContext = createContext(true);
 

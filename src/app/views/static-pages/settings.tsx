@@ -19,7 +19,7 @@ import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
 import { removeServiceWorkers } from '../../util/workers.js';
 import { triggerUpdate } from '../../util/update.js';
-import { useArray } from '../../util/array-compare.js';
+import { useArray } from '../../util/use-array-compare.js';
 
 export const Settings: FunctionComponent = () => {
   const hierarchy = useHierarchy();

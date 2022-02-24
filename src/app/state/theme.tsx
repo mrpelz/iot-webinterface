@@ -3,7 +3,7 @@ import { useContext, useMemo } from 'preact/hooks';
 import { strings } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlag } from './flags.js';
-import { useHookDebug } from '../util/hook-debug.js';
+import { useHookDebug } from '../util/use-hook-debug.js';
 
 export const themes = ['light', 'dark', 'dim'] as const;
 
