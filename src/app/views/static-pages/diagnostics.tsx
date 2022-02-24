@@ -257,7 +257,8 @@ export const Diagnostics: FunctionComponent = () => {
     language,
     locale,
     translation,
-    translationLanguage
+    translationLanguage,
+    translationLocale
   } = useI18n();
 
   const isMenuVisible = useIsMenuVisible();
@@ -338,6 +339,14 @@ export const Diagnostics: FunctionComponent = () => {
                 <tr>
                   <td>locale</td>
                   <td>{JSON.stringify(locale)}</td>
+                </tr>
+                <tr>
+                  <td>translationLanguage</td>
+                  <td>{JSON.stringify(translationLanguage)}</td>
+                </tr>
+                <tr>
+                  <td>translationLocale</td>
+                  <td>{JSON.stringify(translationLocale)}</td>
                 </tr>
               </table>
 

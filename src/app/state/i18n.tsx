@@ -5,15 +5,19 @@ import {
   reconcileLanguage,
   translations,
 } from '../i18n/main.js';
-import { Locale, getLocale } from '../util/locale.js';
+import { getCountry, getLanguage } from '../util/locale.js';
 import { useContext, useMemo } from 'preact/hooks';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
 
 type TI18nContext = {
+  country: string | null;
+  language: string;
+  locale: string | null;
   translation: I18nTranslation;
   translationLanguage: I18nLanguage;
-} & Locale;
+  translationLocale: string | null;
+};
 
 const I18nContext = createContext<TI18nContext>(
   null as unknown as TI18nContext
@@ -24,11 +28,22 @@ export const I18nProvider: FunctionComponent = ({ children }) => {
 
   const languageOverride = useFlag('language');
 
-  const { country, language, locale } = useMemo(() => getLocale(), []);
+  const country = useMemo(() => getCountry(), []);
+  const language = useMemo(() => getLanguage(), []);
 
   const translationLanguage = useMemo(
     () => reconcileLanguage(languageOverride || language),
     [language, languageOverride]
+  );
+
+  const locale = useMemo(
+    () => (country ? `${language}-${country}` : null),
+    [country, language]
+  );
+
+  const translationLocale = useMemo(
+    () => (country ? `${translationLanguage}-${country}` : null),
+    [country, translationLanguage]
   );
 
   const translation = useMemo(
@@ -37,8 +52,22 @@ export const I18nProvider: FunctionComponent = ({ children }) => {
   );
 
   const value = useMemo(
-    () => ({ country, language, locale, translation, translationLanguage }),
-    [country, language, locale, translation, translationLanguage]
+    () => ({
+      country,
+      language,
+      locale,
+      translation,
+      translationLanguage,
+      translationLocale,
+    }),
+    [
+      country,
+      language,
+      locale,
+      translation,
+      translationLanguage,
+      translationLocale,
+    ]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

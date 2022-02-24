@@ -1,6 +1,7 @@
 import { en } from './en.js';
 
 export const de: Record<keyof typeof en, string> = {
+  absoluteTimes: 'absolute Zeitanzeige',
   apiBaseUrl: 'API Base-URL',
   area: 'Area',
   auto: 'automatisch',
@@ -28,6 +29,7 @@ export const de: Record<keyof typeof en, string> = {
   livingRoom: 'Wohnzimmer',
   map: 'Karte',
   menu: 'Menü',
+  now: 'jetzt',
   office: 'Büro',
   property: 'Attribut',
   refresh: 'Aktualisieren',

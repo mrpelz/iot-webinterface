@@ -1,4 +1,5 @@
 export type Flags = {
+  absoluteTimes: boolean;
   apiBaseUrl: string | null;
   debug: boolean;
   enableNotifications: boolean;
@@ -12,6 +13,7 @@ export type Flags = {
 };
 
 const defaultFlags: Flags = {
+  absoluteTimes: false,
   apiBaseUrl: null,
   debug: false,
   enableNotifications: true,
@@ -59,6 +61,9 @@ export const getFlags = (): Flags => {
   const queryFlags = new URLSearchParams(location.search);
 
   const readFlags: { [P in keyof Flags]: Flags[P] | undefined } = {
+    absoluteTimes: getFlag(hashFlags, queryFlags, 'absoluteTimes', (input) =>
+      Boolean(input)
+    ),
     apiBaseUrl: getFlag(hashFlags, queryFlags, 'apiBaseUrl', (input) => {
       return typeof input === 'string' ? input.trim() : undefined;
     }),

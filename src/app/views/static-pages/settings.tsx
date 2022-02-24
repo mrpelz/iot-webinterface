@@ -51,6 +51,9 @@ export const Settings: FunctionComponent = () => {
   const enableNotifications = useFlag('enableNotifications');
   const setEnableNotifications = useSetFlag('enableNotifications');
 
+  const absoluteTimes = useFlag('absoluteTimes');
+  const setAbsoluteTimes = useSetFlag('absoluteTimes');
+
   const inactivityTimeout = useFlag('inactivityTimeout');
   const setInactivityTimeout = useSetFlag('inactivityTimeout');
 
@@ -270,6 +273,23 @@ export const Settings: FunctionComponent = () => {
               setEnableNotifications(selectedEnableNotifications);
             },
             [setEnableNotifications]
+          )}
+        />
+      </Section>
+      <Section>
+        <label for="absoluteTimes">
+          <Translation i18nKey="absoluteTimes" />
+        </label>
+        <input
+          checked={Boolean(absoluteTimes)}
+          id="absoluteTimes"
+          name="absoluteTimes"
+          type="checkbox"
+          onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+            ({ currentTarget: { checked: selectedAbsoluteTimes } }) => {
+              setAbsoluteTimes(selectedAbsoluteTimes);
+            },
+            [setAbsoluteTimes]
           )}
         />
       </Section>

@@ -6,8 +6,11 @@ import {
   useLevelShallowSkipInput,
 } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
+import { TabularNums } from '../../components/controls/tabular-nums.js';
 import { Wrapper } from '../../components/controls/main.js';
-import { useI18n } from '../../state/i18n.js';
+import { useTimeLabel } from '../../util/use-time-label.js';
+
+const zwsp = '\u200b';
 
 export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   device,
@@ -21,13 +24,11 @@ export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({
     return '❌';
   }, [isConnectedValue]);
 
-  const { locale } = useI18n();
   const lastSeenValue = useGetter<number>(children?.lastSeen);
-  const lastSeenLabel = useMemo(() => {
-    return lastSeenValue
-      ? new Date(lastSeenValue).toLocaleTimeString(locale || undefined)
-      : null;
-  }, [lastSeenValue, locale]);
+  const lastSeenDate = useMemo(() => {
+    return lastSeenValue ? new Date(lastSeenValue) : null;
+  }, [lastSeenValue]);
+  const lastSeenLabel = useTimeLabel(lastSeenDate);
 
   const subDevices = useElementFilter(
     useCallback(({ isSubDevice }) => Boolean(isSubDevice), []),
@@ -38,8 +39,8 @@ export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({
     <Wrapper>
       {device.meta.name}
       <br />
-      {isConnectedLabel}
-      {lastSeenLabel}
+      {isConnectedLabel || zwsp}
+      <TabularNums>{lastSeenLabel || zwsp}</TabularNums>
       {subDevices.map((subDevice) => (
         <Device device={subDevice} />
       ))}

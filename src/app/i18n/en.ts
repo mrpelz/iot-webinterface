@@ -1,4 +1,5 @@
 export const en = {
+  absoluteTimes: 'absolute time format',
   apiBaseUrl: 'API base-URL',
   area: 'area',
   auto: 'auto',
@@ -26,6 +27,7 @@ export const en = {
   livingRoom: 'Living Room',
   map: 'Map',
   menu: 'menu',
+  now: 'now',
   office: 'Office',
   property: 'property',
   refresh: 'refresh',

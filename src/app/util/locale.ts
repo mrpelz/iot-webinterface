@@ -439,21 +439,3 @@ export const getLanguage = (): string => {
     navigator.language
   );
 };
-
-export type Locale = {
-  country: string | null;
-  language: string;
-  locale: string | null;
-};
-
-export const getLocale = (): Locale => {
-  const language = getLanguage();
-  const country = getCountry();
-  const locale = country ? `${language}-${country}` : null;
-
-  return {
-    country,
-    language,
-    locale,
-  };
-};
