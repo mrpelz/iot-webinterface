@@ -17,7 +17,6 @@ import { Grid } from '../../components/grid.js';
 import { rooms as roomsSorting } from '../../i18n/sorting.js';
 import { useArray } from '../../util/array-compare.js';
 import { useI18nKeyFallback } from '../../state/i18n.js';
-import { useMemoShorthand } from '../../util/use-memo-shorthand.js';
 
 const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   const {
@@ -44,16 +43,14 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
 export const Technical: FunctionComponent = () => {
   const hierarchy = useHierarchy();
 
-  const rooms = useArray(
-    useMemoShorthand(
-      useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy),
-      useCallback((elements) => sortByName(elements, roomsSorting), [])
-    )
+  const rooms = useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy);
+  const roomsSorted = useArray(
+    useMemo(() => sortByName(rooms, roomsSorting), [rooms])
   );
 
   return (
     <>
-      {rooms.map((room) => (
+      {roomsSorted.map((room) => (
         <Room room={room} />
       ))}
     </>

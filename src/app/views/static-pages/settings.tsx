@@ -19,7 +19,7 @@ import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
 import { removeServiceWorkers } from '../../util/workers.js';
 import { triggerUpdate } from '../../util/update.js';
-import { useMemoShorthand } from '../../util/use-memo-shorthand.js';
+import { useArray } from '../../util/array-compare.js';
 
 export const Settings: FunctionComponent = () => {
   const hierarchy = useHierarchy();
@@ -32,12 +32,12 @@ export const Settings: FunctionComponent = () => {
   );
   const [building, setBuilding] = useNavigationBuilding();
 
-  const rooms = useMemoShorthand(
-    useLevelShallow<HierarchyElementRoom>(Levels.ROOM, hierarchy),
-    useCallback((elements) => elements.map(({ meta: { name } }) => name), [])
+  const rooms = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, hierarchy);
+  const roomNames = useArray(
+    useMemo(() => rooms.map(({ meta: { name } }) => name), [rooms])
   );
 
-  const startPages = useMemo(() => [...staticPages, ...rooms], [rooms]);
+  const startPages = useMemo(() => [...staticPages, ...roomNames], [roomNames]);
 
   const startPage = useFlag('startPage');
   const setStartPage = useSetFlag('startPage');
@@ -171,7 +171,7 @@ export const Settings: FunctionComponent = () => {
             })}
           </optgroup>
           <optgroup label={useI18nKeyFallback('room')}>
-            {rooms.map((aRoom) => {
+            {roomNames.map((aRoom) => {
               return (
                 <option value={aRoom} selected={aRoom === startPage}>
                   <Translation i18nKey={aRoom} />
