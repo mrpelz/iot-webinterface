@@ -170,6 +170,23 @@ export const useElementFilter = <T extends HierarchyElementWithMeta>(
   }, [filter, memoizedInput]);
 };
 
+export const useChild = (
+  input: HierarchyElement | null,
+  child: string
+): HierarchyElement | null => {
+  return useMemo(() => {
+    if (!input) return null;
+
+    const { children } = input;
+    if (!children) return null;
+
+    const { [child]: childElement } = children;
+    if (!childElement) return null;
+
+    return childElement;
+  }, [child, input]);
+};
+
 export const useStreamOnline = (): TWebApiContext['isStreamOnline'] => {
   const { isStreamOnline } = useContext(WebApiContext);
 
@@ -177,7 +194,7 @@ export const useStreamOnline = (): TWebApiContext['isStreamOnline'] => {
 };
 
 // eslint-disable-next-line comma-spacing
-export const useGetter = <T,>(element?: HierarchyElement): T | null => {
+export const useGetter = <T,>(element: HierarchyElement | null): T | null => {
   const { useGetterIndex } = useContext(WebApiContext);
 
   return useGetterIndex(element?.get);
@@ -185,7 +202,7 @@ export const useGetter = <T,>(element?: HierarchyElement): T | null => {
 
 // eslint-disable-next-line comma-spacing
 export const useSetter = <T,>(
-  element?: HierarchyElement
+  element: HierarchyElement | null
 ): SetterFunction<T> => {
   const { useSetterIndex } = useContext(WebApiContext);
 

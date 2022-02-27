@@ -1,6 +1,7 @@
 import { HierarchyElementDevice, Levels } from '../../web-api.js';
 import { useCallback, useMemo } from 'preact/hooks';
 import {
+  useChild,
   useElementFilter,
   useGetter,
   useLevelShallowSkipInput,
@@ -8,27 +9,59 @@ import {
 import { FunctionComponent } from 'preact';
 import { TabularNums } from '../../components/controls/tabular-nums.js';
 import { Wrapper } from '../../components/controls/main.js';
+import { useI18nKeyFallback } from '../../state/i18n.js';
 import { useTimeLabel } from '../../util/use-time-label.js';
 
 const zwsp = '\u200b';
 
+const useDeviceOnlineState = (device: HierarchyElementDevice) => {
+  const isOnline = useChild(device, 'online');
+  const isOnlineValue = useGetter<boolean>(isOnline);
+
+  const onlineLastChange = useChild(isOnline, 'lastChange');
+  const onlineLastChangeValue = useGetter<number>(onlineLastChange);
+
+  const lastSeen = useChild(device, 'lastSeen');
+  const lastSeenValue = useGetter<number>(lastSeen);
+
+  const onlineLabel = useI18nKeyFallback('online');
+  const offlineLabel = useI18nKeyFallback('offline');
+
+  const timeLabel = useTimeLabel(
+    useMemo(() => {
+      const epoch = lastSeenValue || onlineLastChangeValue;
+      if (!epoch) return null;
+
+      return new Date(epoch);
+    }, [lastSeenValue, onlineLastChangeValue])
+  );
+
+  return useMemo(() => {
+    if (lastSeenValue) {
+      return `⏱ last seen: ${timeLabel || 'never'}`;
+    }
+
+    if (isOnlineValue !== null && onlineLastChangeValue) {
+      return `${
+        isOnlineValue ? `✅ ${onlineLabel}` : `❌ ${offlineLabel}`
+      }: ${timeLabel}`;
+    }
+
+    return null;
+  }, [
+    isOnlineValue,
+    lastSeenValue,
+    offlineLabel,
+    onlineLabel,
+    onlineLastChangeValue,
+    timeLabel,
+  ]);
+};
+
 export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   device,
 }) => {
-  const { children } = device;
-
-  const isConnectedValue = useGetter<boolean | null>(children?.online);
-  const isConnectedLabel = useMemo(() => {
-    if (isConnectedValue === null) return null;
-    if (isConnectedValue) return '✅';
-    return '❌';
-  }, [isConnectedValue]);
-
-  const lastSeenValue = useGetter<number>(children?.lastSeen);
-  const lastSeenDate = useMemo(() => {
-    return lastSeenValue ? new Date(lastSeenValue) : null;
-  }, [lastSeenValue]);
-  const lastSeenLabel = useTimeLabel(lastSeenDate);
+  const onlineLabel = useDeviceOnlineState(device);
 
   const subDevices = useElementFilter(
     useCallback(({ isSubDevice }) => Boolean(isSubDevice), []),
@@ -39,8 +72,7 @@ export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({
     <Wrapper>
       {device.meta.name}
       <br />
-      {isConnectedLabel || zwsp}
-      <TabularNums>{lastSeenLabel || zwsp}</TabularNums>
+      <TabularNums>{onlineLabel || zwsp}</TabularNums>
       {subDevices.map((subDevice) => (
         <Device device={subDevice} />
       ))}
