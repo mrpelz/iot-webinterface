@@ -23,8 +23,12 @@ export const combineComponents = (
 export const bindComponent = <T,>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
   Component: FunctionComponent<T>,
-  props: T
-): FunctionComponent => {
-  return ({ children }) =>
-    useMemo(() => <Component {...props}>{children}</Component>, [children]);
+  props: Partial<T>
+): FunctionComponent<Partial<T>> => {
+  return (innerProps) => {
+    return useMemo(
+      () => <Component {...({ ...props, ...innerProps } as T)} />,
+      [innerProps]
+    );
+  };
 };

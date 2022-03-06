@@ -5,6 +5,7 @@ import {
 } from '../state/navigation.js';
 import { Background as BackgroundComponent } from '../components/background.js';
 import { FunctionComponent } from 'preact';
+import { useTheme } from '../state/theme.js';
 
 const BACKGROUND_PATH = '/images/background/';
 const BACKGROUND_EXTENSION = '.png';
@@ -12,6 +13,8 @@ const BACKGROUND_EXTENSION = '.png';
 const camelCase = new RegExp('[A-Z]', 'g');
 
 export const Background: FunctionComponent = () => {
+  const isHighContrast = useTheme() === 'highContrast';
+
   const [staticPage] = useNavigationStaticPage();
   const [room] = useNavigationRoom();
 
@@ -94,6 +97,8 @@ export const Background: FunctionComponent = () => {
       child.remove();
     }
   }, [path, ref]);
+
+  if (isHighContrast) return null;
 
   return <BackgroundComponent ref={ref} />;
 };

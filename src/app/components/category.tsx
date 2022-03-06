@@ -1,13 +1,11 @@
-import { ComponentChild, FunctionComponent } from 'preact';
 import { colors, dimensions } from '../style.js';
 import { styled } from 'goober';
 
-const CategoryWrapper = styled('section')`
+export const CategoryWrapper = styled('section')`
   display: flow-root;
 `;
 
-const CategoryHeader = styled('header')`
-  background-color: ${colors.backgroundSecondary(80)};
+export const CategoryHeader = styled('header')<{ isHighContrast: boolean }>`
   font-size: ${dimensions.fontSizeSmall};
   font-weight: 600;
   height: ${dimensions.fontSizeLarge};
@@ -15,14 +13,19 @@ const CategoryHeader = styled('header')`
   padding: 0 ${dimensions.fontPadding};
   position: sticky;
   top: ${dimensions.headerHeightAdaptive};
-`;
 
-export const Category: FunctionComponent<{ header: ComponentChild }> = ({
-  children,
-  header,
-}) => (
-  <CategoryWrapper>
-    <CategoryHeader>{header}</CategoryHeader>
-    {children}
-  </CategoryWrapper>
-);
+  background-color: ${({ isHighContrast }) => {
+    return isHighContrast
+      ? colors.backgroundSecondary()()
+      : colors.backgroundSecondary(80)();
+  }};
+  border-block: ${({ isHighContrast }) => {
+    return isHighContrast
+      ? `solid ${dimensions.hairline()} ${colors.fontPrimary()()}`
+      : 'none';
+  }};
+  margin-bottom: ${({ isHighContrast }) => (isHighContrast ? '-1px' : '0')};
+  transform: ${({ isHighContrast }) => {
+    return isHighContrast ? 'translateY(-1px)' : 'none';
+  }};
+`;

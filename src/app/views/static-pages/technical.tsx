@@ -10,7 +10,7 @@ import {
   useHierarchy,
   useLevelDeep,
 } from '../../state/web-api.js';
-import { Category } from '../../components/category.js';
+import { Category } from '../category.js';
 import { Device } from '../controls/device.js';
 import { FunctionComponent } from 'preact';
 import { Grid } from '../../components/grid.js';

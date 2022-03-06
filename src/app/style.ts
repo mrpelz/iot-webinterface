@@ -119,7 +119,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: staticColors.black,
-        dim: staticColors.black,
+        highContrast: staticColors.white,
         light: staticColors.white,
       },
       themeOverride
@@ -128,7 +128,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: staticColors.blackShaded,
-        dim: staticColors.blackShaded,
+        highContrast: staticColors.white,
         light: staticColors.whiteShaded,
       },
       themeOverride
@@ -137,7 +137,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: staticColors.blackShaded,
-        dim: staticColors.blackShaded,
+        highContrast: staticColors.white,
         light: staticColors.greyLight,
       },
       themeOverride
@@ -146,7 +146,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: staticColors.white,
-        dim: staticColors.white,
+        highContrast: staticColors.black,
         light: staticColors.black,
       },
       themeOverride
@@ -155,7 +155,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: staticColors.greyLow,
-        dim: staticColors.greyLow,
+        highContrast: staticColors.black,
         light: staticColors.greyLow,
       },
       themeOverride
@@ -164,7 +164,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: staticColors.greyGlow,
-        dim: staticColors.greyGlow,
+        highContrast: staticColors.black,
         light: staticColors.greyMid,
       },
       themeOverride
@@ -173,7 +173,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: staticColors.orange,
-        dim: staticColors.orange,
+        highContrast: staticColors.black,
         light: staticColors.blue,
       },
       themeOverride
@@ -182,7 +182,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: staticColors.blackShaded,
-        dim: staticColors.blackShaded,
+        highContrast: staticColors.black,
         light: staticColors.black,
       },
       themeOverride
@@ -191,7 +191,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: color(brand.hue, 10, 5),
-        dim: color(brand.hue, 10, 15),
+        highContrast: color(brand.hue, 10, 15),
         light: color(brand.hue, 25, 70),
       },
       themeOverride
@@ -200,7 +200,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: color(brand.hue, 10, 10),
-        dim: color(brand.hue, 10, 20),
+        highContrast: color(brand.hue, 10, 20),
         light: color(brand.hue, 25, 90),
       },
       themeOverride
@@ -209,7 +209,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: color(brand.hue, 10, 15),
-        dim: color(brand.hue, 10, 25),
+        highContrast: color(brand.hue, 10, 25),
         light: color(brand.hue, 20, 99),
       },
       themeOverride
@@ -218,7 +218,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: color(brand.hue, 5, 20),
-        dim: color(brand.hue, 5, 30),
+        highContrast: color(brand.hue, 5, 30),
         light: color(brand.hue, 20, 92),
       },
       themeOverride
@@ -227,7 +227,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: color(brand.hue, 5, 25),
-        dim: color(brand.hue, 5, 35),
+        highContrast: color(brand.hue, 5, 35),
         light: color(brand.hue, 20, 85),
       },
       themeOverride
@@ -236,7 +236,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: color(brand.hue, 50, 3),
-        dim: color(brand.hue, 30, 13),
+        highContrast: color(brand.hue, 30, 13),
         light: color(brand.hue, 10, 20),
       },
       themeOverride
@@ -245,7 +245,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: color(brand.hue, 15, 85),
-        dim: color(brand.hue, 15, 75),
+        highContrast: color(brand.hue, 15, 75),
         light: color(brand.hue, brand.saturation, 10),
       },
       themeOverride
@@ -254,7 +254,7 @@ const themedColors = {
     useThemedValue(
       {
         dark: color(brand.hue, 5, 65),
-        dim: color(brand.hue, 10, 61),
+        highContrast: color(brand.hue, 10, 61),
         light: color(brand.hue, 30, 10),
       },
       themeOverride
@@ -272,7 +272,7 @@ export const shadow = (themeOverride?: Theme) => {
     const shadowStength = useThemedValue(
       {
         dark: 80,
-        dim: 20,
+        highContrast: 20,
         light: 2,
       },
       themeOverride

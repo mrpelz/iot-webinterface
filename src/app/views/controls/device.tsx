@@ -10,6 +10,7 @@ import { FunctionComponent } from 'preact';
 import { TabularNums } from '../../components/controls/tabular-nums.js';
 import { Wrapper } from '../../components/controls/main.js';
 import { useI18nKeyFallback } from '../../state/i18n.js';
+import { useTheme } from '../../state/theme.js';
 import { useTimeLabel } from '../../util/use-time-label.js';
 
 const zwsp = '\u200b';
@@ -61,6 +62,9 @@ const useDeviceOnlineState = (device: HierarchyElementDevice) => {
 export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   device,
 }) => {
+  const theme = useTheme();
+  const isHightContrast = useMemo(() => theme === 'highContrast', [theme]);
+
   const onlineLabel = useDeviceOnlineState(device);
 
   const subDevices = useElementFilter(
@@ -69,7 +73,7 @@ export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   );
 
   return (
-    <Wrapper>
+    <Wrapper isHighContrast={isHightContrast}>
       {device.meta.name}
       <br />
       <TabularNums>{onlineLabel || zwsp}</TabularNums>

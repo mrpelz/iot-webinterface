@@ -26,12 +26,15 @@ import { rooms } from '../i18n/sorting.js';
 import { useArray } from '../util/use-array-compare.js';
 import { useIsMenuVisible } from '../state/menu.js';
 import { useLevelShallow } from '../state/web-api.js';
+import { useTheme } from '../state/theme.js';
 
 const MenuListItem: FunctionComponent<{
   isActive: boolean;
   onClick: () => void;
 }> = ({ isActive: active, onClick, children }) => {
   const isMenuVisible = useIsMenuVisible();
+  const isHighContrast = useTheme() === 'highContrast';
+
   const [isHovered, setHovered] = useState(false);
 
   const ref = useRef<HTMLLIElement>(null);
@@ -47,7 +50,7 @@ const MenuListItem: FunctionComponent<{
   return (
     <MenuListItemComponent
       isActive={active}
-      isHovered={isHovered}
+      isHovered={!isHighContrast && isHovered}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

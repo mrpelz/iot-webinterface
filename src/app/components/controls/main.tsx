@@ -4,11 +4,17 @@ import { bindComponent } from '../../util/combine-components.js';
 import { styled } from 'goober';
 
 export const Wrapper = bindComponent(
-  styled(GridCell)`
+  styled(GridCell)<{ isHighContrast: boolean }>`
     background-color: ${colors.backgroundSecondary(75)};
     border-radius: ${dimensions.fontPadding};
     overflow: hidden;
     padding: ${dimensions.fontPadding};
+
+    border: ${({ isHighContrast }) => {
+      return isHighContrast
+        ? `solid ${dimensions.hairline()} ${colors.fontPrimary()()}`
+        : 'none';
+    }};
   `,
   { span: 3 }
 );

@@ -5,7 +5,7 @@ import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
 
-export const themes = ['light', 'dark', 'dim'] as const;
+export const themes = ['light', 'dark', 'highContrast'] as const;
 
 export type Theme = typeof themes[number];
 
