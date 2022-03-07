@@ -1,6 +1,7 @@
 enum WorkerCommands {
   SETUP,
   UNLOAD,
+  PING,
 }
 
 export const swUrl = new URL('../../workers/sw.js', import.meta.url).href;
@@ -92,6 +93,22 @@ export const installServiceWorker = async (
   }
 };
 
+const keepAlive = (port: MessagePort | Worker) => {
+  let timer: number | null = null;
+
+  port.onmessage = () => {
+    if (timer) clearTimeout(timer);
+    timer = null;
+  };
+
+  setInterval(() => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => location.reload(), 1000);
+
+    port.postMessage(WorkerCommands.PING);
+  }, 5000);
+};
+
 export const connectWorker = <T>(
   url: string,
   name: string,
@@ -130,6 +147,8 @@ export const connectWorker = <T>(
 
       port1.start();
 
+      keepAlive(managementPort);
+
       return port1;
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -151,6 +170,8 @@ export const connectWorker = <T>(
       worker.postMessage(setupMessage);
 
       port1.start();
+
+      keepAlive(worker);
 
       return port1;
     } catch (error) {

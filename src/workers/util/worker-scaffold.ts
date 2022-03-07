@@ -32,6 +32,7 @@ const scaffold = <T>(
   enum WorkerCommands {
     SETUP,
     UNLOAD,
+    PING,
   }
 
   let setupDone = false;
@@ -70,6 +71,11 @@ const scaffold = <T>(
         if (managementData === WorkerCommands.UNLOAD) {
           port?.close();
 
+          return;
+        }
+
+        if (managementData === WorkerCommands.PING) {
+          scope.postMessage(null);
           return;
         }
 
@@ -149,6 +155,11 @@ const scaffold = <T>(
             `removed message port, number of connected ports: ${messagePorts.size}`
           );
 
+          return;
+        }
+
+        if (managementData === WorkerCommands.PING) {
+          port.postMessage(null);
           return;
         }
 
