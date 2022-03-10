@@ -42,6 +42,7 @@ export const MenuList = styled('ul')`
 
 export const MenuListItem = styled('li', forwardRef)<{
   isActive: boolean;
+  isHighContrast: boolean;
   isHovered: boolean;
 }>`
   background-color: ${(...args) =>
@@ -57,11 +58,20 @@ export const MenuListItem = styled('li', forwardRef)<{
 
   border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
   border-block-start: ${dimensions.hairline} solid ${colors.fontTertiary()};
-  color: ${dependentValue(
-    'isActive',
-    colors.backgroundPrimary(),
-    colors.fontPrimary()
-  )};
+  color: ${(...args) =>
+    dependentValue(
+      'isActive',
+      colors.backgroundPrimary(),
+      dependentValue(
+        'isHighContrast',
+        dependentValue(
+          'isHovered',
+          colors.backgroundPrimary(),
+          colors.fontPrimary()
+        )(...args),
+        colors.fontPrimary()
+      )(...args)
+    )(...args)};
   cursor: pointer;
   margin: 0;
   padding: ${dimensions.fontPadding};

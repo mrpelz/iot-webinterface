@@ -40,6 +40,11 @@ const MenuListItem: FunctionComponent<{
   const ref = useRef<HTMLLIElement>(null);
 
   useLayoutEffect(() => {
+    if (isMenuVisible) return;
+    setHovered(false);
+  }, [isMenuVisible]);
+
+  useLayoutEffect(() => {
     const { current } = ref;
     if (!active || !current || !isMenuVisible) return;
 
@@ -50,7 +55,8 @@ const MenuListItem: FunctionComponent<{
   return (
     <MenuListItemComponent
       isActive={active}
-      isHovered={!isHighContrast && isHovered}
+      isHighContrast={isHighContrast}
+      isHovered={isHovered}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

@@ -38,25 +38,18 @@ const useDeviceOnlineState = (device: HierarchyElementDevice) => {
   );
 
   return useMemo(() => {
-    if (lastSeenValue) {
-      return `⏱ last seen: ${timeLabel || 'never'}`;
+    if (lastSeen) {
+      return `⏱ last seen: ${timeLabel || '—'}`;
     }
 
-    if (isOnlineValue !== null && onlineLastChangeValue) {
-      return `${
-        isOnlineValue ? `✅ ${onlineLabel}` : `❌ ${offlineLabel}`
-      }: ${timeLabel}`;
+    if (isOnlineValue !== null) {
+      return `${isOnlineValue ? `✅ ${onlineLabel}` : `❌ ${offlineLabel}`}: ${
+        timeLabel || '—'
+      }`;
     }
 
     return null;
-  }, [
-    isOnlineValue,
-    lastSeenValue,
-    offlineLabel,
-    onlineLabel,
-    onlineLastChangeValue,
-    timeLabel,
-  ]);
+  }, [isOnlineValue, lastSeen, offlineLabel, onlineLabel, timeLabel]);
 };
 
 export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({

@@ -1,4 +1,5 @@
 import { colors, dimensions } from '../style.js';
+import { dependentValue } from '../style/main.js';
 import { styled } from 'goober';
 
 export const CategoryWrapper = styled('section')`
@@ -14,18 +15,24 @@ export const CategoryHeader = styled('header')<{ isHighContrast: boolean }>`
   position: sticky;
   top: ${dimensions.headerHeightAdaptive};
 
-  background-color: ${({ isHighContrast }) => {
-    return isHighContrast
-      ? colors.backgroundSecondary()()
-      : colors.backgroundSecondary(80)();
-  }};
-  border-block: ${({ isHighContrast }) => {
-    return isHighContrast
-      ? `solid ${dimensions.hairline()} ${colors.fontPrimary()()}`
-      : 'none';
-  }};
-  margin-bottom: ${({ isHighContrast }) => (isHighContrast ? '-1px' : '0')};
-  transform: ${({ isHighContrast }) => {
-    return isHighContrast ? 'translateY(-1px)' : 'none';
-  }};
+  background-color: ${dependentValue(
+    'isHighContrast',
+    colors.backgroundSecondary(),
+    colors.backgroundSecondary(80)
+  )};
+  border-block: ${dependentValue(
+    'isHighContrast',
+    () => `solid ${dimensions.hairline()} ${colors.fontPrimary()()}`,
+    'none'
+  )};
+  margin-bottom: ${dependentValue(
+    'isHighContrast',
+    () => `-${dimensions.hairline()}`,
+    '0'
+  )};
+  transform: ${dependentValue(
+    'isHighContrast',
+    () => `translateY(-${dimensions.hairline()})`,
+    'none'
+  )};
 `;

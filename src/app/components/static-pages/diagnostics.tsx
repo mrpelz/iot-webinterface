@@ -32,10 +32,6 @@ export const DiagnosticsContainer = styled('section')`
     margin: 0.25rem;
   }
 
-  tr:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-
   td {
     padding: 0.25rem;
   }
