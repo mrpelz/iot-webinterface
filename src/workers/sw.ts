@@ -53,17 +53,21 @@ const isSafari = (() => {
     </html>
   `;
 
-  const laxCacheUrls: RegExp[] = [new RegExp('^\\/$')];
+  const laxCacheUrls: RegExp[] = [new RegExp('^/$')];
 
   const unhandledRequestUrls: RegExp[] = [
-    new RegExp('^\\/api(?!\\/hierarchy|\\/id)$'),
-    new RegExp('^\\/id.txt$'),
+    new RegExp('^/api(?!/hierarchy|/id)$'),
+    new RegExp('^/id.txt$'),
   ];
-  const denyRequestUrls: RegExp[] = [new RegExp('^\\/favicon')];
+  const denyRequestUrls: RegExp[] = [new RegExp('^/favicon')];
+  const indexUrl: RegExp[] = [
+    new RegExp('^/index.html$'),
+    new RegExp('^/(?:(?!api|\\.).)*$'),
+  ];
   const livePreferredUrls: RegExp[] = [
-    new RegExp('^\\/api\\/id$'),
-    new RegExp('^\\/index.json$'),
-    new RegExp('^\\/manifest.json$'),
+    new RegExp('^/api/id$'),
+    new RegExp('^/index.json$'),
+    new RegExp('^/manifest.json$'),
   ];
 
   const testPath = (path: string, list: RegExp[]) => {
@@ -167,7 +171,7 @@ const isSafari = (() => {
 
   scope.onfetch = (fetchEvent) => {
     const { request } = fetchEvent;
-    const { pathname } = new URL(request.url, scope.origin);
+    let { pathname } = new URL(request.url, scope.origin);
 
     const isUnhandled = testPath(pathname, unhandledRequestUrls);
     if (isUnhandled) return;
@@ -185,10 +189,15 @@ const isSafari = (() => {
           return syntheticError(403, request.url, 'denied resource');
         }
 
+        const isIndex = testPath(pathname, indexUrl);
+        if (isIndex) {
+          pathname = '/';
+        }
+
         const isLaxCache = testPath(pathname, laxCacheUrls);
 
         const cachedResponse = await caches
-          .match(request, { ignoreSearch: isLaxCache })
+          .match(pathname, { ignoreSearch: isLaxCache })
           .catch(() => undefined);
 
         const isLivePreferred = testPath(pathname, livePreferredUrls);

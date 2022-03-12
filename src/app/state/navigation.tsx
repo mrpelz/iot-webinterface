@@ -20,6 +20,7 @@ import {
   useSetLocalStorage,
 } from '../util/use-local-storage.js';
 import { useLevelShallow, useWebApi } from './web-api.js';
+import { amendUrlPath } from '../util/url.js';
 import { useDelay } from '../util/use-delay.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
@@ -187,7 +188,14 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   useHookDebug('NavigationProvider');
 
   const { hierarchy } = useWebApi();
-  const startPage = useFlag('startPage');
+  const startPageFlag = useFlag('startPage');
+  const startPage = useMemo(() => {
+    if (startPageFlag) return startPageFlag;
+
+    const [, startPagePath] = location.pathname.split('/');
+
+    return startPagePath || null;
+  }, [startPageFlag]);
 
   const staticPageFromFlag = useMemo(() => {
     return startPage ? staticPages.includes(startPage as StaticPage) : false;
@@ -241,6 +249,15 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
 
   useEffect(() => {
     setMenuVisible(false);
+
+    if (stateStaticPage) {
+      history.replaceState(null, '', amendUrlPath(`/${stateStaticPage}`));
+      return;
+    }
+
+    if (stateRoom) {
+      history.replaceState(null, '', amendUrlPath(`/${stateRoom.meta.name}`));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateRoom, stateStaticPage]);
 

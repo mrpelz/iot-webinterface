@@ -15,26 +15,26 @@ const INDEX_FILE = './index.json';
 
 const HASH_EXCLUSIONS = [
   new RegExp('.js.map$'),
-  new RegExp('^\\/id.txt$'),
-  new RegExp('^\\/index.json$'),
+  new RegExp('^/id.txt$'),
+  new RegExp('^/index.json$'),
 ];
 
 const INDEX_EXCLUSIONS = [
   new RegExp('.js.map$'),
-  new RegExp('^\\/id.txt$'),
-  new RegExp('^\\/index.html$'),
-  new RegExp('^\\/index.json$'),
-  new RegExp('^\\/js\\/workers\\/sw.js$'),
-  new RegExp('^\\/manifest.json$'),
+  new RegExp('^/id.txt$'),
+  new RegExp('^/index.html$'),
+  new RegExp('^/index.json$'),
+  new RegExp('^/js/workers/sw.js$'),
+  new RegExp('^/manifest.json$'),
 ];
 
 const INDEX_TIERS = {
   critical: [
-    new RegExp('^\\/js\\/'),
-    new RegExp('^\\/images\\/icons\\/'),
-    new RegExp('^\\/images\\/splash\\/'),
+    new RegExp('^/js/'),
+    new RegExp('^/images/icons/'),
+    new RegExp('^/images/splash/'),
   ],
-  optional: [new RegExp('^\\/images\\/background\\/')],
+  optional: [new RegExp('^/images/background/')],
 };
 
 const NGINX_CONFIG = './nginx.conf';
