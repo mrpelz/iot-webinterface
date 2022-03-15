@@ -15,6 +15,37 @@ import { Settings } from './static-pages/settings.js';
 import { Technical } from './static-pages/technical.js';
 import { colors } from '../style.js';
 import { useI18nKey } from '../state/i18n.js';
+import { useSegment } from '../state/path.js';
+
+const Test: FunctionComponent = () => {
+  const [route1, setRoute1] = useSegment(1);
+  const [route2, setRoute2] = useSegment(2);
+
+  return (
+    <>
+      <button
+        onClick={() =>
+          setRoute1(Math.round(Math.random() * 10 ** 16).toString(16))
+        }
+      >
+        {route1 || '<none>'}
+      </button>
+      <br />
+      <button onClick={() => setRoute1(null)}>reset</button>
+      <br />
+      <br />
+      <button
+        onClick={() =>
+          setRoute2(Math.round(Math.random() * 10 ** 16).toString(16))
+        }
+      >
+        {route2 || '<none>'}
+      </button>
+      <br />
+      <button onClick={() => setRoute2(null)}>reset</button>
+    </>
+  );
+};
 
 export const App: FunctionComponent = () => {
   const backgroundColor = colors.backgroundPrimary()();
@@ -112,7 +143,7 @@ export const App: FunctionComponent = () => {
           ? {
               diagnostics: <Diagnostics />,
               global: <Global />,
-              map: null,
+              map: <Test />,
               settings: <Settings />,
               technical: <Technical />,
             }[staticPage]

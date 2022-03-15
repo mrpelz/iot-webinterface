@@ -1,5 +1,6 @@
 import { connectWorker, updateUrl } from './workers.js';
 import { Notifications } from './notifications.js';
+import { amend } from './path.js';
 
 type SetupMessage = {
   initialId: string | null;
@@ -15,6 +16,14 @@ const ID_STORAGE_KEY = 'updateId';
 const getInitialId = () => localStorage.getItem(ID_STORAGE_KEY);
 
 export let triggerUpdate: (() => void) | undefined;
+let clearNotifications: (() => void) | undefined;
+
+export const reload: () => void = () => {
+  clearNotifications?.();
+
+  history.replaceState(undefined, '', amend('/'));
+  location.reload();
+};
 
 export const update = (
   interval: number | null,
@@ -37,11 +46,7 @@ export const update = (
   if (!port) return;
 
   triggerUpdate = () => port.postMessage(null);
-
-  const onReloadConfirm = () => {
-    notifications.clear();
-    location.reload();
-  };
+  clearNotifications = () => notifications.clear();
 
   port.onmessage = async ({ data }) => {
     const newId = data as string | null;
@@ -55,7 +60,7 @@ export const update = (
       }
 
       if (unattended) {
-        onReloadConfirm();
+        reload();
 
         return;
       }
@@ -67,7 +72,7 @@ export const update = (
           requireInteraction: false,
           tag: 'versionUpdate',
         },
-        onReloadConfirm,
+        reload,
         () => notifications.clear()
       );
 
@@ -87,7 +92,7 @@ export const update = (
     notifications.clear();
 
     if (unattended) {
-      onReloadConfirm();
+      reload();
 
       return;
     }
@@ -99,7 +104,7 @@ export const update = (
         requireInteraction: true,
         tag: 'versionUpdate',
       },
-      onReloadConfirm,
+      reload,
       () => notifications.clear()
     );
   };

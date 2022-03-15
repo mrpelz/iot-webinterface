@@ -8,6 +8,7 @@ import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
 import { Section, SettingsWrapper } from '../../components/settings.js';
 import { Theme, themes } from '../../state/theme.js';
 import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
+import { reload, triggerUpdate } from '../../util/update.js';
 import {
   staticPages,
   useNavigationBuilding,
@@ -18,7 +19,6 @@ import { useFlag, useSetFlag } from '../../state/flags.js';
 import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
 import { removeServiceWorkers } from '../../util/workers.js';
-import { triggerUpdate } from '../../util/update.js';
 import { useArray } from '../../util/use-array-compare.js';
 
 export const Settings: FunctionComponent = () => {
@@ -438,9 +438,7 @@ export const Settings: FunctionComponent = () => {
         />
       </Section>
       <Section>
-        <button onClick={useCallback(() => location.reload(), [])}>
-          reload
-        </button>
+        <button onClick={useCallback(() => reload(), [])}>reload</button>
         <button onClick={useCallback(() => triggerUpdate?.(), [])}>
           refresh ServiceWorker
         </button>

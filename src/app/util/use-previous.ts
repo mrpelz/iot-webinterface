@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 export const usePrevious = <T>(input: T): readonly [T | null, T] => {
-  const inputRef = useRef<T>(null);
+  const inputRef = useRef<T | null>(null);
   const [previous, setPrevious] = useState<T | null>(null);
 
   useEffect(() => {

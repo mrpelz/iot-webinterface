@@ -1,9 +1,9 @@
+import { BackIcon, MapIcon, MenuIcon, WaitIcon } from '../components/icons.js';
 import {
   IconContainer as IconContainerComponent,
   Title,
   Titlebar as TitlebarComponent,
 } from '../components/titlebar.js';
-import { MapIcon, MenuIcon, WaitIcon } from '../components/icons.js';
 import {
   useCallback,
   useEffect,
@@ -21,6 +21,7 @@ import { dimensions } from '../style.js';
 import { useAwaitEvent } from '../util/use-await-event.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlipMenuVisible } from '../state/menu.js';
+import { useGoUp } from '../state/path.js';
 import { useMediaQuery } from '../style/main.js';
 import { useStreamOnline } from '../state/web-api.js';
 
@@ -90,14 +91,21 @@ export const Titlebar: FunctionComponent = () => {
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
+  const goUp = useGoUp();
+
   const [room] = useNavigationRoom();
   const [staticPage, setStaticPage] = useNavigationStaticPage();
 
   const flipMenuVisible = useFlipMenuVisible();
   const goToMap = useCallback(() => setStaticPage('map'), [setStaticPage]);
 
-  const iconsLeft = useMemo(
-    () => [...(isDesktop ? [] : [<MenuIcon onClick={flipMenuVisible} />])],
+  const backIcon = useMemo(
+    () => (goUp ? <BackIcon onClick={goUp} /> : null),
+    [goUp]
+  );
+
+  const menuIcon = useMemo(
+    () => (isDesktop ? null : <MenuIcon onClick={flipMenuVisible} />),
     [flipMenuVisible, isDesktop]
   );
 
@@ -106,12 +114,11 @@ export const Titlebar: FunctionComponent = () => {
       <Title>
         <Translation i18nKey={staticPage || room?.meta.name} />
       </Title>
-      {iconsLeft?.length ? (
-        <IconContainer paddingSetter={setPaddingLeft}>
-          {iconsLeft}
-        </IconContainer>
+      {menuIcon ? (
+        <IconContainer paddingSetter={setPaddingLeft}>{menuIcon}</IconContainer>
       ) : null}
       <IconContainer paddingSetter={setPaddingRight} right>
+        {backIcon}
         <WaitIconView />
         <MapIcon onClick={goToMap} />
       </IconContainer>

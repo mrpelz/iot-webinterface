@@ -1,3 +1,5 @@
+import { reload } from './update.js';
+
 enum WorkerCommands {
   SETUP,
   UNLOAD,
@@ -103,7 +105,7 @@ const keepAlive = (port: MessagePort | Worker) => {
 
   setInterval(() => {
     if (timer) clearTimeout(timer);
-    timer = setTimeout(() => location.reload(), 1000);
+    timer = setTimeout(() => reload(), 1000);
 
     port.postMessage(WorkerCommands.PING);
   }, 5000);

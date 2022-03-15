@@ -1,6 +1,5 @@
 import { colors, dimensions } from '../style.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
-import { MenuVisible } from '../state/menu.js';
 import { breakpointValue } from '../style/breakpoint.js';
 import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
@@ -15,28 +14,25 @@ export const Header = styled('header')`
   z-index: 4;
 `;
 
-export const Aside = styled('aside', forwardRef)<{ isVisible: MenuVisible }>`
+export const Aside = styled('aside', forwardRef)<{
+  isVisible: boolean;
+}>`
   height: ${dimensions.appHeight};
   left: 0;
   position: fixed;
   top: ${dimensions.headerHeightAdaptive};
   transition: height 0.3s ease-out, transform 0.3s ease-out, top 0.3s ease-out;
-  width: ${dimensions.menuWidth};
   z-index: 4;
 
   transform: ${dependentValue(
     'isVisible',
     'translate3d(0, 0, 0)',
-    breakpointValue(
-      mediaQuery(dimensions.breakpointDesktop),
-      'translate3d(0, 0, 0)',
-      'translate3d(-100%, 0, 0)'
-    )
+    'translate3d(-100%, 0, 0)'
   )};
 `;
 
 export const Main = styled('article', forwardRef)<{
-  isAsideVisible: MenuVisible;
+  isAsideVisible: boolean;
 }>`
   background-color: ${colors.backgroundPrimary()};
   color: ${colors.fontPrimary()};

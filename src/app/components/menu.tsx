@@ -12,6 +12,7 @@ export const Menu = styled('nav')<{ isVisible: boolean }>`
   padding: ${dimensions.titlebarHeight} 0;
   pointer-events: ${dependentValue('isVisible', 'auto', 'none')};
   scroll-behavior: smooth;
+  width: ${dimensions.menuWidth};
 `;
 
 export const MenuContent = styled('ul')`

@@ -8,6 +8,7 @@ import { I18nProvider } from './state/i18n.js';
 import { MenuVisibleProvider } from './state/menu.js';
 import { NavigationProvider } from './state/navigation.js';
 import { Notifications } from './util/notifications.js';
+import { PathProvider } from './state/path.js';
 import { ThemeProvider } from './state/theme.js';
 import { VisibilityProvider } from './state/visibility.js';
 import { WebApi } from './web-api.js';
@@ -51,6 +52,7 @@ export const Root: FunctionComponent<{
   notifications: Notifications;
   webApi: WebApi;
 }> = ({ flags, notifications, webApi }) => {
+  const _PathProvider = bindComponent(PathProvider, { rootPathDepth: 1 });
   const _FlagProvider = bindComponent(FlagProvider, { flags });
   const _WebApiProvider = bindComponent(WebApiProvider, { webApi });
   const _FallbackNotificationProvider = bindComponent(
@@ -59,6 +61,7 @@ export const Root: FunctionComponent<{
   );
 
   const OuterState = combineComponents(
+    _PathProvider,
     _FlagProvider,
     VisibilityProvider,
     ThemeProvider

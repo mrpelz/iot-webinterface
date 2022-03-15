@@ -20,10 +20,10 @@ import {
   useSetLocalStorage,
 } from '../util/use-local-storage.js';
 import { useLevelShallow, useWebApi } from './web-api.js';
-import { amendUrlPath } from '../util/url.js';
 import { useDelay } from '../util/use-delay.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
+import { useSegment } from './path.js';
 import { useSetMenuVisible } from './menu.js';
 import { useVisibility } from './visibility.js';
 
@@ -67,7 +67,7 @@ const useNavigationElements = <
   level: T['meta']['level'],
   persistenceKey: string,
   ignorePersistenceInit = false,
-  override?: string
+  override?: string | null
 ) => {
   const isVisible = useVisibility();
 
@@ -189,13 +189,13 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
 
   const { hierarchy } = useWebApi();
   const startPageFlag = useFlag('startPage');
-  const startPage = useMemo(() => {
-    if (startPageFlag) return startPageFlag;
+  const [startPagePath, setStartPagePath] = useSegment(0);
 
-    const [, startPagePath] = location.pathname.split('/');
-
-    return startPagePath || null;
-  }, [startPageFlag]);
+  const startPage = useMemo(
+    () => startPageFlag || startPagePath || null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const staticPageFromFlag = useMemo(() => {
     return startPage ? staticPages.includes(startPage as StaticPage) : false;
@@ -222,7 +222,7 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
     Levels.ROOM,
     'n_room',
     staticPageFromFlag,
-    staticPageFromFlag || !startPage ? undefined : startPage
+    staticPageFromFlag || !startPage ? null : startPage
   );
   const [stateRoom, setRoom] = room;
 
@@ -250,14 +250,10 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     setMenuVisible(false);
 
-    if (stateStaticPage) {
-      history.replaceState(null, '', amendUrlPath(`/${stateStaticPage}`));
-      return;
-    }
+    const path = stateStaticPage || stateRoom?.meta.name;
+    if (!path) return;
 
-    if (stateRoom) {
-      history.replaceState(null, '', amendUrlPath(`/${stateRoom.meta.name}`));
-    }
+    setStartPagePath(path);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateRoom, stateStaticPage]);
 

@@ -4,7 +4,7 @@ import { bindComponent } from '../../util/combine-components.js';
 import { dependentValue } from '../../style/main.js';
 import { styled } from 'goober';
 
-export const Wrapper = bindComponent(
+export const Wrapper = bindComponent<{ isHighContrast: boolean; span: number }>(
   styled(GridCell)<{ isHighContrast: boolean }>`
     border-radius: ${dimensions.fontPadding};
     overflow: hidden;
@@ -21,5 +21,5 @@ export const Wrapper = bindComponent(
       'none'
     )};
   `,
-  { span: 3 }
+  { isHighContrast: false, span: 3 }
 );
