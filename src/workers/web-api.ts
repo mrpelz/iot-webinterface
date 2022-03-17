@@ -78,7 +78,7 @@
   const HIERARCHY_URL = '/api/hierarchy';
   const ID_URL = '/api/id';
   const WS_URL = '/api/stream';
-  const WS_INTERVAL = 2000;
+  const WS_INTERVAL = 1000;
   const WS_MARCOPOLO_PAYLOAD = '9B864FA5-F0DE-4182-A868-B4DBB81EEC16';
   const WS_MARCOPOLO_INTERVAL = 5000;
   const WS_TIMEOUT_PADDING = 250;
@@ -204,12 +204,14 @@
         workerConsole.error('websocket closed');
 
         destroyWebSocket();
+        setTimeout(() => createWebSocket(), WS_TIMEOUT_PADDING);
       };
 
       socket.onerror = () => {
         workerConsole.error('websocket error');
 
         destroyWebSocket();
+        setTimeout(() => createWebSocket(), WS_TIMEOUT_PADDING);
       };
 
       socket.onmessage = ({ data }) => {
@@ -279,6 +281,8 @@
 
       socket.send(WS_MARCOPOLO_PAYLOAD);
     }, WS_MARCOPOLO_INTERVAL);
+
+    createWebSocket();
 
     return {
       sendMessage,

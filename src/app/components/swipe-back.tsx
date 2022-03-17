@@ -17,6 +17,7 @@ export const SwipeBack = styled('div')<{ isHighContrast: boolean }>`
   )};
   border-radius: 0 100% 100% 0;
   color: ${colors.backgroundSecondary()};
+  display: flex;
 
   & > * {
     height: ${dimensions.fontSizeLarge};

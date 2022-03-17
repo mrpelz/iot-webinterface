@@ -135,7 +135,7 @@ const useNavigationElements = <
   useSetLocalStorage(persistenceKey, state?.meta.name || null);
 
   useEffect(() => {
-    if (!override || isVisible) return;
+    if (!override) return;
 
     setState(() => determineElement(null));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -168,7 +168,7 @@ const useStaticPage = (
   useSetLocalStorage(STATIC_PAGE_KEY, state);
 
   useEffect(() => {
-    if (!override || isVisible) return;
+    if (!override) return;
 
     setState(determineStaticPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -191,10 +191,22 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   const startPageFlag = useFlag('startPage');
   const [startPagePath, setStartPagePath] = useSegment(0);
 
-  const startPage = useMemo(
-    () => startPageFlag || startPagePath || null,
+  const startPagePathInitial = useMemo(
+    () => startPagePath || null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
+  );
+
+  const startPagePathUsable = useDelay(Boolean(hierarchy), 500);
+
+  const startPagePathActual = useMemo(
+    () => (startPagePathUsable ? startPagePath : null),
+    [startPagePath, startPagePathUsable]
+  );
+
+  const startPage = useMemo(
+    () => startPageFlag || startPagePathActual || startPagePathInitial || null,
+    [startPageFlag, startPagePathActual, startPagePathInitial]
   );
 
   const staticPageFromFlag = useMemo(() => {
@@ -234,26 +246,23 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   const [stateStaticPage, setStaticPage] = staticPage;
 
   useEffect(() => {
-    if (stateStaticPage) {
-      setRoom(null);
-    }
+    if (!stateStaticPage) return;
+
+    setStartPagePath(stateStaticPage);
+    setRoom(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateStaticPage]);
 
   useEffect(() => {
-    if (stateRoom) {
-      setStaticPage(null);
-    }
+    if (!stateRoom) return;
+
+    setStartPagePath(stateRoom.meta.name);
+    setStaticPage(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateRoom]);
 
   useEffect(() => {
     setMenuVisible(false);
-
-    const path = stateStaticPage || stateRoom?.meta.name;
-    if (!path) return;
-
-    setStartPagePath(path);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateRoom, stateStaticPage]);
 

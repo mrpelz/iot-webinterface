@@ -1,4 +1,10 @@
-import { BackIcon, MapIcon, MenuIcon, WaitIcon } from '../components/icons.js';
+import {
+  BackIcon,
+  MapIcon,
+  MenuIcon,
+  ReturnIcon,
+  WaitIcon,
+} from '../components/icons.js';
 import {
   IconContainer as IconContainerComponent,
   Title,
@@ -11,6 +17,7 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
+import { useGoPrevious, useGoUp } from '../state/path.js';
 import {
   useNavigationRoom,
   useNavigationStaticPage,
@@ -21,7 +28,6 @@ import { dimensions } from '../style.js';
 import { useAwaitEvent } from '../util/use-await-event.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlipMenuVisible } from '../state/menu.js';
-import { useGoUp } from '../state/path.js';
 import { useMediaQuery } from '../style/main.js';
 import { useStreamOnline } from '../state/web-api.js';
 
@@ -92,6 +98,7 @@ export const Titlebar: FunctionComponent = () => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
   const goUp = useGoUp();
+  const goPrevious = useGoPrevious();
 
   const [room] = useNavigationRoom();
   const [staticPage, setStaticPage] = useNavigationStaticPage();
@@ -99,9 +106,14 @@ export const Titlebar: FunctionComponent = () => {
   const flipMenuVisible = useFlipMenuVisible();
   const goToMap = useCallback(() => setStaticPage('map'), [setStaticPage]);
 
-  const backIcon = useMemo(
+  const upIcon = useMemo(
     () => (goUp ? <BackIcon onClick={goUp} /> : null),
     [goUp]
+  );
+
+  const previousIcon = useMemo(
+    () => (goPrevious ? <ReturnIcon onClick={goPrevious} /> : null),
+    [goPrevious]
   );
 
   const menuIcon = useMemo(
@@ -114,11 +126,14 @@ export const Titlebar: FunctionComponent = () => {
       <Title>
         <Translation i18nKey={staticPage || room?.meta.name} />
       </Title>
-      {menuIcon ? (
-        <IconContainer paddingSetter={setPaddingLeft}>{menuIcon}</IconContainer>
+      {menuIcon || upIcon ? (
+        <IconContainer paddingSetter={setPaddingLeft}>
+          {upIcon}
+          {menuIcon}
+        </IconContainer>
       ) : null}
       <IconContainer paddingSetter={setPaddingRight} right>
-        {backIcon}
+        {previousIcon}
         <WaitIconView />
         <MapIcon onClick={goToMap} />
       </IconContainer>
