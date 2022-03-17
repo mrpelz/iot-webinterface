@@ -136,6 +136,24 @@ export const useGoPrevious = (): TPathContext['goPrevious'] => {
   return useMemo(() => goPrevious, [goPrevious]);
 };
 
+export const useGoPreviousSegment = (
+  segmentNumber: number
+): TPathContext['goPrevious'] => {
+  const { getSegment, setSegment } = useContext(PathContext);
+
+  const segment = getSegment(segmentNumber);
+  const setter = setSegment(segmentNumber);
+
+  const [previousSegment] = usePrevious(segment);
+
+  return useMemo(() => {
+    if (!previousSegment) return null;
+
+    return () => setter(previousSegment);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [previousSegment]);
+};
+
 export const useSegment = (
   segmentNumber: number
 ): [

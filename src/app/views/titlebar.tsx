@@ -17,7 +17,7 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
-import { useGoPrevious, useGoUp } from '../state/path.js';
+import { useGoPreviousSegment, useGoUp, useSegment } from '../state/path.js';
 import {
   useNavigationRoom,
   useNavigationStaticPage,
@@ -97,24 +97,30 @@ export const Titlebar: FunctionComponent = () => {
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
+  const flipMenuVisible = useFlipMenuVisible();
+
   const goUp = useGoUp();
-  const goPrevious = useGoPrevious();
+
+  const [page, setPage] = useSegment(0);
+  const isMap = useMemo(() => page === 'map', [page]);
+
+  const goPrevious = useGoPreviousSegment(0);
 
   const [room] = useNavigationRoom();
-  const [staticPage, setStaticPage] = useNavigationStaticPage();
-
-  const flipMenuVisible = useFlipMenuVisible();
-  const goToMap = useCallback(() => setStaticPage('map'), [setStaticPage]);
+  const [staticPage] = useNavigationStaticPage();
 
   const upIcon = useMemo(
     () => (goUp ? <BackIcon onClick={goUp} /> : null),
     [goUp]
   );
 
-  const previousIcon = useMemo(
-    () => (goPrevious ? <ReturnIcon onClick={goPrevious} /> : null),
-    [goPrevious]
-  );
+  const switchIcon = useMemo(() => {
+    if (isMap) {
+      return goPrevious ? <ReturnIcon onClick={() => goPrevious()} /> : null;
+    }
+
+    return <MapIcon onClick={() => setPage('map')} />;
+  }, [goPrevious, isMap, setPage]);
 
   const menuIcon = useMemo(
     () => (isDesktop ? null : <MenuIcon onClick={flipMenuVisible} />),
@@ -133,9 +139,8 @@ export const Titlebar: FunctionComponent = () => {
         </IconContainer>
       ) : null}
       <IconContainer paddingSetter={setPaddingRight} right>
-        {previousIcon}
         <WaitIconView />
-        <MapIcon onClick={goToMap} />
+        {switchIcon}
       </IconContainer>
     </TitlebarComponent>
   );
