@@ -248,7 +248,7 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     if (!stateStaticPage) return;
 
-    setStartPagePath(stateStaticPage);
+    setStartPagePath?.(stateStaticPage);
     setRoom(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateStaticPage]);
@@ -256,7 +256,7 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     if (!stateRoom) return;
 
-    setStartPagePath(stateRoom.meta.name);
+    setStartPagePath?.(stateRoom.meta.name);
     setStaticPage(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateRoom]);

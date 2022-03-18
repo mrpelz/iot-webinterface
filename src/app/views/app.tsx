@@ -24,25 +24,31 @@ const Test: FunctionComponent = () => {
   return (
     <>
       <button
+        disabled={!setRoute1}
         onClick={() =>
-          setRoute1(Math.round(Math.random() * 10 ** 16).toString(16))
+          setRoute1?.(Math.round(Math.random() * 10 ** 16).toString(16))
         }
       >
         {route1 || '<none>'}
       </button>
       <br />
-      <button onClick={() => setRoute1(null)}>reset</button>
+      <button disabled={!route1} onClick={() => setRoute1?.(null)}>
+        reset
+      </button>
       <br />
       <br />
       <button
+        disabled={!setRoute2}
         onClick={() =>
-          setRoute2(Math.round(Math.random() * 10 ** 16).toString(16))
+          setRoute2?.(Math.round(Math.random() * 10 ** 16).toString(16))
         }
       >
         {route2 || '<none>'}
       </button>
       <br />
-      <button onClick={() => setRoute2(null)}>reset</button>
+      <button disabled={!route2} onClick={() => setRoute2?.(null)}>
+        reset
+      </button>
     </>
   );
 };

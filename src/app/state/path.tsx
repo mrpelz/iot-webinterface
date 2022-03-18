@@ -20,7 +20,9 @@ export type TPathContext = {
   getSegment: (segmentNumber: number) => string | null;
   goPrevious: (() => void) | null;
   goUp: (() => void) | null;
-  setSegment: (segmentNumber: number) => (value: string | null) => void;
+  setSegment: (
+    segmentNumber: number
+  ) => ((value: string | null) => void) | null;
 };
 
 const triggerState = 'C0AAB99B-77E0-45C8-AB13-7EFFA083BC19';
@@ -70,15 +72,17 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
   }, [isRoot, path]);
 
   const setSegment = useMemo(
-    () => (segmentNumber: number) => (value: string | null) => {
+    () => (segmentNumber: number) => {
       const segments = getSegments(path);
-      if (segments.length < segmentNumber) return;
+      if (segments.length < segmentNumber) return null;
 
-      const segment = segments[segmentNumber];
-      if (segment === value) return;
+      return (value: string | null) => {
+        const segment = segments[segmentNumber];
+        if (segment === value) return;
 
-      const basePath = getPath(segments.slice(0, segmentNumber));
-      setPath(value ? goDown(basePath, value) : basePath);
+        const basePath = getPath(segments.slice(0, segmentNumber));
+        setPath(value ? goDown(basePath, value) : basePath);
+      };
     },
     [path]
   );
@@ -147,7 +151,7 @@ export const useGoPreviousSegment = (
   const [previousSegment] = usePrevious(segment);
 
   return useMemo(() => {
-    if (!previousSegment) return null;
+    if (!previousSegment || !setter) return null;
 
     return () => setter(previousSegment);
     // eslint-disable-next-line react-hooks/exhaustive-deps

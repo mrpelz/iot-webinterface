@@ -119,7 +119,7 @@ export const Titlebar: FunctionComponent = () => {
       return goPrevious ? <ReturnIcon onClick={() => goPrevious()} /> : null;
     }
 
-    return <MapIcon onClick={() => setPage('map')} />;
+    return setPage ? <MapIcon onClick={() => setPage('map')} /> : null;
   }, [goPrevious, isMap, setPage]);
 
   const menuIcon = useMemo(
