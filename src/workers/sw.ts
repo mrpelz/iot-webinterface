@@ -34,6 +34,7 @@ const isSafari = (() => {
   /* eslint-enable no-console */
 
   const INDEX_ENDPOINT = '/index.json';
+  const INDEX_PATH = '/';
   const CACHE_KEY = 'cache';
 
   const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
@@ -144,7 +145,7 @@ const isSafari = (() => {
     const cache = await scope.caches.open(CACHE_KEY);
 
     const { critical = [], optional = [] } = (await response.json()) || {};
-    const paths = ['/'].concat(critical);
+    const paths = [INDEX_PATH].concat(critical);
 
     await Promise.all(
       paths.map(async (path) => {
@@ -171,7 +172,9 @@ const isSafari = (() => {
 
   scope.onfetch = (fetchEvent) => {
     const { request } = fetchEvent;
-    let { pathname } = new URL(request.url, scope.origin);
+    const { pathname } = new URL(request.url, scope.origin);
+
+    let pathnameOverride: string | null = null;
 
     const isUnhandled = testPath(pathname, unhandledRequestUrls);
     if (isUnhandled) return;
@@ -191,16 +194,19 @@ const isSafari = (() => {
 
         const isIndex = testPath(pathname, indexUrl);
         if (isIndex) {
-          pathname = '/';
+          pathnameOverride = INDEX_PATH;
         }
 
-        const isLaxCache = testPath(pathname, laxCacheUrls);
+        const isLaxCache = testPath(pathnameOverride || pathname, laxCacheUrls);
 
         const cachedResponse = await caches
-          .match(pathname, { ignoreSearch: isLaxCache })
+          .match(pathnameOverride || request, { ignoreSearch: isLaxCache })
           .catch(() => undefined);
 
-        const isLivePreferred = testPath(pathname, livePreferredUrls);
+        const isLivePreferred = testPath(
+          pathnameOverride || pathname,
+          livePreferredUrls
+        );
         if (isLivePreferred) {
           const liveResponse = await fetchLive(request);
 
@@ -229,7 +235,7 @@ const isSafari = (() => {
           return liveResponse;
         }
 
-        if (pathname === '/') {
+        if ((pathnameOverride || pathname) === INDEX_PATH) {
           return new Response(FALLBACK_HTML, {
             headers: {
               // eslint-disable-next-line @typescript-eslint/naming-convention
