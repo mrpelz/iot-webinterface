@@ -2,52 +2,60 @@ import { FunctionComponent } from 'preact';
 import { styled } from 'goober';
 
 const SVG = styled('svg')`
+  fill: none;
   max-height: 100%;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  stroke: currentColor;
 
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
-`;
-
-const CurrentColorFill = styled(SVG)`
-  fill: currentColor;
-`;
-
-const CurrentColorStroke = styled(SVG)`
-  stroke: currentColor;
 `;
 
 export const BackIcon: FunctionComponent<JSX.SVGAttributes<SVGSVGElement>> = (
   props
 ) => (
-  <CurrentColorFill {...props} viewBox="0 0 1000 1000">
-    <path d="M794.6 120.8 683.9 10l-488 488 485.5 492 122.8-116.4-390.7-377.7 381.1-375.1z" />
-  </CurrentColorFill>
+  // https://feathericons.com
+  <SVG {...props} viewBox="8 5 8 14">
+    <polyline points="15 18 9 12 15 6" />
+  </SVG>
 );
 
 export const MapIcon: FunctionComponent<JSX.SVGAttributes<SVGSVGElement>> = (
   props
 ) => (
-  <CurrentColorFill {...props} viewBox="5 5 90 90">
-    <path d="M75 30h-7v13H45v5h10v17h5V48h28v40H60v-8h-5v8H13V48h17v-5H13V13h55v7h7V5H5v90h90V40H75z"></path>
-  </CurrentColorFill>
+  // https://feathericons.com
+  <SVG {...props} viewBox="0 0 24 24">
+    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+    <line x1="8" y1="2" x2="8" y2="18" />
+    <line x1="16" y1="6" x2="16" y2="22" />
+  </SVG>
 );
 
 export const MenuIcon: FunctionComponent<JSX.SVGAttributes<SVGSVGElement>> = (
   props
 ) => (
-  <CurrentColorFill {...props} viewBox="10 12 30 24">
-    <path d="M10 12h30v4H10zM10 22h30v4H10zM10 32h30v4H10z"></path>
-  </CurrentColorFill>
+  // https://feathericons.com
+  <SVG {...props} viewBox="2 5 20 14">
+    <line x1="3" y1="12" x2="21" y2="12" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <line x1="3" y1="18" x2="21" y2="18" />
+  </SVG>
 );
 
 export const ReturnIcon: FunctionComponent<JSX.SVGAttributes<SVGSVGElement>> = (
   props
 ) => (
-  <CurrentColorFill {...props} viewBox="1 4 50 44">
-    <path d="M22 16V4L1 24l21 20V32s17-4 29 16c0 0 3-15-10-27 0 0-6-5-19-5z"></path>
-  </CurrentColorFill>
+  // https://feathericons.com
+  <SVG {...props} viewBox="2 0 20 24">
+    <polyline points="17 1 21 5 17 9" />
+    <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+    <polyline points="7 23 3 19 7 15" />
+    <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+  </SVG>
 );
 
-const WaitIconOuter = styled(CurrentColorStroke)`
+const WaitIconOuter = styled(SVG)`
   animation: 2s linear infinite wait-outer-animation;
 
   @keyframes wait-outer-animation {

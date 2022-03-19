@@ -47,6 +47,7 @@ export const Layout: FunctionComponent = ({ children }) => {
 
     const setTransform = (input: number) => {
       if (!asideRef.current) return;
+      if (input === lastX) return;
 
       lastX = input;
 
@@ -87,10 +88,9 @@ export const Layout: FunctionComponent = ({ children }) => {
       const x = targetTouches.item(0)?.pageX || 0;
 
       if (!x) return;
-      if (x > asideRef.current.offsetWidth) return;
 
       event.preventDefault();
-      setTransform(x);
+      setTransform(Math.min(x, asideRef.current.offsetWidth));
     };
 
     const onTouchEnd: (
