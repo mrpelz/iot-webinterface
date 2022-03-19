@@ -69,8 +69,6 @@ const useNavigationElements = <
   ignorePersistenceInit = false,
   override?: string | null
 ) => {
-  const isVisible = useVisibility();
-
   const elements = useLevelShallow<T>(level, parent);
 
   const storedElement = useGetLocalStorage(persistenceKey);
@@ -139,7 +137,7 @@ const useNavigationElements = <
 
     setState(() => determineElement(null));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isVisible, override]);
+  }, [override]);
 
   return element;
 };
@@ -150,7 +148,6 @@ const useStaticPage = (
   defer = false
 ) => {
   const fallback = useDelay(defer ? null : START_PAGE, 300);
-  const isVisible = useVisibility();
 
   const storedStaticPage = useGetLocalStorage(STATIC_PAGE_KEY);
 
@@ -172,7 +169,7 @@ const useStaticPage = (
 
     setState(determineStaticPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isVisible, override]);
+  }, [override]);
 
   useEffect(() => {
     if (!fallback) return;
@@ -187,7 +184,12 @@ const useStaticPage = (
 export const NavigationProvider: FunctionComponent = ({ children }) => {
   useHookDebug('NavigationProvider');
 
+  const isVisible = useVisibility();
+  const isVisibleDelayed = useDelay(isVisible, 300);
+
   const { hierarchy } = useWebApi();
+  const settled = useDelay(Boolean(hierarchy), 500);
+
   const startPageFlag = useFlag('startPage');
   const [startPagePath, setStartPagePath] = useSegment(0);
 
@@ -197,16 +199,19 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
     []
   );
 
-  const startPagePathUsable = useDelay(Boolean(hierarchy), 500);
-
   const startPagePathActual = useMemo(
-    () => (startPagePathUsable ? startPagePath : null),
-    [startPagePath, startPagePathUsable]
+    () => (settled ? startPagePath : null),
+    [startPagePath, settled]
+  );
+
+  const startPageFlagActual = useMemo(
+    () => (settled && isVisibleDelayed ? null : startPageFlag),
+    [isVisibleDelayed, settled, startPageFlag]
   );
 
   const startPage = useMemo(
-    () => startPageFlag || startPagePathActual || startPagePathInitial || null,
-    [startPageFlag, startPagePathActual, startPagePathInitial]
+    () => startPageFlagActual || startPagePathActual || startPagePathInitial,
+    [startPageFlagActual, startPagePathActual, startPagePathInitial]
   );
 
   const staticPageFromFlag = useMemo(() => {
