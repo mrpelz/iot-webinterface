@@ -15,10 +15,12 @@ import {
 } from 'preact/hooks';
 import { useHookDebug } from '../util/use-hook-debug.js';
 import { usePrevious } from '../util/use-previous.js';
+import { useVisibility } from './visibility.js';
 
 export type TPathContext = {
   getSegment: (segmentNumber: number) => string | null;
   goPrevious: (() => void) | null;
+  goRoot: (() => void) | null;
   goUp: (() => void) | null;
   isRoot: boolean;
   path: string;
@@ -39,6 +41,8 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
   rootPathDepth,
 }) => {
   useHookDebug('PathProvider');
+
+  const isVisible = useVisibility();
 
   useEffect(() => {
     if (disableBackcapture) return;
@@ -74,8 +78,8 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
     return () => setPath(goUpUtil(path));
   }, [isRoot, path]);
 
-  const setSegment = useMemo(
-    () => (segmentNumber: number) => {
+  const setSegment = useCallback(
+    (segmentNumber: number) => {
       const segments = getSegments(path);
       if (segments.length < segmentNumber) return null;
 
@@ -89,6 +93,15 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
     },
     [path]
   );
+
+  const goRoot = useMemo(() => {
+    if (isRoot) return null;
+
+    const setter = setSegment(rootPathDepth);
+    if (!setter) return null;
+
+    return () => setter(null);
+  }, [isRoot, rootPathDepth, setSegment]);
 
   const onPopstate = useCallback(
     ({ state }: PopStateEvent) => {
@@ -124,14 +137,29 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
     () => ({
       getSegment,
       goPrevious,
+      goRoot,
       goUp,
       isRoot,
       path,
       previousPath,
       setSegment,
     }),
-    [getSegment, goPrevious, goUp, isRoot, path, previousPath, setSegment]
+    [
+      getSegment,
+      goPrevious,
+      goRoot,
+      goUp,
+      isRoot,
+      path,
+      previousPath,
+      setSegment,
+    ]
   );
+
+  useEffect(() => {
+    if (!goRoot || isVisible) return;
+    goRoot();
+  }, [goRoot, isVisible]);
 
   return <PathContext.Provider value={value}>{children}</PathContext.Provider>;
 };
@@ -173,6 +201,11 @@ export const useGoPreviousSegment = (
     return () => setter(previousSegment);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [previousSegment]);
+};
+
+export const useGoRoot = (): TPathContext['goRoot'] => {
+  const { goRoot } = useContext(PathContext);
+  return useMemo(() => goRoot, [goRoot]);
 };
 
 export const useGoUp = (): TPathContext['goUp'] => {

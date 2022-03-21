@@ -1,6 +1,7 @@
 import { Diagnostics, Hierarchy } from './static-pages/diagnostics.js';
 import { MenuVisible, useIsMenuVisible } from '../state/menu.js';
 import { useEffect, useLayoutEffect, useRef } from 'preact/hooks';
+import { useGoRoot, useSegment } from '../state/path.js';
 import {
   useNavigationRoom,
   useNavigationStaticPage,
@@ -15,10 +16,11 @@ import { Global } from './static-pages/global.js';
 import { Layout } from './layout.js';
 import { Settings } from './static-pages/settings.js';
 import { colors } from '../style.js';
-import { useSegment } from '../state/path.js';
 
 const Test: FunctionComponent = () => {
   const setTitleOverride = useSetTitleOverride();
+
+  const goRoot = useGoRoot();
 
   const [route1, setRoute1] = useSegment(1);
   const [route2, setRoute2] = useSegment(2);
@@ -57,6 +59,11 @@ const Test: FunctionComponent = () => {
       <br />
       <button disabled={!route2} onClick={() => setRoute2?.(null)}>
         reset
+      </button>
+      <br />
+      <br />
+      <button disabled={!goRoot} onClick={() => goRoot?.()}>
+        go root
       </button>
     </>
   );

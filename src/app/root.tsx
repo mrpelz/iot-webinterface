@@ -62,9 +62,9 @@ export const Root: FunctionComponent<{
   );
 
   const OuterState = combineComponents(
-    _PathProvider,
     _FlagProvider,
     VisibilityProvider,
+    _PathProvider,
     ThemeProvider
   );
 
