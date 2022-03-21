@@ -37,6 +37,7 @@ import { useI18n } from '../../state/i18n.js';
 import { useIsMenuVisible } from '../../state/menu.js';
 import { useMediaQuery } from '../../style/main.js';
 import { useNotification } from '../../state/notification.js';
+import { usePath } from '../../state/path.js';
 import { useTheme } from '../../state/theme.js';
 import { useVisibility } from '../../state/visibility.js';
 
@@ -133,36 +134,37 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
   const isNull = valueType === ValueType.NULL;
   const namedValueType = valueTypeToType(valueType);
 
-  const onChange: JSX.EventHandler<JSX.TargetedEvent<HTMLInputElement, Event>> =
-    ({ currentTarget }) => {
-      const { value } = currentTarget;
+  const onChange: JSX.EventHandler<
+    JSX.TargetedEvent<HTMLInputElement, Event>
+  > = ({ currentTarget }) => {
+    const { value } = currentTarget;
 
-      if (!value.length) {
-        currentTarget.setCustomValidity('');
-        setInput(undefined);
+    if (!value.length) {
+      currentTarget.setCustomValidity('');
+      setInput(undefined);
+
+      return;
+    }
+
+    try {
+      const parsedValue = JSON.parse(value);
+      const inputType = typeToValueType(parsedValue);
+      const namedInputType = valueTypeToType(inputType);
+
+      if (inputType !== valueType) {
+        currentTarget.setCustomValidity(
+          `parsed type does not match the required type! Needed: ${namedValueType}, parsed: ${namedInputType}`
+        );
 
         return;
       }
 
-      try {
-        const parsedValue = JSON.parse(value);
-        const inputType = typeToValueType(parsedValue);
-        const namedInputType = valueTypeToType(inputType);
-
-        if (inputType !== valueType) {
-          currentTarget.setCustomValidity(
-            `parsed type does not match the required type! Needed: ${namedValueType}, parsed: ${namedInputType}`
-          );
-
-          return;
-        }
-
-        currentTarget.setCustomValidity('');
-        setInput(parsedValue);
-      } catch {
-        currentTarget.setCustomValidity('invalid input');
-      }
-    };
+      currentTarget.setCustomValidity('');
+      setInput(parsedValue);
+    } catch {
+      currentTarget.setCustomValidity('invalid input');
+    }
+  };
 
   const onSubmit: JSX.GenericEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -245,11 +247,17 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
 };
 
 export const Diagnostics: FunctionComponent = () => {
+  const isStreamOnline = useStreamOnline();
+
+  const { isRoot, path, previousPath } = usePath();
+
+  const isMenuVisible = useIsMenuVisible();
+
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
   const isVisible = useVisibility();
 
-  const flags = useFlags();
+  const theme = useTheme();
 
   // prettier-ignore
   const {
@@ -261,7 +269,7 @@ export const Diagnostics: FunctionComponent = () => {
     translationLocale
   } = useI18n();
 
-  const isMenuVisible = useIsMenuVisible();
+  const flags = useFlags();
 
   const hierarchy = useHierarchy();
   const {
@@ -278,10 +286,6 @@ export const Diagnostics: FunctionComponent = () => {
 
   const fallbackNotification = useNotification();
 
-  const theme = useTheme();
-
-  const isStreamOnline = useStreamOnline();
-
   return (
     <DiagnosticsContainer>
       <table>
@@ -290,6 +294,27 @@ export const Diagnostics: FunctionComponent = () => {
             <b>stream</b>
           </td>
           <td>{JSON.stringify(isStreamOnline)}</td>
+        </tr>
+
+        <tr>
+          <td colSpan={999}>
+            <b>path</b>
+
+            <table>
+              <tr>
+                <td>isRoot</td>
+                <td>{JSON.stringify(isRoot)}</td>
+              </tr>
+              <tr>
+                <td>path</td>
+                <td>{JSON.stringify(path)}</td>
+              </tr>
+              <tr>
+                <td>previousPath</td>
+                <td>{JSON.stringify(previousPath)}</td>
+              </tr>
+            </table>
+          </td>
         </tr>
 
         <tr>

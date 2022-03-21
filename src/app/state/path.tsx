@@ -20,6 +20,9 @@ export type TPathContext = {
   getSegment: (segmentNumber: number) => string | null;
   goPrevious: (() => void) | null;
   goUp: (() => void) | null;
+  isRoot: boolean;
+  path: string;
+  previousPath: string | null;
   setSegment: (
     segmentNumber: number
   ) => ((value: string | null) => void) | null;
@@ -122,22 +125,36 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
       getSegment,
       goPrevious,
       goUp,
+      isRoot,
+      path,
+      previousPath,
       setSegment,
     }),
-    [getSegment, goPrevious, goUp, setSegment]
+    [getSegment, goPrevious, goUp, isRoot, path, previousPath, setSegment]
   );
 
   return <PathContext.Provider value={value}>{children}</PathContext.Provider>;
 };
 
-export const useGoUp = (): TPathContext['goUp'] => {
-  const { goUp } = useContext(PathContext);
-  return useMemo(() => goUp, [goUp]);
-};
+export const usePath = (): TPathContext => useContext(PathContext);
 
 export const useGoPrevious = (): TPathContext['goPrevious'] => {
   const { goPrevious } = useContext(PathContext);
   return useMemo(() => goPrevious, [goPrevious]);
+};
+
+export const useSegment = (
+  segmentNumber: number
+): [
+  ReturnType<TPathContext['getSegment']>,
+  ReturnType<TPathContext['setSegment']>
+] => {
+  const { getSegment, setSegment } = useContext(PathContext);
+
+  const segment = getSegment(segmentNumber);
+  const setter = setSegment(segmentNumber);
+
+  return useMemo(() => [segment, setter], [segment, setter]);
 };
 
 export const useGoPreviousSegment = (
@@ -158,16 +175,7 @@ export const useGoPreviousSegment = (
   }, [previousSegment]);
 };
 
-export const useSegment = (
-  segmentNumber: number
-): [
-  ReturnType<TPathContext['getSegment']>,
-  ReturnType<TPathContext['setSegment']>
-] => {
-  const { getSegment, setSegment } = useContext(PathContext);
-
-  const segment = getSegment(segmentNumber);
-  const setter = setSegment(segmentNumber);
-
-  return useMemo(() => [segment, setter], [segment, setter]);
+export const useGoUp = (): TPathContext['goUp'] => {
+  const { goUp } = useContext(PathContext);
+  return useMemo(() => goUp, [goUp]);
 };
