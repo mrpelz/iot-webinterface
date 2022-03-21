@@ -18,18 +18,14 @@ import {
   useState,
 } from 'preact/hooks';
 import { useGoPreviousSegment, useGoUp, useSegment } from '../state/path.js';
-import {
-  useNavigationRoom,
-  useNavigationStaticPage,
-} from '../state/navigation.js';
 import { FunctionComponent } from 'preact';
-import { Translation } from '../state/i18n.js';
 import { dimensions } from '../style.js';
 import { useAwaitEvent } from '../util/use-await-event.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlipMenuVisible } from '../state/menu.js';
 import { useMediaQuery } from '../style/main.js';
 import { useStreamOnline } from '../state/web-api.js';
+import { useTitle } from '../state/title.js';
 
 export const IconContainer: FunctionComponent<{
   paddingSetter: (input: number) => void;
@@ -95,6 +91,8 @@ export const Titlebar: FunctionComponent = () => {
     [paddingLeft, paddingRight]
   );
 
+  const title = useTitle();
+
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
   const flipMenuVisible = useFlipMenuVisible();
@@ -105,9 +103,6 @@ export const Titlebar: FunctionComponent = () => {
   const isMap = useMemo(() => page === 'map', [page]);
 
   const goPrevious = useGoPreviousSegment(0);
-
-  const [room] = useNavigationRoom();
-  const [staticPage] = useNavigationStaticPage();
 
   const upIcon = useMemo(
     () => (goUp ? <BackIcon onClick={goUp} /> : null),
@@ -129,9 +124,7 @@ export const Titlebar: FunctionComponent = () => {
 
   return (
     <TitlebarComponent padding={padding}>
-      <Title>
-        <Translation i18nKey={staticPage || room?.meta.name} />
-      </Title>
+      {title ? <Title>{title}</Title> : null}
       {menuIcon || upIcon ? (
         <IconContainer paddingSetter={setPaddingLeft}>
           {upIcon}

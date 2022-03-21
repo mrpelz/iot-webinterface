@@ -10,6 +10,7 @@ import { NavigationProvider } from './state/navigation.js';
 import { Notifications } from './util/notifications.js';
 import { PathProvider } from './state/path.js';
 import { ThemeProvider } from './state/theme.js';
+import { TitleProvider } from './state/title.js';
 import { VisibilityProvider } from './state/visibility.js';
 import { WebApi } from './web-api.js';
 import { WebApiProvider } from './state/web-api.js';
@@ -72,7 +73,8 @@ export const Root: FunctionComponent<{
     _FallbackNotificationProvider,
     I18nProvider,
     MenuVisibleProvider,
-    NavigationProvider
+    NavigationProvider,
+    TitleProvider
   );
 
   return (

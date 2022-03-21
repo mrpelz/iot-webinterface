@@ -5,6 +5,7 @@ import {
   useNavigationRoom,
   useNavigationStaticPage,
 } from '../state/navigation.js';
+import { useSetTitleOverride, useTitle } from '../state/title.js';
 import { App as AppComponent } from '../components/app.js';
 import { Background } from './background.js';
 import { Devices } from './static-pages/devices.js';
@@ -14,12 +15,20 @@ import { Global } from './static-pages/global.js';
 import { Layout } from './layout.js';
 import { Settings } from './static-pages/settings.js';
 import { colors } from '../style.js';
-import { useI18nKey } from '../state/i18n.js';
 import { useSegment } from '../state/path.js';
 
 const Test: FunctionComponent = () => {
+  const setTitleOverride = useSetTitleOverride();
+
   const [route1, setRoute1] = useSegment(1);
   const [route2, setRoute2] = useSegment(2);
+
+  useEffect(() => {
+    setTitleOverride(route2 || route1 || null);
+
+    return () => setTitleOverride(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route1, route2]);
 
   return (
     <>
@@ -65,14 +74,11 @@ export const App: FunctionComponent = () => {
   const previousPage = useRef<string | undefined>();
   const previousScrollY = useRef(0);
 
-  const staticPageName = useI18nKey(staticPage || undefined);
-  const roomName = useI18nKey(room?.meta.name);
+  const title = useTitle();
 
   useEffect(() => {
-    document.title = [staticPageName || roomName, 'wurstsalat IoT']
-      .filter(Boolean)
-      .join(' | ');
-  }, [roomName, staticPageName]);
+    document.title = [title, 'wurstsalat IoT'].filter(Boolean).join(' | ');
+  }, [title]);
 
   useLayoutEffect(() => {
     isMenuVisibleRef.current = isMenuVisible;
