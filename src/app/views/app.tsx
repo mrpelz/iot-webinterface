@@ -7,12 +7,12 @@ import {
 } from '../state/navigation.js';
 import { App as AppComponent } from '../components/app.js';
 import { Background } from './background.js';
+import { Devices } from './static-pages/devices.js';
 import { DiagnosticsContainer } from '../components/static-pages/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Global } from './static-pages/global.js';
 import { Layout } from './layout.js';
 import { Settings } from './static-pages/settings.js';
-import { Technical } from './static-pages/technical.js';
 import { colors } from '../style.js';
 import { useI18nKey } from '../state/i18n.js';
 import { useSegment } from '../state/path.js';
@@ -147,11 +147,11 @@ export const App: FunctionComponent = () => {
         <Background />
         {staticPage
           ? {
+              devices: <Devices />,
               diagnostics: <Diagnostics />,
               global: <Global />,
               map: <Test />,
               settings: <Settings />,
-              technical: <Technical />,
             }[staticPage]
           : null}
 

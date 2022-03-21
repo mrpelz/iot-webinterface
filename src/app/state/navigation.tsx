@@ -29,7 +29,7 @@ import { useVisibility } from './visibility.js';
 
 export const staticPagesTop = ['global', 'map'] as const;
 export const staticPagesBottom = [
-  'technical',
+  'devices',
   'settings',
   'diagnostics',
 ] as const;

@@ -40,7 +40,7 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   );
 };
 
-export const Technical: FunctionComponent = () => {
+export const Devices: FunctionComponent = () => {
   const hierarchy = useHierarchy();
 
   const rooms = useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy);
