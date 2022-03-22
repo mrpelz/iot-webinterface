@@ -12,16 +12,13 @@ import {
 } from 'preact/hooks';
 import { useHookDebug } from '../util/use-hook-debug.js';
 
-export type TFallbackNotificationContext = {
-  fallbackNotification: FallbackNotificationOptions;
-  setFallbackNotification: StateUpdater<FallbackNotificationOptions>;
-};
+export type TFallbackNotificationContext = readonly [
+  FallbackNotificationOptions,
+  StateUpdater<FallbackNotificationOptions>
+];
 
 const FallbackNotificationContext = createContext<TFallbackNotificationContext>(
-  {
-    fallbackNotification: null,
-    setFallbackNotification: () => undefined,
-  }
+  [null, () => undefined]
 );
 
 export const FallbackNotificationProvider: FunctionComponent<{
@@ -39,10 +36,7 @@ export const FallbackNotificationProvider: FunctionComponent<{
   }, [notifications]);
 
   const value = useMemo(
-    () => ({
-      fallbackNotification,
-      setFallbackNotification,
-    }),
+    () => [fallbackNotification, setFallbackNotification] as const,
     [fallbackNotification]
   );
 
@@ -54,12 +48,12 @@ export const FallbackNotificationProvider: FunctionComponent<{
 };
 
 export const useNotification = (): FallbackNotificationOptions => {
-  const { fallbackNotification } = useContext(FallbackNotificationContext);
+  const [fallbackNotification] = useContext(FallbackNotificationContext);
   return useMemo(() => fallbackNotification, [fallbackNotification]);
 };
 
 export const useSetNotification =
   (): StateUpdater<FallbackNotificationOptions> => {
-    const { setFallbackNotification } = useContext(FallbackNotificationContext);
+    const [, setFallbackNotification] = useContext(FallbackNotificationContext);
     return useMemo(() => setFallbackNotification, [setFallbackNotification]);
   };

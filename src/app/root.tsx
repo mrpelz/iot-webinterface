@@ -9,6 +9,7 @@ import { MenuVisibleProvider } from './state/menu.js';
 import { NavigationProvider } from './state/navigation.js';
 import { Notifications } from './util/notifications.js';
 import { PathProvider } from './state/path.js';
+import { ScrollEffects } from './state/scroll-effects.js';
 import { ThemeProvider } from './state/theme.js';
 import { TitleProvider } from './state/title.js';
 import { VisibilityProvider } from './state/visibility.js';
@@ -17,6 +18,7 @@ import { WebApiProvider } from './state/web-api.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
 import { prefix } from 'goober/prefixer';
 import { setup } from 'goober';
+import { useMemo } from 'preact/hooks';
 
 const GlobalStyles = createGlobalStyle`
   * {
@@ -53,9 +55,21 @@ export const Root: FunctionComponent<{
   notifications: Notifications;
   webApi: WebApi;
 }> = ({ flags, notifications, webApi }) => {
-  const _PathProvider = bindComponent(PathProvider, { rootPathDepth: 1 });
-  const _FlagProvider = bindComponent(FlagProvider, { flags });
-  const _WebApiProvider = bindComponent(WebApiProvider, { webApi });
+  const _PathProvider = bindComponent(
+    PathProvider,
+    useMemo(() => ({ rootPathDepth: 1 }), [])
+  );
+
+  const _FlagProvider = bindComponent(
+    FlagProvider,
+    useMemo(() => ({ flags }), [flags])
+  );
+
+  const _WebApiProvider = bindComponent(
+    WebApiProvider,
+    useMemo(() => ({ webApi }), [webApi])
+  );
+
   const _FallbackNotificationProvider = bindComponent(
     FallbackNotificationProvider,
     { notifications }
@@ -81,6 +95,7 @@ export const Root: FunctionComponent<{
     <OuterState>
       <GlobalStyles />
       <InnerState>
+        <ScrollEffects />
         <App />
       </InnerState>
     </OuterState>

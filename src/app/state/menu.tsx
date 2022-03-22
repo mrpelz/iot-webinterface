@@ -16,6 +16,7 @@ import { useVisibility } from './visibility.js';
 export type MenuVisible = boolean | null;
 
 export type TMenuVisibleContext = {
+  flipMenuVisible: () => void;
   isMenuVisible: MenuVisible;
   setMenuVisible: StateUpdater<MenuVisible>;
 };
@@ -46,6 +47,10 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
     [isDesktop]
   );
 
+  const flipMenuVisible = useCallback(() => {
+    setMenuVisible((value) => !value);
+  }, [setMenuVisible]);
+
   useEffect(() => {
     if (isVisible) return;
     setMenuVisible(false);
@@ -53,10 +58,11 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
 
   const value = useMemo<TMenuVisibleContext>(
     () => ({
+      flipMenuVisible,
       isMenuVisible,
       setMenuVisible,
     }),
-    [isMenuVisible, setMenuVisible]
+    [flipMenuVisible, isMenuVisible, setMenuVisible]
   );
 
   return (
@@ -77,9 +83,6 @@ export const useSetMenuVisible = (): StateUpdater<MenuVisible> => {
 };
 
 export const useFlipMenuVisible = (): (() => void) => {
-  const { setMenuVisible } = useContext(MenuVisibleContext);
-
-  return useCallback(() => {
-    setMenuVisible((value) => !value);
-  }, [setMenuVisible]);
+  const { flipMenuVisible } = useContext(MenuVisibleContext);
+  return useMemo(() => flipMenuVisible, [flipMenuVisible]);
 };

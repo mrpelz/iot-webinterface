@@ -1,5 +1,11 @@
 import { FunctionComponent, createContext } from 'preact';
-import { StateUpdater, useContext, useMemo, useState } from 'preact/hooks';
+import {
+  StateUpdater,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'preact/hooks';
 import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
 import { useI18nKey } from './i18n.js';
@@ -10,6 +16,8 @@ export type TTitleContext = readonly [
 ];
 
 const TitleContext = createContext(null as unknown as TTitleContext);
+
+const appName = document.title;
 
 export const TitleProvider: FunctionComponent = ({ children }) => {
   useHookDebug('TitleProvider');
@@ -28,6 +36,10 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
   );
 
   const value = useMemo(() => [title, setTitleOverride] as const, [title]);
+
+  useEffect(() => {
+    document.title = [title, appName].filter(Boolean).join(' | ');
+  }, [title]);
 
   return (
     <TitleContext.Provider value={value}>{children}</TitleContext.Provider>
