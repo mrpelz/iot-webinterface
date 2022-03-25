@@ -2,7 +2,9 @@ import { colors, dimensions } from '../style.js';
 import { dependentValue } from '../style/main.js';
 import { styled } from 'goober';
 
-export const Notification = styled('section')<{ isVisible: boolean }>`
+export const Notification = styled('notification' as 'section')<{
+  isVisible: boolean;
+}>`
   align-items: center;
   color: ${colors.backgroundPrimary()};
   cursor: ${dependentValue('onClick', 'pointer', 'default')};

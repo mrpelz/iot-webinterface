@@ -16,15 +16,17 @@ export const ThemeProvider: FunctionComponent = ({ children }) => {
 
   const flagPreferredTheme = useFlag('theme');
 
+  const prefersHighContrastTheme = useBreakpoint(strings.prefersMoreContrast);
   const prefersDarkTheme = useBreakpoint(strings.prefersDarkTheme);
   const prefersLightTheme = useBreakpoint(strings.prefersLightTheme);
 
   const browserPreferredTheme = useMemo(() => {
+    if (prefersHighContrastTheme) return 'highContrast';
     if (prefersDarkTheme) return 'dark';
     if (prefersLightTheme) return 'light';
 
     return null;
-  }, [prefersDarkTheme, prefersLightTheme]);
+  }, [prefersDarkTheme, prefersHighContrastTheme, prefersLightTheme]);
 
   const value = useMemo(
     () =>

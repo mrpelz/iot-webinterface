@@ -8,11 +8,11 @@ export const Category: FunctionComponent<{ header: ComponentChild }> = ({
   header,
 }) => {
   const theme = useTheme();
-  const isHightContrast = useMemo(() => theme === 'highContrast', [theme]);
+  const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
   return (
     <CategoryWrapper>
-      <CategoryHeader isHighContrast={isHightContrast}>{header}</CategoryHeader>
+      <CategoryHeader isHighContrast={isHighContrast}>{header}</CategoryHeader>
       {children}
     </CategoryWrapper>
   );

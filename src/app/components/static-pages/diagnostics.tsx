@@ -1,7 +1,7 @@
 import { colors } from '../../style.js';
 import { styled } from 'goober';
 
-export const DiagnosticsContainer = styled('section')`
+export const DiagnosticsContainer = styled('diagnostics-container')`
   background-color: white;
   color: ${colors.black()};
   display: flex;

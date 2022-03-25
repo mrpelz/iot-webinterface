@@ -2,14 +2,14 @@ import { colors, dimensions } from '../style.js';
 import { dependentValue } from '../style/main.js';
 import { styled } from 'goober';
 
-export const SwipeBackWrapper = styled('div')`
+export const SwipeBackWrapper = styled('swipe-back-wrapper')`
   display: flex;
   height: 100%;
   flex-direction: column;
   justify-content: center;
 `;
 
-export const SwipeBack = styled('div')<{ isHighContrast: boolean }>`
+export const SwipeBack = styled('swipe-back')<{ isHighContrast: boolean }>`
   background-color: ${dependentValue(
     'isHighContrast',
     colors.fontPrimary(),

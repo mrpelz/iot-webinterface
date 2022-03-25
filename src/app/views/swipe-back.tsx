@@ -9,11 +9,11 @@ import { useTheme } from '../state/theme.js';
 
 export const SwipeBack: FunctionComponent = () => {
   const theme = useTheme();
-  const isHightContrast = useMemo(() => theme === 'highContrast', [theme]);
+  const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
   return (
     <SwipeBackWrapper>
-      <SwipeBackComponent isHighContrast={isHightContrast}>
+      <SwipeBackComponent isHighContrast={isHighContrast}>
         <BackIcon />
       </SwipeBackComponent>
     </SwipeBackWrapper>

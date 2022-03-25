@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import { Theme, useTheme } from './state/theme.js';
-import { add, dimension, subtract } from './style/dimensions.js';
+import { add, dimension, half, subtract } from './style/dimensions.js';
 import { color, useThemedValue } from './style/colors.js';
 import { cssEnv, cssVar, useMediaQuery } from './style/main.js';
 import { multiline } from './util/string.js';
@@ -16,6 +16,7 @@ export const strings = {
   isRetina: '(-webkit-min-device-pixel-ratio: 2)',
   prefersDarkTheme: '(prefers-color-scheme: dark)',
   prefersLightTheme: '(prefers-color-scheme: light)',
+  prefersMoreContrast: '(prefers-contrast: more)',
   safeAreaInsetTop: cssVar(
     'safe-area-inset-top',
     cssEnv('safe-area-inset-top')
@@ -29,10 +30,11 @@ const staticDimensions = {
   breakpointDesktop: dimension(1024),
   breakpointHuge: dimension(1440),
   breakpointTablet: dimension(640),
+  controlBase: dimension(6),
   fontSize: dimension(17),
   fontSizeLarge: dimension(21),
   fontSizeSmall: dimension(14),
-  gridCellWidth: dimension(100),
+  gridCellWidth: dimension(75),
   menuHeight: dimension(44),
   menuWidth: dimension(200),
   titlebarHeight: dimension(44),
@@ -58,7 +60,9 @@ const partialDynamicDimensions = {
         strings.viewportWidth
       );
   },
-  fontPadding: `calc((${staticDimensions.titlebarHeight} - ${staticDimensions.fontSize}) / 2)`,
+  fontPadding: half(
+    subtract(staticDimensions.titlebarHeight, staticDimensions.fontSize)
+  ),
   get hairline() {
     return () =>
       useBreakpointValue(strings.isRetina, dimension(0.5), dimension(1));

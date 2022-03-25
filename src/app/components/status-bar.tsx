@@ -2,7 +2,7 @@ import { colors, strings } from '../style.js';
 import { dependentValue } from '../style/main.js';
 import { styled } from 'goober';
 
-export const StatusBar = styled('section')<{
+export const StatusBar = styled('status-bar')<{
   isConnected: boolean;
   isLight: boolean;
 }>`
@@ -10,6 +10,7 @@ export const StatusBar = styled('section')<{
   animation-fill-mode: forwards;
   animation-name: ${dependentValue('isConnected', 'onConnect', 'none')};
   animation-timing-function: ease-out;
+  display: block;
   height: ${strings.safeAreaInsetTop};
   position: relative;
 

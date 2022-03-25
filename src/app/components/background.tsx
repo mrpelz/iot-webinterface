@@ -1,7 +1,7 @@
 import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 
-export const Background = styled('div', forwardRef)`
+export const Background = styled('background' as 'div', forwardRef)`
   display: contents;
 
   & > * {

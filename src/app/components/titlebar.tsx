@@ -1,11 +1,11 @@
+import { add, invert } from '../style/dimensions.js';
 import { colors, dimensions } from '../style.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
-import { add } from '../style/dimensions.js';
 import { breakpointValue } from '../style/breakpoint.js';
 import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 
-export const Titlebar = styled('section')<{ padding: number }>`
+export const Titlebar = styled('titlebar')<{ padding: number }>`
   border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
   display: flex;
   font-weight: bold;
@@ -36,10 +36,13 @@ export const Title = styled('h1')`
   color: ${colors.fontPrimary()};
 `;
 
-export const IconContainer = styled('div', forwardRef)<{ right?: true }>`
+export const IconContainer = styled('icon-container' as 'div', forwardRef)<{
+  right?: true;
+}>`
   color: ${colors.fontPrimary()};
   display: flex;
   justify-content: ${dependentValue('right', 'flex-end', 'flex-start')};
+  height: 100%;
   position: absolute;
   top: 0;
 
@@ -50,7 +53,7 @@ export const IconContainer = styled('div', forwardRef)<{ right?: true }>`
     padding: ${dimensions.fontPadding};
 
     & + * {
-      margin-left: calc(${dimensions.fontPadding} * -1);
+      margin-left: ${() => invert(dimensions.fontPadding)};
     }
   }
 `;

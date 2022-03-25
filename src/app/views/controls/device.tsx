@@ -1,4 +1,12 @@
+import {
+  ActivityIcon,
+  CheckIcon,
+  TargetIcon,
+  WiFiIcon,
+  XIcon,
+} from '../../components/icons.js';
 import { HierarchyElementDevice, Levels } from '../../web-api.js';
+import { Tag, TagGroup } from '../../components/controls/main.js';
 import { useCallback, useMemo } from 'preact/hooks';
 import {
   useChild,
@@ -6,16 +14,15 @@ import {
   useGetter,
   useLevelShallowSkipInput,
 } from '../../state/web-api.js';
+import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { TabularNums } from '../../components/controls/tabular-nums.js';
-import { Wrapper } from '../../components/controls/main.js';
-import { useI18nKeyFallback } from '../../state/i18n.js';
 import { useTheme } from '../../state/theme.js';
 import { useTimeLabel } from '../../util/use-time-label.js';
 
-const zwsp = '\u200b';
-
-const useDeviceOnlineState = (device: HierarchyElementDevice) => {
+const DeviceOnlineState: FunctionComponent<{
+  device: HierarchyElementDevice;
+}> = ({ device }) => {
   const isOnline = useChild(device, 'online');
   const isOnlineValue = useGetter<boolean>(isOnline);
 
@@ -24,9 +31,6 @@ const useDeviceOnlineState = (device: HierarchyElementDevice) => {
 
   const lastSeen = useChild(device, 'lastSeen');
   const lastSeenValue = useGetter<number>(lastSeen);
-
-  const onlineLabel = useI18nKeyFallback('online');
-  const offlineLabel = useI18nKeyFallback('offline');
 
   const timeLabel = useTimeLabel(
     useMemo(() => {
@@ -37,42 +41,73 @@ const useDeviceOnlineState = (device: HierarchyElementDevice) => {
     }, [lastSeenValue, onlineLastChangeValue])
   );
 
-  return useMemo(() => {
-    if (lastSeen) {
-      return `⏱ last seen: ${timeLabel || '—'}`;
-    }
+  const time = useMemo(
+    () => <TabularNums>{timeLabel || '—'}</TabularNums>,
+    [timeLabel]
+  );
 
-    if (isOnlineValue !== null) {
-      return `${isOnlineValue ? `✅ ${onlineLabel}` : `❌ ${offlineLabel}`}: ${
-        timeLabel || '—'
-      }`;
-    }
+  const theme = useTheme();
+  const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
-    return null;
-  }, [isOnlineValue, lastSeen, offlineLabel, onlineLabel, timeLabel]);
+  if (lastSeen) {
+    return (
+      <>
+        <ActivityIcon height="1em" />
+        {time}
+      </>
+    );
+  }
+
+  if (isOnlineValue !== null) {
+    return (
+      <>
+        {isOnlineValue ? (
+          <CheckIcon
+            color={isHighContrast ? undefined : 'rgb(4, 195, 6)'}
+            height="1em"
+          />
+        ) : (
+          <XIcon
+            color={isHighContrast ? undefined : 'rgb(205, 3, 4)'}
+            height="1em"
+          />
+        )}
+        {time}
+      </>
+    );
+  }
+
+  return null;
 };
 
-export const Device: FunctionComponent<{ device: HierarchyElementDevice }> = ({
-  device,
-}) => {
-  const theme = useTheme();
-  const isHightContrast = useMemo(() => theme === 'highContrast', [theme]);
-
-  const onlineLabel = useDeviceOnlineState(device);
-
+export const Device: FunctionComponent<{
+  device: HierarchyElementDevice;
+}> = ({ device }) => {
   const subDevices = useElementFilter(
     useCallback(({ isSubDevice }) => Boolean(isSubDevice), []),
     useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device)
   );
 
   return (
-    <Wrapper isHighContrast={isHightContrast}>
-      {device.meta.name}
-      <br />
-      <TabularNums>{onlineLabel || zwsp}</TabularNums>
-      {subDevices.map((subDevice) => (
-        <Device device={subDevice} />
-      ))}
-    </Wrapper>
+    <Cell title={device.meta.name}>
+      {subDevices.length ? (
+        subDevices.map((subDevice) => (
+          <Tag>
+            <TagGroup>
+              {subDevice.meta.name === 'espNow' ? (
+                <TargetIcon height="1em" />
+              ) : (
+                <WiFiIcon height="1em" />
+              )}
+            </TagGroup>
+            <DeviceOnlineState device={subDevice} />
+          </Tag>
+        ))
+      ) : (
+        <Tag>
+          <DeviceOnlineState device={device} />
+        </Tag>
+      )}
+    </Cell>
   );
 };

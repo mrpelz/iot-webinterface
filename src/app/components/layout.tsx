@@ -31,7 +31,7 @@ export const Aside = styled('aside', forwardRef)<{
   )};
 `;
 
-export const Main = styled('article', forwardRef)<{
+export const Main = styled('main', forwardRef)<{
   isAsideVisible: boolean;
 }>`
   background-color: ${colors.backgroundPrimary()};

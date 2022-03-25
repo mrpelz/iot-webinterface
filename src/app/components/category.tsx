@@ -2,11 +2,14 @@ import { colors, dimensions } from '../style.js';
 import { dependentValue } from '../style/main.js';
 import { styled } from 'goober';
 
-export const CategoryWrapper = styled('section')`
+export const CategoryWrapper = styled('category-wrapper')`
   display: flow-root;
 `;
 
-export const CategoryHeader = styled('header')<{ isHighContrast: boolean }>`
+export const CategoryHeader = styled('category-header')<{
+  isHighContrast: boolean;
+}>`
+  display: block;
   font-size: ${dimensions.fontSizeSmall};
   font-weight: 600;
   height: ${dimensions.fontSizeLarge};
@@ -14,6 +17,7 @@ export const CategoryHeader = styled('header')<{ isHighContrast: boolean }>`
   padding: 0 ${dimensions.fontPadding};
   position: sticky;
   top: ${dimensions.headerHeightAdaptive};
+  will-change: contents;
 
   background-color: ${dependentValue(
     'isHighContrast',
