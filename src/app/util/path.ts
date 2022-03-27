@@ -10,10 +10,11 @@ export const amend = (path: string): URL => {
 export const getSegments = (path: string): string[] => {
   const relevantPath = relevantPathMatcher.exec(path)?.groups?.path;
   if (!relevantPath?.length) return [];
-  return relevantPath.split('/');
+  return relevantPath.split('/').map((segment) => decodeURIComponent(segment));
 };
 
-export const getPath = (segments: string[]): string => `/${segments.join('/')}`;
+export const getPath = (segments: string[]): string =>
+  `/${segments.map((segment) => encodeURIComponent(segment)).join('/')}`;
 
 export const goDown = (basePath: string, path: string): string =>
   getPath([getSegments(basePath), getSegments(path)].flat());

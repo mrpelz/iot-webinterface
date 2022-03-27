@@ -162,7 +162,7 @@ export const useLevelDeepSkipInput = <T extends HierarchyElementWithMeta>(
 export const useElementFilter = <T extends HierarchyElementWithMeta>(
   filter: (meta: T['meta']) => boolean,
   input: T[]
-): T[] => {
+): T[] | null => {
   const memoizedInput = useArray(input);
 
   return useMemo(() => {

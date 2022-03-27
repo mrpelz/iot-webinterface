@@ -91,7 +91,7 @@ export const Device: FunctionComponent<{
 
   return (
     <Cell title={device.meta.name} onClick={onSelect}>
-      {subDevices.length ? (
+      {subDevices?.length ? (
         subDevices.map((subDevice) => (
           <Tag>
             <TagGroup>
