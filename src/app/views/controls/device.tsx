@@ -82,14 +82,15 @@ const DeviceOnlineState: FunctionComponent<{
 
 export const Device: FunctionComponent<{
   device: HierarchyElementDevice;
-}> = ({ device }) => {
+  onSelect?: () => void;
+}> = ({ device, onSelect }) => {
   const subDevices = useElementFilter(
     useCallback(({ isSubDevice }) => Boolean(isSubDevice), []),
     useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device)
   );
 
   return (
-    <Cell title={device.meta.name}>
+    <Cell title={device.meta.name} onClick={onSelect}>
       {subDevices.length ? (
         subDevices.map((subDevice) => (
           <Tag>

@@ -17,11 +17,21 @@ import { Grid } from '../../components/grid.js';
 import { rooms as roomsSorting } from '../../i18n/sorting.js';
 import { useArray } from '../../util/use-array-compare.js';
 import { useI18nKeyFallback } from '../../state/i18n.js';
+import { useSegment } from '../../state/path.js';
 
 const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   const {
     meta: { name },
   } = room;
+
+  const [, setRoute1] = useSegment(1);
+
+  const onSelect = useCallback(
+    ({ meta: { name: deviceName } }: HierarchyElementDevice) => {
+      setRoute1?.(`${name}›${deviceName}`);
+    },
+    [name, setRoute1]
+  );
 
   const devices = useElementFilter(
     useCallback(({ isSubDevice }) => !isSubDevice, []),
@@ -32,8 +42,13 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
     <Category header={useI18nKeyFallback(name)}>
       <Grid>
         {useMemo(
-          () => devices.map((device) => <Device device={device} />),
-          [devices]
+          () =>
+            devices.map((device) => {
+              return (
+                <Device device={device} onSelect={() => onSelect(device)} />
+              );
+            }),
+          [devices, onSelect]
         )}
       </Grid>
     </Category>

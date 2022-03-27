@@ -1,18 +1,20 @@
 import { FunctionComponent, createContext } from 'preact';
 import {
+  MutableRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
+import {
   amend,
   getPath,
   getSegments,
   goDown,
   goUp as goUpUtil,
 } from '../util/path.js';
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'preact/hooks';
 import { useHookDebug } from '../util/use-hook-debug.js';
 import { usePrevious } from '../util/use-previous.js';
 import { useVisibility } from './visibility.js';
@@ -23,6 +25,7 @@ export type TPathContext = {
   goRoot: (() => void) | null;
   goUp: (() => void) | null;
   isRoot: boolean;
+  leaveCallbackRef: MutableRef<(() => void) | null>;
   path: string;
   previousPath: string | null;
   setSegment: (
@@ -42,18 +45,21 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
 }) => {
   useHookDebug('PathProvider');
 
+  const leaveCallbackRef = useRef<(() => void) | null>(null);
+
   const isVisible = useVisibility();
+
+  const [path, setPath] = useState(location.pathname);
+  const [previousPath] = usePrevious(path);
 
   useEffect(() => {
     if (disableBackcapture) return;
 
+    history.scrollRestoration = 'manual';
+
     history.replaceState(triggerState, '');
     history.pushState(undefined, '');
   }, []);
-
-  const [path, setPath] = useState(location.pathname);
-
-  const [previousPath] = usePrevious(path);
 
   const isRoot = useMemo(
     () => getSegments(path).length <= rootPathDepth,
@@ -108,8 +114,14 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
       if (disableBackcapture) return;
       if (state !== triggerState) return;
 
+      const { current: leaveCallback } = leaveCallbackRef;
+
       if (isRoot) {
-        history.back();
+        if (leaveCallback) {
+          leaveCallback();
+        } else if (document.referrer.length) {
+          history.back();
+        }
 
         setTimeout(() => {
           history.pushState(undefined, '', amend(path));
@@ -140,6 +152,7 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
       goRoot,
       goUp,
       isRoot,
+      leaveCallbackRef,
       path,
       previousPath,
       setSegment,
@@ -164,7 +177,7 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
   return <PathContext.Provider value={value}>{children}</PathContext.Provider>;
 };
 
-export const usePath = (): TPathContext => useContext(PathContext);
+export const usePathContext = (): TPathContext => useContext(PathContext);
 
 export const useGoPrevious = (): TPathContext['goPrevious'] => {
   const { goPrevious } = useContext(PathContext);
@@ -211,4 +224,24 @@ export const useGoRoot = (): TPathContext['goRoot'] => {
 export const useGoUp = (): TPathContext['goUp'] => {
   const { goUp } = useContext(PathContext);
   return useMemo(() => goUp, [goUp]);
+};
+
+export const useIsRoot = (): TPathContext['isRoot'] => {
+  const { isRoot } = useContext(PathContext);
+  return useMemo(() => isRoot, [isRoot]);
+};
+
+export const useLeaveCallbackRef = (): TPathContext['leaveCallbackRef'] => {
+  const { leaveCallbackRef } = useContext(PathContext);
+  return useMemo(() => leaveCallbackRef, [leaveCallbackRef]);
+};
+
+export const usePath = (): TPathContext['path'] => {
+  const { path } = useContext(PathContext);
+  return useMemo(() => path, [path]);
+};
+
+export const usePreviousPath = (): TPathContext['previousPath'] => {
+  const { previousPath } = useContext(PathContext);
+  return useMemo(() => previousPath, [previousPath]);
 };

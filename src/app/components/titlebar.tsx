@@ -6,12 +6,12 @@ import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 
 export const Titlebar = styled('titlebar')<{ padding: number }>`
+  align-items: center;
   border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
   display: flex;
   font-weight: bold;
   height: ${dimensions.titlebarHeight};
   justify-content: center;
-  padding: ${dimensions.fontPadding};
   position: relative;
   word-break: break-all;
 
@@ -30,10 +30,12 @@ export const Titlebar = styled('titlebar')<{ padding: number }>`
 `;
 
 export const Title = styled('h1')`
-  font-size: ${dimensions.fontSize};
-  line-height: ${dimensions.fontSize};
-  margin: 0;
   color: ${colors.fontPrimary()};
+  font-size: ${dimensions.fontSize};
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const IconContainer = styled('icon-container' as 'div', forwardRef)<{

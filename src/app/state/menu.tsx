@@ -10,6 +10,7 @@ import {
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
+import { useLeaveCallbackRef } from './path.js';
 import { useMediaQuery } from '../style/main.js';
 import { useVisibility } from './visibility.js';
 
@@ -27,6 +28,8 @@ const MenuVisibleContext = createContext<TMenuVisibleContext>(
 
 export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
   useHookDebug('MenuVisibleProvider');
+
+  const leaveCallbackRef = useLeaveCallbackRef();
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
   const isVisible = useVisibility();
@@ -50,6 +53,11 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
   const flipMenuVisible = useCallback(() => {
     setMenuVisible((value) => !value);
   }, [setMenuVisible]);
+
+  useEffect(() => {
+    if (!leaveCallbackRef) return;
+    leaveCallbackRef.current = () => setMenuVisible(true);
+  }, [leaveCallbackRef, setMenuVisible]);
 
   useEffect(() => {
     if (isVisible) return;

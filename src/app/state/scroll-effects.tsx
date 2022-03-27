@@ -2,7 +2,7 @@ import { MenuVisible, useIsMenuVisible } from './menu.js';
 import { useLayoutEffect, useRef } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { useHookDebug } from '../util/use-hook-debug.js';
-import { usePath } from './path.js';
+import { useSegment } from './path.js';
 
 export const ScrollEffects: FunctionComponent = () => {
   useHookDebug('Scroll');
@@ -10,8 +10,8 @@ export const ScrollEffects: FunctionComponent = () => {
   const isMenuVisible = useIsMenuVisible();
   const isMenuVisibleRef = useRef<MenuVisible>(isMenuVisible);
 
-  const { path } = usePath();
-  const previousPath = useRef<string | undefined>();
+  const [path] = useSegment(0);
+  const previousPath = useRef<string | null>(null);
 
   const previousScrollY = useRef(0);
 

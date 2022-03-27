@@ -37,7 +37,7 @@ import { useI18n } from '../../state/i18n.js';
 import { useIsMenuVisible } from '../../state/menu.js';
 import { useMediaQuery } from '../../style/main.js';
 import { useNotification } from '../../state/notification.js';
-import { usePath } from '../../state/path.js';
+import { usePathContext } from '../../state/path.js';
 import { useTheme } from '../../state/theme.js';
 import { useVisibility } from '../../state/visibility.js';
 
@@ -249,7 +249,7 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
 export const Diagnostics: FunctionComponent = () => {
   const isStreamOnline = useStreamOnline();
 
-  const { isRoot, path, previousPath } = usePath();
+  const { isRoot, path, previousPath } = usePathContext();
 
   const isMenuVisible = useIsMenuVisible();
 
