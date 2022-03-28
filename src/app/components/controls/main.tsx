@@ -12,7 +12,7 @@ type CellProps = {
 };
 
 export const Cell = bindComponent<CellProps>(
-  styled(GridCell)<{ isHighContrast: boolean }>`
+  styled(GridCell)<CellProps>`
     border-radius: 9px;
     color: ${colors.fontPrimary()};
     font-size: ${dimensions.fontSizeSmall};
@@ -28,6 +28,7 @@ export const Cell = bindComponent<CellProps>(
       () => `solid ${dimensions.hairline()} ${colors.fontPrimary()()}`,
       'none'
     )};
+    cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
   `,
   { isHighContrast: false, span: 2 }
 );

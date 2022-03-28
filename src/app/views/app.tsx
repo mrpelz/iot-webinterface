@@ -1,6 +1,3 @@
-import { Diagnostics, Hierarchy } from './static-pages/diagnostics.js';
-import { useEffect, useLayoutEffect } from 'preact/hooks';
-import { useGoRoot, useSegment } from '../state/path.js';
 import {
   useNavigationRoom,
   useNavigationStaticPage,
@@ -8,65 +5,15 @@ import {
 import { App as AppComponent } from '../components/app.js';
 import { Background } from './background.js';
 import { Devices } from './static-pages/devices.js';
-import { DiagnosticsContainer } from '../components/static-pages/diagnostics.js';
+import { Diagnostics } from './static-pages/diagnostics.js';
+import { ElementDiagnostics } from './controls/element-diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Global } from './static-pages/global.js';
 import { Layout } from './layout.js';
 import { Settings } from './static-pages/settings.js';
+import { Test } from './controls/test.js';
 import { colors } from '../style.js';
-import { useSetTitleOverride } from '../state/title.js';
-
-const Test: FunctionComponent = () => {
-  const setTitleOverride = useSetTitleOverride();
-
-  const goRoot = useGoRoot();
-
-  const [route1, setRoute1] = useSegment(1);
-  const [route2, setRoute2] = useSegment(2);
-
-  useEffect(() => {
-    setTitleOverride(route2 || route1 || null);
-
-    return () => setTitleOverride(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route1, route2]);
-
-  return (
-    <>
-      <button
-        disabled={!setRoute1}
-        onClick={() =>
-          setRoute1?.(Math.round(Math.random() * 10 ** 16).toString(16))
-        }
-      >
-        {route1 || '<none>'}
-      </button>
-      <br />
-      <button disabled={!route1} onClick={() => setRoute1?.(null)}>
-        reset
-      </button>
-      <br />
-      <br />
-      <button
-        disabled={!setRoute2}
-        onClick={() =>
-          setRoute2?.(Math.round(Math.random() * 10 ** 16).toString(16))
-        }
-      >
-        {route2 || '<none>'}
-      </button>
-      <br />
-      <button disabled={!route2} onClick={() => setRoute2?.(null)}>
-        reset
-      </button>
-      <br />
-      <br />
-      <button disabled={!goRoot} onClick={() => goRoot?.()}>
-        go root
-      </button>
-    </>
-  );
-};
+import { useLayoutEffect } from 'preact/hooks';
 
 export const App: FunctionComponent = () => {
   const backgroundColor = colors.backgroundPrimary()();
@@ -98,11 +45,7 @@ export const App: FunctionComponent = () => {
             }[staticPage]
           : null}
 
-        {room && !staticPage ? (
-          <DiagnosticsContainer>
-            <Hierarchy element={room} />
-          </DiagnosticsContainer>
-        ) : null}
+        {room && !staticPage ? <ElementDiagnostics element={room} /> : null}
       </Layout>
     </AppComponent>
   );

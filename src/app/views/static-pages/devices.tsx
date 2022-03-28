@@ -4,7 +4,13 @@ import {
   Levels,
   sortByName,
 } from '../../web-api.js';
-import { useCallback, useEffect, useMemo } from 'preact/hooks';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from 'preact/hooks';
 import {
   useElementFilter,
   useHierarchy,
@@ -12,6 +18,7 @@ import {
 } from '../../state/web-api.js';
 import { Category } from '../category.js';
 import { Device } from '../controls/device.js';
+import { ElementDiagnostics } from '../controls/element-diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Grid } from '../../components/grid.js';
 import { rooms as roomsSorting } from '../../i18n/sorting.js';
@@ -78,19 +85,57 @@ export const Devices: FunctionComponent = () => {
     []
   );
 
-  const [room, device] = useMemo(
+  const [roomId, deviceId] = useMemo(
     () => route1?.split('›') || ([] as null[]),
     [route1]
   );
 
-  const roomName = useI18nKey(room || undefined);
+  const [room] =
+    useElementFilter(
+      useCallback(({ name }) => name === roomId, [roomId]),
+      rooms
+    ) || ([] as null[]);
+
+  const [device] =
+    useElementFilter(
+      useCallback(({ name }) => name === deviceId, [deviceId]),
+      useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room)
+    ) || ([] as null[]);
 
   useEffect(() => {
-    setTitleOverride(roomName && device ? `${roomName} › ${device}` : null);
+    setTitleOverride(device?.meta.name || null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [device, roomName]);
+  }, [device]);
 
-  return (
+  const deepRouteRef = useRef(false);
+  const scrollYRef = useRef<number>(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (deepRouteRef.current) return;
+      scrollYRef.current = scrollY;
+    };
+
+    document.addEventListener('scroll', onScroll);
+
+    return () => {
+      document.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    deepRouteRef.current = Boolean(device);
+    if (device) return;
+
+    scrollTo({
+      behavior: 'instant' as ScrollBehavior,
+      top: scrollYRef.current,
+    });
+  }, [device]);
+
+  return device ? (
+    <ElementDiagnostics element={device} />
+  ) : (
     <>
       {roomsSorted.map((aRoom) => (
         <Room room={aRoom} />
