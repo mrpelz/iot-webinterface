@@ -15,6 +15,23 @@ export const Menu = styled('nav')<{ isVisible: boolean }>`
   width: ${dimensions.menuWidth};
 `;
 
+export const MenuShade = styled('menu-shade' as 'div', forwardRef)<{
+  active: boolean;
+}>`
+  background-color: black;
+  content: '';
+  display: block;
+  height: ${dimensions.appHeight};
+  left: 0;
+  position: fixed;
+  top: ${dimensions.headerHeightAdaptive};
+  transition: opacity 0.3s ease-out;
+  width: ${dimensions.appWidth};
+
+  opacity: ${dependentValue('active', '0.5', '0')};
+  pointer-events: ${dependentValue('active', 'all', 'none')};
+`;
+
 export const MenuContent = styled('ul')`
   display: contents;
 `;

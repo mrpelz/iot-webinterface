@@ -50,4 +50,14 @@ export const Main = styled('main', forwardRef)<{
     dimensions.menuWidth,
     'unset'
   )};
+
+  &::after {
+    bottom: 0;
+    content: '';
+    left: 0;
+    position: absolute;
+    top: 0;
+    touch-action: pan-x;
+    width: 20px;
+  }
 `;

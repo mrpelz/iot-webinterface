@@ -4,13 +4,7 @@ import {
   Levels,
   sortByName,
 } from '../../web-api.js';
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from 'preact/hooks';
+import { useCallback, useEffect, useMemo } from 'preact/hooks';
 import {
   useElementFilter,
   useHierarchy,
@@ -21,9 +15,11 @@ import { Device } from '../controls/device.js';
 import { ElementDiagnostics } from '../controls/element-diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Grid } from '../../components/grid.js';
+import { ShowHide } from '../../components/show-hide.js';
 import { rooms as roomsSorting } from '../../i18n/sorting.js';
 import { useArray } from '../../util/use-array-compare.js';
 import { useI18nKey } from '../../state/i18n.js';
+import { useScrollRestore } from '../../util/use-scroll-restore.js';
 import { useSegment } from '../../state/path.js';
 import { useSetTitleOverride } from '../../state/title.js';
 
@@ -107,39 +103,16 @@ export const Devices: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [device]);
 
-  const deepRouteRef = useRef(false);
-  const scrollYRef = useRef<number>(0);
+  useScrollRestore(!device);
 
-  useEffect(() => {
-    const onScroll = () => {
-      if (deepRouteRef.current) return;
-      scrollYRef.current = scrollY;
-    };
-
-    document.addEventListener('scroll', onScroll);
-
-    return () => {
-      document.removeEventListener('scroll', onScroll);
-    };
-  }, []);
-
-  useLayoutEffect(() => {
-    deepRouteRef.current = Boolean(device);
-    if (device) return;
-
-    scrollTo({
-      behavior: 'instant' as ScrollBehavior,
-      top: scrollYRef.current,
-    });
-  }, [device]);
-
-  return device ? (
-    <ElementDiagnostics element={device} />
-  ) : (
+  return (
     <>
-      {roomsSorted.map((aRoom) => (
-        <Room room={aRoom} />
-      ))}
+      <ShowHide show={!device}>
+        {roomsSorted.map((aRoom) => (
+          <Room room={aRoom} />
+        ))}
+      </ShowHide>
+      {device ? <ElementDiagnostics element={device} /> : null}
     </>
   );
 };

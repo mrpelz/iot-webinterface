@@ -7,6 +7,7 @@ import {
 } from '../state/menu.js';
 import { useLayoutEffect, useMemo, useRef } from 'preact/hooks';
 import { Menu } from './menu.js';
+import { MenuShade } from '../components/menu.js';
 import { Notification } from './notification.js';
 import { StatusBar } from './status-bar.js';
 import { SwipeBack } from './swipe-back.js';
@@ -26,6 +27,7 @@ export const Layout: FunctionComponent = ({ children }) => {
 
   const asideRef = useRef<HTMLElement>(null);
   const mainRef = useRef<HTMLElement>(null);
+  const menuShadeRef = useRef<HTMLDivElement>(null);
 
   const isAsideVisibleRef = useRef<MenuVisible>(null);
   const isGoUpActiveRef = useRef<typeof goUp>(null);
@@ -46,17 +48,23 @@ export const Layout: FunctionComponent = ({ children }) => {
     let lastX = 0;
 
     const setTransform = (input: number) => {
-      if (!asideRef.current) return;
+      if (!asideRef.current || !menuShadeRef.current) return;
       if (input === lastX) return;
 
       lastX = input;
 
-      const { style } = asideRef.current;
+      const { style: asideStyle, offsetWidth } = asideRef.current;
+      const { style: shadeStyle } = menuShadeRef.current;
 
-      style.transition = input ? 'none' : '';
-      style.touchAction = input ? 'pan-x' : '';
+      asideStyle.transition = input ? 'none' : '';
+      asideStyle.touchAction = input ? 'pan-x' : '';
 
-      style.transform = input
+      shadeStyle.transition = input ? 'none' : '';
+      shadeStyle.opacity = input
+        ? ((input / offsetWidth) * 0.5).toString()
+        : '';
+
+      asideStyle.transform = input
         ? `translate3d(calc(-100% + ${input}px), 0, 0)`
         : '';
     };
@@ -170,15 +178,18 @@ export const Layout: FunctionComponent = ({ children }) => {
       >
         <Menu />
       </Aside>
-      <Aside isVisible={false} ref={goUp ? asideRef : undefined}>
-        <SwipeBack />
-      </Aside>
+      {goUp ? (
+        <Aside isVisible={false} ref={asideRef}>
+          <SwipeBack />
+        </Aside>
+      ) : null}
       <Main
         isAsideVisible={Boolean(isAsideVisible)}
         ref={mainRef}
         onClickCapture={handleAsideOutsideClick}
       >
         {children}
+        <MenuShade active={Boolean(isAsideVisible)} ref={menuShadeRef} />
       </Main>
     </>
   );

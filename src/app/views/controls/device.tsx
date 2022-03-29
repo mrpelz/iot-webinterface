@@ -20,6 +20,27 @@ import { TabularNums } from '../../components/controls/tabular-nums.js';
 import { useTheme } from '../../state/theme.js';
 import { useTimeLabel } from '../../util/use-time-label.js';
 
+const OnlineIcon: FunctionComponent = () => {
+  const theme = useTheme();
+  const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
+
+  return (
+    <CheckIcon
+      color={isHighContrast ? undefined : 'rgb(4, 195, 6)'}
+      height="1em"
+    />
+  );
+};
+
+const OfflineIcon: FunctionComponent = () => {
+  const theme = useTheme();
+  const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
+
+  return (
+    <XIcon color={isHighContrast ? undefined : 'rgb(205, 3, 4)'} height="1em" />
+  );
+};
+
 const DeviceOnlineState: FunctionComponent<{
   device: HierarchyElementDevice;
 }> = ({ device }) => {
@@ -46,9 +67,6 @@ const DeviceOnlineState: FunctionComponent<{
     [timeLabel]
   );
 
-  const theme = useTheme();
-  const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
-
   if (lastSeen) {
     return (
       <>
@@ -58,20 +76,18 @@ const DeviceOnlineState: FunctionComponent<{
     );
   }
 
-  if (isOnlineValue !== null) {
+  if (isOnline) {
+    if (isOnlineValue === null) {
+      return (
+        <>
+          <OfflineIcon />—
+        </>
+      );
+    }
+
     return (
       <>
-        {isOnlineValue ? (
-          <CheckIcon
-            color={isHighContrast ? undefined : 'rgb(4, 195, 6)'}
-            height="1em"
-          />
-        ) : (
-          <XIcon
-            color={isHighContrast ? undefined : 'rgb(205, 3, 4)'}
-            height="1em"
-          />
-        )}
+        {isOnlineValue ? <OnlineIcon /> : <OfflineIcon />}
         {time}
       </>
     );
