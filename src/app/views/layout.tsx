@@ -17,6 +17,8 @@ import { useBreakpoint } from '../style/breakpoint.js';
 import { useGoUp } from '../state/path.js';
 import { useMediaQuery } from '../style/main.js';
 
+const swipeCaptureWidth = 40;
+
 export const Layout: FunctionComponent = ({ children }) => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
@@ -25,9 +27,12 @@ export const Layout: FunctionComponent = ({ children }) => {
 
   const goUp = useGoUp();
 
-  const asideRef = useRef<HTMLElement>(null);
-  const mainRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLElement>(null);
   const menuShadeRef = useRef<HTMLDivElement>(null);
+
+  const swipeBackRef = useRef<HTMLElement>(null);
+
+  const mainRef = useRef<HTMLElement>(null);
 
   const isAsideVisibleRef = useRef<MenuVisible>(null);
   const isGoUpActiveRef = useRef<typeof goUp>(null);
@@ -43,29 +48,33 @@ export const Layout: FunctionComponent = ({ children }) => {
   useLayoutEffect(() => {
     const { current: mainCurrent } = mainRef;
 
-    if (!mainCurrent || !asideRef.current) return undefined;
+    if (!mainCurrent || !menuRef.current) return undefined;
 
     let lastX = 0;
 
     const setTransform = (input: number) => {
-      if (!asideRef.current || !menuShadeRef.current) return;
+      if (!menuRef.current || !menuShadeRef.current) return;
       if (input === lastX) return;
+
+      const slideElement = swipeBackRef.current || menuRef.current;
 
       lastX = input;
 
-      const { style: asideStyle, offsetWidth } = asideRef.current;
+      const { style: asideStyle, offsetWidth } = slideElement;
       const { style: shadeStyle } = menuShadeRef.current;
 
       asideStyle.transition = input ? 'none' : '';
       asideStyle.touchAction = input ? 'pan-x' : '';
 
+      asideStyle.transform = input
+        ? `translate3d(calc(-100% + ${input}px), 0, 0)`
+        : '';
+
+      if (swipeBackRef.current) return;
+
       shadeStyle.transition = input ? 'none' : '';
       shadeStyle.opacity = input
         ? ((input / offsetWidth) * 0.5).toString()
-        : '';
-
-      asideStyle.transform = input
-        ? `translate3d(calc(-100% + ${input}px), 0, 0)`
         : '';
     };
 
@@ -78,7 +87,7 @@ export const Layout: FunctionComponent = ({ children }) => {
       const x = targetTouches.item(0)?.pageX || 0;
 
       if (!x) return;
-      if (x > 20) return;
+      if (x > swipeCaptureWidth) return;
 
       setTransform(x);
     };
@@ -87,7 +96,9 @@ export const Layout: FunctionComponent = ({ children }) => {
       this: HTMLElement,
       event: HTMLElementEventMap['touchmove']
     ) => void = (event) => {
-      if (!asideRef.current) return;
+      if (!menuRef.current) return;
+
+      const slideElement = swipeBackRef.current || menuRef.current;
 
       const { targetTouches } = event;
 
@@ -98,22 +109,24 @@ export const Layout: FunctionComponent = ({ children }) => {
       if (!x) return;
 
       event.preventDefault();
-      setTransform(Math.min(x, asideRef.current.offsetWidth));
+      setTransform(Math.min(x, slideElement.offsetWidth));
     };
 
     const onTouchEnd: (
       this: HTMLElement,
       event: HTMLElementEventMap['touchend']
     ) => void = () => {
-      if (!asideRef.current) return;
+      if (!menuRef.current) return;
+
+      const slideElement = swipeBackRef.current || menuRef.current;
 
       if (!lastX || isAsideVisibleRef.current) return;
 
-      if (isGoUpActiveRef.current) {
-        if (lastX > asideRef.current.offsetWidth / 2) {
+      if (isGoUpActiveRef.current && slideElement !== menuRef.current) {
+        if (lastX >= slideElement.offsetWidth - 1) {
           isGoUpActiveRef.current?.();
         }
-      } else if (lastX > asideRef.current.offsetWidth / 3) {
+      } else if (lastX >= slideElement.offsetWidth / 3) {
         setAsideVisible(true);
       }
 
@@ -148,9 +161,9 @@ export const Layout: FunctionComponent = ({ children }) => {
   }, []);
 
   useLayoutEffect(() => {
-    if (!asideRef.current) return;
+    if (!menuRef.current) return;
 
-    const { style } = asideRef.current;
+    const { style } = menuRef.current;
     style.transform = '';
   }, [isDesktop]);
 
@@ -172,21 +185,19 @@ export const Layout: FunctionComponent = ({ children }) => {
         <Titlebar />
         <Notification />
       </Header>
-      <Aside
-        isVisible={isDesktop || Boolean(isAsideVisible)}
-        ref={goUp ? undefined : asideRef}
-      >
+      <Aside isVisible={isDesktop || Boolean(isAsideVisible)} ref={menuRef}>
         <Menu />
       </Aside>
       {goUp ? (
-        <Aside isVisible={false} ref={asideRef}>
+        <Aside isVisible={false} ref={swipeBackRef}>
           <SwipeBack />
         </Aside>
       ) : null}
       <Main
         isAsideVisible={Boolean(isAsideVisible)}
-        ref={mainRef}
         onClickCapture={handleAsideOutsideClick}
+        ref={mainRef}
+        swipeCaptureWidth={swipeCaptureWidth}
       >
         {children}
         <MenuShade active={Boolean(isAsideVisible)} ref={menuShadeRef} />

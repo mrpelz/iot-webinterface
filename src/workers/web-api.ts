@@ -434,6 +434,9 @@
       _handleHierachy(port);
 
       setId(id);
+
+      // re-request hierarchy to ensure SW cache entry 🙄
+      setTimeout(() => getHierarchy(apiBaseUrl, interval, id), interval);
     });
   })(
     ...(await scaffold<SetupMessage>(self, (port) => {

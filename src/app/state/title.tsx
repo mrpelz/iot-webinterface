@@ -1,4 +1,4 @@
-import { ComponentChild, FunctionComponent, createContext } from 'preact';
+import { FunctionComponent, createContext } from 'preact';
 import {
   StateUpdater,
   useContext,
@@ -11,8 +11,8 @@ import { useHookDebug } from '../util/use-hook-debug.js';
 import { useI18nKey } from './i18n.js';
 
 export type TTitleContext = readonly [
-  ComponentChild,
-  StateUpdater<ComponentChild>
+  string | null,
+  StateUpdater<string | null>
 ];
 
 const TitleContext = createContext(null as unknown as TTitleContext);
@@ -28,7 +28,7 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
   const [room] = useNavigationRoom();
   const roomName = useI18nKey(room?.meta.name);
 
-  const [titleOverride, setTitleOverride] = useState<ComponentChild>(null);
+  const [titleOverride, setTitleOverride] = useState<string | null>(null);
 
   const title = useMemo(
     () => titleOverride || staticPageName || roomName,
@@ -46,13 +46,13 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
   );
 };
 
-export const useTitle = (): ComponentChild => {
+export const useTitle = (): string | null => {
   const [title] = useContext(TitleContext);
 
   return useMemo(() => title, [title]);
 };
 
-export const useSetTitleOverride = (): StateUpdater<ComponentChild> => {
+export const useSetTitleOverride = (): StateUpdater<string | null> => {
   const [, setTitleOverride] = useContext(TitleContext);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

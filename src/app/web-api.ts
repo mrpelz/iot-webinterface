@@ -46,6 +46,7 @@ export enum ParentRelation {
 }
 
 export type MetaSystem = {
+  id: string;
   level: Levels.SYSTEM;
 };
 
@@ -83,9 +84,14 @@ export type MetaArea = {
 };
 
 export type MetaDevice = {
+  host?: string;
+  identifier?: string;
   isSubDevice?: true;
   level: Levels.DEVICE;
   name: string;
+  port?: number;
+  transportType?: string;
+  type?: string;
 };
 
 type MetaProperty = {

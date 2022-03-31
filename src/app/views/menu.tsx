@@ -24,6 +24,7 @@ import { FunctionComponent } from 'preact';
 import { Translation } from '../state/i18n.js';
 import { rooms } from '../i18n/sorting.js';
 import { useArray } from '../util/use-array-compare.js';
+import { useGoRoot } from '../state/path.js';
 import { useIsMenuVisible } from '../state/menu.js';
 import { useLevelShallow } from '../state/web-api.js';
 import { useTheme } from '../state/theme.js';
@@ -70,6 +71,8 @@ const MenuListItem: FunctionComponent<{
 export const Floor: FunctionComponent<{
   floor: HierarchyElementFloor;
 }> = ({ floor }) => {
+  const goRoot = useGoRoot();
+
   const elements = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, floor);
   const sortedElements = useArray(
     useMemo(() => sortByName(elements, rooms), [elements])
@@ -83,21 +86,27 @@ export const Floor: FunctionComponent<{
         <Translation i18nKey={floor.meta.name} />
       </MenuSubdivisionHeader>
       <MenuList>
-        {sortedElements.map((room, key) => (
-          <MenuListItem
-            key={key}
-            isActive={room === selectedRoom}
-            onClick={() => selectRoom(room)}
-          >
-            <Translation i18nKey={room.meta.name} />
-          </MenuListItem>
-        ))}
+        {sortedElements.map((room, key) => {
+          const isActive = room === selectedRoom;
+
+          return (
+            <MenuListItem
+              key={key}
+              isActive={isActive}
+              onClick={() => (isActive ? goRoot?.() : selectRoom(room))}
+            >
+              <Translation i18nKey={room.meta.name} />
+            </MenuListItem>
+          );
+        })}
       </MenuList>
     </>
   );
 };
 
 export const Menu: FunctionComponent = () => {
+  const goRoot = useGoRoot();
+
   const isMenuVisible = useIsMenuVisible();
 
   const [selectedStaticPage, selectStaticPage] = useNavigationStaticPage();
@@ -115,15 +124,21 @@ export const Menu: FunctionComponent = () => {
       <MenuContent>
         <MenuSubdivision>
           <MenuList>
-            {staticPagesTop.map((staticPage, key) => (
-              <MenuListItem
-                key={key}
-                isActive={staticPage === selectedStaticPage}
-                onClick={() => selectStaticPage(staticPage)}
-              >
-                <Translation i18nKey={staticPage} />
-              </MenuListItem>
-            ))}
+            {staticPagesTop.map((staticPage, key) => {
+              const isActive = staticPage === selectedStaticPage;
+
+              return (
+                <MenuListItem
+                  key={key}
+                  isActive={isActive}
+                  onClick={() => {
+                    return isActive ? goRoot?.() : selectStaticPage(staticPage);
+                  }}
+                >
+                  <Translation i18nKey={staticPage} />
+                </MenuListItem>
+              );
+            })}
           </MenuList>
         </MenuSubdivision>
 
@@ -135,15 +150,21 @@ export const Menu: FunctionComponent = () => {
 
         <MenuSubdivision>
           <MenuList>
-            {staticPagesBottom.map((staticPage, key) => (
-              <MenuListItem
-                key={key}
-                isActive={staticPage === selectedStaticPage}
-                onClick={() => selectStaticPage(staticPage)}
-              >
-                <Translation i18nKey={staticPage} />
-              </MenuListItem>
-            ))}
+            {staticPagesBottom.map((staticPage, key) => {
+              const isActive = staticPage === selectedStaticPage;
+
+              return (
+                <MenuListItem
+                  key={key}
+                  isActive={isActive}
+                  onClick={() => {
+                    return isActive ? goRoot?.() : selectStaticPage(staticPage);
+                  }}
+                >
+                  <Translation i18nKey={staticPage} />
+                </MenuListItem>
+              );
+            })}
           </MenuList>
         </MenuSubdivision>
       </MenuContent>

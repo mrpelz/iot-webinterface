@@ -33,6 +33,7 @@ export const Aside = styled('aside', forwardRef)<{
 
 export const Main = styled('main', forwardRef)<{
   isAsideVisible: boolean;
+  swipeCaptureWidth: number;
 }>`
   background-color: ${colors.backgroundPrimary()};
   color: ${colors.fontPrimary()};
@@ -58,6 +59,6 @@ export const Main = styled('main', forwardRef)<{
     position: absolute;
     top: 0;
     touch-action: pan-x;
-    width: 20px;
+    width: ${({ swipeCaptureWidth }) => `${swipeCaptureWidth}px`};
   }
 `;

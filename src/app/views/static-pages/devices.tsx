@@ -82,7 +82,7 @@ export const Devices: FunctionComponent = () => {
   );
 
   const [roomId, deviceId] = useMemo(
-    () => route1?.split('›') || ([] as null[]),
+    () => route1?.split('›') || ([] as undefined[]),
     [route1]
   );
 
@@ -90,18 +90,22 @@ export const Devices: FunctionComponent = () => {
     useElementFilter(
       useCallback(({ name }) => name === roomId, [roomId]),
       rooms
-    ) || ([] as null[]);
+    ) || ([] as undefined[]);
 
   const [device] =
     useElementFilter(
       useCallback(({ name }) => name === deviceId, [deviceId]),
-      useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room)
-    ) || ([] as null[]);
+      useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room || null)
+    ) || ([] as undefined[]);
+
+  const roomName = useI18nKey(roomId);
 
   useEffect(() => {
-    setTitleOverride(device?.meta.name || null);
+    setTitleOverride(
+      roomName && device ? [roomName, device.meta.name].join(' › ') : null
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [device]);
+  }, [device, roomName]);
 
   useScrollRestore(!device);
 
