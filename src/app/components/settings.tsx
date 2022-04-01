@@ -39,3 +39,7 @@ export const Section = styled('li')`
     border-bottom: none;
   }
 `;
+
+export const Button = styled('button')`
+  width: 100%;
+`;

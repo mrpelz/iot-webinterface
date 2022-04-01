@@ -24,7 +24,6 @@ import { useDelay } from '../util/use-delay.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
 import { useSegment } from './path.js';
-import { useSetMenuVisible } from './menu.js';
 import { useVisibility } from './visibility.js';
 
 export const staticPagesTop = ['global', 'map'] as const;
@@ -218,8 +217,6 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
     return startPage ? staticPages.includes(startPage as StaticPage) : false;
   }, [startPage]);
 
-  const setMenuVisible = useSetMenuVisible();
-
   const home = useNavigationElements<HierarchyElementHome>(
     hierarchy,
     Levels.HOME,
@@ -265,11 +262,6 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
     setStaticPage(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateRoom]);
-
-  useEffect(() => {
-    setMenuVisible(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stateRoom, stateStaticPage]);
 
   const value = useMemo<TNavigationContext>(() => {
     return {

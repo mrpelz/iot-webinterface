@@ -8,10 +8,7 @@ const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 const isSafari = (() => {
   const ua = navigator.userAgent.toLowerCase();
 
-  if (!ua.includes('chrome')) return false;
-  if (!ua.includes('safari')) return false;
-
-  return true;
+  return ua.includes('safari') && !ua.includes('chrome');
 })();
 
 ((scope) => {
@@ -35,9 +32,11 @@ const isSafari = (() => {
 
   const INDEX_ENDPOINT = '/index.json';
   const INDEX_PATH = '/';
-  const CACHE_KEY = 'cache';
 
   const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
+  const WARM_URL = '/1C941CA2-2CE3-48DB-B953-2DF891321BAF';
+  const INVENTORY_URL = '/B98534B3-903F-4117-B7B7-962ABDAC4C42';
+  const ECHO_URL = '/E4B38FA2-08D2-4117-9738-29FC9106CBA0';
 
   const ERROR_MESSAGE = 'service worker synthesized response';
   const FALLBACK_HTML = `
@@ -107,9 +106,9 @@ const isSafari = (() => {
 
   const fetchLive = (request: RequestInfo) => fetchFallback(request, 2000);
 
-  const putInCache = async (response: Response) => {
+  const putInCache = async (response: Response, cacheKey: string) => {
     const cloned = response.clone();
-    const cache = await scope.caches.open(CACHE_KEY);
+    const cache = await scope.caches.open(cacheKey);
 
     try {
       await cache.put(cloned.url, cloned);
@@ -118,39 +117,46 @@ const isSafari = (() => {
     }
   };
 
-  const refreshCache = async () => {
-    wsConsole.debug('refreshCache');
-
-    await scope.clients.claim();
+  const refreshSW = async () => {
+    wsConsole.debug('refreshSW');
 
     try {
+      await scope.clients.claim();
+
       if (scope.registration.active) {
         await scope.registration.update();
       }
     } catch {
       // noop
     }
+  };
 
-    const response = await fetchLive(
+  const refreshCache = async (reset = false) => {
+    wsConsole.debug('refreshCache');
+
+    const indexResponse = await fetchLive(
       new URL(INDEX_ENDPOINT, scope.origin).href
     );
-    if (!response) return;
+    if (!indexResponse) return;
 
-    const cacheKeys = await caches.keys();
-    for (const cacheKey of cacheKeys) {
-      // eslint-disable-next-line no-await-in-loop
-      await caches.delete(cacheKey);
+    if (reset) {
+      const cacheKeys = await scope.caches.keys();
+      for (const cacheKey of cacheKeys) {
+        // eslint-disable-next-line no-await-in-loop
+        await scope.caches.delete(cacheKey);
+      }
     }
 
-    const cache = await scope.caches.open(CACHE_KEY);
-
-    const { critical = [], optional = [] } = (await response.json()) || {};
+    const { critical = [], optional = [] } = (await indexResponse.json()) || {};
     const paths = [INDEX_PATH].concat(critical);
+
+    const cacheCritical = await scope.caches.open('pre_cache_critical');
 
     await Promise.all(
       paths.map(async (path) => {
         try {
-          await cache.add(path);
+          if (await cacheCritical.match(path)) return;
+          await cacheCritical.add(path);
         } catch {
           // noop
         }
@@ -159,14 +165,56 @@ const isSafari = (() => {
 
     if (isSafari) return;
 
+    const cacheOptional = await scope.caches.open('pre_cache_optional');
+
     await Promise.all(
       (optional as string[]).map(async (path) => {
         try {
-          await cache.add(path);
+          if (await cacheOptional.match(path)) return;
+          await cacheOptional.add(path);
         } catch {
           // noop
         }
       })
+    );
+  };
+
+  const inventory = async () => {
+    try {
+      const cacheKeys = await scope.caches.keys();
+
+      const cacheEntries = Object.fromEntries(
+        await Promise.all(
+          cacheKeys.map(async (cacheKey) => {
+            const cache = await scope.caches.open(cacheKey);
+            const responses = await cache.matchAll();
+
+            return [
+              cacheKey,
+              responses.map(({ status, url }) => ({ status, url })),
+            ] as const;
+          })
+        )
+      );
+
+      return new Response(JSON.stringify(cacheEntries, undefined, 2), {
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      });
+    } catch (error) {
+      syntheticError(
+        500,
+        INVENTORY_URL,
+        `error creating cache inventory: ${error}`
+      );
+    }
+
+    return syntheticError(
+      500,
+      INVENTORY_URL,
+      'unknown error creating cache inventory'
     );
   };
 
@@ -180,11 +228,27 @@ const isSafari = (() => {
     if (isUnhandled) return;
 
     fetchEvent.respondWith(
+      // eslint-disable-next-line complexity
       (async () => {
         if (request.method === 'POST' && pathname === REFRESH_URL) {
-          await refreshCache();
+          await refreshSW();
+          await refreshCache(true);
 
           return new Response(REFRESH_URL);
+        }
+
+        if (request.method === 'POST' && pathname === WARM_URL) {
+          await refreshCache();
+
+          return new Response(WARM_URL);
+        }
+
+        if (request.method === 'POST' && pathname === INVENTORY_URL) {
+          return inventory();
+        }
+
+        if (request.method === 'POST' && pathname === ECHO_URL) {
+          return new Response(ECHO_URL);
         }
 
         const isDenied = testPath(pathname, denyRequestUrls);
@@ -199,7 +263,7 @@ const isSafari = (() => {
 
         const isLaxCache = testPath(pathnameOverride || pathname, laxCacheUrls);
 
-        const cachedResponse = await caches
+        const cachedResponse = await scope.caches
           .match(pathnameOverride || request, { ignoreSearch: isLaxCache })
           .catch(() => undefined);
 
@@ -208,10 +272,10 @@ const isSafari = (() => {
           livePreferredUrls
         );
         if (isLivePreferred) {
-          const liveResponse = await fetchLive(request);
+          const liveResponse = await fetchLive(pathnameOverride || request);
 
           if (liveResponse) {
-            await putInCache(liveResponse);
+            await putInCache(liveResponse, 'post_cache_livePreferred');
 
             return liveResponse;
           }
@@ -227,15 +291,15 @@ const isSafari = (() => {
 
         if (cachedResponse) return cachedResponse;
 
-        const liveResponse = await fetchLive(request);
+        const liveResponse = await fetchLive(pathnameOverride || request);
 
         if (liveResponse) {
-          await putInCache(liveResponse);
+          await putInCache(liveResponse, 'post_cache_cachePreferred');
 
           return liveResponse;
         }
 
-        if ((pathnameOverride || pathname) === INDEX_PATH) {
+        if (isIndex) {
           return new Response(FALLBACK_HTML, {
             headers: {
               // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -260,7 +324,7 @@ const isSafari = (() => {
     installEvent.waitUntil(
       (async () => {
         try {
-          await refreshCache();
+          await refreshCache(true);
           await scope.skipWaiting();
         } catch (error) {
           wsConsole.error(`oninstall error: ${error}`);

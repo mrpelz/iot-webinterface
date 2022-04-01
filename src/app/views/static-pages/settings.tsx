@@ -1,3 +1,10 @@
+import { Button, Section, SettingsWrapper } from '../../components/settings.js';
+import {
+  ECHO_URL,
+  INVENTORY_URL,
+  reload,
+  triggerUpdate,
+} from '../../util/update.js';
 import {
   HierarchyElementBuilding,
   HierarchyElementHome,
@@ -5,10 +12,8 @@ import {
   Levels,
 } from '../../web-api.js';
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
-import { Section, SettingsWrapper } from '../../components/settings.js';
 import { Theme, themes } from '../../state/theme.js';
 import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
-import { reload, triggerUpdate } from '../../util/update.js';
 import {
   staticPages,
   useNavigationBuilding,
@@ -438,18 +443,26 @@ export const Settings: FunctionComponent = () => {
         />
       </Section>
       <Section>
-        <button onClick={useCallback(() => reload(), [])}>reload</button>
-        <button onClick={useCallback(() => triggerUpdate?.(), [])}>
-          refresh ServiceWorker
-        </button>
-        <button
+        <Button onClick={useCallback(() => reload(), [])}>reload</Button>
+        <Button
           onClick={useCallback(() => {
             removeServiceWorkers();
             localStorage.clear();
           }, [])}
         >
           reset persistent storage
-        </button>
+        </Button>
+      </Section>
+      <Section>
+        <Button onClick={useCallback(() => triggerUpdate?.(), [])}>
+          refresh ServiceWorker
+        </Button>
+        <form action={INVENTORY_URL} method="post">
+          <Button type="submit">ServiceWorker cache inventory</Button>
+        </form>
+        <form action={ECHO_URL} method="post">
+          <Button type="submit">ServiceWorker echo</Button>
+        </form>
       </Section>
     </SettingsWrapper>
   );

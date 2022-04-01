@@ -1,6 +1,7 @@
 import { connectWorker, updateUrl } from './workers.js';
 import { Notifications } from './notifications.js';
 import { amend } from './path.js';
+import { fetchFallback } from './fetch.js';
 
 type SetupMessage = {
   initialId: string | null;
@@ -12,6 +13,12 @@ const isProd = !['localhost', '127.0.0.1'].includes(location.hostname);
 
 export const CHECK_INTERVAL = isProd ? 60000 : 2500;
 const ID_STORAGE_KEY = 'updateId';
+
+const WARM_URL = '/1C941CA2-2CE3-48DB-B953-2DF891321BAF';
+const WARM_TIMEOUT = 20000;
+
+export const INVENTORY_URL = '/B98534B3-903F-4117-B7B7-962ABDAC4C42';
+export const ECHO_URL = '/E4B38FA2-08D2-4117-9738-29FC9106CBA0';
 
 const getInitialId = () => localStorage.getItem(ID_STORAGE_KEY);
 
@@ -108,4 +115,8 @@ export const update = (
       () => notifications.clear()
     );
   };
+};
+
+export const warm = (): void => {
+  fetchFallback(WARM_URL, WARM_TIMEOUT, { method: 'POST' });
 };

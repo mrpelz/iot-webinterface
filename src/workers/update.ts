@@ -17,7 +17,10 @@
   };
 
   const ID_URL = '/id.txt';
+
   const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
+  const REFRESH_TIMEOUT = 20000;
+
   const INTERVAL = 5000;
 
   (async (port: MessagePort, setup: SetupMessage | null) => {
@@ -41,7 +44,7 @@
       const ok = await (async () => {
         if (!serviceWorkerRefresh) return false;
 
-        const response = await fetchFallback(REFRESH_URL, 20000, {
+        const response = await fetchFallback(REFRESH_URL, REFRESH_TIMEOUT, {
           method: 'POST',
         });
         if (!response) return false;

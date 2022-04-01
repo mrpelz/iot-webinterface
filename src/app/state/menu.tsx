@@ -7,10 +7,10 @@ import {
   useMemo,
   useState,
 } from 'preact/hooks';
+import { useLeaveCallbackRef, usePath } from './path.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
-import { useLeaveCallbackRef } from './path.js';
 import { useMediaQuery } from '../style/main.js';
 import { useVisibility } from './visibility.js';
 
@@ -33,6 +33,7 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
   const isVisible = useVisibility();
+  const path = usePath();
 
   const [isMenuVisible, _setMenuVisible] = useState<MenuVisible>(
     isDesktop ? null : false
@@ -63,6 +64,10 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
     if (isVisible) return;
     setMenuVisible(false);
   }, [isVisible, setMenuVisible]);
+
+  useEffect(() => {
+    setMenuVisible(false);
+  }, [path, setMenuVisible]);
 
   const value = useMemo<TMenuVisibleContext>(
     () => ({

@@ -4,12 +4,12 @@ import {
   removeServiceWorkers,
   swUrl,
 } from './util/workers.js';
+import { update, warm } from './util/update.js';
 import { Notifications } from './util/notifications.js';
 import { WebApi } from './web-api.js';
 import { defer } from './util/defer.js';
 import { getFlags } from './util/flags.js';
 import { render } from './root.js';
-import { update } from './util/update.js';
 
 try {
   const flags = getFlags();
@@ -46,6 +46,8 @@ try {
       serviceWorker,
       debug
     );
+
+    warm();
   });
 } catch (error) {
   removeServiceWorkers();

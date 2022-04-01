@@ -85,7 +85,7 @@ export type MetaArea = {
 
 export type MetaDevice = {
   host?: string;
-  identifier?: string;
+  identifier?: number[];
   isSubDevice?: true;
   level: Levels.DEVICE;
   name: string;
