@@ -30,8 +30,11 @@ const isSafari = (() => {
   };
   /* eslint-enable no-console */
 
-  const INDEX_ENDPOINT = '/index.json';
+  const INDEX_ENDPOINT = new URL('/index.json', scope.origin).href;
+
   const INDEX_PATH = '/';
+
+  const CACHE_KEY_INTERNAL = 'internal_cache';
 
   const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
   const WARM_URL = '/1C941CA2-2CE3-48DB-B953-2DF891321BAF';
@@ -134,10 +137,7 @@ const isSafari = (() => {
   const refreshCache = async (reset = false) => {
     wsConsole.debug('refreshCache');
 
-    const indexResponse = await fetchLive(
-      new URL(INDEX_ENDPOINT, scope.origin).href
-    );
-    if (!indexResponse) return;
+    const date = Date.now();
 
     if (reset) {
       const cacheKeys = await scope.caches.keys();
@@ -147,7 +147,26 @@ const isSafari = (() => {
       }
     }
 
-    const { critical = [], optional = [] } = (await indexResponse.json()) || {};
+    const cacheInternal = await scope.caches.open(CACHE_KEY_INTERNAL);
+
+    const indexCache = reset
+      ? null
+      : (await cacheInternal.match(INDEX_ENDPOINT)) || null;
+    const [indexLive] = indexCache ? [null] : await fetchLive(INDEX_ENDPOINT);
+
+    const indexResponse = indexCache || indexLive;
+    if (!indexResponse) return;
+
+    const index = (await indexResponse.json()) || {};
+
+    if (reset) {
+      await cacheInternal.put(
+        INDEX_ENDPOINT,
+        new Response(JSON.stringify({ ...index, date }))
+      );
+    }
+
+    const { critical = [], optional = [] } = index;
     const paths = [INDEX_PATH].concat(critical);
 
     const cacheCritical = await scope.caches.open('pre_cache_critical');
@@ -181,9 +200,15 @@ const isSafari = (() => {
 
   const inventory = async () => {
     try {
+      const index = await (
+        await (
+          await scope.caches.open(CACHE_KEY_INTERNAL)
+        ).match(INDEX_ENDPOINT)
+      )?.json();
+
       const cacheKeys = await scope.caches.keys();
 
-      const cacheEntries = Object.fromEntries(
+      const caches = Object.fromEntries(
         await Promise.all(
           cacheKeys.map(async (cacheKey) => {
             const cache = await scope.caches.open(cacheKey);
@@ -197,7 +222,7 @@ const isSafari = (() => {
         )
       );
 
-      return new Response(JSON.stringify(cacheEntries, undefined, 2), {
+      return new Response(JSON.stringify({ caches, index }), {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           'Content-Type': 'application/json; charset=utf-8',
@@ -272,7 +297,9 @@ const isSafari = (() => {
           livePreferredUrls
         );
         if (isLivePreferred) {
-          const liveResponse = await fetchLive(pathnameOverride || request);
+          const [liveResponse, code] = await fetchLive(
+            pathnameOverride || request
+          );
 
           if (liveResponse) {
             await putInCache(liveResponse, 'post_cache_livePreferred');
@@ -283,7 +310,7 @@ const isSafari = (() => {
           if (cachedResponse) return cachedResponse;
 
           return syntheticError(
-            500,
+            code || 500,
             request.url,
             'live-preferred resource not available from live or from cache'
           );
@@ -291,7 +318,9 @@ const isSafari = (() => {
 
         if (cachedResponse) return cachedResponse;
 
-        const liveResponse = await fetchLive(pathnameOverride || request);
+        const [liveResponse, code] = await fetchLive(
+          pathnameOverride || request
+        );
 
         if (liveResponse) {
           await putInCache(liveResponse, 'post_cache_cachePreferred');
@@ -310,7 +339,7 @@ const isSafari = (() => {
         }
 
         return syntheticError(
-          500,
+          code || 500,
           request.url,
           'cache-preferred resource not available from cache or from live'
         );

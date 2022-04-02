@@ -83,8 +83,6 @@
   const WS_MARCOPOLO_INTERVAL = 5000;
   const WS_TIMEOUT_PADDING = 250;
 
-  const ECHO_URL = '/E4B38FA2-08D2-4117-9738-29FC9106CBA0';
-
   const getters = new Map<number, Set<Getter>>();
   const existingValues = new Map<number, unknown>();
 
@@ -96,7 +94,7 @@
     const url = new URL(ID_URL, apiBaseUrl);
 
     const getLiveId = async () => {
-      const response = await fetchFallback(url.href, interval);
+      const [response] = await fetchFallback(url.href, interval);
       if (!response) return null;
 
       const responseText = await response.text();
@@ -133,20 +131,10 @@
     url.searchParams.append('id', id);
 
     const hierarchy = await (async () => {
-      const doGetHierarchy = () => fetchFallback(url.href, interval);
+      await waitForServiceWorker();
 
-      const response = await doGetHierarchy();
+      const [response] = await fetchFallback(url.href, interval);
       if (!response) return null;
-
-      const cacheForceInterval = setInterval(async () => {
-        const hasSw = Boolean(
-          await fetchFallback(ECHO_URL, interval, { method: 'POST' })
-        );
-        if (!hasSw) return;
-
-        clearInterval(cacheForceInterval);
-        await doGetHierarchy();
-      }, interval);
 
       try {
         // eslint-disable-next-line @typescript-eslint/ban-types

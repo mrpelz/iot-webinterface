@@ -1,7 +1,6 @@
 import {
   HierarchyElement,
   Levels,
-  Meta,
   ParentRelation,
   ValueType,
   isElementWithMeta,
@@ -18,7 +17,7 @@ import { FunctionComponent } from 'preact';
 import { Summary } from '../../components/controls/diagnostics.js';
 import { useI18n } from '../../state/i18n.js';
 
-const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
+export const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
 }) => {
   if (!isElementWithMeta(element)) return null;

@@ -2,7 +2,7 @@ export const fetchFallback = async (
   input: RequestInfo,
   timeout = 5000,
   init?: RequestInit
-): Promise<Response | null> => {
+): Promise<readonly [Response | null, number | null, AbortController]> => {
   const abortController = new AbortController();
 
   const aTimeout = setTimeout(() => abortController.abort(), timeout);
@@ -18,11 +18,14 @@ export const fetchFallback = async (
 
     clear();
 
-    if (!response || !response.ok) return null;
-    return response;
+    if (!response || !response.ok) {
+      return [null, response?.status || null, abortController] as const;
+    }
+
+    return [response, response.status, abortController] as const;
   } catch {
     clear();
 
-    return null;
+    return [null, null, abortController] as const;
   }
 };

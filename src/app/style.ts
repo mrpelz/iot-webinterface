@@ -31,8 +31,8 @@ const staticDimensions = {
   breakpointHuge: dimension(1440),
   breakpointTablet: dimension(640),
   controlBase: dimension(6),
-  fontSize: dimension(17),
-  fontSizeLarge: dimension(21),
+  fontSize: dimension(16),
+  fontSizeLarge: dimension(18),
   fontSizeSmall: dimension(14),
   gridCellWidth: dimension(75),
   menuHeight: dimension(44),
@@ -63,6 +63,14 @@ const partialDynamicDimensions = {
   fontPadding: half(
     subtract(staticDimensions.titlebarHeight, staticDimensions.fontSize)
   ),
+  get fontSizeLargeAdaptive() {
+    return () =>
+      useBreakpointValue(
+        useMediaQuery(staticDimensions.breakpointDesktop),
+        staticDimensions.fontSizeLarge,
+        staticDimensions.fontSize
+      );
+  },
   get hairline() {
     return () =>
       useBreakpointValue(strings.isRetina, dimension(0.5), dimension(1));

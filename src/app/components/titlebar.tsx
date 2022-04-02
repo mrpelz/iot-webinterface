@@ -31,7 +31,7 @@ export const Titlebar = styled('titlebar')<{ padding: number }>`
 
 export const Title = styled('h1')`
   color: ${colors.fontPrimary()};
-  font-size: ${dimensions.fontSize};
+  font-size: ${dimensions.fontSizeLargeAdaptive};
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;

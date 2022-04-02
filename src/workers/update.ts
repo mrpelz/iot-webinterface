@@ -29,7 +29,7 @@
     const { initialId, interval, serviceWorkerRefresh } = setup;
 
     const getLiveId = async () => {
-      const response = await fetchFallback(ID_URL, interval || INTERVAL);
+      const [response] = await fetchFallback(ID_URL, interval || INTERVAL);
       if (!response) return null;
 
       const responseText = await response.text();
@@ -44,7 +44,7 @@
       const ok = await (async () => {
         if (!serviceWorkerRefresh) return false;
 
-        const response = await fetchFallback(REFRESH_URL, REFRESH_TIMEOUT, {
+        const [response] = await fetchFallback(REFRESH_URL, REFRESH_TIMEOUT, {
           method: 'POST',
         });
         if (!response) return false;

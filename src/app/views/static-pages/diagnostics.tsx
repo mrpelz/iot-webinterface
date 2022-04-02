@@ -2,18 +2,20 @@ import {
   DiagnosticsContainer,
   Summary,
 } from '../../components/controls/diagnostics.js';
+import { ECHO_URL, INVENTORY_URL } from '../../util/update.js';
+import { Hierarchy, Meta } from '../controls/diagnostics.js';
 import {
   staticPagesBottom,
   staticPagesTop,
   useNavigation,
 } from '../../state/navigation.js';
+import { useFetchJson, useFetchText } from '../../util/use-fetch.js';
 import {
   useHierarchy,
   useLevelShallow,
   useStreamOnline,
 } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
-import { Hierarchy } from '../controls/diagnostics.js';
 import { Levels } from '../../web-api.js';
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
@@ -21,11 +23,16 @@ import { useFlags } from '../../state/flags.js';
 import { useI18n } from '../../state/i18n.js';
 import { useIsMenuVisible } from '../../state/menu.js';
 import { useMediaQuery } from '../../style/main.js';
-import { useMemo } from 'preact/hooks';
 import { useNotification } from '../../state/notification.js';
 import { usePathContext } from '../../state/path.js';
 import { useTheme } from '../../state/theme.js';
 import { useVisibility } from '../../state/visibility.js';
+
+const Fallback: FunctionComponent = () => (
+  <tr>
+    <td>null</td>
+  </tr>
+);
 
 export const Diagnostics: FunctionComponent = () => {
   const isStreamOnline = useStreamOnline();
@@ -66,6 +73,9 @@ export const Diagnostics: FunctionComponent = () => {
   const rooms = useLevelShallow(Levels.ROOM, building);
 
   const fallbackNotification = useNotification();
+
+  const echo = useFetchText(ECHO_URL, 'POST');
+  const inventory = useFetchJson(INVENTORY_URL, 'POST');
 
   return (
     <DiagnosticsContainer>
@@ -157,19 +167,12 @@ export const Diagnostics: FunctionComponent = () => {
               </table>
 
               <table>
-                <tr>
-                  <td>{translationLanguage}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <pre>
-                      {useMemo(
-                        () => JSON.stringify(translation, undefined, 2),
-                        [translation]
-                      )}
-                    </pre>
-                  </td>
-                </tr>
+                {Object.entries(translation).map(([key, value]) => (
+                  <tr>
+                    <td>{key}</td>
+                    <td>{JSON.stringify(value)}</td>
+                  </tr>
+                ))}
               </table>
             </details>
           </td>
@@ -205,96 +208,109 @@ export const Diagnostics: FunctionComponent = () => {
                 <tr>
                   <td>home</td>
                   <td>
-                    <pre>
-                      {useMemo(
-                        () =>
-                          JSON.stringify(
-                            {
-                              elements: homes.map(({ meta }) => meta),
-                              state: home?.meta || null,
-                            },
-                            undefined,
-                            2
-                          ),
-                        [home, homes]
-                      )}
-                    </pre>
+                    <table>
+                      <tr>
+                        <td colSpan={999}>elements</td>
+                      </tr>
+                      {homes.map((element) => (
+                        <Meta element={element} />
+                      ))}
+                    </table>
+                    <table>
+                      <tr>
+                        <td colSpan={999}>state</td>
+                      </tr>
+                      {home ? <Meta element={home} /> : <Fallback />}
+                    </table>
                   </td>
                 </tr>
                 <tr>
                   <td>building</td>
                   <td>
-                    <pre>
-                      {useMemo(
-                        () =>
-                          JSON.stringify(
-                            {
-                              elements: buildings.map(({ meta }) => meta),
-                              state: building?.meta || null,
-                            },
-                            undefined,
-                            2
-                          ),
-                        [building, buildings]
-                      )}
-                    </pre>
+                    <table>
+                      <tr>
+                        <td colSpan={999}>elements</td>
+                      </tr>
+                      {buildings.map((element) => (
+                        <Meta element={element} />
+                      ))}
+                    </table>
+                    <table>
+                      <tr>
+                        <td colSpan={999}>state</td>
+                      </tr>
+                      {building ? <Meta element={building} /> : <Fallback />}
+                    </table>
                   </td>
                 </tr>
                 <tr>
                   <td>floor</td>
                   <td>
-                    <pre>
-                      {useMemo(
-                        () =>
-                          JSON.stringify(
-                            floors.map(({ meta }) => meta),
-                            undefined,
-                            2
-                          ),
-                        [floors]
-                      )}
-                    </pre>
+                    <table>
+                      <tr>
+                        <td colSpan={999}>elements</td>
+                      </tr>
+                      {floors.map((element) => (
+                        <Meta element={element} />
+                      ))}
+                    </table>
                   </td>
                 </tr>
                 <tr>
                   <td>room</td>
                   <td>
-                    <pre>
-                      {useMemo(
-                        () =>
-                          JSON.stringify(
-                            {
-                              elements: rooms.map(({ meta }) => meta),
-                              state: room?.meta || null,
-                            },
-                            undefined,
-                            2
-                          ),
-                        [room, rooms]
-                      )}
-                    </pre>
+                    <table>
+                      <tr>
+                        <td colSpan={999}>elements</td>
+                      </tr>
+                      {rooms.map((element) => (
+                        <Meta element={element} />
+                      ))}
+                    </table>
+                    <table>
+                      <tr>
+                        <td colSpan={999}>state</td>
+                      </tr>
+                      {room ? <Meta element={room} /> : <Fallback />}
+                    </table>
                   </td>
                 </tr>
                 <tr>
                   <td>staticPage</td>
                   <td>
-                    <pre>
-                      {useMemo(
-                        () =>
-                          JSON.stringify(
-                            {
-                              elements: {
-                                staticPagesBottom,
-                                staticPagesTop,
-                              },
-                              state: staticPage,
-                            },
-                            undefined,
-                            2
-                          ),
-                        [staticPage]
-                      )}
-                    </pre>
+                    <table>
+                      <tr>
+                        <td colSpan={999}>elements</td>
+                      </tr>
+                      <tr>
+                        <td>top</td>
+                        <td>
+                          {staticPagesTop.map((page) => (
+                            <tr>
+                              <td>{JSON.stringify(page)}</td>
+                            </tr>
+                          ))}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>bottom</td>
+                        <td>
+                          {staticPagesBottom.map((page) => (
+                            <tr>
+                              <td>{JSON.stringify(page)}</td>
+                            </tr>
+                          ))}
+                        </td>
+                      </tr>
+                    </table>
+                    <table>
+                      <tr>
+                        <td>state</td>
+                      </tr>
+                      <tr>
+                        <td>{JSON.stringify(staticPage)}</td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
@@ -302,28 +318,51 @@ export const Diagnostics: FunctionComponent = () => {
           </td>
         </tr>
 
-        {fallbackNotification ? (
-          <tr>
-            <td colSpan={999}>
-              <details>
-                <Summary>
-                  <b>fallback notification</b>
-                </Summary>
+        <tr>
+          <td colSpan={999}>
+            <details>
+              <Summary>
+                <b>fallback notification</b>
+              </Summary>
 
-                <table>
-                  <tr>
-                    <td>title</td>
-                    <td>{JSON.stringify(fallbackNotification.title)}</td>
-                  </tr>
-                  <tr>
-                    <td>body</td>
-                    <td>{JSON.stringify(fallbackNotification.body)}</td>
-                  </tr>
-                </table>
-              </details>
-            </td>
-          </tr>
-        ) : null}
+              <table>
+                {fallbackNotification ? (
+                  <>
+                    <tr>
+                      <td>title</td>
+                      <td>{JSON.stringify(fallbackNotification.title)}</td>
+                    </tr>
+                    <tr>
+                      <td>body</td>
+                      <td>{JSON.stringify(fallbackNotification.body)}</td>
+                    </tr>
+                  </>
+                ) : (
+                  <Fallback />
+                )}
+              </table>
+            </details>
+          </td>
+        </tr>
+
+        <tr>
+          <td colSpan={999}>
+            <details>
+              <Summary>
+                <b>ServiceWorker inventory</b>
+              </Summary>
+
+              <table>
+                <tr>
+                  <td>handling requests</td>
+                  <td>{JSON.stringify(echo === ECHO_URL)}</td>
+                </tr>
+              </table>
+
+              <pre>{JSON.stringify(inventory, undefined, 2)}</pre>
+            </details>
+          </td>
+        </tr>
       </table>
 
       {hierarchy ? <Hierarchy element={hierarchy} /> : null}

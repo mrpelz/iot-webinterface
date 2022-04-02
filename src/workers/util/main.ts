@@ -1,4 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 const defer = (callback: () => void): void => {
   if ('requestIdleCallback' in self) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -15,12 +16,11 @@ const defer = (callback: () => void): void => {
   setTimeout(callback, 0);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fetchFallback = async (
   input: RequestInfo,
   timeout = 5000,
   init?: RequestInit
-): Promise<Response | null> => {
+): Promise<readonly [Response | null, number | null, AbortController]> => {
   const abortController = new AbortController();
 
   const aTimeout = setTimeout(() => abortController.abort(), timeout);
@@ -36,18 +36,50 @@ const fetchFallback = async (
 
     clear();
 
-    if (!response || !response.ok) return null;
-    return response;
+    if (!response || !response.ok) {
+      return [null, response?.status || null, abortController] as const;
+    }
+
+    return [response, response.status, abortController] as const;
   } catch {
     clear();
 
-    return null;
+    return [null, null, abortController] as const;
   }
+};
+
+const waitForServiceWorker = (): Promise<void> => {
+  const delay = 50;
+  const url = '/E4B38FA2-08D2-4117-9738-29FC9106CBA0';
+
+  return new Promise<void>((resolve, reject) => {
+    try {
+      // eslint-disable-next-line prefer-const
+      let interval: number | undefined;
+
+      const fn = async () => {
+        const [response] = await fetchFallback(url, delay, {
+          method: 'POST',
+        });
+
+        if (!response || (await response.text()) !== url) {
+          return;
+        }
+
+        clearInterval(interval);
+        resolve();
+      };
+
+      interval = setInterval(fn, delay);
+      fn();
+    } catch {
+      reject(new Error('could not check for SW presence'));
+    }
+  });
 };
 
 const indentMatcher = new RegExp('\\s*');
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const multiline = (
   strings: TemplateStringsArray | string,
   ...tags: string[]

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 
@@ -6,7 +8,6 @@ const workerDebug = Boolean(
 );
 
 /* eslint-disable no-console */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const workerConsole = {
   debug: (...args: unknown[]) => {
     if (!workerDebug) return;
@@ -22,7 +23,6 @@ const workerConsole = {
 };
 /* eslint-enable no-console */
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const scaffold = <T>(
   scope: DedicatedWorkerGlobalScope | SharedWorkerGlobalScope,
   handleNewPort?: (port: MessagePort) => void

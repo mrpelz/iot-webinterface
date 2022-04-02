@@ -1,11 +1,5 @@
 import { Button, Section, SettingsWrapper } from '../../components/settings.js';
 import {
-  ECHO_URL,
-  INVENTORY_URL,
-  reload,
-  triggerUpdate,
-} from '../../util/update.js';
-import {
   HierarchyElementBuilding,
   HierarchyElementHome,
   HierarchyElementRoom,
@@ -14,6 +8,7 @@ import {
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
 import { Theme, themes } from '../../state/theme.js';
 import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
+import { reload, triggerUpdate } from '../../util/update.js';
 import {
   staticPages,
   useNavigationBuilding,
@@ -443,6 +438,9 @@ export const Settings: FunctionComponent = () => {
         />
       </Section>
       <Section>
+        <Button onClick={useCallback(() => triggerUpdate?.(), [])}>
+          refresh ServiceWorker
+        </Button>
         <Button onClick={useCallback(() => reload(), [])}>reload</Button>
         <Button
           onClick={useCallback(() => {
@@ -452,17 +450,6 @@ export const Settings: FunctionComponent = () => {
         >
           reset persistent storage
         </Button>
-      </Section>
-      <Section>
-        <Button onClick={useCallback(() => triggerUpdate?.(), [])}>
-          refresh ServiceWorker
-        </Button>
-        <form action={INVENTORY_URL} method="post">
-          <Button type="submit">ServiceWorker cache inventory</Button>
-        </form>
-        <form action={ECHO_URL} method="post">
-          <Button type="submit">ServiceWorker echo</Button>
-        </form>
       </Section>
     </SettingsWrapper>
   );

@@ -17,7 +17,7 @@ import { useBreakpoint } from '../style/breakpoint.js';
 import { useGoUp } from '../state/path.js';
 import { useMediaQuery } from '../style/main.js';
 
-const swipeCaptureWidth = 40;
+const swipeCaptureWidth = 30;
 
 export const Layout: FunctionComponent = ({ children }) => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
