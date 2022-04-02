@@ -71,7 +71,7 @@ const waitForServiceWorker = (): Promise<void> => {
       };
 
       interval = setInterval(fn, delay);
-      fn();
+      defer(fn);
     } catch {
       reject(new Error('could not check for SW presence'));
     }

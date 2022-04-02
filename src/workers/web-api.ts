@@ -131,10 +131,15 @@
     url.searchParams.append('id', id);
 
     const hierarchy = await (async () => {
-      await waitForServiceWorker();
+      const fn = () => fetchFallback(url.href, interval);
 
-      const [response] = await fetchFallback(url.href, interval);
+      const [response] = await fn();
       if (!response) return null;
+
+      (async () => {
+        await waitForServiceWorker();
+        await fn();
+      })();
 
       try {
         // eslint-disable-next-line @typescript-eslint/ban-types

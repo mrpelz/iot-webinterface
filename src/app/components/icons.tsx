@@ -15,7 +15,7 @@ const SvgStroke = styled(Svg)<{ thin?: boolean }>`
 
   stroke-width: ${dependentValue('thin', '1', '2')};
 
-  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
+  ${({ onClick }) => (onClick ? 'cursor: pointer' : '')};
 `;
 
 type SVGProps = Parameters<typeof Svg>['0'];

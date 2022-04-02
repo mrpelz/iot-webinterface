@@ -104,36 +104,36 @@ export const Titlebar: FunctionComponent = () => {
 
   const goPrevious = useGoPreviousSegment(0);
 
-  const upIcon = useMemo(
-    () => (goUp ? <BackIcon onClick={goUp} /> : null),
-    [goUp]
-  );
+  const leftIcon = useMemo(() => {
+    if (goUp) {
+      return <BackIcon onClick={goUp} />;
+    }
 
-  const switchIcon = useMemo(() => {
+    if (isDesktop) return null;
+
+    return <MenuIcon onClick={flipMenuVisible} />;
+  }, [flipMenuVisible, goUp, isDesktop]);
+
+  const rightIcon = useMemo(() => {
+    if (goUp) {
+      return <MenuIcon onClick={flipMenuVisible} />;
+    }
+
     if (isMap) {
       return goPrevious ? <ReturnIcon onClick={() => goPrevious()} /> : null;
     }
 
     return setPage ? <MapIcon onClick={() => setPage('map')} /> : null;
-  }, [goPrevious, isMap, setPage]);
-
-  const menuIcon = useMemo(
-    () => (isDesktop ? null : <MenuIcon onClick={flipMenuVisible} />),
-    [flipMenuVisible, isDesktop]
-  );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goPrevious, goUp, isMap, setPage]);
 
   return (
     <TitlebarComponent padding={padding}>
       {title ? <Title>{title}</Title> : null}
-      {menuIcon || upIcon ? (
-        <IconContainer paddingSetter={setPaddingLeft}>
-          {upIcon}
-          {menuIcon}
-        </IconContainer>
-      ) : null}
+      <IconContainer paddingSetter={setPaddingLeft}>{leftIcon}</IconContainer>
       <IconContainer paddingSetter={setPaddingRight} right>
         <WaitIconView />
-        {switchIcon}
+        {rightIcon}
       </IconContainer>
     </TitlebarComponent>
   );
