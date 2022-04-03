@@ -22,24 +22,26 @@ export const ScrollEffects: FunctionComponent = () => {
   useLayoutEffect(() => {
     const { style } = document.documentElement;
 
-    if (isMenuVisible) {
-      previousScrollY.current = scrollY;
-    }
+    requestAnimationFrame(() => {
+      if (isMenuVisible) {
+        previousScrollY.current = scrollY;
+      }
 
-    style.overflowY = isMenuVisible ? 'hidden' : '';
+      style.overflowY = isMenuVisible ? 'hidden' : '';
 
-    scrollTo({
-      behavior: 'instant' as ScrollBehavior,
-      top:
-        !isMenuVisible && previousPath.current !== path
-          ? 0
-          : previousScrollY.current,
+      scrollTo({
+        behavior: 'instant' as ScrollBehavior,
+        top:
+          !isMenuVisible && previousPath.current !== path
+            ? 0
+            : previousScrollY.current,
+      });
+
+      if (!isMenuVisible) {
+        previousPath.current = path;
+        previousScrollY.current = 0;
+      }
     });
-
-    if (!isMenuVisible) {
-      previousPath.current = path;
-      previousScrollY.current = 0;
-    }
   }, [isMenuVisible, path]);
 
   useLayoutEffect(() => {

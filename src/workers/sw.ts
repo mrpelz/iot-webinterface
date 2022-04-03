@@ -162,7 +162,7 @@ const isSafari = (() => {
     if (reset) {
       await cacheInternal.put(
         INDEX_ENDPOINT,
-        new Response(JSON.stringify({ ...index, date }))
+        new Response(JSON.stringify({ date, ...index }))
       );
     }
 

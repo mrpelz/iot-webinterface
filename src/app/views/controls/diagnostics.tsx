@@ -1,3 +1,4 @@
+import { ComponentChildren, FunctionComponent } from 'preact';
 import {
   HierarchyElement,
   Levels,
@@ -11,11 +12,37 @@ import {
   typeToValueType,
   valueTypeToType,
 } from '../../web-api.js';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { useGetter, useSetter } from '../../state/web-api.js';
-import { useMemo, useState } from 'preact/hooks';
-import { FunctionComponent } from 'preact';
 import { Summary } from '../../components/controls/diagnostics.js';
 import { useI18n } from '../../state/i18n.js';
+
+export const Details: FunctionComponent<{
+  open?: boolean;
+  summary: ComponentChildren;
+}> = ({ children, open, summary }) => {
+  const ref = useRef<HTMLDetailsElement>(null);
+  const [isOpen, setIsOpen] = useState(Boolean(open));
+
+  useEffect(() => {
+    const { current: element } = ref;
+
+    const fn = () => {
+      if (!element) return;
+      setIsOpen(element.open);
+    };
+
+    element?.addEventListener('toggle', fn);
+    return () => element?.removeEventListener('toggle', fn);
+  }, []);
+
+  return (
+    <details open={isOpen} ref={ref}>
+      <Summary>{summary}</Summary>
+      {isOpen ? children : null}
+    </details>
+  );
+};
 
 export const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
@@ -181,14 +208,17 @@ const Child: FunctionComponent<{
   return (
     <tr>
       <td colSpan={999}>
-        <details open={open}>
-          <Summary>
-            <b>Child:</b> {name}
-          </Summary>
-
+        <Details
+          open={open}
+          summary={
+            <>
+              <b>Child:</b> {name}
+            </>
+          }
+        >
           {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
           <Hierarchy element={element} />
-        </details>
+        </Details>
       </td>
     </tr>
   );
