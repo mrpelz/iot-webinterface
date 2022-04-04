@@ -1,8 +1,4 @@
 import { Details, Hierarchy, Meta } from '../controls/diagnostics.js';
-import {
-  DiagnosticsContainer,
-  NonBreaking,
-} from '../../components/controls/diagnostics.js';
 import { ECHO_URL, INVENTORY_URL } from '../../util/update.js';
 import {
   staticPagesBottom,
@@ -15,6 +11,7 @@ import {
   useLevelShallow,
   useStreamOnline,
 } from '../../state/web-api.js';
+import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Levels } from '../../web-api.js';
 import { dimensions } from '../../style.js';
@@ -329,10 +326,7 @@ const ServiceWorkerInventory: FunctionComponent = () => {
 
             {((values as any) || []).map((value: any) => (
               <tr>
-                <td>
-                  <NonBreaking>{value?.status}</NonBreaking>
-                </td>
-                <td>{value?.url}</td>
+                <td>{value}</td>
               </tr>
             ))}
           </>

@@ -1,6 +1,7 @@
 import { FunctionComponent, h, render as preactRender } from 'preact';
 import { bindComponent, combineComponents } from './util/combine-components.js';
 import { App } from './views/app.js';
+import { BackgroundProvider } from './state/background.js';
 import { FallbackNotificationProvider } from './state/notification.js';
 import { FlagProvider } from './state/flags.js';
 import { Flags } from './util/flags.js';
@@ -88,6 +89,7 @@ export const Root: FunctionComponent<{
     I18nProvider,
     MenuVisibleProvider,
     NavigationProvider,
+    BackgroundProvider,
     TitleProvider
   );
 

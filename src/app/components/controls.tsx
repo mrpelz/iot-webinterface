@@ -1,8 +1,8 @@
-import { colors, dimensions } from '../../style.js';
-import { GridCell } from '../grid.js';
-import { bindComponent } from '../../util/combine-components.js';
-import { dependentValue } from '../../style/main.js';
-import { multiply } from '../../style/dimensions.js';
+import { colors, dimensions } from '../style.js';
+import { GridCell } from './grid.js';
+import { bindComponent } from '../util/combine-components.js';
+import { dependentValue } from '../style/main.js';
+import { multiply } from '../style/dimensions.js';
 import { styled } from 'goober';
 
 type CellProps = {

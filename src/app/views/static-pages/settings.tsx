@@ -1,4 +1,5 @@
-import { Button, Section, SettingsWrapper } from '../../components/settings.js';
+import { Button, Entry as EntryComponent } from '../../components/list.js';
+import { Entry, List } from '../list.js';
 import {
   HierarchyElementBuilding,
   HierarchyElementHome,
@@ -73,11 +74,8 @@ export const Settings: FunctionComponent = () => {
   const setApiBaseUrl = useSetFlag('apiBaseUrl');
 
   return (
-    <SettingsWrapper>
-      <Section>
-        <label for="home">
-          <Translation i18nKey="home" />
-        </label>
+    <List>
+      <Entry id="home" label={<Translation i18nKey="home" />}>
         <select
           disabled={homes.length < 2}
           id="home"
@@ -102,11 +100,8 @@ export const Settings: FunctionComponent = () => {
             </option>
           ))}
         </select>
-      </Section>
-      <Section>
-        <label for="building">
-          <Translation i18nKey="building" />
-        </label>
+      </Entry>
+      <Entry id="building" label={<Translation i18nKey="building" />}>
         <select
           disabled={buildings.length < 2}
           id="building"
@@ -134,11 +129,8 @@ export const Settings: FunctionComponent = () => {
             </option>
           ))}
         </select>
-      </Section>
-      <Section>
-        <label for="startPage">
-          <Translation i18nKey="startPage" />
-        </label>
+      </Entry>
+      <Entry id="startPage" label={<Translation i18nKey="startPage" />}>
         <select
           id="startPage"
           name="startPage"
@@ -183,11 +175,8 @@ export const Settings: FunctionComponent = () => {
             })}
           </optgroup>
         </select>
-      </Section>
-      <Section>
-        <label for="theme">
-          <Translation i18nKey="theme" />
-        </label>
+      </Entry>
+      <Entry id="theme" label={<Translation i18nKey="theme" />}>
         <select
           id="theme"
           name="theme"
@@ -219,11 +208,8 @@ export const Settings: FunctionComponent = () => {
             );
           })}
         </select>
-      </Section>
-      <Section>
-        <label for="language">
-          <Translation i18nKey="language" />
-        </label>
+      </Entry>
+      <Entry id="language" label={<Translation i18nKey="language" />}>
         <select
           id="language"
           name="language"
@@ -258,11 +244,11 @@ export const Settings: FunctionComponent = () => {
             );
           })}
         </select>
-      </Section>
-      <Section>
-        <label for="enableNotifications">
-          <Translation i18nKey="enableNotifications" />
-        </label>
+      </Entry>
+      <Entry
+        id="enableNotifications"
+        label={<Translation i18nKey="enableNotifications" />}
+      >
         <input
           checked={Boolean(enableNotifications)}
           id="enableNotifications"
@@ -275,11 +261,8 @@ export const Settings: FunctionComponent = () => {
             [setEnableNotifications]
           )}
         />
-      </Section>
-      <Section>
-        <label for="absoluteTimes">
-          <Translation i18nKey="absoluteTimes" />
-        </label>
+      </Entry>
+      <Entry id="absoluteTimes" label={<Translation i18nKey="absoluteTimes" />}>
         <input
           checked={Boolean(absoluteTimes)}
           id="absoluteTimes"
@@ -292,11 +275,11 @@ export const Settings: FunctionComponent = () => {
             [setAbsoluteTimes]
           )}
         />
-      </Section>
-      <Section>
-        <label for="inactivityTimeout">
-          <Translation i18nKey="inactivityTimeout" />
-        </label>
+      </Entry>
+      <Entry
+        id="inactivityTimeout"
+        label={<Translation i18nKey="inactivityTimeout" />}
+      >
         <input
           id="inactivityTimeout"
           inputMode="numeric"
@@ -324,11 +307,8 @@ export const Settings: FunctionComponent = () => {
             [setInactivityTimeout]
           )}
         />
-      </Section>
-      <Section>
-        <label for="debug">
-          <Translation i18nKey="debug" />
-        </label>
+      </Entry>
+      <Entry id="debug" label={<Translation i18nKey="debug" />}>
         <input
           checked={Boolean(debug)}
           id="debug"
@@ -341,11 +321,11 @@ export const Settings: FunctionComponent = () => {
             [setDebug]
           )}
         />
-      </Section>
-      <Section>
-        <label for="updateCheckInterval">
-          <Translation i18nKey="updateCheckInterval" />
-        </label>
+      </Entry>
+      <Entry
+        id="updateCheckInterval"
+        label={<Translation i18nKey="updateCheckInterval" />}
+      >
         <input
           id="updateCheckInterval"
           inputMode="numeric"
@@ -373,11 +353,11 @@ export const Settings: FunctionComponent = () => {
             [setAutoReloadCheckInterval]
           )}
         />
-      </Section>
-      <Section>
-        <label for="updateUnattended">
-          <Translation i18nKey="updateUnattended" />
-        </label>
+      </Entry>
+      <Entry
+        id="updateUnattended"
+        label={<Translation i18nKey="updateUnattended" />}
+      >
         <input
           checked={Boolean(updateUnattended)}
           id="updateUnattended"
@@ -390,11 +370,8 @@ export const Settings: FunctionComponent = () => {
             [setAutoReloadUnattended]
           )}
         />
-      </Section>
-      <Section>
-        <label for="serviceWorker">
-          <Translation i18nKey="serviceWorker" />
-        </label>
+      </Entry>
+      <Entry id="serviceWorker" label={<Translation i18nKey="serviceWorker" />}>
         <input
           checked={Boolean(serviceWorker)}
           id="serviceWorker"
@@ -407,11 +384,8 @@ export const Settings: FunctionComponent = () => {
             [setServiceWorker]
           )}
         />
-      </Section>
-      <Section>
-        <label for="apiBaseUrl">
-          <Translation i18nKey="apiBaseUrl" />
-        </label>
+      </Entry>
+      <Entry id="apiBaseUrl" label={<Translation i18nKey="apiBaseUrl" />}>
         <input
           id="apiBaseUrl"
           name="apiBaseUrl"
@@ -436,8 +410,8 @@ export const Settings: FunctionComponent = () => {
             [setApiBaseUrl]
           )}
         />
-      </Section>
-      <Section>
+      </Entry>
+      <EntryComponent>
         <Button onClick={useCallback(() => triggerUpdate?.(), [])}>
           refresh ServiceWorker
         </Button>
@@ -450,7 +424,7 @@ export const Settings: FunctionComponent = () => {
         >
           reset persistent storage
         </Button>
-      </Section>
-    </SettingsWrapper>
+      </EntryComponent>
+    </List>
   );
 };

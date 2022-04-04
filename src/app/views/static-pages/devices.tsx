@@ -4,6 +4,10 @@ import {
   Levels,
   sortByName,
 } from '../../web-api.js';
+import {
+  noBackground,
+  useSetBackgroundOverride,
+} from '../../state/background.js';
 import { useCallback, useEffect, useMemo } from 'preact/hooks';
 import {
   useElementFilter,
@@ -12,7 +16,7 @@ import {
 } from '../../state/web-api.js';
 import { Category } from '../category.js';
 import { Device } from '../controls/device.js';
-import { ElementDiagnostics } from '../controls/element-diagnostics.js';
+import { DeviceDetails } from '../controls/device-details.js';
 import { FunctionComponent } from 'preact';
 import { Grid } from '../../components/grid.js';
 import { ShowHide } from '../../components/show-hide.js';
@@ -73,6 +77,7 @@ export const Devices: FunctionComponent = () => {
   );
 
   const [route1] = useSegment(1);
+  const setBackgroundOverride = useSetBackgroundOverride();
   const setTitleOverride = useSetTitleOverride();
 
   useEffect(
@@ -101,9 +106,12 @@ export const Devices: FunctionComponent = () => {
   const roomName = useI18nKey(roomId);
 
   useEffect(() => {
+    setBackgroundOverride(roomName && device ? noBackground : null);
+
     setTitleOverride(
       roomName && device ? [roomName, device.meta.name].join(' › ') : null
     );
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [device, roomName]);
 
@@ -116,7 +124,7 @@ export const Devices: FunctionComponent = () => {
           <Room room={aRoom} />
         ))}
       </ShowHide>
-      {device ? <ElementDiagnostics element={device} /> : null}
+      {device ? <DeviceDetails device={device} /> : null}
     </>
   );
 };

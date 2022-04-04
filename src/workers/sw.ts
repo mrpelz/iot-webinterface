@@ -214,10 +214,7 @@ const isSafari = (() => {
             const cache = await scope.caches.open(cacheKey);
             const responses = await cache.matchAll();
 
-            return [
-              cacheKey,
-              responses.map(({ status, url }) => ({ status, url })),
-            ] as const;
+            return [cacheKey, responses.map(({ url }) => url)] as const;
           })
         )
       );

@@ -1,4 +1,4 @@
-import { DiagnosticsContainer } from '../../components/controls/diagnostics.js';
+import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from './diagnostics.js';
 import { HierarchyElement } from '../../web-api.js';

@@ -59,6 +59,12 @@ export const Main = styled('main', forwardRef)<{
     position: absolute;
     top: 0;
     touch-action: pan-x;
-    width: ${({ swipeCaptureWidth }) => `${swipeCaptureWidth}px`};
+
+    width: ${({ swipeCaptureWidth }) =>
+      breakpointValue(
+        mediaQuery(dimensions.breakpointDesktop),
+        '0',
+        `${swipeCaptureWidth}px`
+      )()};
   }
 `;

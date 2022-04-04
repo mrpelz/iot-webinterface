@@ -3,7 +3,7 @@ import {
   Cell as CellComponent,
   Header,
   Title,
-} from '../../components/controls/main.js';
+} from '../../components/controls.js';
 import { ForwardIcon } from '../../components/icons.js';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';

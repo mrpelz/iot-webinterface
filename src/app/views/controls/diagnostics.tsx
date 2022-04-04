@@ -14,7 +14,7 @@ import {
 } from '../../web-api.js';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { useGetter, useSetter } from '../../state/web-api.js';
-import { Summary } from '../../components/controls/diagnostics.js';
+import { Summary } from '../../components/diagnostics.js';
 import { useI18n } from '../../state/i18n.js';
 
 export const Details: FunctionComponent<{

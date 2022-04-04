@@ -1,5 +1,6 @@
 import { colors, dimensions } from '../style.js';
-import { dependentValue } from '../style/main.js';
+import { dependentValue, mediaQuery } from '../style/main.js';
+import { breakpointValue } from '../style/breakpoint.js';
 import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 
@@ -28,6 +29,11 @@ export const MenuShade = styled('menu-shade' as 'div', forwardRef)<{
   transition: opacity 0.3s ease-out;
   width: ${dimensions.appWidth};
 
+  margin-left: ${breakpointValue(
+    mediaQuery(dimensions.breakpointDesktop),
+    dimensions.menuWidth,
+    'unset'
+  )};
   opacity: ${dependentValue('active', '0.5', '0')};
   pointer-events: ${dependentValue('active', 'all', 'none')};
 `;

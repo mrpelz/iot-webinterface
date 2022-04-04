@@ -1,4 +1,4 @@
-import { colors } from '../../style.js';
+import { colors } from '../style.js';
 import { styled } from 'goober';
 
 export const DiagnosticsContainer = styled('diagnostics-container')`
@@ -43,9 +43,4 @@ export const DiagnosticsContainer = styled('diagnostics-container')`
 
 export const Summary = styled('summary')`
   cursor: pointer;
-`;
-
-export const NonBreaking = styled('non-breaking')`
-  display: contents;
-  white-space: nowrap;
 `;

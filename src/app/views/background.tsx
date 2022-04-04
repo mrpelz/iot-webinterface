@@ -1,37 +1,10 @@
-import { useEffect, useMemo, useRef } from 'preact/hooks';
-import {
-  useNavigationRoom,
-  useNavigationStaticPage,
-} from '../state/navigation.js';
+import { useEffect, useRef } from 'preact/hooks';
 import { Background as BackgroundComponent } from '../components/background.js';
 import { FunctionComponent } from 'preact';
-import { useTheme } from '../state/theme.js';
-
-const BACKGROUND_PATH = '/images/background/';
-const BACKGROUND_EXTENSION = '.png';
-
-const camelCase = new RegExp('[A-Z]', 'g');
+import { useBackground } from '../state/background.js';
 
 export const Background: FunctionComponent = () => {
-  const isHighContrast = useTheme() === 'highContrast';
-
-  const [staticPage] = useNavigationStaticPage();
-  const [room] = useNavigationRoom();
-
-  const identifier = useMemo(
-    () => staticPage || room?.meta.name || null,
-    [room?.meta.name, staticPage]
-  );
-
-  const path = useMemo(() => {
-    if (!identifier) return null;
-
-    const baseName = encodeURIComponent(
-      identifier.replace(camelCase, (letter) => `-${letter.toLowerCase()}`)
-    );
-
-    return [BACKGROUND_PATH, baseName, BACKGROUND_EXTENSION].join('');
-  }, [identifier]);
+  const path = useBackground();
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -97,8 +70,6 @@ export const Background: FunctionComponent = () => {
       child.remove();
     }
   }, [path, ref]);
-
-  if (isHighContrast) return null;
 
   return <BackgroundComponent ref={ref} />;
 };

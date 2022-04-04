@@ -5,9 +5,9 @@ import {
   WiFiIcon,
   XIcon,
 } from '../../components/icons.js';
-import { HierarchyElementDevice, Levels } from '../../web-api.js';
-import { Tag, TagGroup } from '../../components/controls/main.js';
-import { useCallback, useMemo } from 'preact/hooks';
+import { HierarchyElementDevice, Levels, MetaDevice } from '../../web-api.js';
+import { NonBreaking, TabularNums } from '../../components/text.js';
+import { Tag, TagGroup } from '../../components/controls.js';
 import {
   useChild,
   useElementFilter,
@@ -16,7 +16,7 @@ import {
 } from '../../state/web-api.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
-import { TabularNums } from '../../components/controls/tabular-nums.js';
+import { useMemo } from 'preact/hooks';
 import { useTheme } from '../../state/theme.js';
 import { useTimeLabel } from '../../util/use-time-label.js';
 
@@ -63,7 +63,11 @@ const DeviceOnlineState: FunctionComponent<{
   );
 
   const time = useMemo(
-    () => <TabularNums>{timeLabel || '—'}</TabularNums>,
+    () => (
+      <NonBreaking>
+        <TabularNums>{timeLabel || '—'}</TabularNums>
+      </NonBreaking>
+    ),
     [timeLabel]
   );
 
@@ -96,12 +100,15 @@ const DeviceOnlineState: FunctionComponent<{
   return null;
 };
 
+export const filterSubDevices = ({ isSubDevice }: MetaDevice): boolean =>
+  Boolean(isSubDevice);
+
 export const Device: FunctionComponent<{
   device: HierarchyElementDevice;
   onSelect?: () => void;
 }> = ({ device, onSelect }) => {
   const subDevices = useElementFilter(
-    useCallback(({ isSubDevice }) => Boolean(isSubDevice), []),
+    filterSubDevices,
     useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device)
   );
 
