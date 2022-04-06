@@ -99,6 +99,8 @@ const isSafari = (() => {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           'Content-Type': 'text/plain; charset=utf-8',
+          'x-sw-error': message,
+          'x-sw-synthetic': '1',
         },
         status,
       }
@@ -223,6 +225,8 @@ const isSafari = (() => {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           'Content-Type': 'application/json; charset=utf-8',
+          'x-sw-special': 'inventory',
+          'x-sw-synthetic': '1',
         },
       });
     } catch (error) {
@@ -256,13 +260,23 @@ const isSafari = (() => {
           await refreshSW();
           await refreshCache(true);
 
-          return new Response(REFRESH_URL);
+          return new Response(REFRESH_URL, {
+            headers: {
+              'x-sw-special': 'refresh',
+              'x-sw-synthetic': '1',
+            },
+          });
         }
 
         if (request.method === 'POST' && pathname === WARM_URL) {
           await refreshCache();
 
-          return new Response(WARM_URL);
+          return new Response(WARM_URL, {
+            headers: {
+              'x-sw-special': 'warm',
+              'x-sw-synthetic': '1',
+            },
+          });
         }
 
         if (request.method === 'POST' && pathname === INVENTORY_URL) {
@@ -270,7 +284,12 @@ const isSafari = (() => {
         }
 
         if (request.method === 'POST' && pathname === ECHO_URL) {
-          return new Response(ECHO_URL);
+          return new Response(ECHO_URL, {
+            headers: {
+              'x-sw-special': 'echo',
+              'x-sw-synthetic': '1',
+            },
+          });
         }
 
         const isDenied = testPath(pathname, denyRequestUrls);
