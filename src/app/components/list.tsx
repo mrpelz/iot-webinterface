@@ -50,5 +50,6 @@ export const Entry = styled('li')`
 `;
 
 export const Button = styled('button')`
+  cursor: pointer;
   width: 100%;
 `;

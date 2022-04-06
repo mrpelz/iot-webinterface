@@ -7,8 +7,8 @@ export const AlignRight = styled('align-right')`
 
 export const BreakAll = styled('break-all')`
   display: contents;
-  hyphens: auto;
   word-break: break-all;
+  word-break: break-word;
 `;
 
 export const NonBreaking = styled('non-breaking')`
