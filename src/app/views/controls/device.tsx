@@ -6,7 +6,6 @@ import {
   XIcon,
 } from '../../components/icons.js';
 import { HierarchyElementDevice, Levels, MetaDevice } from '../../web-api.js';
-import { NonBreaking, TabularNums } from '../../components/text.js';
 import { Tag, TagGroup } from '../../components/controls.js';
 import {
   useChild,
@@ -16,6 +15,7 @@ import {
 } from '../../state/web-api.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
+import { TabularNums } from '../../components/text.js';
 import { useMemo } from 'preact/hooks';
 import { useTheme } from '../../state/theme.js';
 import { useTimeLabel } from '../../util/use-time-label.js';
@@ -63,11 +63,7 @@ const DeviceOnlineState: FunctionComponent<{
   );
 
   const time = useMemo(
-    () => (
-      <NonBreaking>
-        <TabularNums>{timeLabel || '—'}</TabularNums>
-      </NonBreaking>
-    ),
+    () => <TabularNums>{timeLabel || '—'}</TabularNums>,
     [timeLabel]
   );
 
@@ -124,7 +120,9 @@ export const Device: FunctionComponent<{
                 <WiFiIcon height="1em" />
               )}
             </TagGroup>
-            <DeviceOnlineState device={subDevice} />
+            <TagGroup>
+              <DeviceOnlineState device={subDevice} />
+            </TagGroup>
           </Tag>
         ))
       ) : (

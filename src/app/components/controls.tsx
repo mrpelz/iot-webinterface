@@ -1,8 +1,8 @@
 import { colors, dimensions } from '../style.js';
+import { half, multiply } from '../style/dimensions.js';
 import { GridCell } from './grid.js';
 import { bindComponent } from '../util/combine-components.js';
 import { dependentValue } from '../style/main.js';
-import { multiply } from '../style/dimensions.js';
 import { styled } from 'goober';
 
 type CellProps = {
@@ -61,13 +61,18 @@ export const Title = styled('cell-title')`
 
 export const Tag = styled('tag')`
   align-items: center;
-  border-radius: 3px;
+  border-radius: ${half(dimensions.controlBase)};
   border: solid ${dimensions.hairline} ${colors.fontPrimary()};
   display: flex;
+  flex-wrap: wrap;
   gap: ${dimensions.controlBase};
-  height: ${multiply(dimensions.controlBase, '3')};
+  min-height: ${multiply(dimensions.controlBase, '3')};
   overflow: hidden;
   padding-inline: ${dimensions.controlBase};
+
+  & > * {
+    flex-shrink: 0;
+  }
 
   &:empty {
     visibility: hidden;
@@ -82,6 +87,10 @@ export const TagGroup = styled('tag-group')`
   height: ${multiply(dimensions.controlBase, '3')};
   overflow: hidden;
   padding-inline: ${dimensions.controlBase};
+
+  & > * {
+    flex-shrink: 0;
+  }
 
   &:empty {
     visibility: hidden;

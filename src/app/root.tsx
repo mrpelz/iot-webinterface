@@ -22,7 +22,7 @@ import { setup } from 'goober';
 import { useMemo } from 'preact/hooks';
 
 const GlobalStyles = createGlobalStyle`
-  * {
+  *:not(input, select, button) {
     -moz-user-select: none;
     -ms-user-select: none;
     -webkit-tap-highlight-color: transparent;

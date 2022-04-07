@@ -19,11 +19,10 @@ export const useScrollRestore = (isOnRestoration: boolean): void => {
 
   useLayoutEffect(() => {
     isOnRestorationRef.current = isOnRestoration;
-    if (!isOnRestoration) return;
 
     scrollTo({
       behavior: 'instant' as ScrollBehavior,
-      top: scrollYRef.current,
+      top: isOnRestoration ? scrollYRef.current : 0,
     });
   }, [isOnRestoration]);
 };

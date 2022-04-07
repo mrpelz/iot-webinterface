@@ -11,6 +11,8 @@ export const List = styled('ul')<{ isHighContrast: boolean }>`
 
   border-block: ${() =>
     `solid ${dimensions.hairline()} ${colors.fontTertiary()()}`};
+  border-block-end-color: ${colors.fontSecondary()};
+
   width: ${breakpointValue(
     mediaQuery(dimensions.breakpointTablet),
     () =>
@@ -50,6 +52,15 @@ export const Entry = styled('li')`
 `;
 
 export const Button = styled('button')`
+  -webkit-appearance: none;
+  background: none;
+  border-radius: ${half(dimensions.controlBase)};
+  border: ${dimensions.hairline} solid ${colors.fontPrimary()};
+  color: ${colors.fontPrimary()};
   cursor: pointer;
+  display: block;
+  font-size: ${dimensions.fontSizeSmall};
+  min-height: 3em;
+  padding-inline: ${dimensions.fontPadding};
   width: 100%;
 `;

@@ -4,29 +4,30 @@ import { FunctionComponent } from 'preact';
 import { useBackground } from '../state/background.js';
 
 export const Background: FunctionComponent = () => {
-  const path = useBackground();
+  const background = useBackground();
 
-  const ref = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const previousRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    const { current: wrapper } = ref;
+    const { current: wrapper } = wrapperRef;
     if (!wrapper) return;
 
-    const previous = wrapper.firstElementChild;
+    const { current: previous } = previousRef;
 
     const fade = async (current: HTMLElement | null) => {
       const animation = await (async () => {
         try {
           if (previous) {
             return previous.animate([{ opacity: 1 }, { opacity: 0 }], {
-              duration: current ? 1000 : 500,
+              duration: current ? 1000 : 250,
               fill: 'forwards',
             }).finished;
           }
 
           if (current) {
             return current.animate([{ opacity: 0 }, { opacity: 1 }], {
-              duration: 1000,
+              duration: previous ? 1000 : 250,
               fill: 'forwards',
             }).finished;
           }
@@ -41,12 +42,14 @@ export const Background: FunctionComponent = () => {
 
       if (!previous && current) animation?.commitStyles();
       animation?.cancel();
+
+      previousRef.current = current;
     };
 
-    const img = path ? new Image() : null;
+    const img = background ? new Image() : null;
 
-    if (img && path) {
-      img.src = path;
+    if (img && background) {
+      img.src = background;
 
       img.onload = async () => {
         await img.decode?.();
@@ -69,7 +72,7 @@ export const Background: FunctionComponent = () => {
 
       child.remove();
     }
-  }, [path, ref]);
+  }, [background]);
 
-  return <BackgroundComponent ref={ref} />;
+  return <BackgroundComponent ref={wrapperRef} />;
 };
