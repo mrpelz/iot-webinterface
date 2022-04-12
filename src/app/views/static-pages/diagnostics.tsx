@@ -9,6 +9,7 @@ import { useFetchJson, useFetchText } from '../../util/use-fetch.js';
 import {
   useHierarchy,
   useLevelShallow,
+  useStreamCount,
   useStreamOnline,
 } from '../../state/web-api.js';
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
@@ -348,6 +349,7 @@ export const Diagnostics: FunctionComponent = () => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
   const isStreamOnline = useStreamOnline();
+  const streamCount = useStreamCount();
 
   const hierarchy = useHierarchy();
 
@@ -416,6 +418,11 @@ export const Diagnostics: FunctionComponent = () => {
           </td>
           <td>
             {useMemo(() => JSON.stringify(isStreamOnline), [isStreamOnline])}
+            {streamCount === null ? null : (
+              <>
+                <br />({streamCount})
+              </>
+            )}
           </td>
         </tr>
 
