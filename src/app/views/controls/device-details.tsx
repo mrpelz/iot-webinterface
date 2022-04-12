@@ -2,6 +2,7 @@ import { AlignRight, BreakAll, TabularNums } from '../../components/text.js';
 import { Button, Entry as EntryComponent } from '../../components/list.js';
 import { Entry, List } from '../list.js';
 import { HierarchyElementDevice, Levels } from '../../web-api.js';
+import { OfflineIcon, OnlineIcon, filterSubDevices } from './device.js';
 import {
   useAbsoluteTimeLabel,
   useRelativeTimeLabel,
@@ -15,7 +16,6 @@ import {
   useSetter,
 } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
-import { filterSubDevices } from './device.js';
 
 const SHY_CHARACTER = '\u00ad';
 
@@ -90,8 +90,7 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   device,
 }) => {
   const online = useChild(device, 'online');
-  const onlineValue = useGetter<boolean>(online);
-  const onlineLabel = useMemo(() => JSON.stringify(onlineValue), [onlineValue]);
+  const isOnlineValue = useGetter<boolean>(online);
 
   const lastSeen = useChild(device, 'lastSeen');
   const lastSeenValue = useGetter<number>(lastSeen);
@@ -115,7 +114,9 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
     () => (
       <>
         {online ? (
-          <DeviceDetail label="online">{onlineLabel}</DeviceDetail>
+          <DeviceDetail label="online">
+            {isOnlineValue ? <OnlineIcon /> : <OfflineIcon />}
+          </DeviceDetail>
         ) : null}
         {onlineChange ? (
           <DeviceDetail label="online change">
@@ -136,6 +137,7 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
       </>
     ),
     [
+      isOnlineValue,
       lastSeen,
       lastSeenLabelAbsolute,
       lastSeenLabelRelative,
@@ -143,7 +145,6 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
       onlineChange,
       onlineChangeLabelAbsolute,
       onlineChangeLabelRelative,
-      onlineLabel,
     ]
   );
 };

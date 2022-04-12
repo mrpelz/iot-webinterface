@@ -86,7 +86,7 @@ export const TagGroup = styled('tag-group')`
   gap: ${dimensions.controlBase};
   height: ${multiply(dimensions.controlBase, '3')};
   overflow: hidden;
-  padding-inline: ${dimensions.controlBase};
+  padding-inline-end: ${dimensions.controlBase};
 
   & > * {
     flex-shrink: 0;
@@ -94,10 +94,6 @@ export const TagGroup = styled('tag-group')`
 
   &:empty {
     visibility: hidden;
-  }
-
-  &:first-child {
-    padding-inline-start: 0;
   }
 
   &:last-child {

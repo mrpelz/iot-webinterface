@@ -1,7 +1,6 @@
 import {
   ActivityIcon,
   CheckIcon,
-  TargetIcon,
   WiFiIcon,
   XIcon,
 } from '../../components/icons.js';
@@ -20,7 +19,7 @@ import { useMemo } from 'preact/hooks';
 import { useTheme } from '../../state/theme.js';
 import { useTimeLabel } from '../../util/use-time-label.js';
 
-const OnlineIcon: FunctionComponent = () => {
+export const OnlineIcon: FunctionComponent = () => {
   const theme = useTheme();
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
@@ -32,7 +31,7 @@ const OnlineIcon: FunctionComponent = () => {
   );
 };
 
-const OfflineIcon: FunctionComponent = () => {
+export const OfflineIcon: FunctionComponent = () => {
   const theme = useTheme();
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
@@ -113,13 +112,11 @@ export const Device: FunctionComponent<{
       {subDevices?.length ? (
         subDevices.map((subDevice) => (
           <Tag>
-            <TagGroup>
-              {subDevice.meta.name === 'espNow' ? (
-                <TargetIcon height="1em" />
-              ) : (
+            {subDevice.meta.name === 'espNow' ? null : (
+              <TagGroup>
                 <WiFiIcon height="1em" />
-              )}
-            </TagGroup>
+              </TagGroup>
+            )}
             <TagGroup>
               <DeviceOnlineState device={subDevice} />
             </TagGroup>
