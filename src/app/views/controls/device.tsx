@@ -103,13 +103,13 @@ export const Device: FunctionComponent<{
   onSelect?: () => void;
 }> = ({ device, onSelect }) => {
   const subDevices = useElementFilter(
-    filterSubDevices,
-    useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device)
+    useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
+    filterSubDevices
   );
 
   return (
     <Cell title={device.meta.name} onClick={onSelect}>
-      {subDevices?.length ? (
+      {subDevices.length ? (
         subDevices.map((subDevice) => (
           <Tag>
             {subDevice.meta.name === 'espNow' ? null : (

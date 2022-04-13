@@ -2,7 +2,7 @@ import {
   HierarchyElementDevice,
   HierarchyElementRoom,
   Levels,
-  sortByName,
+  sortBy,
 } from '../../web-api.js';
 import {
   noBackground,
@@ -35,8 +35,8 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   const roomName = useI18nKey(name);
 
   const devices = useElementFilter(
-    useCallback(({ isSubDevice }) => !isSubDevice, []),
-    useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room)
+    useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room),
+    useCallback(({ isSubDevice }) => !isSubDevice, [])
   );
 
   const [, setRoute1] = useSegment(1);
@@ -51,18 +51,18 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   return (
     <Category header={roomName}>
       <Grid>
-        {useMemo(() => {
-          if (!devices) return null;
-
-          return devices.map((device) => {
-            return (
-              <Device
-                device={device}
-                onSelect={() => onSelect(device.meta.name)}
-              />
-            );
-          });
-        }, [devices, onSelect])}
+        {useMemo(
+          () =>
+            devices.map((device) => {
+              return (
+                <Device
+                  device={device}
+                  onSelect={() => onSelect(device.meta.name)}
+                />
+              );
+            }),
+          [devices, onSelect]
+        )}
       </Grid>
     </Category>
   );
@@ -73,7 +73,7 @@ export const Devices: FunctionComponent = () => {
 
   const rooms = useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy);
   const roomsSorted = useArray(
-    useMemo(() => sortByName(rooms, roomsSorting), [rooms])
+    useMemo(() => sortBy(rooms, 'name', roomsSorting), [rooms])
   );
 
   const [route1] = useSegment(1);
@@ -91,17 +91,15 @@ export const Devices: FunctionComponent = () => {
     [route1]
   );
 
-  const [room] =
-    useElementFilter(
-      useCallback(({ name }) => name === roomId, [roomId]),
-      rooms
-    ) || ([] as undefined[]);
+  const [room] = useElementFilter(
+    rooms,
+    useCallback(({ name }) => name === roomId, [roomId])
+  );
 
-  const [device] =
-    useElementFilter(
-      useCallback(({ name }) => name === deviceId, [deviceId]),
-      useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room || null)
-    ) || ([] as undefined[]);
+  const [device] = useElementFilter(
+    useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room || null),
+    useCallback(({ name }) => name === deviceId, [deviceId])
+  );
 
   const roomName = useI18nKey(roomId);
 

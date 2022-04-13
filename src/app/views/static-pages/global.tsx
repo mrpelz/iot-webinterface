@@ -1,5 +1,16 @@
-import { HierarchyElementProperty, Levels } from '../../web-api.js';
-import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
+import {
+  HierarchyElementProperty,
+  HierarchyElementPropertyActuator,
+  Levels,
+  groupBy,
+  isMetaPropertyActuator,
+} from '../../web-api.js';
+import {
+  useElementFilter,
+  useHierarchy,
+  useLevelShallow,
+} from '../../state/web-api.js';
+import { Category } from '../category.js';
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from '../controls/diagnostics.js';
@@ -19,19 +30,33 @@ export const Global: FunctionComponent = () => {
     ...useLevelShallow(Levels.FLOOR, building)
   );
 
-  const globalElements = useMemo(
-    () =>
-      [...globalProperties, ...firstFloorProperties].filter(
-        (element): element is HierarchyElementProperty => Boolean(element)
-      ),
-    [firstFloorProperties, globalProperties]
+  const globalElements = useElementFilter<
+    HierarchyElementProperty,
+    HierarchyElementPropertyActuator
+  >(
+    useMemo(
+      () => [...globalProperties, ...firstFloorProperties],
+      [firstFloorProperties, globalProperties]
+    ),
+    isMetaPropertyActuator
+  );
+
+  const groupedElements = useMemo(
+    () => groupBy(globalElements, 'actuated'),
+    [globalElements]
   );
 
   return (
-    <DiagnosticsContainer>
-      {globalElements.map((element) => (
-        <Hierarchy element={element} />
+    <>
+      {groupedElements.map(({ elements, group }) => (
+        <Category header={group}>
+          <DiagnosticsContainer>
+            {elements.map((element) => (
+              <Hierarchy element={element} />
+            ))}
+          </DiagnosticsContainer>
+        </Category>
       ))}
-    </DiagnosticsContainer>
+    </>
   );
 };

@@ -2,7 +2,7 @@ import {
   HierarchyElementFloor,
   HierarchyElementRoom,
   Levels,
-  sortByName,
+  sortBy,
 } from '../web-api.js';
 import {
   Menu as MenuComponent,
@@ -75,7 +75,7 @@ export const Floor: FunctionComponent<{
 
   const elements = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, floor);
   const sortedElements = useArray(
-    useMemo(() => sortByName(elements, rooms), [elements])
+    useMemo(() => sortBy(elements, 'name', rooms), [elements])
   );
 
   const [selectedRoom, selectRoom] = useNavigationRoom();

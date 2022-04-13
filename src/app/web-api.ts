@@ -532,15 +532,55 @@ export const getElementsFromLevel = <T extends HierarchyElementWithMeta>(
   return Array.from(result);
 };
 
-export const sortByName = <T extends HierarchyElementWithMeta>(
-  input: T[],
-  list: readonly string[]
+type GroupByResult<
+  T extends HierarchyElementWithMeta,
+  K extends keyof Required<T['meta']>
+> = {
+  elements: T[];
+  group: T['meta'][K];
+}[];
+
+export const groupBy = <
+  T extends HierarchyElementWithMeta,
+  K extends keyof Required<T['meta']>
+>(
+  input: readonly T[],
+  property: K
+): GroupByResult<T, K> => {
+  const keys = new Set<T['meta'][K]>();
+
+  for (const { meta } of input) {
+    keys.add((meta as T['meta'])[property]);
+  }
+
+  const result: GroupByResult<T, K> = [];
+
+  for (const key of keys) {
+    result.push({
+      elements: input.filter(
+        ({ meta }) => property in meta && (meta as T['meta'])[property] === key
+      ),
+      group: key,
+    });
+  }
+
+  return result;
+};
+
+export const sortBy = <
+  T extends HierarchyElementWithMeta,
+  K extends keyof Required<T['meta']>
+>(
+  input: readonly T[],
+  property: K,
+  list: readonly T['meta'][K][]
 ): T[] => {
   const result: T[] = [];
 
   for (const listItem of list) {
     const match = input.find(
-      ({ meta }) => 'name' in meta && meta.name === listItem
+      ({ meta }) =>
+        property in meta && (meta as T['meta'])[property] === listItem
     );
     if (!match) continue;
 
@@ -549,7 +589,10 @@ export const sortByName = <T extends HierarchyElementWithMeta>(
 
   result.push(
     ...input.filter(
-      ({ meta }) => 'name' in meta && meta.name && !list.includes(meta.name)
+      ({ meta }) =>
+        property in meta &&
+        (meta as T['meta'])[property] &&
+        !list.includes((meta as T['meta'])[property])
     )
   );
 

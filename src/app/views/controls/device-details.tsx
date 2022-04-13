@@ -256,8 +256,8 @@ export const DeviceDetails: FunctionComponent<{
   device: HierarchyElementDevice;
 }> = ({ device }) => {
   const subDevices = useElementFilter(
-    filterSubDevices,
-    useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device)
+    useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
+    filterSubDevices
   );
 
   return (

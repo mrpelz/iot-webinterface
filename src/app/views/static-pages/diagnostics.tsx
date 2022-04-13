@@ -414,16 +414,18 @@ export const Diagnostics: FunctionComponent = () => {
 
         <tr>
           <td>
-            <b>stream</b>
+            <b>stream connected</b>
           </td>
           <td>
             {useMemo(() => JSON.stringify(isStreamOnline), [isStreamOnline])}
-            {streamCount === null ? null : (
-              <>
-                <br />({streamCount})
-              </>
-            )}
           </td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>stream client count</b>
+          </td>
+          <td>{streamCount === null ? null : streamCount}</td>
         </tr>
 
         <tr>
