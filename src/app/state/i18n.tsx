@@ -7,6 +7,7 @@ import {
 } from '../i18n/main.js';
 import { getCountry, getLanguage } from '../util/locale.js';
 import { useContext, useMemo } from 'preact/hooks';
+import { Capitalize } from '../components/text.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
 
@@ -102,9 +103,16 @@ export const useI18nKeyFallback = (
 };
 
 export const Translation: FunctionComponent<{
+  capitalize?: boolean;
   i18nKey?: keyof I18nTranslation | string;
-}> = ({ i18nKey }) => {
+}> = ({ capitalize, i18nKey }) => {
   const translation = useI18nKey(i18nKey);
 
-  return <>{translation}</>;
+  return useMemo(() => {
+    if (capitalize) {
+      return <Capitalize>{translation}</Capitalize>;
+    }
+
+    return <>{translation}</>;
+  }, [capitalize, translation]);
 };

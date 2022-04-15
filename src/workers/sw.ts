@@ -30,11 +30,18 @@ const isSafari = (() => {
   };
   /* eslint-enable no-console */
 
-  const INDEX_ENDPOINT = new URL('/index.json', scope.origin).href;
+  const origin = (() => {
+    const url = new URL(scope.origin);
+    url.pathname = '/';
+
+    return url.href;
+  })();
+
+  const INDEX_ENDPOINT = '/index.json';
 
   const INDEX_PATH = '/';
 
-  const CACHE_KEY_INTERNAL = 'internal_cache';
+  const CACHE_KEY_INTERNAL = 'internal';
 
   const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
   const WARM_URL = '/1C941CA2-2CE3-48DB-B953-2DF891321BAF';
@@ -171,7 +178,7 @@ const isSafari = (() => {
     const { critical = [], optional = [] } = index;
     const paths = [INDEX_PATH].concat(critical);
 
-    const cacheCritical = await scope.caches.open('pre_cache_critical');
+    const cacheCritical = await scope.caches.open('pre:critical');
 
     await Promise.all(
       paths.map(async (path) => {
@@ -186,7 +193,7 @@ const isSafari = (() => {
 
     if (isSafari) return;
 
-    const cacheOptional = await scope.caches.open('pre_cache_optional');
+    const cacheOptional = await scope.caches.open('pre:optional');
 
     await Promise.all(
       (optional as string[]).map(async (path) => {
@@ -216,7 +223,15 @@ const isSafari = (() => {
             const cache = await scope.caches.open(cacheKey);
             const responses = await cache.matchAll();
 
-            return [cacheKey, responses.map(({ url }) => url)] as const;
+            return [
+              cacheKey,
+              responses.map(({ url }) => {
+                if (!url?.length) return null;
+                if (!url.startsWith(origin)) return url;
+
+                return url.replace(origin, '/');
+              }),
+            ] as const;
           })
         )
       );
@@ -318,7 +333,7 @@ const isSafari = (() => {
           );
 
           if (liveResponse) {
-            await putInCache(liveResponse, 'post_cache_livePreferred');
+            await putInCache(liveResponse, 'post:livePreferred');
 
             return liveResponse;
           }
@@ -339,7 +354,7 @@ const isSafari = (() => {
         );
 
         if (liveResponse) {
-          await putInCache(liveResponse, 'post_cache_cachePreferred');
+          await putInCache(liveResponse, 'post:cachePreferred');
 
           return liveResponse;
         }

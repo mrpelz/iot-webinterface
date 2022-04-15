@@ -9,3 +9,5 @@ export const rooms = [
   'storageRoom',
   'hallway',
 ] as const;
+
+export const actuated = ['light', 'offTimer', 'scheduledRamp'] as const;

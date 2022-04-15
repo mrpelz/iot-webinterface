@@ -574,27 +574,40 @@ export const sortBy = <
   input: readonly T[],
   property: K,
   list: readonly T['meta'][K][]
-): T[] => {
-  const result: T[] = [];
+): Record<'all' | 'listedResults' | 'unlistedResults', T[]> => {
+  const listedResultsCollection: T[][] = [];
 
   for (const listItem of list) {
-    const match = input.find(
+    const match = input.filter(
       ({ meta }) =>
         property in meta && (meta as T['meta'])[property] === listItem
     );
-    if (!match) continue;
+    if (!match.length) continue;
 
-    result.push(match);
+    listedResultsCollection.push(match);
   }
 
-  result.push(
-    ...input.filter(
-      ({ meta }) =>
-        property in meta &&
-        (meta as T['meta'])[property] &&
-        !list.includes((meta as T['meta'])[property])
-    )
-  );
+  const listedResults = listedResultsCollection.flat(1);
 
-  return result;
+  const unlistedResults: T[] = [];
+
+  for (const inputItem of input) {
+    const { meta } = inputItem;
+
+    if (!(property in meta)) continue;
+
+    const value = (meta as T['meta'])[property];
+    if (!value) continue;
+    if (list.includes(value)) continue;
+
+    unlistedResults.push(inputItem);
+  }
+
+  return {
+    get all() {
+      return [listedResults, unlistedResults].flat(1);
+    },
+    listedResults,
+    unlistedResults,
+  };
 };

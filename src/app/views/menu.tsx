@@ -75,7 +75,7 @@ export const Floor: FunctionComponent<{
 
   const elements = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, floor);
   const sortedElements = useArray(
-    useMemo(() => sortBy(elements, 'name', rooms), [elements])
+    useMemo(() => sortBy(elements, 'name', rooms).all, [elements])
   );
 
   const [selectedRoom, selectRoom] = useNavigationRoom();

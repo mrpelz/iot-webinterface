@@ -11,6 +11,11 @@ export const BreakAll = styled('break-all')`
   word-break: break-word;
 `;
 
+export const Capitalize = styled('capitalize')`
+  display: contents;
+  text-transform: capitalize;
+`;
+
 export const NonBreaking = styled('non-breaking')`
   display: contents;
   white-space: nowrap;

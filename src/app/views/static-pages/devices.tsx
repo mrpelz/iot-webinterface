@@ -73,7 +73,7 @@ export const Devices: FunctionComponent = () => {
 
   const rooms = useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy);
   const roomsSorted = useArray(
-    useMemo(() => sortBy(rooms, 'name', roomsSorting), [rooms])
+    useMemo(() => sortBy(rooms, 'name', roomsSorting).all, [rooms])
   );
 
   const [route1] = useSegment(1);

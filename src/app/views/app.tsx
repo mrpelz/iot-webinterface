@@ -6,10 +6,10 @@ import { App as AppComponent } from '../components/app.js';
 import { Background } from './background.js';
 import { Devices } from './static-pages/devices.js';
 import { Diagnostics } from './static-pages/diagnostics.js';
-import { ElementDiagnostics } from './controls/element-diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Global } from './static-pages/global.js';
 import { Layout } from './layout.js';
+import { Room } from './controls/room.js';
 import { Settings } from './static-pages/settings.js';
 import { Test } from './controls/test.js';
 import { colors } from '../style.js';
@@ -45,7 +45,7 @@ export const App: FunctionComponent = () => {
             }[staticPage]
           : null}
 
-        {room && !staticPage ? <ElementDiagnostics element={room} /> : null}
+        {room && !staticPage ? <Room element={room} /> : null}
       </Layout>
     </AppComponent>
   );
