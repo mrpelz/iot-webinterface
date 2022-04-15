@@ -74,11 +74,7 @@ export const Global: FunctionComponent = () => {
   return (
     <>
       {entryDoor ? (
-        <Category
-          header={
-            <Translation i18nKey={entryDoor.meta.measured} capitalize={true} />
-          }
-        >
+        <Category header={<Translation i18nKey="security" capitalize={true} />}>
           <DiagnosticsContainer>
             <Hierarchy element={entryDoor} />
           </DiagnosticsContainer>

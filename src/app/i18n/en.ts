@@ -1,5 +1,7 @@
 export const en = {
   absoluteTimes: 'absolute time format',
+  airQuality: 'air quality',
+  airSafety: 'air safety',
   apiBaseUrl: 'API base-URL',
   area: 'area',
   auto: 'auto',
@@ -15,6 +17,7 @@ export const en = {
   diningRoom: 'Dining Room',
   en: 'English',
   enableNotifications: 'enable notifications',
+  environmental: 'environmental',
   firstFloor: '1st floor',
   floor: 'floor',
   global: 'Global',
@@ -39,6 +42,7 @@ export const en = {
   refresh: 'refresh',
   room: 'room',
   scheduledRamp: 'scheduled ramp',
+  security: 'security',
   serviceWorker: 'ServiceWorker',
   settings: 'Settings',
   showerBathroom: 'Shower Bathroom',
@@ -52,6 +56,5 @@ export const en = {
   theme: 'theme',
   updateCheckInterval: 'update check-interval',
   updateUnattended: 'update unattended',
-  windowOpen: 'window/door open',
   wurstHome: 'Wurst Home',
 };

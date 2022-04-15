@@ -9,13 +9,13 @@ import {
   isMetaPropertySensor,
   sortBy,
 } from '../../web-api.js';
+import { actuated, measuredCategories } from '../../i18n/sorting.js';
 import { useElementFilter, useLevelShallow } from '../../state/web-api.js';
 import { Category } from '../category.js';
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Hierarchy } from '../controls/diagnostics.js';
 import { Translation } from '../../state/i18n.js';
-import { actuated } from '../../i18n/sorting.js';
 import { useMemo } from 'preact/hooks';
 
 export const Room: FunctionComponent<{
@@ -31,9 +31,30 @@ export const Room: FunctionComponent<{
     HierarchyElementPropertySensor
   >(properties, isMetaPropertySensor);
 
-  const groupedSensors = useMemo(() => {
-    return groupBy(sensors, 'measured');
-  }, [sensors]);
+  const securitySensors = useMemo(
+    () =>
+      sortBy(sensors, 'measured', measuredCategories.security).listedResults,
+    [sensors]
+  );
+
+  const airQualitySensors = useMemo(
+    () =>
+      sortBy(sensors, 'measured', measuredCategories.airQuality).listedResults,
+    [sensors]
+  );
+
+  const airSafetySensors = useMemo(
+    () =>
+      sortBy(sensors, 'measured', measuredCategories.airSafety).listedResults,
+    [sensors]
+  );
+
+  const environmentalSensors = useMemo(
+    () =>
+      sortBy(sensors, 'measured', measuredCategories.environmental)
+        .listedResults,
+    [sensors]
+  );
 
   const actuators = useElementFilter<
     HierarchyElementProperty,
@@ -52,15 +73,48 @@ export const Room: FunctionComponent<{
 
   return (
     <>
-      {groupedSensors.map(({ elements, group }) => (
-        <Category header={<Translation i18nKey={group} capitalize={true} />}>
+      {securitySensors.length ? (
+        <Category header={<Translation i18nKey="security" capitalize={true} />}>
           <DiagnosticsContainer>
-            {elements.map((element) => (
+            {securitySensors.map((element) => (
               <Hierarchy element={element} />
             ))}
           </DiagnosticsContainer>
         </Category>
-      ))}
+      ) : null}
+      {airQualitySensors.length ? (
+        <Category
+          header={<Translation i18nKey="airQuality" capitalize={true} />}
+        >
+          <DiagnosticsContainer>
+            {airQualitySensors.map((element) => (
+              <Hierarchy element={element} />
+            ))}
+          </DiagnosticsContainer>
+        </Category>
+      ) : null}
+      {airSafetySensors.length ? (
+        <Category
+          header={<Translation i18nKey="airSafety" capitalize={true} />}
+        >
+          <DiagnosticsContainer>
+            {airSafetySensors.map((element) => (
+              <Hierarchy element={element} />
+            ))}
+          </DiagnosticsContainer>
+        </Category>
+      ) : null}
+      {environmentalSensors.length ? (
+        <Category
+          header={<Translation i18nKey="environmental" capitalize={true} />}
+        >
+          <DiagnosticsContainer>
+            {environmentalSensors.map((element) => (
+              <Hierarchy element={element} />
+            ))}
+          </DiagnosticsContainer>
+        </Category>
+      ) : null}
 
       {listedActuators.map(({ elements, group }) => (
         <Category header={<Translation i18nKey={group} capitalize={true} />}>

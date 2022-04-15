@@ -2,6 +2,8 @@ import { en } from './en.js';
 
 export const de: Record<keyof typeof en, string> = {
   absoluteTimes: 'absolute Zeitanzeige',
+  airQuality: 'Luftqualität',
+  airSafety: 'Luftschadstoffe',
   apiBaseUrl: 'API Base-URL',
   area: 'Area',
   auto: 'automatisch',
@@ -17,6 +19,7 @@ export const de: Record<keyof typeof en, string> = {
   diningRoom: 'Esszimmer',
   en: 'englisch',
   enableNotifications: 'Benachrichtigungen aktivieren',
+  environmental: 'Umwelt',
   firstFloor: '1. OG',
   floor: 'Stockwerk',
   global: 'Global',
@@ -41,6 +44,7 @@ export const de: Record<keyof typeof en, string> = {
   refresh: 'Aktualisieren',
   room: 'Raum',
   scheduledRamp: 'geplante Rampe',
+  security: 'Sicherheit',
   serviceWorker: 'Service Worker',
   settings: 'Einstellungen',
   showerBathroom: 'Duschbad',
@@ -54,6 +58,5 @@ export const de: Record<keyof typeof en, string> = {
   theme: 'Theme',
   updateCheckInterval: 'Update-Intervall',
   updateUnattended: 'unbestätigt updaten',
-  windowOpen: 'Fenster/Tür offen',
   wurstHome: 'Wurst Home',
 };
