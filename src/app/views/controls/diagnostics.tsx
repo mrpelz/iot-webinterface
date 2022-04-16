@@ -47,6 +47,8 @@ export const Details: FunctionComponent<{
 export const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
 }) => {
+  const { country } = useI18n();
+
   if (!isElementWithMeta(element)) return null;
 
   const { meta } = element;
@@ -61,6 +63,11 @@ export const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
       <td>
         <table>
           {Object.entries(meta).map(([key, value]) => {
+            const idDate =
+              key === 'id' && meta.level === Levels.SYSTEM && country
+                ? new Date(Number(value)).toLocaleString(country)
+                : null;
+
             const level =
               key === 'level'
                 ? levelToString(value as unknown as Levels)
@@ -83,7 +90,8 @@ export const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
                   {level ||
                     parentRelation ||
                     valueType ||
-                    JSON.stringify(value)}
+                    JSON.stringify(value)}{' '}
+                  {idDate ? <>({idDate})</> : null}
                 </td>
               </tr>
             );

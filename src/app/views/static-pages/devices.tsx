@@ -27,6 +27,8 @@ import { useScrollRestore } from '../../util/use-scroll-restore.js';
 import { useSegment } from '../../state/path.js';
 import { useSetTitleOverride } from '../../state/title.js';
 
+const FAKE_ROUTE_DIVIDER = '❚';
+
 const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   const {
     meta: { name },
@@ -39,13 +41,13 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
     useCallback(({ isSubDevice }) => !isSubDevice, [])
   );
 
-  const [, setRoute1] = useSegment(1);
+  const [, setRoute] = useSegment(1);
 
   const onSelect = useCallback(
     (device: string) => {
-      setRoute1?.(`${name}›${device}`);
+      setRoute?.(`${name}${FAKE_ROUTE_DIVIDER}${device}`);
     },
-    [name, setRoute1]
+    [name, setRoute]
   );
 
   return (
@@ -76,7 +78,7 @@ export const Devices: FunctionComponent = () => {
     useMemo(() => sortBy(rooms, 'name', roomsSorting).all, [rooms])
   );
 
-  const [route1] = useSegment(1);
+  const [route] = useSegment(1);
   const setBackgroundOverride = useSetBackgroundOverride();
   const setTitleOverride = useSetTitleOverride();
 
@@ -87,8 +89,8 @@ export const Devices: FunctionComponent = () => {
   );
 
   const [roomId, deviceId] = useMemo(
-    () => route1?.split('›') || ([] as undefined[]),
-    [route1]
+    () => route?.split(FAKE_ROUTE_DIVIDER) || ([] as undefined[]),
+    [route]
   );
 
   const [room] = useElementFilter(

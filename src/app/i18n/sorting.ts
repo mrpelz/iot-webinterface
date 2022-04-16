@@ -10,7 +10,7 @@ export const rooms = [
   'hallway',
 ] as const;
 
-export const actuated = ['light', 'offTimer', 'scheduledRamp'] as const;
+export const actuated = ['lighting'] as const;
 
 export const measuredCategories = {
   airQuality: ['temperature', 'relativeHumidity', 'pressure'],

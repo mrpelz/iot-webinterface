@@ -29,6 +29,7 @@ export const en = {
   language: 'language',
   lastSeen: 'last seen',
   light: 'light',
+  lighting: 'lighting',
   livingRoom: 'Living Room',
   map: 'Map',
   menu: 'menu',

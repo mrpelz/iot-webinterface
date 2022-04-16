@@ -31,6 +31,7 @@ export const de: Record<keyof typeof en, string> = {
   language: 'Sprache',
   lastSeen: 'zuletzt gesehen',
   light: 'hell',
+  lighting: 'Beleuchtung',
   livingRoom: 'Wohnzimmer',
   map: 'Karte',
   menu: 'Menü',
