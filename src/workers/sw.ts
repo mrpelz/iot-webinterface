@@ -171,7 +171,7 @@ const isSafari = (() => {
     if (reset) {
       await cacheInternal.put(
         INDEX_ENDPOINT,
-        new Response(JSON.stringify({ date, ...index }))
+        new Response(JSON.stringify({ date, index }))
       );
     }
 
@@ -215,6 +215,11 @@ const isSafari = (() => {
         ).match(INDEX_ENDPOINT)
       )?.json();
 
+      const persisted =
+        'storage' in scope.navigator &&
+        'persisted' in scope.navigator.storage &&
+        (await scope.navigator.storage.persisted());
+
       const cacheKeys = await scope.caches.keys();
 
       const caches = Object.fromEntries(
@@ -236,7 +241,7 @@ const isSafari = (() => {
         )
       );
 
-      return new Response(JSON.stringify({ caches, index }), {
+      return new Response(JSON.stringify({ caches, index, persisted }), {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           'Content-Type': 'application/json; charset=utf-8',

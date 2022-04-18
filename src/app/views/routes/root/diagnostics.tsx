@@ -1,32 +1,32 @@
-import { Details, Hierarchy, Meta } from '../controls/diagnostics.js';
-import { ECHO_URL, INVENTORY_URL } from '../../util/update.js';
+import { Details, Hierarchy, Meta } from '../../controls/diagnostics.js';
+import { ECHO_URL, INVENTORY_URL } from '../../../util/update.js';
 import {
   staticPagesBottom,
   staticPagesTop,
   useNavigation,
-} from '../../state/navigation.js';
-import { useFetchJson, useFetchText } from '../../util/use-fetch.js';
+} from '../../../state/navigation.js';
+import { useFetchJson, useFetchText } from '../../../util/use-fetch.js';
 import {
   useHierarchy,
   useLevelShallow,
   useStreamCount,
   useStreamOnline,
-} from '../../state/web-api.js';
-import { DiagnosticsContainer } from '../../components/diagnostics.js';
+} from '../../../state/web-api.js';
+import { DiagnosticsContainer } from '../../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
-import { Levels } from '../../web-api.js';
-import { dimensions } from '../../style.js';
-import { useBreakpoint } from '../../style/breakpoint.js';
-import { useFlags } from '../../state/flags.js';
-import { useI18n } from '../../state/i18n.js';
-import { useIsMenuVisible } from '../../state/menu.js';
-import { useMediaQuery } from '../../style/main.js';
+import { Levels } from '../../../web-api.js';
+import { dimensions } from '../../../style.js';
+import { useBreakpoint } from '../../../style/breakpoint.js';
+import { useFlags } from '../../../state/flags.js';
+import { useI18n } from '../../../state/i18n.js';
+import { useIsMenuVisible } from '../../../state/menu.js';
+import { useMediaQuery } from '../../../style/main.js';
 import { useMemo } from 'preact/hooks';
-import { useNotification } from '../../state/notification.js';
-import { usePathContext } from '../../state/path.js';
-import { useTheme } from '../../state/theme.js';
-import { useTitle } from '../../state/title.js';
-import { useVisibility } from '../../state/visibility.js';
+import { useNotification } from '../../../state/notification.js';
+import { usePathContext } from '../../../state/path.js';
+import { useTheme } from '../../../state/theme.js';
+import { useTitle } from '../../../state/title.js';
+import { useVisibility } from '../../../state/visibility.js';
 
 const Fallback: FunctionComponent = () => (
   <tr>
@@ -267,7 +267,11 @@ const ServiceWorkerInventory: FunctionComponent = () => {
   const echo = useFetchText(ECHO_URL, 'POST');
   const inventory = useFetchJson(INVENTORY_URL, 'POST');
 
-  const { caches = {}, index = {} } = (inventory as any) || {};
+  const {
+    caches = {},
+    index: { date = null, index = {} } = {},
+    persisted = null,
+  } = (inventory as any) || {};
 
   return (
     <>
@@ -276,44 +280,38 @@ const ServiceWorkerInventory: FunctionComponent = () => {
           <td>handling requests</td>
           <td>{useMemo(() => JSON.stringify(echo === ECHO_URL), [echo])}</td>
         </tr>
+        <tr>
+          <td>index date</td>
+          <td>
+            {typeof date === 'number'
+              ? new Date(date).toLocaleString(locale || 'en')
+              : null}
+          </td>
+        </tr>
+        <tr>
+          <td>StorageManager persisted</td>
+          <td>{useMemo(() => JSON.stringify(persisted), [persisted])}</td>
+        </tr>
       </table>
 
       <table>
-        {Object.entries(index).map(([key, values]) => {
-          const head = (
+        {Object.entries(index).map(([key, values]) => (
+          <>
             <tr>
               <td>
                 <b>{key}</b>
               </td>
             </tr>
-          );
 
-          if (key === 'date' && typeof values === 'number') {
-            return (
-              <>
-                {head}
-
-                <tr>
-                  <td>{new Date(values).toLocaleString(locale || 'en')}</td>
-                </tr>
-              </>
-            );
-          }
-
-          return (
-            <>
-              {head}
-
-              {Array.isArray(values)
-                ? values.map((value: any) => (
-                    <tr>
-                      <td>{value}</td>
-                    </tr>
-                  ))
-                : null}
-            </>
-          );
-        })}
+            {Array.isArray(values)
+              ? values.map((value: any) => (
+                  <tr>
+                    <td>{value}</td>
+                  </tr>
+                ))
+              : null}
+          </>
+        ))}
       </table>
 
       <table>

@@ -1,12 +1,16 @@
-import { AlignRight, BreakAll, TabularNums } from '../../components/text.js';
-import { Button, Entry as EntryComponent } from '../../components/list.js';
-import { Entry, List } from '../list.js';
-import { HierarchyElementDevice, Levels } from '../../web-api.js';
-import { OfflineIcon, OnlineIcon, filterSubDevices } from './device.js';
+import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
+import { Button, Entry as EntryComponent } from '../../../components/list.js';
+import { Entry, List } from '../../list.js';
+import { HierarchyElementDevice, Levels } from '../../../web-api.js';
+import {
+  OfflineIcon,
+  OnlineIcon,
+  filterSubDevices,
+} from '../../controls/device.js';
 import {
   useAbsoluteTimeLabel,
   useRelativeTimeLabel,
-} from '../../util/use-time-label.js';
+} from '../../../util/use-time-label.js';
 import { useCallback, useMemo } from 'preact/hooks';
 import {
   useChild,
@@ -14,7 +18,7 @@ import {
   useGetter,
   useLevelShallowSkipInput,
   useSetter,
-} from '../../state/web-api.js';
+} from '../../../state/web-api.js';
 import { FunctionComponent } from 'preact';
 
 const SHY_CHARACTER = '\u00ad';

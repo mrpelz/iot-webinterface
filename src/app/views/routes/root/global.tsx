@@ -8,7 +8,7 @@ import {
   groupBy,
   isMetaPropertyActuator,
   sortBy,
-} from '../../web-api.js';
+} from '../../../web-api.js';
 import { useCallback, useMemo } from 'preact/hooks';
 import {
   useChild,
@@ -16,14 +16,14 @@ import {
   useHierarchy,
   useLevelDeep,
   useLevelShallow,
-} from '../../state/web-api.js';
-import { Category } from '../category.js';
-import { DiagnosticsContainer } from '../../components/diagnostics.js';
+} from '../../../state/web-api.js';
+import { Category } from '../../category.js';
+import { DiagnosticsContainer } from '../../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
-import { Hierarchy } from '../controls/diagnostics.js';
-import { Translation } from '../../state/i18n.js';
-import { actuated } from '../../i18n/sorting.js';
-import { useNavigationBuilding } from '../../state/navigation.js';
+import { Hierarchy } from '../../controls/diagnostics.js';
+import { Translation } from '../../../state/i18n.js';
+import { actuated } from '../../../i18n/sorting.js';
+import { useNavigationBuilding } from '../../../state/navigation.js';
 
 export const Global: FunctionComponent = () => {
   const hierarchy = useHierarchy();

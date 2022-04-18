@@ -4,14 +4,14 @@ import {
 } from '../state/navigation.js';
 import { App as AppComponent } from '../components/app.js';
 import { Background } from './background.js';
-import { Devices } from './static-pages/devices.js';
-import { Diagnostics } from './static-pages/diagnostics.js';
+import { Devices } from './routes/root/devices.js';
+import { Diagnostics } from './routes/root/diagnostics.js';
 import { FunctionComponent } from 'preact';
-import { Global } from './static-pages/global.js';
+import { Global } from './routes/root/global.js';
 import { Layout } from './layout.js';
-import { Room } from './controls/room.js';
-import { Settings } from './static-pages/settings.js';
-import { Test } from './controls/test.js';
+import { Room } from './routes/root/room.js';
+import { Settings } from './routes/root/settings.js';
+import { Test } from './routes/root/test.js';
 import { colors } from '../style.js';
 import { useLayoutEffect } from 'preact/hooks';
 

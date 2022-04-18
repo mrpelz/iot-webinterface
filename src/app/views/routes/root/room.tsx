@@ -8,14 +8,14 @@ import {
   isMetaPropertyActuator,
   isMetaPropertySensor,
   sortBy,
-} from '../../web-api.js';
-import { actuated, measuredCategories } from '../../i18n/sorting.js';
-import { useElementFilter, useLevelShallow } from '../../state/web-api.js';
-import { Category } from '../category.js';
-import { DiagnosticsContainer } from '../../components/diagnostics.js';
+} from '../../../web-api.js';
+import { actuated, measuredCategories } from '../../../i18n/sorting.js';
+import { useElementFilter, useLevelShallow } from '../../../state/web-api.js';
+import { Category } from '../../category.js';
+import { DiagnosticsContainer } from '../../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
-import { Hierarchy } from '../controls/diagnostics.js';
-import { Translation } from '../../state/i18n.js';
+import { Hierarchy } from '../../controls/diagnostics.js';
+import { Translation } from '../../../state/i18n.js';
 import { useMemo } from 'preact/hooks';
 
 export const Room: FunctionComponent<{

@@ -268,7 +268,7 @@
       storedId = id;
 
       destroyWebSocket();
-      createWebSocket();
+      setTimeout(() => createWebSocket(), WS_TIMEOUT_PADDING);
     };
 
     setInterval(() => {

@@ -3,29 +3,29 @@ import {
   HierarchyElementRoom,
   Levels,
   sortBy,
-} from '../../web-api.js';
+} from '../../../web-api.js';
 import {
   noBackground,
   useSetBackgroundOverride,
-} from '../../state/background.js';
+} from '../../../state/background.js';
 import { useCallback, useEffect, useMemo } from 'preact/hooks';
 import {
   useElementFilter,
   useHierarchy,
   useLevelDeep,
-} from '../../state/web-api.js';
-import { Category } from '../category.js';
-import { Device } from '../controls/device.js';
-import { DeviceDetails } from '../controls/device-details.js';
+} from '../../../state/web-api.js';
+import { Category } from '../../category.js';
+import { Device } from '../../controls/device.js';
+import { DeviceDetails } from '../sub/device-details.js';
 import { FunctionComponent } from 'preact';
-import { Grid } from '../../components/grid.js';
-import { ShowHide } from '../../components/show-hide.js';
-import { rooms as roomsSorting } from '../../i18n/sorting.js';
-import { useArray } from '../../util/use-array-compare.js';
-import { useI18nKey } from '../../state/i18n.js';
-import { useScrollRestore } from '../../util/use-scroll-restore.js';
-import { useSegment } from '../../state/path.js';
-import { useSetTitleOverride } from '../../state/title.js';
+import { Grid } from '../../../components/grid.js';
+import { ShowHide } from '../../../components/show-hide.js';
+import { rooms as roomsSorting } from '../../../i18n/sorting.js';
+import { useArray } from '../../../util/use-array-compare.js';
+import { useI18nKey } from '../../../state/i18n.js';
+import { useScrollRestore } from '../../../util/use-scroll-restore.js';
+import { useSegment } from '../../../state/path.js';
+import { useSetTitleOverride } from '../../../state/title.js';
 
 const FAKE_ROUTE_DIVIDER = '❚';
 

@@ -9,6 +9,7 @@ import { Notifications } from './util/notifications.js';
 import { WebApi } from './web-api.js';
 import { defer } from './util/defer.js';
 import { getFlags } from './util/flags.js';
+import { persist } from './util/storage.js';
 import { render } from './root.js';
 
 try {
@@ -48,6 +49,8 @@ try {
     );
 
     warm();
+
+    persist();
   });
 } catch (error) {
   removeServiceWorkers();

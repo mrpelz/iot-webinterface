@@ -1,26 +1,26 @@
-import { Button, Entry as EntryComponent } from '../../components/list.js';
-import { Entry, List } from '../list.js';
+import { Button, Entry as EntryComponent } from '../../../components/list.js';
+import { Entry, List } from '../../list.js';
 import {
   HierarchyElementBuilding,
   HierarchyElementHome,
   HierarchyElementRoom,
   Levels,
-} from '../../web-api.js';
-import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
-import { Theme, themes } from '../../state/theme.js';
-import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
-import { reload, triggerUpdate } from '../../util/update.js';
+} from '../../../web-api.js';
+import { I18nLanguage, i18nLanguages } from '../../../i18n/main.js';
+import { Theme, themes } from '../../../state/theme.js';
+import { Translation, useI18nKeyFallback } from '../../../state/i18n.js';
+import { reload, triggerUpdate } from '../../../util/update.js';
 import {
   staticPages,
   useNavigationBuilding,
   useNavigationHome,
-} from '../../state/navigation.js';
+} from '../../../state/navigation.js';
 import { useCallback, useMemo } from 'preact/hooks';
-import { useFlag, useSetFlag } from '../../state/flags.js';
-import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
+import { useFlag, useSetFlag } from '../../../state/flags.js';
+import { useHierarchy, useLevelShallow } from '../../../state/web-api.js';
 import { FunctionComponent } from 'preact';
-import { removeServiceWorkers } from '../../util/workers.js';
-import { useArray } from '../../util/use-array-compare.js';
+import { removeServiceWorkers } from '../../../util/workers.js';
+import { useArray } from '../../../util/use-array-compare.js';
 
 export const Settings: FunctionComponent = () => {
   const hierarchy = useHierarchy();
