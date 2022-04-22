@@ -16,5 +16,5 @@ export const measuredCategories = {
   airQuality: ['temperature', 'relativeHumidity', 'pressure'],
   airSafety: ['co2', 'pm025', 'pm10'],
   environmental: ['brightness', 'uvIndex'],
-  security: ['motion', 'open'],
+  security: ['motion', 'windowOpen', 'doorOpen'],
 } as const;
