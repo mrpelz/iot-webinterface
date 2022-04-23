@@ -4,14 +4,14 @@ import {
   Header,
   Title,
 } from '../../components/controls.js';
+import { ComponentChild, FunctionComponent } from 'preact';
 import { ForwardIcon } from '../../components/icons.js';
-import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 import { useTheme } from '../../state/theme.js';
 
 export const Cell: FunctionComponent<{
   onClick?: () => void;
-  title: string;
+  title: ComponentChild;
 }> = ({ children, onClick, title }) => {
   const theme = useTheme();
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);

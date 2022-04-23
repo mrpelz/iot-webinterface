@@ -1,4 +1,8 @@
 import {
+  BinarySensor,
+  BinarySensorLabeling,
+} from '../../controls/binary-sensor.js';
+import {
   HierarchyElementFloor,
   HierarchyElementProperty,
   HierarchyElementPropertyActuator,
@@ -20,6 +24,7 @@ import {
 import { Category } from '../../category.js';
 import { DiagnosticsContainer } from '../../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
+import { Grid } from '../../../components/grid.js';
 import { Hierarchy } from '../../controls/diagnostics.js';
 import { Translation } from '../../../state/i18n.js';
 import { actuated } from '../../../i18n/sorting.js';
@@ -75,9 +80,13 @@ export const Global: FunctionComponent = () => {
     <>
       {entryDoor ? (
         <Category header={<Translation i18nKey="security" capitalize={true} />}>
-          <DiagnosticsContainer>
-            <Hierarchy element={entryDoor} />
-          </DiagnosticsContainer>
+          <Grid>
+            <BinarySensor
+              element={entryDoor}
+              labeling={BinarySensorLabeling.OPEN_CLOSED}
+              titleKey="entryDoorOpen"
+            />
+          </Grid>
         </Category>
       ) : null}
 

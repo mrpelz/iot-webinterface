@@ -1,4 +1,8 @@
 import {
+  BinarySensor,
+  BinarySensorLabeling,
+} from '../../controls/binary-sensor.js';
+import {
   HierarchyElementProperty,
   HierarchyElementPropertyActuator,
   HierarchyElementPropertySensor,
@@ -14,6 +18,7 @@ import { useElementFilter, useLevelShallow } from '../../../state/web-api.js';
 import { Category } from '../../category.js';
 import { DiagnosticsContainer } from '../../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
+import { Grid } from '../../../components/grid.js';
 import { Hierarchy } from '../../controls/diagnostics.js';
 import { Translation } from '../../../state/i18n.js';
 import { useMemo } from 'preact/hooks';
@@ -75,11 +80,14 @@ export const Room: FunctionComponent<{
     <>
       {securitySensors.length ? (
         <Category header={<Translation i18nKey="security" capitalize={true} />}>
-          <DiagnosticsContainer>
+          <Grid>
             {securitySensors.map((element) => (
-              <Hierarchy element={element} />
+              <BinarySensor
+                element={element}
+                labeling={BinarySensorLabeling.OPEN_CLOSED}
+              />
             ))}
-          </DiagnosticsContainer>
+          </Grid>
         </Category>
       ) : null}
       {airQualitySensors.length ? (

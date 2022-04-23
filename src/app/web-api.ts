@@ -96,7 +96,7 @@ export type MetaDevice = {
 
 type MetaProperty = {
   level: Levels.PROPERTY;
-  name?: string;
+  name: string;
   parentRelation?: ParentRelation;
 };
 
