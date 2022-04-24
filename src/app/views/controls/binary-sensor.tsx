@@ -27,7 +27,8 @@ export const BinarySensor: FunctionComponent<{
   titleKey?: I18nKey;
 }> = ({ element, labeling = BinarySensorLabeling.YES_NO, titleKey }) => {
   const {
-    meta: { measured, name, valueType },
+    meta: { valueType },
+    key,
   } = element;
 
   const value = useGetter<boolean>(
@@ -45,11 +46,7 @@ export const BinarySensor: FunctionComponent<{
   );
 
   return (
-    <Cell
-      title={
-        <Translation i18nKey={titleKey || measured || name} capitalize={true} />
-      }
-    >
+    <Cell title={<Translation i18nKey={titleKey || key} capitalize={true} />}>
       {value === null ? (
         '?'
       ) : (

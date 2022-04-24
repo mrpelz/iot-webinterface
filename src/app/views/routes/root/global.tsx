@@ -50,10 +50,7 @@ export const Global: FunctionComponent = () => {
     useCallback(({ name }) => name === 'hallway', [])
   );
 
-  const entryDoor = useChild(
-    hallway,
-    'doorOpen'
-  ) as HierarchyElementPropertySensor;
+  const entryDoor = useChild(hallway, 'door') as HierarchyElementPropertySensor;
 
   const actuators = useElementFilter<
     HierarchyElementProperty,
@@ -84,7 +81,7 @@ export const Global: FunctionComponent = () => {
             <BinarySensor
               element={entryDoor}
               labeling={BinarySensorLabeling.OPEN_CLOSED}
-              titleKey="entryDoorOpen"
+              titleKey="entryDoor"
             />
           </Grid>
         </Category>

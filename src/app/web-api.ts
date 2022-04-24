@@ -129,11 +129,13 @@ export type HierarchyChildren = Record<string, HierarchyElement>;
 export type HierarchyElement = {
   children?: HierarchyChildren;
   get?: number;
+  key: string;
   meta?: Meta;
   set?: number;
 };
 
-export type HierarchyElementWithMeta<T = Meta> = HierarchyElement & { meta: T };
+export type HierarchyElementWithMeta<T extends Meta = Meta> =
+  HierarchyElement & { meta: T };
 
 export type HierarchyElementSystem = HierarchyElementWithMeta<MetaSystem>;
 
@@ -512,7 +514,7 @@ export const getElementsFromLevel = <T extends HierarchyElementWithMeta>(
 ): T[] => {
   const result = new Set<T>();
 
-  const get = (elements: (HierarchyElement | null)[]) => {
+  const get = (elements: HierarchyElement[]) => {
     if (elements !== input || !skipInput) {
       for (const element of elements) {
         if (element?.meta?.level !== level) continue;
@@ -527,7 +529,7 @@ export const getElementsFromLevel = <T extends HierarchyElementWithMeta>(
     }
   };
 
-  get(input);
+  get(input.filter((value): value is HierarchyElement => Boolean(value)));
 
   return Array.from(result);
 };
