@@ -8,6 +8,7 @@ import {
 import { getCountry, getLanguage } from '../util/locale.js';
 import { useContext, useMemo } from 'preact/hooks';
 import { Capitalize } from '../components/text.js';
+import { universal } from '../i18n/universal.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
 
@@ -48,7 +49,7 @@ export const I18nProvider: FunctionComponent = ({ children }) => {
   );
 
   const translation = useMemo(
-    () => translations[translationLanguage],
+    () => ({ ...universal, ...translations[translationLanguage] }),
     [translationLanguage]
   );
 
@@ -78,35 +79,40 @@ export const useI18n = (): TI18nContext => {
   return useContext(I18nContext);
 };
 
-export const useI18nKey = (
-  key?: keyof I18nTranslation | string
-): string | null => {
+export const useI18nKey = <F extends boolean>(
+  key?: keyof I18nTranslation | string,
+  fallback?: F
+): F extends true ? string : string | null => {
   const { translation } = useContext(I18nContext);
 
-  return useMemo(() => {
+  const result = useMemo(() => {
     if (!key || !(key in translation)) return null;
 
     return translation[key as unknown as keyof I18nTranslation];
   }, [key, translation]);
+
+  return useMemo(() => {
+    if (result) return result;
+
+    if (fallback) {
+      if (key) return `<${key}>`;
+      return '<[empty]>';
+    }
+
+    return null;
+  }, [fallback, key, result]) as F extends true ? string : string | null;
 };
 
 export const useI18nKeyFallback = (
   key?: keyof I18nTranslation | string
-): string => {
-  const translation = useI18nKey(key);
-
-  return useMemo(() => {
-    if (translation) return translation;
-    if (key) return `<${key}>`;
-    return '<[empty]>';
-  }, [key, translation]);
-};
+): string => useI18nKey(key, true);
 
 export const Translation: FunctionComponent<{
   capitalize?: boolean;
+  fallback?: boolean;
   i18nKey?: keyof I18nTranslation | string;
-}> = ({ capitalize, i18nKey }) => {
-  const translation = useI18nKey(i18nKey);
+}> = ({ capitalize, fallback = true, i18nKey }) => {
+  const translation = useI18nKey(i18nKey, fallback);
 
   return useMemo(() => {
     if (capitalize) {

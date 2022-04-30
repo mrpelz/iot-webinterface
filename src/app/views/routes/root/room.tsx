@@ -1,8 +1,4 @@
 import {
-  BinarySensor,
-  BinarySensorLabeling,
-} from '../../controls/binary-sensor.js';
-import {
   HierarchyElementProperty,
   HierarchyElementPropertyActuator,
   HierarchyElementPropertySensor,
@@ -20,6 +16,7 @@ import { DiagnosticsContainer } from '../../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Grid } from '../../../components/grid.js';
 import { Hierarchy } from '../../controls/diagnostics.js';
+import { Sensor } from '../../controls/sensor.js';
 import { Translation } from '../../../state/i18n.js';
 import { useMemo } from 'preact/hooks';
 
@@ -82,10 +79,7 @@ export const Room: FunctionComponent<{
         <Category header={<Translation i18nKey="security" capitalize={true} />}>
           <Grid>
             {securitySensors.map((element) => (
-              <BinarySensor
-                element={element}
-                labeling={BinarySensorLabeling.OPEN_CLOSED}
-              />
+              <Sensor element={element} />
             ))}
           </Grid>
         </Category>
@@ -94,33 +88,33 @@ export const Room: FunctionComponent<{
         <Category
           header={<Translation i18nKey="airQuality" capitalize={true} />}
         >
-          <DiagnosticsContainer>
+          <Grid>
             {airQualitySensors.map((element) => (
-              <Hierarchy element={element} />
+              <Sensor element={element} />
             ))}
-          </DiagnosticsContainer>
+          </Grid>
         </Category>
       ) : null}
       {airSafetySensors.length ? (
         <Category
           header={<Translation i18nKey="airSafety" capitalize={true} />}
         >
-          <DiagnosticsContainer>
+          <Grid>
             {airSafetySensors.map((element) => (
-              <Hierarchy element={element} />
+              <Sensor element={element} />
             ))}
-          </DiagnosticsContainer>
+          </Grid>
         </Category>
       ) : null}
       {environmentalSensors.length ? (
         <Category
           header={<Translation i18nKey="environmental" capitalize={true} />}
         >
-          <DiagnosticsContainer>
+          <Grid>
             {environmentalSensors.map((element) => (
-              <Hierarchy element={element} />
+              <Sensor element={element} />
             ))}
-          </DiagnosticsContainer>
+          </Grid>
         </Category>
       ) : null}
 

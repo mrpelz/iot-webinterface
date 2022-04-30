@@ -88,12 +88,15 @@
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const addKey = (element: any, key = ''): unknown => {
-    if (
-      typeof element !== 'object' ||
-      element === null ||
-      !('children' in element)
-    ) {
+    if (typeof element !== 'object' || element === null) {
       return element;
+    }
+
+    if (!('children' in element)) {
+      return {
+        ...element,
+        key,
+      };
     }
 
     const { children = {}, ...rest } = element;
