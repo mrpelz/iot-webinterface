@@ -3,10 +3,11 @@ import {
   HierarchyElement,
   HierarchyElementSystem,
   HierarchyElementWithMeta,
+  Setter,
   WebApi,
   getElementsFromLevel,
 } from '../web-api.js';
-import { useContext, useEffect, useMemo, useState } from 'preact/hooks';
+import { useContext, useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { useArray } from '../util/use-array-compare.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
 
@@ -22,14 +23,14 @@ type TWebApiContext = {
   hierarchy: HierarchyElementSystem | null;
   isStreamOnline: boolean;
   useGetterIndex: <T>(index?: number) => T | null;
-  useSetterIndex: <T>(index?: number) => SetterFunction<T>;
+  useSetterIndex: <T>(index?: number) => SetterFunction<T> | null;
 };
 
 const WebApiContext = createContext<TWebApiContext>({
   hierarchy: null,
   isStreamOnline: false,
   useGetterIndex: () => null,
-  useSetterIndex: () => () => undefined,
+  useSetterIndex: () => null,
 });
 
 // eslint-disable-next-line comma-spacing
@@ -50,23 +51,18 @@ const useGetterIndexFactory = <T,>(webApi: WebApi, index?: number) => {
 
 // eslint-disable-next-line comma-spacing
 const useSetterIndexFactory = <T,>(webApi: WebApi, index?: number) => {
-  const [setterFn, setSetterFn] = useState<SetterFunction<T>>(() => () => {
-    // eslint-disable-next-line no-console
-    console.warn(`cannot send value for index ${index}, setter not yet ready`);
-  });
+  const setter = useRef<Setter<T> | null>(null);
 
   useEffect(() => {
-    const setter = index === undefined ? null : webApi.createSetter<T>(index);
+    setter.current = index === undefined ? null : webApi.createSetter<T>(index);
 
-    setSetterFn(
-      () => (value: T) =>
-        setter?.set(value === undefined ? (null as unknown as T) : value)
-    );
-
-    return () => setter?.remove();
+    return () => setter.current?.remove();
   }, [index, webApi]);
 
-  return setterFn;
+  return useMemo(() => {
+    if (index === undefined) return null;
+    return (value: T) => setter.current?.set(value);
+  }, [index]);
 };
 
 export const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
@@ -204,12 +200,32 @@ export const useGetter = <T,>(element: HierarchyElement | null): T | null => {
 };
 
 // eslint-disable-next-line comma-spacing
+export const useChildGetter = <T,>(
+  input: HierarchyElement | null,
+  child: string
+): T | null => {
+  const { useGetterIndex } = useContext(WebApiContext);
+
+  return useGetterIndex(useChild(input, child)?.get);
+};
+
+// eslint-disable-next-line comma-spacing
 export const useSetter = <T,>(
   element: HierarchyElement | null
-): SetterFunction<T> => {
+): SetterFunction<T> | null => {
   const { useSetterIndex } = useContext(WebApiContext);
 
   return useSetterIndex(element?.set);
+};
+
+// eslint-disable-next-line comma-spacing
+export const useChildSetter = <T,>(
+  input: HierarchyElement | null,
+  child: string
+): SetterFunction<T> | null => {
+  const { useSetterIndex } = useContext(WebApiContext);
+
+  return useSetterIndex(useChild(input, child)?.set);
 };
 
 export const useStreamCount = (): number | null => {

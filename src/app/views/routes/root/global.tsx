@@ -17,11 +17,10 @@ import {
   useLevelDeep,
   useLevelShallow,
 } from '../../../state/web-api.js';
+import { Actuator } from '../../controls/actuator.js';
 import { Category } from '../../category.js';
-import { DiagnosticsContainer } from '../../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
 import { Grid } from '../../../components/grid.js';
-import { Hierarchy } from '../../controls/diagnostics.js';
 import { Sensor } from '../../controls/sensor.js';
 import { Translation } from '../../../state/i18n.js';
 import { actuated } from '../../../i18n/sorting.js';
@@ -82,21 +81,21 @@ export const Global: FunctionComponent = () => {
 
       {listed.map(({ elements, group }) => (
         <Category header={<Translation i18nKey={group} capitalize={true} />}>
-          <DiagnosticsContainer>
+          <Grid>
             {elements.map((element) => (
-              <Hierarchy element={element} />
+              <Actuator element={element} />
             ))}
-          </DiagnosticsContainer>
+          </Grid>
         </Category>
       ))}
 
       {unlisted.length ? (
         <Category header={<Translation i18nKey="other" capitalize={true} />}>
-          <DiagnosticsContainer>
+          <Grid>
             {unlisted.map((element) => (
-              <Hierarchy element={element} />
+              <Actuator element={element} />
             ))}
-          </DiagnosticsContainer>
+          </Grid>
         </Category>
       ) : null}
     </>

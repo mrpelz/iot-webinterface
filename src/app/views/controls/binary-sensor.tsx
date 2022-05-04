@@ -1,5 +1,5 @@
 import { HierarchyElementPropertySensor, ValueType } from '../../web-api.js';
-import { useChild, useGetter } from '../../state/web-api.js';
+import { useChildGetter, useGetter } from '../../state/web-api.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
@@ -15,24 +15,16 @@ export const isBinarySensorElement = (
   element.meta.valueType === ValueType.BOOLEAN;
 
 export const BinarySensor: FunctionComponent<{
-  element: HierarchyElementPropertySensor & {
-    meta: { valueType: ValueType.BOOLEAN };
-  };
+  element: BinarySensorElement;
+  negativeKey?: I18nKey;
+  positiveKey?: I18nKey;
   title?: I18nKey;
-}> = ({ element, title }) => {
+}> = ({ element, negativeKey = 'no', positiveKey = 'yes', title }) => {
   const { key } = element;
 
   const value = useGetter<boolean>(element);
 
-  const isReceivedChild = useChild(
-    element,
-    'isReceivedValue'
-  ) as HierarchyElementPropertySensor | null;
-  const isReceivedValue = useGetter<boolean>(
-    isReceivedChild?.meta.valueType === ValueType.BOOLEAN
-      ? isReceivedChild
-      : null
-  );
+  const isReceived = useChildGetter<boolean>(element, 'isReceivedValue');
 
   return (
     <Cell title={<Translation i18nKey={title || key} capitalize={true} />}>
@@ -40,8 +32,11 @@ export const BinarySensor: FunctionComponent<{
         '?'
       ) : (
         <>
-          <Translation i18nKey={value ? 'yes' : 'no'} />
-          {!isReceivedChild || isReceivedValue ? null : '*'}
+          <Translation i18nKey={value ? positiveKey : negativeKey} />
+          {
+            // eslint-disable-next-line no-negated-condition
+            isReceived !== false ? null : '*'
+          }
         </>
       )}
     </Cell>

@@ -217,14 +217,14 @@ export const DeviceDetailsInner: FunctionComponent<{
   const identifyDevice = useChild(device, 'identifyDevice');
   const identifyDeviceSetter = useSetter<null>(identifyDevice);
   const identifyDeviceTrigger = useCallback(
-    () => identifyDeviceSetter(null),
+    () => identifyDeviceSetter?.(null),
     [identifyDeviceSetter]
   );
 
   const resetDevice = useChild(device, 'resetDevice');
   const resetDeviceSetter = useSetter<null>(resetDevice);
   const resetDeviceTrigger = useCallback(
-    () => resetDeviceSetter(null),
+    () => resetDeviceSetter?.(null),
     [resetDeviceSetter]
   );
 

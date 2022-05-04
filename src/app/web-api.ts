@@ -13,7 +13,7 @@ type Getter = {
   remove: () => void;
 };
 
-type Setter<T> = {
+export type Setter<T> = {
   remove: () => void;
   set: (value: T) => void;
 };

@@ -182,7 +182,7 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
 
     if (input === undefined) return;
 
-    setter(input);
+    setter?.(input);
   };
 
   if (set === undefined) return null;
@@ -194,7 +194,7 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
       </td>
       <td>
         {isNull ? (
-          <button onClick={() => setter(null)}>null</button>
+          <button onClick={() => setter?.(null)}>null</button>
         ) : (
           <form action="#" onSubmit={onSubmit}>
             <input placeholder={namedValueType} onChange={onChange} />

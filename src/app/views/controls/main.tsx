@@ -10,9 +10,10 @@ import { useMemo } from 'preact/hooks';
 import { useTheme } from '../../state/theme.js';
 
 export const Cell: FunctionComponent<{
+  arrow?: boolean;
   onClick?: () => void;
   title: ComponentChild;
-}> = ({ children, onClick, title }) => {
+}> = ({ arrow, children, onClick, title }) => {
   const theme = useTheme();
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
@@ -20,7 +21,7 @@ export const Cell: FunctionComponent<{
     <CellComponent isHighContrast={isHighContrast} onClick={onClick}>
       <Header>
         <Title>{title}</Title>
-        {onClick ? <ForwardIcon height="1em" /> : null}
+        {arrow && onClick ? <ForwardIcon height="1em" /> : null}
       </Header>
       <Body>{children}</Body>
     </CellComponent>

@@ -9,7 +9,18 @@ export const Sensor: FunctionComponent<{
   title?: I18nKey;
 }> = ({ element, title }) => {
   if (isBinarySensorElement(element)) {
-    return <BinarySensor element={element} title={title} />;
+    return (
+      <BinarySensor
+        element={element}
+        negativeKey={
+          ['door', 'window'].includes(element.key) ? 'closed' : undefined
+        }
+        positiveKey={
+          ['door', 'window'].includes(element.key) ? 'open' : undefined
+        }
+        title={title}
+      />
+    );
   }
 
   if (isNumericSensorElement(element)) {

@@ -109,7 +109,7 @@ export const Device: FunctionComponent<{
   );
 
   return (
-    <Cell title={device.meta.name} onClick={onSelect}>
+    <Cell title={device.meta.name} onClick={onSelect} arrow={true}>
       {subDevices.length ? (
         subDevices.map((subDevice) => (
           <Tag>
