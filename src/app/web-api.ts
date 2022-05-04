@@ -512,10 +512,14 @@ export const getElementsFromLevel = <T extends HierarchyElementWithMeta>(
   deep = false,
   skipInput = false
 ): T[] => {
+  const filteredInput = input.filter((value): value is HierarchyElement =>
+    Boolean(value)
+  );
+
   const result = new Set<T>();
 
   const get = (elements: HierarchyElement[]) => {
-    if (elements !== input || !skipInput) {
+    if (elements !== filteredInput || !skipInput) {
       for (const element of elements) {
         if (element?.meta?.level !== level) continue;
         result.add(element as T);
@@ -529,7 +533,7 @@ export const getElementsFromLevel = <T extends HierarchyElementWithMeta>(
     }
   };
 
-  get(input.filter((value): value is HierarchyElement => Boolean(value)));
+  get(filteredInput);
 
   return Array.from(result);
 };

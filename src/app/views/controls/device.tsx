@@ -95,8 +95,9 @@ const DeviceOnlineState: FunctionComponent<{
   return null;
 };
 
-export const filterSubDevices = ({ isSubDevice }: MetaDevice): boolean =>
-  Boolean(isSubDevice);
+export const filterSubDevices = (
+  device: MetaDevice
+): device is MetaDevice & { isSubDevice: true } => Boolean(device.isSubDevice);
 
 export const Device: FunctionComponent<{
   device: HierarchyElementDevice;

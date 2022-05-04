@@ -37,6 +37,8 @@ const INDEX_TIERS = {
   optional: [new RegExp('^/images/background/')],
 };
 
+const SEPARATOR = Buffer.from(':');
+
 const NGINX_CONFIG = './nginx.conf';
 
 const tasks = process.argv[process.argv.length - 1].split(',');
@@ -45,8 +47,16 @@ async function precacheIndex() {
   const indexFile = join(process.cwd(), DIST_DIR, INDEX_FILE);
   const idFile = join(process.cwd(), DIST_DIR, ID_FILE);
 
+  /**
+   * @type {string[]}
+   */
   const hashes = [];
 
+  /**
+   * @param {string} path
+   * @param {string} root
+   * @returns {string[]}
+   */
   const walk = async (path, root) => {
     const stats = await stat(path);
 
@@ -61,7 +71,13 @@ async function precacheIndex() {
       ) {
         hashes.push(
           createHash('md5')
-            .update(await readFile(path))
+            .update(
+              Buffer.concat([
+                Buffer.from(path),
+                SEPARATOR,
+                await readFile(path),
+              ])
+            )
             .digest('hex')
         );
       }
@@ -114,16 +130,20 @@ async function precacheIndex() {
     })
   );
 
-  const filePayload = JSON.stringify(result);
+  const filePayload = Buffer.from(`${JSON.stringify(result)}\n`);
 
-  hashes.push(createHash('md5').update(filePayload, 'utf8').digest('hex'));
+  hashes.push(
+    createHash('md5')
+      .update(Buffer.concat([Buffer.from(indexFile), SEPARATOR, filePayload]))
+      .digest('hex')
+  );
 
   const globalHash = createHash('md5')
     .update(hashes.sort().join(':'))
     .digest('hex');
 
   await Promise.all([
-    writeFile(indexFile, `${filePayload}\n`),
+    writeFile(indexFile, filePayload),
     writeFile(idFile, `${globalHash}\n`),
   ]);
 }

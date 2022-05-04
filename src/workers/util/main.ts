@@ -54,8 +54,7 @@ const waitForServiceWorker = (): Promise<void> => {
 
   return new Promise<void>((resolve, reject) => {
     try {
-      // eslint-disable-next-line prefer-const
-      let interval: number | undefined;
+      let interval: number | null = null;
 
       const fn = async () => {
         const [response] = await fetchFallback(url, delay, {
@@ -66,12 +65,12 @@ const waitForServiceWorker = (): Promise<void> => {
           return;
         }
 
-        clearInterval(interval);
+        if (interval) clearInterval(interval);
         resolve();
       };
 
       interval = setInterval(fn, delay);
-      defer(fn);
+      fn();
     } catch {
       reject(new Error('could not check for SW presence'));
     }
