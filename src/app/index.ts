@@ -31,9 +31,6 @@ try {
   document.documentElement.removeAttribute('static');
 
   defer(async () => {
-    iOSHoverStyles();
-    iOSScrollToTop();
-
     if (serviceWorker) {
       await installServiceWorker(swUrl, debug);
     } else {
@@ -47,6 +44,9 @@ try {
       serviceWorker,
       debug
     );
+
+    iOSHoverStyles();
+    iOSScrollToTop();
 
     warm();
 

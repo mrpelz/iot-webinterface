@@ -13,10 +13,10 @@ export const Sensor: FunctionComponent<{
       <BinarySensor
         element={element}
         negativeKey={
-          ['door', 'window'].includes(element.key) ? 'closed' : undefined
+          ['door', 'window'].includes(element.property) ? 'closed' : undefined
         }
         positiveKey={
-          ['door', 'window'].includes(element.key) ? 'open' : undefined
+          ['door', 'window'].includes(element.property) ? 'open' : undefined
         }
         title={title}
       />

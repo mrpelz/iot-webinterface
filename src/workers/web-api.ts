@@ -86,33 +86,6 @@
   const getters = new Map<number, Set<Getter>>();
   const existingValues = new Map<number, unknown>();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const addKey = (element: any, key = ''): unknown => {
-    if (typeof element !== 'object' || element === null) {
-      return element;
-    }
-
-    if (!('children' in element)) {
-      return {
-        ...element,
-        key,
-      };
-    }
-
-    const { children = {}, ...rest } = element;
-
-    return {
-      ...rest,
-      children: Object.fromEntries(
-        Object.entries(children).map(([property, value]) => [
-          property,
-          addKey(value, property),
-        ])
-      ),
-      key,
-    };
-  };
-
   const getId = async (
     apiBaseUrl: string,
     interval: number,
@@ -121,7 +94,9 @@
     const url = new URL(ID_URL, apiBaseUrl);
 
     const getLiveId = async () => {
-      const [response] = await fetchFallback(url.href, interval);
+      const [response] = await fetchFallback(url.href, interval, {
+        cache: 'no-store',
+      });
       if (!response) return null;
 
       const responseText = await response.text();
@@ -177,7 +152,7 @@
       workerConsole.error('hierarchy request failure');
     }
 
-    return addKey(hierarchy);
+    return hierarchy;
   };
 
   const setupStream = (

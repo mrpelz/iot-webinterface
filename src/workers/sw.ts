@@ -116,14 +116,19 @@ const isSafari = (() => {
     return response;
   };
 
-  const fetchLive = (request: RequestInfo) => fetchFallback(request, 2000);
+  const fetchLive = (request: RequestInfo, cache?: RequestCache) =>
+    fetchFallback(request, 2000, { cache });
 
-  const putInCache = async (response: Response, cacheKey: string) => {
+  const putInCache = async (
+    path: string,
+    response: Response,
+    cacheKey: string
+  ) => {
     const cloned = response.clone();
     const cache = await scope.caches.open(cacheKey);
 
     try {
-      await cache.put(cloned.url, cloned);
+      await cache.put(path, cloned);
     } catch {
       // noop
     }
@@ -161,7 +166,9 @@ const isSafari = (() => {
     const indexCache = reset
       ? null
       : (await cacheInternal.match(INDEX_ENDPOINT)) || null;
-    const [indexLive] = indexCache ? [null] : await fetchLive(INDEX_ENDPOINT);
+    const [indexLive] = indexCache
+      ? [null]
+      : await fetchLive(INDEX_ENDPOINT, 'no-store');
 
     const indexResponse = indexCache || indexLive;
     if (!indexResponse) return;
@@ -184,7 +191,10 @@ const isSafari = (() => {
       paths.map(async (path) => {
         try {
           if (await cacheCritical.match(path)) return;
-          await cacheCritical.add(path);
+          const [response] = await fetchLive(path, 'no-cache');
+          if (!response) return;
+
+          await cacheCritical.put(path, response);
         } catch {
           // noop
         }
@@ -199,7 +209,10 @@ const isSafari = (() => {
       (optional as string[]).map(async (path) => {
         try {
           if (await cacheOptional.match(path)) return;
-          await cacheOptional.add(path);
+          const [response] = await fetchLive(path, 'no-cache');
+          if (!response) return;
+
+          await cacheOptional.put(path, response);
         } catch {
           // noop
         }
@@ -334,11 +347,16 @@ const isSafari = (() => {
         );
         if (isLivePreferred) {
           const [liveResponse, code] = await fetchLive(
-            pathnameOverride || request
+            pathnameOverride || request,
+            'no-cache'
           );
 
           if (liveResponse) {
-            await putInCache(liveResponse, 'post:livePreferred');
+            await putInCache(
+              pathnameOverride || request.url,
+              liveResponse,
+              'post:livePreferred'
+            );
 
             return liveResponse;
           }
@@ -346,7 +364,7 @@ const isSafari = (() => {
           if (cachedResponse) return cachedResponse;
 
           return syntheticError(
-            code || 500,
+            code || 504,
             request.url,
             'live-preferred resource not available from live or from cache'
           );
@@ -355,11 +373,16 @@ const isSafari = (() => {
         if (cachedResponse) return cachedResponse;
 
         const [liveResponse, code] = await fetchLive(
-          pathnameOverride || request
+          pathnameOverride || request,
+          'no-cache'
         );
 
         if (liveResponse) {
-          await putInCache(liveResponse, 'post:cachePreferred');
+          await putInCache(
+            pathnameOverride || request.url,
+            liveResponse,
+            'post:cachePreferred'
+          );
 
           return liveResponse;
         }
@@ -370,12 +393,12 @@ const isSafari = (() => {
               // eslint-disable-next-line @typescript-eslint/naming-convention
               'Content-Type': 'text/html; charset=utf-8',
             },
-            status: 500,
+            status: 504,
           });
         }
 
         return syntheticError(
-          code || 500,
+          code || 504,
           request.url,
           'cache-preferred resource not available from cache or from live'
         );

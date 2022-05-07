@@ -25,7 +25,7 @@ export const BinaryActuator: FunctionComponent<{
   positiveKey?: I18nKey;
   title?: I18nKey;
 }> = ({ element, negativeKey = 'off', positiveKey = 'on', title }) => {
-  const { key } = element;
+  const { property } = element;
 
   const value = useGetter<boolean>(element);
 
@@ -36,7 +36,7 @@ export const BinaryActuator: FunctionComponent<{
 
   return (
     <Cell
-      title={<Translation i18nKey={title || key} capitalize={true} />}
+      title={<Translation i18nKey={title || property} capitalize={true} />}
       onClick={flip ? handleClick : undefined}
     >
       {value === null ? (

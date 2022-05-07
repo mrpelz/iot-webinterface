@@ -20,14 +20,14 @@ export const BinarySensor: FunctionComponent<{
   positiveKey?: I18nKey;
   title?: I18nKey;
 }> = ({ element, negativeKey = 'no', positiveKey = 'yes', title }) => {
-  const { key } = element;
+  const { property } = element;
 
   const value = useGetter<boolean>(element);
 
   const isReceived = useChildGetter<boolean>(element, 'isReceivedValue');
 
   return (
-    <Cell title={<Translation i18nKey={title || key} capitalize={true} />}>
+    <Cell title={<Translation i18nKey={title || property} capitalize={true} />}>
       {value === null ? (
         '?'
       ) : (

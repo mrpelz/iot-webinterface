@@ -129,8 +129,8 @@ export type HierarchyChildren = Record<string, HierarchyElement>;
 export type HierarchyElement = {
   children?: HierarchyChildren;
   get?: number;
-  key: string;
   meta?: Meta;
+  property: string;
   set?: number;
 };
 

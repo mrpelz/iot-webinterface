@@ -39,7 +39,7 @@ const INDEX_TIERS = {
 
 const SEPARATOR = Buffer.from(':');
 
-const NGINX_CONFIG = './nginx.conf';
+const NGINX_CONFIG = './nginx/main.conf';
 
 const tasks = process.argv[process.argv.length - 1].split(',');
 

@@ -18,14 +18,14 @@ export const NullActuator: FunctionComponent<{
   element: NullActuatorElement;
   title?: I18nKey;
 }> = ({ element, title }) => {
-  const { key } = element;
+  const { property } = element;
 
   const setter = useSetter<null>(element);
   const handleClick = useCallback(() => setter?.(null), [setter]);
 
   return (
     <Cell
-      title={<Translation i18nKey={title || key} capitalize={true} />}
+      title={<Translation i18nKey={title || property} capitalize={true} />}
       onClick={setter ? handleClick : undefined}
     >
       <Translation i18nKey="trigger" />

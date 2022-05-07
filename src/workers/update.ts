@@ -29,7 +29,9 @@
     const { initialId, interval, serviceWorkerRefresh } = setup;
 
     const getLiveId = async () => {
-      const [response] = await fetchFallback(ID_URL, interval || INTERVAL);
+      const [response] = await fetchFallback(ID_URL, interval || INTERVAL, {
+        cache: 'no-store',
+      });
       if (!response) return null;
 
       const responseText = await response.text();
