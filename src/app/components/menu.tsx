@@ -2,6 +2,7 @@ import { colors, dimensions } from '../style.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
 import { breakpointValue } from '../style/breakpoint.js';
 import { forwardRef } from 'preact/compat';
+import { multiply } from '../style/dimensions.js';
 import { styled } from 'goober';
 
 export const Menu = styled('nav')<{ isVisible: boolean }>`
@@ -69,6 +70,18 @@ export const MenuListItem = styled('li', forwardRef)<{
   isHighContrast: boolean;
   isHovered: boolean;
 }>`
+  align-items: center;
+  border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
+  border-block-start: ${dimensions.hairline} solid ${colors.fontTertiary()};
+  cursor: pointer;
+  display: flex;
+  font-size: ${dimensions.fontSize};
+  height: ${dimensions.titlebarHeight};
+  justify-content: space-between;
+  line-height: ${dimensions.fontSize};
+  margin: 0;
+  padding: ${dimensions.fontPadding};
+
   background-color: ${(...args) =>
     dependentValue(
       'isActive',
@@ -79,9 +92,6 @@ export const MenuListItem = styled('li', forwardRef)<{
         colors.backgroundPrimary()
       )(...args)
     )(...args)};
-
-  border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
-  border-block-start: ${dimensions.hairline} solid ${colors.fontTertiary()};
   color: ${(...args) =>
     dependentValue(
       'isActive',
@@ -96,14 +106,18 @@ export const MenuListItem = styled('li', forwardRef)<{
         colors.fontPrimary()
       )(...args)
     )(...args)};
-  cursor: pointer;
-  margin: 0;
-  padding: ${dimensions.fontPadding};
-  font-size: ${dimensions.fontSize};
-  height: ${dimensions.titlebarHeight};
-  line-height: ${dimensions.fontSize};
 
   * + & {
     margin-top: -${dimensions.hairline};
   }
+`;
+
+export const MenuIndicator = styled('menu-indicator')`
+  background-color: hsl(40, 100%, 50%);
+  border-radius: 50%;
+  display: block;
+  flex-grow: 0;
+  flex-shrink: 0;
+  height: ${multiply(dimensions.controlBase, '1.5')};
+  width: ${multiply(dimensions.controlBase, '1.5')};
 `;

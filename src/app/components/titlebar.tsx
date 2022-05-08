@@ -38,13 +38,26 @@ export const Title = styled('h1')`
   white-space: nowrap;
 `;
 
+export const Subtitle = styled('h2')`
+  color: ${colors.fontPrimary()};
+  font-size: 0.5rem;
+  font-weight: normal;
+  height: min-content;
+  margin: 0;
+  max-width: min-content;
+  padding-block: 0;
+  text-transform: uppercase;
+  word-break: normal;
+`;
+
 export const IconContainer = styled('icon-container' as 'div', forwardRef)<{
   right?: true;
 }>`
+  align-items: center;
   color: ${colors.fontPrimary()};
   display: flex;
-  justify-content: ${dependentValue('right', 'flex-end', 'flex-start')};
   height: 100%;
+  justify-content: ${dependentValue('right', 'flex-end', 'flex-start')};
   position: absolute;
   top: 0;
 

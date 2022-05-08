@@ -7,6 +7,7 @@ import {
 import {
   Menu as MenuComponent,
   MenuContent,
+  MenuIndicator,
   MenuList,
   MenuListItem as MenuListItemComponent,
   MenuSubdivision,
@@ -19,6 +20,7 @@ import {
   useNavigationRoom,
   useNavigationStaticPage,
 } from '../state/navigation.js';
+import { useChildGetter, useLevelShallow } from '../state/web-api.js';
 import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { Translation } from '../state/i18n.js';
@@ -26,8 +28,15 @@ import { rooms } from '../i18n/sorting.js';
 import { useArray } from '../util/use-array-compare.js';
 import { useGoRoot } from '../state/path.js';
 import { useIsMenuVisible } from '../state/menu.js';
-import { useLevelShallow } from '../state/web-api.js';
 import { useTheme } from '../state/theme.js';
+
+const AllLightState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
+  room,
+}) => {
+  const allLights = useChildGetter<boolean>(room, 'allLights');
+
+  return allLights ? <MenuIndicator /> : null;
+};
 
 const MenuListItem: FunctionComponent<{
   isActive: boolean;
@@ -96,6 +105,7 @@ export const Floor: FunctionComponent<{
               onClick={() => (isActive ? goRoot?.() : selectRoom(room))}
             >
               <Translation i18nKey={room.meta.name} />
+              <AllLightState room={room} />
             </MenuListItem>
           );
         })}

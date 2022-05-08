@@ -7,6 +7,7 @@ import {
 } from '../components/icons.js';
 import {
   IconContainer as IconContainerComponent,
+  Subtitle,
   Title,
   Titlebar as TitlebarComponent,
 } from '../components/titlebar.js';
@@ -18,6 +19,7 @@ import {
   useState,
 } from 'preact/hooks';
 import { useGoPreviousSegment, useGoUp, useSegment } from '../state/path.js';
+import { useSubtitle, useTitle } from '../state/title.js';
 import { FunctionComponent } from 'preact';
 import { dimensions } from '../style.js';
 import { useAwaitEvent } from '../util/use-await-event.js';
@@ -25,7 +27,6 @@ import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlipMenuVisible } from '../state/menu.js';
 import { useMediaQuery } from '../style/main.js';
 import { useStreamOnline } from '../state/web-api.js';
-import { useTitle } from '../state/title.js';
 
 export const IconContainer: FunctionComponent<{
   paddingSetter: (input: number) => void;
@@ -92,6 +93,7 @@ export const Titlebar: FunctionComponent = () => {
   );
 
   const title = useTitle();
+  const subtitle = useSubtitle();
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
@@ -130,7 +132,12 @@ export const Titlebar: FunctionComponent = () => {
   return (
     <TitlebarComponent padding={padding}>
       {title ? <Title>{title}</Title> : null}
-      <IconContainer paddingSetter={setPaddingLeft}>{leftIcon}</IconContainer>
+      {leftIcon || subtitle ? (
+        <IconContainer paddingSetter={setPaddingLeft}>
+          {leftIcon}
+          {subtitle ? <Subtitle>{subtitle}</Subtitle> : null}
+        </IconContainer>
+      ) : null}
       <IconContainer paddingSetter={setPaddingRight} right>
         <WaitIconView />
         {rightIcon}
