@@ -1,6 +1,10 @@
 import { HierarchyElementPropertySensor, ValueType } from '../../web-api.js';
 import { NonBreaking, TabularNums } from '../../components/text.js';
 import { Translation, useI18n } from '../../state/i18n.js';
+import {
+  defaultNumberFormat,
+  measuredNumberFormats,
+} from '../../i18n/mapping.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
@@ -37,8 +41,14 @@ export const NumericSensor: FunctionComponent<{
   );
 
   const numberFormat = useMemo(
-    () => new Intl.NumberFormat(effectiveLocale),
-    [effectiveLocale]
+    () =>
+      new Intl.NumberFormat(
+        effectiveLocale,
+        measured && measured in measuredNumberFormats
+          ? measuredNumberFormats[measured]
+          : defaultNumberFormat
+      ),
+    [effectiveLocale, measured]
   );
 
   const value = useGetter<number>(element);

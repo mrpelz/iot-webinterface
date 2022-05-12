@@ -7,7 +7,8 @@ import {
 import {
   Menu as MenuComponent,
   MenuContent,
-  MenuIndicator,
+  MenuIndicatorItem,
+  MenuIndicatorSection,
   MenuList,
   MenuListItem as MenuListItemComponent,
   MenuSubdivision,
@@ -20,11 +21,17 @@ import {
   useNavigationRoom,
   useNavigationStaticPage,
 } from '../state/navigation.js';
-import { useChildGetter, useLevelShallow } from '../state/web-api.js';
+import {
+  useChild,
+  useChildGetter,
+  useGetter,
+  useLevelShallow,
+} from '../state/web-api.js';
 import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { Translation } from '../state/i18n.js';
-import { rooms } from '../i18n/sorting.js';
+import { colors } from '../style.js';
+import { roomSorting } from '../i18n/mapping.js';
 import { useArray } from '../util/use-array-compare.js';
 import { useGoRoot } from '../state/path.js';
 import { useIsMenuVisible } from '../state/menu.js';
@@ -35,7 +42,19 @@ const AllLightState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
 }) => {
   const allLights = useChildGetter<boolean>(room, 'allLights');
 
-  return allLights ? <MenuIndicator /> : null;
+  return allLights ? <MenuIndicatorItem color="hsl(40, 100%, 50%)" /> : null;
+};
+
+const DoorState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
+  room,
+}) => {
+  const fontColor = colors.fontPrimary()();
+  const allLightsChild = useChild(room, 'door');
+  const allLights = useGetter<boolean>(
+    useChildGetter(allLightsChild, 'isReceivedValue') ? allLightsChild : null
+  );
+
+  return allLights ? <MenuIndicatorItem color={fontColor} /> : null;
 };
 
 const MenuListItem: FunctionComponent<{
@@ -84,7 +103,7 @@ export const Floor: FunctionComponent<{
 
   const elements = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, floor);
   const sortedElements = useArray(
-    useMemo(() => sortBy(elements, 'name', rooms).all, [elements])
+    useMemo(() => sortBy(elements, 'name', roomSorting).all, [elements])
   );
 
   const [selectedRoom, selectRoom] = useNavigationRoom();
@@ -105,7 +124,10 @@ export const Floor: FunctionComponent<{
               onClick={() => (isActive ? goRoot?.() : selectRoom(room))}
             >
               <Translation i18nKey={room.meta.name} />
-              <AllLightState room={room} />
+              <MenuIndicatorSection>
+                <DoorState room={room} />
+                <AllLightState room={room} />
+              </MenuIndicatorSection>
             </MenuListItem>
           );
         })}

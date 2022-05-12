@@ -112,9 +112,17 @@ export const MenuListItem = styled('li', forwardRef)<{
   }
 `;
 
-export const MenuIndicator = styled('menu-indicator')`
-  background-color: hsl(40, 100%, 50%);
+export const MenuIndicatorSection = styled('menu-indicator-section')`
+  display: flex;
+  gap: ${dimensions.controlBase};
+`;
+
+export const MenuIndicatorItem = styled('menu-indicator-item')<{
+  color: string;
+}>`
+  background-color: ${({ color }) => color};
   border-radius: 50%;
+  border: solid ${dimensions.hairline} ${colors.backgroundPrimary()};
   display: block;
   flex-grow: 0;
   flex-shrink: 0;

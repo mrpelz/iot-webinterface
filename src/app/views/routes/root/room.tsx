@@ -9,7 +9,7 @@ import {
   isMetaPropertySensor,
   sortBy,
 } from '../../../web-api.js';
-import { actuated, measuredCategories } from '../../../i18n/sorting.js';
+import { actuated, measuredCategories } from '../../../i18n/mapping.js';
 import { useElementFilter, useLevelShallow } from '../../../state/web-api.js';
 import { Actuator } from '../../controls/actuator.js';
 import { Category } from '../../category.js';

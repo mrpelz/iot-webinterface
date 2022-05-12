@@ -29,19 +29,13 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
 
   const [room] = useNavigationRoom();
   const roomName = useI18nKey(room?.meta.name);
-  const roomLabel = useI18nKey('room');
 
   const [titleOverride, setTitleOverride] = useState<string | null>(null);
-  const [subtitleOverride, setSubtitleOverride] = useState<string | null>(null);
+  const [subtitle, setSubtitleOverride] = useState<string | null>(null);
 
   const title = useMemo(
     () => titleOverride || staticPageName || roomName,
     [roomName, staticPageName, titleOverride]
-  );
-
-  const subtitle = useMemo(
-    () => subtitleOverride || (room ? roomLabel : null),
-    [subtitleOverride, room, roomLabel]
   );
 
   const value = useMemo(

@@ -22,11 +22,9 @@ export const Titlebar = styled('titlebar')<{ padding: number }>`
         dimensions.menuWidth,
         '0px'
       )(),
-      dimensions.fontPadding,
       `${padding}px`
     )};
-  padding-inline-end: ${({ padding }) =>
-    add(dimensions.fontPadding, `${padding}px`)};
+  padding-inline-end: ${({ padding }) => `${padding}px`};
 `;
 
 export const Title = styled('h1')`

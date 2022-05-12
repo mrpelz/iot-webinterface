@@ -23,7 +23,7 @@ import { FunctionComponent } from 'preact';
 import { Grid } from '../../../components/grid.js';
 import { Sensor } from '../../controls/sensor.js';
 import { Translation } from '../../../state/i18n.js';
-import { actuated } from '../../../i18n/sorting.js';
+import { actuated } from '../../../i18n/mapping.js';
 import { useNavigationBuilding } from '../../../state/navigation.js';
 
 export const Global: FunctionComponent = () => {

@@ -24,7 +24,7 @@ import { DeviceDetails } from '../sub/device-details.js';
 import { FunctionComponent } from 'preact';
 import { Grid } from '../../../components/grid.js';
 import { ShowHide } from '../../../components/show-hide.js';
-import { rooms as roomsSorting } from '../../../i18n/sorting.js';
+import { roomSorting as roomsSorting } from '../../../i18n/mapping.js';
 import { useArray } from '../../../util/use-array-compare.js';
 import { useI18nKey } from '../../../state/i18n.js';
 import { useScrollRestore } from '../../../util/use-scroll-restore.js';
