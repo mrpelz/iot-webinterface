@@ -21,12 +21,7 @@ import {
   useNavigationRoom,
   useNavigationStaticPage,
 } from '../state/navigation.js';
-import {
-  useChild,
-  useChildGetter,
-  useGetter,
-  useLevelShallow,
-} from '../state/web-api.js';
+import { useChildGetter, useLevelShallow } from '../state/web-api.js';
 import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { Translation } from '../state/i18n.js';
@@ -45,16 +40,21 @@ const AllLightState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
   return allLights ? <MenuIndicatorItem color="hsl(40, 100%, 50%)" /> : null;
 };
 
+const AllWindowsState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
+  room,
+}) => {
+  const allLights = useChildGetter<boolean>(room, 'allWindows');
+
+  return allLights ? <MenuIndicatorItem color="hsl(0, 100%, 50%)" /> : null;
+};
+
 const DoorState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
   room,
 }) => {
   const fontColor = colors.fontPrimary()();
-  const allLightsChild = useChild(room, 'door');
-  const allLights = useGetter<boolean>(
-    useChildGetter(allLightsChild, 'isReceivedValue') ? allLightsChild : null
-  );
+  const door = useChildGetter<boolean>(room, 'door');
 
-  return allLights ? <MenuIndicatorItem color={fontColor} /> : null;
+  return door ? <MenuIndicatorItem color={fontColor} /> : null;
 };
 
 const MenuListItem: FunctionComponent<{
@@ -125,6 +125,7 @@ export const Floor: FunctionComponent<{
             >
               <Translation i18nKey={room.meta.name} />
               <MenuIndicatorSection>
+                <AllWindowsState room={room} />
                 <DoorState room={room} />
                 <AllLightState room={room} />
               </MenuIndicatorSection>
