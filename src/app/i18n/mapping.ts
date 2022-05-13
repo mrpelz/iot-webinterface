@@ -13,9 +13,9 @@ export const roomSorting = [
 export const actuated = ['lighting'] as const;
 
 export const measuredCategories = {
-  airQuality: ['temperature', 'relativeHumidity', 'pressure'],
-  airSafety: ['co2', 'pm025', 'pm10'],
-  environmental: ['brightness', 'uvIndex'],
+  airQuality: ['temperature', 'relativeHumidity'],
+  airSafety: ['pm025', 'pm10', 'co2'],
+  environmental: ['brightness', 'uvIndex', 'pressure'],
   security: ['motion', 'windowOpen', 'doorOpen'],
 } as const;
 

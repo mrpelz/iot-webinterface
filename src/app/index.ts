@@ -9,6 +9,7 @@ import { Notifications } from './util/notifications.js';
 import { WebApi } from './web-api.js';
 import { defer } from './util/defer.js';
 import { getFlags } from './util/flags.js';
+import { multiline } from './util/string.js';
 import { persist } from './util/storage.js';
 import { render } from './root.js';
 
@@ -53,6 +54,24 @@ try {
     persist();
   });
 } catch (error) {
-  removeServiceWorkers();
+  if (
+    // eslint-disable-next-line no-alert
+    confirm(multiline`
+    Error!
+
+    Confirm to clear local storage and remove ServiceWorker.
+
+    After the underlaying issue is fixed,
+    do a hard reload to also invalidate the browser’s HTTP cache.
+
+    ${(error as Error).name}: "${(error as Error).message}"
+    
+    ${(error as Error).stack || '[no stack trace]'}
+    `)
+  ) {
+    localStorage.clear();
+    await removeServiceWorkers();
+  }
+
   throw error;
 }
