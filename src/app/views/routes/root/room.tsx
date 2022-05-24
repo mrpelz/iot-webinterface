@@ -1,9 +1,11 @@
 import {
+  HierarchyElementArea,
   HierarchyElementProperty,
   HierarchyElementPropertyActuator,
   HierarchyElementPropertySensor,
   HierarchyElementRoom,
   Levels,
+  MetaArea,
   groupBy,
   isMetaPropertyActuator,
   isMetaPropertySensor,
@@ -19,9 +21,17 @@ import { Sensor } from '../../controls/sensor.js';
 import { Translation } from '../../../state/i18n.js';
 import { useMemo } from 'preact/hooks';
 
+const isMetaAreaDoor = ({ name }: MetaArea) => name === 'door';
+const isMetaAreaWindow = ({ name }: MetaArea) => name === 'window';
+
 export const Room: FunctionComponent<{
   element: HierarchyElementRoom;
 }> = ({ element: room }) => {
+  const areas = useLevelShallow<HierarchyElementArea>(Levels.AREA, room);
+
+  const doors = useElementFilter(areas, isMetaAreaDoor);
+  const windows = useElementFilter(areas, isMetaAreaWindow);
+
   const properties = useLevelShallow<HierarchyElementProperty>(
     Levels.PROPERTY,
     room
@@ -31,12 +41,6 @@ export const Room: FunctionComponent<{
     HierarchyElementProperty,
     HierarchyElementPropertySensor
   >(properties, isMetaPropertySensor);
-
-  const securitySensors = useMemo(
-    () =>
-      sortBy(sensors, 'measured', measuredCategories.security).listedResults,
-    [sensors]
-  );
 
   const airQualitySensors = useMemo(
     () =>
@@ -74,10 +78,13 @@ export const Room: FunctionComponent<{
 
   return (
     <>
-      {securitySensors.length ? (
+      {doors.length || windows.length ? (
         <Category header={<Translation i18nKey="security" capitalize={true} />}>
           <Grid>
-            {securitySensors.map((element) => (
+            {doors.map((element) => (
+              <Sensor element={element} />
+            ))}
+            {windows.map((element) => (
               <Sensor element={element} />
             ))}
           </Grid>

@@ -21,7 +21,7 @@ import {
   useNavigationRoom,
   useNavigationStaticPage,
 } from '../state/navigation.js';
-import { useChildGetter, useLevelShallow } from '../state/web-api.js';
+import { useChild, useChildGetter, useLevelShallow } from '../state/web-api.js';
 import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { Translation } from '../state/i18n.js';
@@ -43,18 +43,19 @@ const AllLightState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
 const AllWindowsState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
   room,
 }) => {
-  const allLights = useChildGetter<boolean>(room, 'allWindows');
+  const allWindows = useChildGetter<boolean>(room, 'allWindows');
 
-  return allLights ? <MenuIndicatorItem color="hsl(0, 100%, 50%)" /> : null;
+  return allWindows ? <MenuIndicatorItem color="hsl(0, 100%, 50%)" /> : null;
 };
 
 const DoorState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
   room,
 }) => {
   const fontColor = colors.fontPrimary()();
-  const door = useChildGetter<boolean>(room, 'door');
+  const door = useChild(room, 'door');
+  const open = useChildGetter<boolean>(door, 'open');
 
-  return door ? <MenuIndicatorItem color={fontColor} /> : null;
+  return open ? <MenuIndicatorItem color={fontColor} /> : null;
 };
 
 const MenuListItem: FunctionComponent<{

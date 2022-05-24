@@ -4,37 +4,37 @@ import {
   Levels,
   ValueType,
 } from '../../web-api.js';
+import { useChild, useChildGetter, useGetter } from '../../state/web-api.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
-import { useGetter } from '../../state/web-api.js';
 
 export type BinarySensorElement = HierarchyElementPropertySensor & {
   meta: { valueType: ValueType.BOOLEAN };
 };
 
-export const isBinarySensorAreaElement = (
+export const isWindowSensorElement = (
   element: HierarchyElementPropertySensor | HierarchyElementArea
 ): element is BinarySensorElement =>
-  element.meta.level === Levels.PROPERTY &&
-  element.meta.valueType === ValueType.BOOLEAN;
+  Boolean(
+    element.meta.level === Levels.AREA &&
+      element.children &&
+      'open' in element.children
+  );
 
-export const isBinarySensorElement = (
-  element: HierarchyElementPropertySensor | HierarchyElementArea
-): element is BinarySensorElement =>
-  element.meta.level === Levels.PROPERTY &&
-  element.meta.valueType === ValueType.BOOLEAN;
-
-export const BinarySensor: FunctionComponent<{
+export const WindowSensor: FunctionComponent<{
   element: BinarySensorElement;
   negativeKey?: I18nKey;
   positiveKey?: I18nKey;
   title?: I18nKey;
-}> = ({ element, negativeKey = 'no', positiveKey = 'yes', title }) => {
+}> = ({ element, negativeKey = 'closed', positiveKey = 'open', title }) => {
   const { property } = element;
 
-  const value = useGetter<boolean>(element);
+  const open = useChild(element, 'open');
+  const value = useGetter<boolean>(open);
+
+  const isReceived = useChildGetter<boolean>(open, 'isReceivedValue');
 
   return (
     <Cell title={<Translation i18nKey={title || property} capitalize={true} />}>
@@ -43,6 +43,10 @@ export const BinarySensor: FunctionComponent<{
       ) : (
         <>
           <Translation i18nKey={value ? positiveKey : negativeKey} />
+          {
+            // eslint-disable-next-line no-negated-condition
+            isReceived !== false ? null : '*'
+          }
         </>
       )}
     </Cell>

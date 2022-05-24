@@ -1,8 +1,8 @@
 import {
+  HierarchyElementArea,
   HierarchyElementFloor,
   HierarchyElementProperty,
   HierarchyElementPropertyActuator,
-  HierarchyElementPropertySensor,
   HierarchyElementRoom,
   Levels,
   groupBy,
@@ -46,7 +46,7 @@ export const Global: FunctionComponent = () => {
     useCallback(({ name }) => name === 'hallway', [])
   );
 
-  const entryDoor = useChild(hallway, 'door') as HierarchyElementPropertySensor;
+  const entryDoor = useChild(hallway, 'door') as HierarchyElementArea;
 
   const actuators = useElementFilter<
     HierarchyElementProperty,

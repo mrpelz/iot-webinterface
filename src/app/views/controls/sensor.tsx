@@ -1,26 +1,23 @@
 import { BinarySensor, isBinarySensorElement } from './binary-sensor.js';
+import {
+  HierarchyElementArea,
+  HierarchyElementPropertySensor,
+} from '../../web-api.js';
 import { NumericSensor, isNumericSensorElement } from './numeric-sensor.js';
+import { WindowSensor, isWindowSensorElement } from './window-sensor.js';
 import { FunctionComponent } from 'preact';
-import { HierarchyElementPropertySensor } from '../../web-api.js';
 import { I18nKey } from '../../i18n/main.js';
 
 export const Sensor: FunctionComponent<{
-  element: HierarchyElementPropertySensor;
+  element: HierarchyElementPropertySensor | HierarchyElementArea;
   title?: I18nKey;
 }> = ({ element, title }) => {
+  if (isWindowSensorElement(element)) {
+    return <WindowSensor element={element} title={title} />;
+  }
+
   if (isBinarySensorElement(element)) {
-    return (
-      <BinarySensor
-        element={element}
-        negativeKey={
-          ['door', 'window'].includes(element.property) ? 'closed' : undefined
-        }
-        positiveKey={
-          ['door', 'window'].includes(element.property) ? 'open' : undefined
-        }
-        title={title}
-      />
-    );
+    return <BinarySensor element={element} title={title} />;
   }
 
   if (isNumericSensorElement(element)) {

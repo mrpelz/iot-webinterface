@@ -10,12 +10,10 @@ import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
 import { useHookDebug } from '../util/use-hook-debug.js';
 import { useI18nKey } from './i18n.js';
 
-export type TTitleContext = {
-  setSubtitleOverride: StateUpdater<string | null>;
-  setTitleOverride: StateUpdater<string | null>;
-  subtitle: string | null;
-  title: string | null;
-};
+export type TTitleContext = readonly [
+  string | null,
+  StateUpdater<string | null>
+];
 
 const TitleContext = createContext(null as unknown as TTitleContext);
 
@@ -31,23 +29,13 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
   const roomName = useI18nKey(room?.meta.name);
 
   const [titleOverride, setTitleOverride] = useState<string | null>(null);
-  const [subtitle, setSubtitleOverride] = useState<string | null>(null);
 
   const title = useMemo(
     () => titleOverride || staticPageName || roomName,
     [roomName, staticPageName, titleOverride]
   );
 
-  const value = useMemo(
-    () =>
-      ({
-        setSubtitleOverride,
-        setTitleOverride,
-        subtitle,
-        title,
-      } as const),
-    [subtitle, title]
-  );
+  const value = useMemo(() => [title, setTitleOverride] as const, [title]);
 
   useEffect(() => {
     document.title = [title, appName].filter(Boolean).join(' | ');
@@ -59,27 +47,14 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
 };
 
 export const useTitle = (): string | null => {
-  const { title } = useContext(TitleContext);
+  const [title] = useContext(TitleContext);
 
   return useMemo(() => title, [title]);
 };
 
-export const useSubtitle = (): string | null => {
-  const { subtitle } = useContext(TitleContext);
-
-  return useMemo(() => subtitle, [subtitle]);
-};
-
 export const useSetTitleOverride = (): StateUpdater<string | null> => {
-  const { setTitleOverride } = useContext(TitleContext);
+  const [, setTitleOverride] = useContext(TitleContext);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(() => setTitleOverride, []);
-};
-
-export const useSetSubtitleOverride = (): StateUpdater<string | null> => {
-  const { setSubtitleOverride } = useContext(TitleContext);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => setSubtitleOverride, []);
 };

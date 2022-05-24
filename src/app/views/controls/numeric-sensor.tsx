@@ -1,4 +1,9 @@
-import { HierarchyElementPropertySensor, ValueType } from '../../web-api.js';
+import {
+  HierarchyElementArea,
+  HierarchyElementPropertySensor,
+  Levels,
+  ValueType,
+} from '../../web-api.js';
 import { NonBreaking, TabularNums } from '../../components/text.js';
 import { Translation, useI18n } from '../../state/i18n.js';
 import {
@@ -22,9 +27,13 @@ export type NumericSensorElement = HierarchyElementPropertySensor & {
 };
 
 export const isNumericSensorElement = (
-  element: HierarchyElementPropertySensor
+  element: HierarchyElementPropertySensor | HierarchyElementArea
 ): element is NumericSensorElement =>
-  Boolean(element.meta.valueType === ValueType.NUMBER && element.meta.measured);
+  Boolean(
+    element.meta.level === Levels.PROPERTY &&
+      element.meta.valueType === ValueType.NUMBER &&
+      element.meta.measured
+  );
 
 export const NumericSensor: FunctionComponent<{
   element: NumericSensorElement;

@@ -14,10 +14,6 @@ import {
   useHierarchy,
   useLevelDeep,
 } from '../../../state/web-api.js';
-import {
-  useSetSubtitleOverride,
-  useSetTitleOverride,
-} from '../../../state/title.js';
 import { Category } from '../../category.js';
 import { Device } from '../../controls/device.js';
 import { DeviceDetails } from '../sub/device-details.js';
@@ -29,6 +25,7 @@ import { useArray } from '../../../util/use-array-compare.js';
 import { useI18nKey } from '../../../state/i18n.js';
 import { useScrollRestore } from '../../../util/use-scroll-restore.js';
 import { useSegment } from '../../../state/path.js';
+import { useSetTitleOverride } from '../../../state/title.js';
 
 const FAKE_ROUTE_DIVIDER = '❚';
 
@@ -84,7 +81,6 @@ export const Devices: FunctionComponent = () => {
   const [route] = useSegment(1);
   const setBackgroundOverride = useSetBackgroundOverride();
   const setTitleOverride = useSetTitleOverride();
-  const setSubtitleOverride = useSetSubtitleOverride();
 
   useEffect(
     () => () => setTitleOverride(null),
@@ -113,7 +109,6 @@ export const Devices: FunctionComponent = () => {
     setBackgroundOverride(roomName && device ? noBackground : null);
 
     setTitleOverride(device ? device.meta.name : null);
-    setSubtitleOverride(roomName || null);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [device, roomName]);
