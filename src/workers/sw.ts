@@ -347,8 +347,7 @@ const isSafari = (() => {
         );
         if (isLivePreferred) {
           const [liveResponse, code] = await fetchLive(
-            pathnameOverride || request,
-            'no-cache'
+            pathnameOverride || request
           );
 
           if (liveResponse) {
@@ -373,8 +372,7 @@ const isSafari = (() => {
         if (cachedResponse) return cachedResponse;
 
         const [liveResponse, code] = await fetchLive(
-          pathnameOverride || request,
-          'no-cache'
+          pathnameOverride || request
         );
 
         if (liveResponse) {

@@ -61,9 +61,6 @@ try {
 
     Confirm to clear local storage and remove ServiceWorker.
 
-    After the underlaying issue is fixed,
-    do a hard reload to also invalidate the browser’s HTTP cache.
-
     ${(error as Error).name}: "${(error as Error).message}"
     
     ${(error as Error).stack || '[no stack trace]'}

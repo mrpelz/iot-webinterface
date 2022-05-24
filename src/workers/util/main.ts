@@ -23,6 +23,8 @@ const fetchFallback = async (
 ): Promise<readonly [Response | null, number | null, AbortController]> => {
   const abortController = new AbortController();
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const aTimeout = setTimeout(() => abortController.abort(), timeout);
   const clear = () => clearTimeout(aTimeout);
 
