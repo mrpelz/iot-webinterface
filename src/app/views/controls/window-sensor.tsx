@@ -1,8 +1,8 @@
+import { BinarySensorElement, isBinarySensorElement } from './binary-sensor.js';
 import {
+  HierarchyElement,
   HierarchyElementArea,
-  HierarchyElementPropertySensor,
-  Levels,
-  ValueType,
+  isMetaArea,
 } from '../../web-api.js';
 import { useChild, useChildGetter, useGetter } from '../../state/web-api.js';
 import { Cell } from './main.js';
@@ -10,28 +10,31 @@ import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
 
-export type BinarySensorElement = HierarchyElementPropertySensor & {
-  meta: { valueType: ValueType.BOOLEAN };
+export type WindowSensorElement = HierarchyElementArea & {
+  children: {
+    open: BinarySensorElement;
+  };
 };
 
 export const isWindowSensorElement = (
-  element: HierarchyElementPropertySensor | HierarchyElementArea
-): element is BinarySensorElement =>
+  element: HierarchyElement
+): element is WindowSensorElement =>
   Boolean(
-    element.meta.level === Levels.AREA &&
+    isMetaArea(element.meta) &&
       element.children &&
-      'open' in element.children
+      'open' in element.children &&
+      isBinarySensorElement(element.children.open)
   );
 
 export const WindowSensor: FunctionComponent<{
-  element: BinarySensorElement;
+  element: WindowSensorElement;
   negativeKey?: I18nKey;
   positiveKey?: I18nKey;
   title?: I18nKey;
 }> = ({ element, negativeKey = 'closed', positiveKey = 'open', title }) => {
   const { property } = element;
 
-  const open = useChild(element, 'open');
+  const open = useChild(element, 'open') as BinarySensorElement;
   const value = useGetter<boolean>(open);
 
   const isReceived = useChildGetter<boolean>(open, 'isReceivedValue');

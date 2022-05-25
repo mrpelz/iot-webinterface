@@ -1,4 +1,9 @@
-import { HierarchyElementPropertyActuator, ValueType } from '../../web-api.js';
+import {
+  HierarchyElement,
+  HierarchyElementPropertyActuator,
+  ValueType,
+  isMetaPropertyActuator,
+} from '../../web-api.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
@@ -11,8 +16,10 @@ export type NullActuatorElement = HierarchyElementPropertyActuator & {
 };
 
 export const isNullActuatorElement = (
-  element: HierarchyElementPropertyActuator
-): element is NullActuatorElement => element.meta.valueType === ValueType.NULL;
+  element: HierarchyElement
+): element is NullActuatorElement =>
+  isMetaPropertyActuator(element.meta) &&
+  element.meta.valueType === ValueType.NULL;
 
 export const NullActuator: FunctionComponent<{
   element: NullActuatorElement;

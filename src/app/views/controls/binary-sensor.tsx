@@ -1,8 +1,8 @@
 import {
-  HierarchyElementArea,
+  HierarchyElement,
   HierarchyElementPropertySensor,
-  Levels,
   ValueType,
+  isMetaPropertySensor,
 } from '../../web-api.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
@@ -14,16 +14,10 @@ export type BinarySensorElement = HierarchyElementPropertySensor & {
   meta: { valueType: ValueType.BOOLEAN };
 };
 
-export const isBinarySensorAreaElement = (
-  element: HierarchyElementPropertySensor | HierarchyElementArea
-): element is BinarySensorElement =>
-  element.meta.level === Levels.PROPERTY &&
-  element.meta.valueType === ValueType.BOOLEAN;
-
 export const isBinarySensorElement = (
-  element: HierarchyElementPropertySensor | HierarchyElementArea
+  element: HierarchyElement
 ): element is BinarySensorElement =>
-  element.meta.level === Levels.PROPERTY &&
+  isMetaPropertySensor(element.meta) &&
   element.meta.valueType === ValueType.BOOLEAN;
 
 export const BinarySensor: FunctionComponent<{

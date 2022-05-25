@@ -1,8 +1,8 @@
 import {
-  HierarchyElementArea,
+  HierarchyElement,
   HierarchyElementPropertySensor,
-  Levels,
   ValueType,
+  isMetaPropertySensor,
 } from '../../web-api.js';
 import { NonBreaking, TabularNums } from '../../components/text.js';
 import { Translation, useI18n } from '../../state/i18n.js';
@@ -27,10 +27,10 @@ export type NumericSensorElement = HierarchyElementPropertySensor & {
 };
 
 export const isNumericSensorElement = (
-  element: HierarchyElementPropertySensor | HierarchyElementArea
+  element: HierarchyElement
 ): element is NumericSensorElement =>
   Boolean(
-    element.meta.level === Levels.PROPERTY &&
+    isMetaPropertySensor(element.meta) &&
       element.meta.valueType === ValueType.NUMBER &&
       element.meta.measured
   );

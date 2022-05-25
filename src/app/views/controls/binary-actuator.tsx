@@ -1,4 +1,9 @@
-import { HierarchyElementPropertyActuator, ValueType } from '../../web-api.js';
+import {
+  HierarchyElement,
+  HierarchyElementPropertyActuator,
+  ValueType,
+  isMetaPropertyActuator,
+} from '../../web-api.js';
 import {
   useChildGetter,
   useChildSetter,
@@ -15,8 +20,9 @@ export type BinaryActuatorElement = HierarchyElementPropertyActuator & {
 };
 
 export const isBinaryActuatorElement = (
-  element: HierarchyElementPropertyActuator
+  element: HierarchyElement
 ): element is BinaryActuatorElement =>
+  isMetaPropertyActuator(element.meta) &&
   element.meta.valueType === ValueType.BOOLEAN;
 
 export const BinaryActuator: FunctionComponent<{
