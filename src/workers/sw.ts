@@ -338,7 +338,10 @@ const isSafari = (() => {
         const isLaxCache = testPath(pathnameOverride || pathname, laxCacheUrls);
 
         const cachedResponse = await scope.caches
-          .match(pathnameOverride || request, { ignoreSearch: isLaxCache })
+          .match(pathnameOverride || request, {
+            ignoreSearch: isLaxCache,
+            ignoreVary: true,
+          })
           .catch(() => undefined);
 
         const isLivePreferred = testPath(

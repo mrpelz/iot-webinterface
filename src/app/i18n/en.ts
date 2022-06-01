@@ -57,6 +57,7 @@ export const en = {
   property: 'property',
   refresh: 'refresh',
   relativeHumidity: 'relative humidity',
+  restored: 'restored',
   room: 'room',
   scheduledRamp: 'scheduled ramp',
   security: 'security',

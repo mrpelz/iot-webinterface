@@ -4,6 +4,7 @@ import {
   HierarchyElementArea,
   isMetaArea,
 } from '../../web-api.js';
+import { Tag, TagGroup } from '../../components/controls.js';
 import { useChild, useChildGetter, useGetter } from '../../state/web-api.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
@@ -41,17 +42,23 @@ export const WindowSensor: FunctionComponent<{
 
   return (
     <Cell title={<Translation i18nKey={title || property} capitalize={true} />}>
-      {value === null ? (
-        '?'
-      ) : (
-        <>
-          <Translation i18nKey={value ? positiveKey : negativeKey} />
-          {
-            // eslint-disable-next-line no-negated-condition
-            isReceived !== false ? null : '*'
-          }
-        </>
-      )}
+      <Tag>
+        {
+          // eslint-disable-next-line no-negated-condition
+          value === null || isReceived !== false ? null : (
+            <TagGroup>
+              <Translation i18nKey="restored" />
+            </TagGroup>
+          )
+        }
+        <TagGroup>
+          {value === null ? (
+            '?'
+          ) : (
+            <Translation i18nKey={value ? positiveKey : negativeKey} />
+          )}
+        </TagGroup>
+      </Tag>
     </Cell>
   );
 };

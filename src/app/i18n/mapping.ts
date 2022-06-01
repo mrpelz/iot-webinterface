@@ -16,7 +16,7 @@ export const measuredCategories = {
   airQuality: ['temperature', 'relativeHumidity'],
   airSafety: ['pm025', 'pm10', 'co2'],
   environmental: ['brightness', 'uvIndex', 'pressure'],
-  security: ['motion', 'windowOpen', 'doorOpen'],
+  security: ['motion'],
 } as const;
 
 export const defaultNumberFormat: Intl.NumberFormatOptions = {

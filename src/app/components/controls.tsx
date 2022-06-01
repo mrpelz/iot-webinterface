@@ -21,7 +21,7 @@ export const Cell = bindComponent<CellProps>(
     background-color: ${dependentValue(
       'isHighContrast',
       colors.backgroundSecondary(),
-      colors.backgroundSecondary(80)
+      colors.backgroundSecondary(70)
     )};
     border: ${dependentValue(
       'isHighContrast',

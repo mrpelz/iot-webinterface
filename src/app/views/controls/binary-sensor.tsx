@@ -7,6 +7,7 @@ import {
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
+import { Tag } from '../../components/controls.js';
 import { Translation } from '../../state/i18n.js';
 import { useGetter } from '../../state/web-api.js';
 
@@ -32,13 +33,13 @@ export const BinarySensor: FunctionComponent<{
 
   return (
     <Cell title={<Translation i18nKey={title || property} capitalize={true} />}>
-      {value === null ? (
-        '?'
-      ) : (
-        <>
+      <Tag>
+        {value === null ? (
+          '?'
+        ) : (
           <Translation i18nKey={value ? positiveKey : negativeKey} />
-        </>
-      )}
+        )}
+      </Tag>
     </Cell>
   );
 };

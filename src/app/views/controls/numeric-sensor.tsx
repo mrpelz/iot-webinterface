@@ -5,6 +5,7 @@ import {
   isMetaPropertySensor,
 } from '../../web-api.js';
 import { NonBreaking, TabularNums } from '../../components/text.js';
+import { Tag, TagGroup } from '../../components/controls.js';
 import { Translation, useI18n } from '../../state/i18n.js';
 import {
   defaultNumberFormat,
@@ -68,19 +69,22 @@ export const NumericSensor: FunctionComponent<{
 
   return (
     <Cell title={<Translation i18nKey={title || measured} capitalize={true} />}>
-      {value === null ? (
-        '?'
-      ) : (
-        <NonBreaking>
-          <TabularNums>{formattedValue}</TabularNums>
-          {unit ? (
-            <>
-              {' '}
-              <Translation i18nKey={unit} />
-            </>
-          ) : null}
-        </NonBreaking>
-      )}
+      <Tag>
+        {value === null ? (
+          '?'
+        ) : (
+          <NonBreaking>
+            <TagGroup>
+              <TabularNums>{formattedValue}</TabularNums>
+            </TagGroup>
+            {unit ? (
+              <TagGroup>
+                <Translation i18nKey={unit} />
+              </TagGroup>
+            ) : null}
+          </NonBreaking>
+        )}
+      </Tag>
     </Cell>
   );
 };

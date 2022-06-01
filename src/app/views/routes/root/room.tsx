@@ -42,6 +42,12 @@ export const Room: FunctionComponent<{
     HierarchyElementPropertySensor
   >(properties, isMetaPropertySensor);
 
+  const securitySensors = useMemo(
+    () =>
+      sortBy(sensors, 'measured', measuredCategories.security).listedResults,
+    [sensors]
+  );
+
   const airQualitySensors = useMemo(
     () =>
       sortBy(sensors, 'measured', measuredCategories.airQuality).listedResults,
@@ -81,6 +87,9 @@ export const Room: FunctionComponent<{
       {doors.length || windows.length ? (
         <Category header={<Translation i18nKey="security" capitalize={true} />}>
           <Grid>
+            {securitySensors.map((element) => (
+              <Sensor element={element} />
+            ))}
             {doors.map((element) => (
               <Sensor element={element} />
             ))}

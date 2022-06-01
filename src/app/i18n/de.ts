@@ -59,6 +59,7 @@ export const de: Record<keyof typeof en, string> = {
   property: 'Attribut',
   refresh: 'Aktualisieren',
   relativeHumidity: 'Relative Luftfeuchtigkeit',
+  restored: 'wiederhergestellt',
   room: 'Raum',
   scheduledRamp: 'geplante Rampe',
   security: 'Sicherheit',
