@@ -67,7 +67,7 @@ try {
     `)
   ) {
     localStorage.clear();
-    await removeServiceWorkers();
+    removeServiceWorkers();
   }
 
   throw error;
