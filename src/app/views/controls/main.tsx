@@ -11,9 +11,10 @@ import { useTheme } from '../../state/theme.js';
 
 export const Cell: FunctionComponent<{
   arrow?: boolean;
+  includeBody?: boolean;
   onClick?: () => void;
   title: ComponentChild;
-}> = ({ arrow, children, onClick, title }) => {
+}> = ({ arrow, includeBody = true, children, onClick, title }) => {
   const theme = useTheme();
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
@@ -23,7 +24,7 @@ export const Cell: FunctionComponent<{
         <Title>{title}</Title>
         {arrow && onClick ? <ForwardIcon height="1em" /> : null}
       </Header>
-      <Body>{children}</Body>
+      {includeBody ? <Body>{children}</Body> : children}
     </CellComponent>
   );
 };

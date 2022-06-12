@@ -18,7 +18,7 @@ export const Cell = bindComponent<CellProps>(
     font-size: ${dimensions.fontSizeSmall};
     overflow: hidden;
 
-    background-color: ${dependentValue(
+    --background-color: ${dependentValue(
       'isHighContrast',
       colors.backgroundSecondary(),
       colors.backgroundSecondary(70)
@@ -44,12 +44,20 @@ export const Header = styled('cell-header')`
   padding: ${dimensions.controlBase};
 `;
 
-export const Body = styled('cell-body')`
+export const Body = styled('cell-body')<{
+  backgroundColor?: string;
+  color?: string;
+}>`
   align-content: flex-start;
+  color: ${({ color }) => color || ''};
   display: flex;
   flex-wrap: wrap;
   gap: ${dimensions.controlBase};
   padding: ${dimensions.controlBase};
+
+  background-color: ${({ backgroundColor }) => {
+    return backgroundColor || 'var(--background-color, none)';
+  }};
 `;
 
 export const Title = styled('cell-title')`

@@ -142,6 +142,7 @@ const d = {
   ledRightFloodlight: `${s.led} ${s.right} ${s.flood}${s.light}`,
   ledRightWWhite: `${s.led} ${s.right} ${s.warm}-${s.white}`,
   leds: p.led,
+  lightTimer: `${s.light} ${s.timer}`,
   livingRoom: `living ${s.room}`,
   mediaOff: `${s.media} ${s.off}`,
   mediaOnOrSwitch: `${s.media} ${s.on}/${s.switch}`,
