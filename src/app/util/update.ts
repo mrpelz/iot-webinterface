@@ -11,7 +11,7 @@ type SetupMessage = {
 
 const isProd = !['localhost', '127.0.0.1'].includes(location.hostname);
 
-export const CHECK_INTERVAL = isProd ? 15000 : 2500;
+export const CHECK_INTERVAL = isProd ? 15000 : 1000;
 const ID_STORAGE_KEY = 'updateId';
 
 const WARM_URL = '/1C941CA2-2CE3-48DB-B953-2DF891321BAF';

@@ -18,6 +18,7 @@ import {
   useState,
 } from 'preact/hooks';
 import { useGoPreviousSegment, useGoUp, useSegment } from '../state/path.js';
+import { Capitalize } from '../components/text.js';
 import { FunctionComponent } from 'preact';
 import { dimensions } from '../style.js';
 import { useAwaitEvent } from '../util/use-await-event.js';
@@ -129,7 +130,11 @@ export const Titlebar: FunctionComponent = () => {
 
   return (
     <TitlebarComponent padding={padding}>
-      {title ? <Title>{title}</Title> : null}
+      {title ? (
+        <Title>
+          <Capitalize>{title}</Capitalize>
+        </Title>
+      ) : null}
       {leftIcon ? (
         <IconContainer paddingSetter={setPaddingLeft}>{leftIcon}</IconContainer>
       ) : null}

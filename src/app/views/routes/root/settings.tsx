@@ -75,7 +75,7 @@ export const Settings: FunctionComponent = () => {
 
   return (
     <List>
-      <Entry id="home" label={<Translation i18nKey="home" />}>
+      <Entry id="home" label={<Translation capitalize={true} i18nKey="home" />}>
         <select
           disabled={homes.length < 2}
           id="home"
@@ -101,7 +101,10 @@ export const Settings: FunctionComponent = () => {
           ))}
         </select>
       </Entry>
-      <Entry id="building" label={<Translation i18nKey="building" />}>
+      <Entry
+        id="building"
+        label={<Translation capitalize={true} i18nKey="building" />}
+      >
         <select
           disabled={buildings.length < 2}
           id="building"
@@ -130,7 +133,10 @@ export const Settings: FunctionComponent = () => {
           ))}
         </select>
       </Entry>
-      <Entry id="startPage" label={<Translation i18nKey="startPage" />}>
+      <Entry
+        id="startPage"
+        label={<Translation capitalize={true} i18nKey="startPage" />}
+      >
         <select
           id="startPage"
           name="startPage"
@@ -176,7 +182,10 @@ export const Settings: FunctionComponent = () => {
           </optgroup>
         </select>
       </Entry>
-      <Entry id="theme" label={<Translation i18nKey="theme" />}>
+      <Entry
+        id="theme"
+        label={<Translation capitalize={true} i18nKey="theme" />}
+      >
         <select
           id="theme"
           name="theme"
@@ -209,7 +218,10 @@ export const Settings: FunctionComponent = () => {
           })}
         </select>
       </Entry>
-      <Entry id="language" label={<Translation i18nKey="language" />}>
+      <Entry
+        id="language"
+        label={<Translation capitalize={true} i18nKey="language" />}
+      >
         <select
           id="language"
           name="language"
@@ -247,7 +259,7 @@ export const Settings: FunctionComponent = () => {
       </Entry>
       <Entry
         id="enableNotifications"
-        label={<Translation i18nKey="enableNotifications" />}
+        label={<Translation capitalize={true} i18nKey="enableNotifications" />}
       >
         <input
           checked={Boolean(enableNotifications)}
@@ -262,7 +274,10 @@ export const Settings: FunctionComponent = () => {
           )}
         />
       </Entry>
-      <Entry id="absoluteTimes" label={<Translation i18nKey="absoluteTimes" />}>
+      <Entry
+        id="absoluteTimes"
+        label={<Translation capitalize={true} i18nKey="absoluteTimes" />}
+      >
         <input
           checked={Boolean(absoluteTimes)}
           id="absoluteTimes"
@@ -278,7 +293,7 @@ export const Settings: FunctionComponent = () => {
       </Entry>
       <Entry
         id="inactivityTimeout"
-        label={<Translation i18nKey="inactivityTimeout" />}
+        label={<Translation capitalize={true} i18nKey="inactivityTimeout" />}
       >
         <input
           id="inactivityTimeout"
@@ -308,7 +323,10 @@ export const Settings: FunctionComponent = () => {
           )}
         />
       </Entry>
-      <Entry id="debug" label={<Translation i18nKey="debug" />}>
+      <Entry
+        id="debug"
+        label={<Translation capitalize={true} i18nKey="debug" />}
+      >
         <input
           checked={Boolean(debug)}
           id="debug"
@@ -324,7 +342,7 @@ export const Settings: FunctionComponent = () => {
       </Entry>
       <Entry
         id="updateCheckInterval"
-        label={<Translation i18nKey="updateCheckInterval" />}
+        label={<Translation capitalize={true} i18nKey="updateCheckInterval" />}
       >
         <input
           id="updateCheckInterval"
@@ -356,7 +374,7 @@ export const Settings: FunctionComponent = () => {
       </Entry>
       <Entry
         id="updateUnattended"
-        label={<Translation i18nKey="updateUnattended" />}
+        label={<Translation capitalize={true} i18nKey="updateUnattended" />}
       >
         <input
           checked={Boolean(updateUnattended)}
@@ -371,7 +389,10 @@ export const Settings: FunctionComponent = () => {
           )}
         />
       </Entry>
-      <Entry id="serviceWorker" label={<Translation i18nKey="serviceWorker" />}>
+      <Entry
+        id="serviceWorker"
+        label={<Translation capitalize={true} i18nKey="serviceWorker" />}
+      >
         <input
           checked={Boolean(serviceWorker)}
           id="serviceWorker"
@@ -385,7 +406,10 @@ export const Settings: FunctionComponent = () => {
           )}
         />
       </Entry>
-      <Entry id="apiBaseUrl" label={<Translation i18nKey="apiBaseUrl" />}>
+      <Entry
+        id="apiBaseUrl"
+        label={<Translation capitalize={true} i18nKey="apiBaseUrl" />}
+      >
         <input
           id="apiBaseUrl"
           name="apiBaseUrl"

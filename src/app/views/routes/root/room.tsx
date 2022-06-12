@@ -84,7 +84,7 @@ export const Room: FunctionComponent<{
 
   return (
     <>
-      {doors.length || windows.length ? (
+      {[securitySensors, doors, windows].flat().length ? (
         <Category header={<Translation i18nKey="security" capitalize={true} />}>
           <Grid>
             {securitySensors.map((element) => (

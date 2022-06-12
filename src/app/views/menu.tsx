@@ -124,7 +124,7 @@ export const Floor: FunctionComponent<{
               isActive={isActive}
               onClick={() => (isActive ? goRoot?.() : selectRoom(room))}
             >
-              <Translation i18nKey={room.meta.name} />
+              <Translation capitalize={true} i18nKey={room.meta.name} />
               <MenuIndicatorSection>
                 <AllWindowsState room={room} />
                 <DoorState room={room} />
@@ -169,7 +169,7 @@ export const Menu: FunctionComponent = () => {
                     return isActive ? goRoot?.() : selectStaticPage(staticPage);
                   }}
                 >
-                  <Translation i18nKey={staticPage} />
+                  <Translation capitalize={true} i18nKey={staticPage} />
                 </MenuListItem>
               );
             })}
@@ -195,7 +195,7 @@ export const Menu: FunctionComponent = () => {
                     return isActive ? goRoot?.() : selectStaticPage(staticPage);
                   }}
                 >
-                  <Translation i18nKey={staticPage} />
+                  <Translation capitalize={true} i18nKey={staticPage} />
                 </MenuListItem>
               );
             })}

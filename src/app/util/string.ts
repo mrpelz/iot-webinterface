@@ -1,5 +1,10 @@
 const indentMatcher = new RegExp('\\s*');
 
+export const capitalize = (input: string): string => {
+  const [firstLetter, ...rest] = input.split('');
+  return [firstLetter.toLocaleUpperCase(), ...rest].join('');
+};
+
 export const multiline = (
   strings: TemplateStringsArray | string,
   ...tags: string[]
