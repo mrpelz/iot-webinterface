@@ -3,6 +3,7 @@ import { half, multiply } from '../style/dimensions.js';
 import { GridCell } from './grid.js';
 import { bindComponent } from '../util/combine-components.js';
 import { dependentValue } from '../style/main.js';
+import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 
 type CellProps = {
@@ -13,21 +14,22 @@ type CellProps = {
 
 export const Cell = bindComponent<CellProps>(
   styled(GridCell)<CellProps>`
-    border-radius: 9px;
-    color: ${colors.fontPrimary()};
-    font-size: ${dimensions.fontSizeSmall};
-    overflow: hidden;
-
     --background-color: ${dependentValue(
       'isHighContrast',
       colors.backgroundSecondary(),
       colors.backgroundSecondary(70)
     )};
-    border: ${dependentValue(
+    --border-radius: 9px;
+    --border: ${dependentValue(
       'isHighContrast',
       () => `solid ${dimensions.hairline()} ${colors.fontPrimary()()}`,
       'none'
     )};
+
+    color: ${colors.fontPrimary()};
+    font-size: ${dimensions.fontSizeSmall};
+    overflow: hidden;
+
     cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
   `,
   { isHighContrast: false, span: 2 }
@@ -36,6 +38,9 @@ export const Cell = bindComponent<CellProps>(
 export const Header = styled('cell-header')`
   align-items: center;
   background-color: ${colors.backgroundSecondary()};
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  border: var(--border);
   display: flex;
   gap: ${dimensions.controlBase};
   height: ${multiply(dimensions.controlBase, '4')};
@@ -44,20 +49,26 @@ export const Header = styled('cell-header')`
   padding: ${dimensions.controlBase};
 `;
 
-export const Body = styled('cell-body')<{
-  backgroundColor?: string;
-  color?: string;
-}>`
+export const Body = styled('cell-body' as 'section', forwardRef)`
   align-content: flex-start;
-  color: ${({ color }) => color || ''};
+  background-color: var(--background-color, none);
+  border-bottom-left-radius: inherit;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: inherit;
+  border-bottom-right-radius: var(--border-radius);
+  border-bottom: var(--border);
+  border-left: var(--border);
+  border-right: var(--border);
   display: flex;
   flex-wrap: wrap;
   gap: ${dimensions.controlBase};
   padding: ${dimensions.controlBase};
+`;
 
-  background-color: ${({ backgroundColor }) => {
-    return backgroundColor || 'var(--background-color, none)';
-  }};
+export const BodyLarge = styled(Body, forwardRef)`
+  font-size: ${dimensions.fontSizeLarge};
+  font-weight: bold;
+  justify-content: center;
 `;
 
 export const Title = styled('cell-title')`

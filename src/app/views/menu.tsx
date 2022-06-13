@@ -37,7 +37,7 @@ const AllLightState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
 }) => {
   const allLights = useChildGetter<boolean>(room, 'allLights');
 
-  return allLights ? <MenuIndicatorItem color="hsl(40, 100%, 50%)" /> : null;
+  return allLights ? <MenuIndicatorItem color="hsl(40deg 100% 50%)" /> : null;
 };
 
 const AllWindowsState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
@@ -45,7 +45,7 @@ const AllWindowsState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
 }) => {
   const allWindows = useChildGetter<boolean>(room, 'allWindows');
 
-  return allWindows ? <MenuIndicatorItem color="hsl(0, 100%, 50%)" /> : null;
+  return allWindows ? <MenuIndicatorItem color="hsl(0deg 100% 50%)" /> : null;
 };
 
 const DoorState: FunctionComponent<{ room: HierarchyElementRoom }> = ({

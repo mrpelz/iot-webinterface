@@ -4,19 +4,35 @@ import {
   ValueType,
   isMetaPropertyActuator,
 } from '../../web-api.js';
+import { useCallback, useMemo } from 'preact/hooks';
 import {
   useChildGetter,
   useChildSetter,
   useGetter,
 } from '../../state/web-api.js';
 import { BlendOver } from '../../components/blend-over.js';
-import { Body } from '../../components/controls.js';
+import { BodyLarge } from '../../components/controls.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
 import { colors } from '../../style.js';
-import { useCallback } from 'preact/hooks';
+import { styled } from 'goober';
+
+export const overlayBodies = {
+  _: styled(BodyLarge)`
+    background-color: ${colors.whiteShaded(80)};
+    color: ${colors.fontPrimary(undefined, 'light')};
+  `,
+  fan: styled(BodyLarge)`
+    background-color: hsla(200deg 100% 50% / 80%);
+    color: ${colors.fontPrimary(undefined, 'light')};
+  `,
+  lighting: styled(BodyLarge)`
+    background-color: hsla(40deg 100% 50% / 80%);
+    color: ${colors.fontPrimary(undefined, 'light')};
+  `,
+} as const;
 
 export type BinaryActuatorElement = HierarchyElementPropertyActuator & {
   meta: { valueType: ValueType.BOOLEAN };
@@ -34,9 +50,10 @@ export const BinaryActuator: FunctionComponent<{
   positiveKey?: I18nKey;
   title?: I18nKey;
 }> = ({ element, negativeKey = 'off', positiveKey = 'on', title }) => {
-  const overlayFontColor = colors.fontPrimary(undefined, 'light')();
-
-  const { property } = element;
+  const {
+    property,
+    meta: { actuated },
+  } = element;
 
   const value = useGetter<boolean>(element);
 
@@ -44,6 +61,14 @@ export const BinaryActuator: FunctionComponent<{
 
   const flip = useChildSetter<null>(element, 'flip');
   const handleClick = useCallback(() => flip?.(null), [flip]);
+
+  const OverlayBody = useMemo(() => {
+    if (actuated && actuated in overlayBodies) {
+      return overlayBodies[actuated as keyof typeof overlayBodies];
+    }
+
+    return overlayBodies._;
+  }, [actuated]);
 
   return (
     <Cell
@@ -54,12 +79,14 @@ export const BinaryActuator: FunctionComponent<{
       <BlendOver
         blendOver={value ? 1 : 0}
         overlay={
-          <Body backgroundColor="hsl(40, 100%, 50%)" color={overlayFontColor}>
-            <Translation i18nKey={positiveKey} />
-          </Body>
+          value === null ? undefined : (
+            <OverlayBody>
+              <Translation i18nKey={positiveKey} />
+            </OverlayBody>
+          )
         }
       >
-        <Body>
+        <BodyLarge>
           {value === null ? (
             '?'
           ) : (
@@ -68,7 +95,7 @@ export const BinaryActuator: FunctionComponent<{
               {loading ? '…' : null}
             </>
           )}
-        </Body>
+        </BodyLarge>
       </BlendOver>
     </Cell>
   );

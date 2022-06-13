@@ -116,7 +116,7 @@ const d = {
   bathtubBathroom: `Wannen${s.bath}`,
   bedLedDownlightRed: `${s.bed} Boden${s.lamp} ${s.red}`,
   bedLedW: `${s.bed} ${s.led} ${s.white}`,
-  bedroom: `${s.bed}${s.room2}`,
+  bedroom: `schlaf${s.room2}`,
   cWhite: `${s.cold}${s.white}`,
   ceilingLight: `${s.ceiling}n${s.lamp}`,
   ceilingLightBack: `${s.ceiling} ${s.light} hinten`,
