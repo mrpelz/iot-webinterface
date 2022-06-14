@@ -2,6 +2,7 @@ import { BinarySensorElement, isBinarySensorElement } from './binary-sensor.js';
 import {
   HierarchyElement,
   HierarchyElementArea,
+  MetaArea,
   isMetaArea,
 } from '../../web-api.js';
 import { Tag, TagGroup } from '../../components/controls.js';
@@ -16,6 +17,10 @@ export type WindowSensorElement = HierarchyElementArea & {
     open: BinarySensorElement;
   };
 };
+
+export const isMetaAreaDoor = ({ name }: MetaArea): boolean => name === 'door';
+export const isMetaAreaWindow = ({ name }: MetaArea): boolean =>
+  name === 'window';
 
 export const isWindowSensorElement = (
   element: HierarchyElement

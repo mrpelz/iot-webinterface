@@ -1,7 +1,7 @@
 import {
   BinaryActuatorElement,
+  OverlayBodies,
   isBinaryActuatorElement,
-  overlayBodies,
 } from './binary-actuator.js';
 import {
   HierarchyElement,
@@ -23,8 +23,6 @@ import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
 
-const OverlayBody = overlayBodies.lighting;
-
 export type BrightnessActuatorElement = BinaryActuatorElement & {
   children: {
     brightness: HierarchyElementPropertyActuator & {
@@ -44,6 +42,23 @@ export const isBrightnessActuatorElement = (
       element.children.brightness.meta.valueType === ValueType.NUMBER
   );
 
+export const BrightnessLabel: FunctionComponent<{
+  brightness: number | null;
+  loading: boolean | null;
+  value: boolean | null;
+}> = ({ brightness, loading, value }) => {
+  return (
+    <NonBreaking>
+      {useMemo(() => {
+        if (value === null || brightness === null) return '?';
+        if (loading) return '…';
+
+        return <TabularNums>{Math.round(brightness * 100)}%</TabularNums>;
+      }, [brightness, loading, value])}
+    </NonBreaking>
+  );
+};
+
 export const BrightnessActuator: FunctionComponent<{
   element: BrightnessActuatorElement;
   title?: I18nKey;
@@ -58,16 +73,26 @@ export const BrightnessActuator: FunctionComponent<{
   const flip = useChildSetter<null>(element, 'flip');
   const handleClick = useCallback(() => flip?.(null), [flip]);
 
-  const label = useMemo(() => {
-    if (value === null || brightness === null) return '?';
-    if (loading) return '…';
+  const OverlayBody = useMemo(() => {
+    if (property.toLowerCase().includes('red') || property === 'r') {
+      return OverlayBodies.lightingRed;
+    }
+    if (property.toLowerCase().includes('green') || property === 'g') {
+      return OverlayBodies.lightingGreen;
+    }
+    if (property.toLowerCase().includes('blue') || property === 'b') {
+      return OverlayBodies.lightingBlue;
+    }
+    if (property.toLowerCase().includes('cwhite')) {
+      return OverlayBodies.lightingCold;
+    }
 
-    return (
-      <NonBreaking>
-        <TabularNums>{Math.round(brightness * 100)} %</TabularNums>
-      </NonBreaking>
-    );
-  }, [brightness, loading, value]);
+    return OverlayBodies.lighting;
+  }, [property]);
+
+  const label = (
+    <BrightnessLabel brightness={brightness} loading={loading} value={value} />
+  );
 
   return (
     <Cell

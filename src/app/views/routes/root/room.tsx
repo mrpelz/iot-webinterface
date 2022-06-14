@@ -5,13 +5,16 @@ import {
   HierarchyElementPropertySensor,
   HierarchyElementRoom,
   Levels,
-  MetaArea,
   groupBy,
   isMetaPropertyActuator,
   isMetaPropertySensor,
   sortBy,
 } from '../../../web-api.js';
 import { actuated, measuredCategories } from '../../../i18n/mapping.js';
+import {
+  isMetaAreaDoor,
+  isMetaAreaWindow,
+} from '../../controls/window-sensor.js';
 import { useElementFilter, useLevelShallow } from '../../../state/web-api.js';
 import { Actuator } from '../../controls/actuator.js';
 import { Category } from '../../category.js';
@@ -19,10 +22,8 @@ import { FunctionComponent } from 'preact';
 import { Grid } from '../../../components/grid.js';
 import { Sensor } from '../../controls/sensor.js';
 import { Translation } from '../../../state/i18n.js';
+import { isMetaAreaRGB } from '../../controls/rgb-actuator.js';
 import { useMemo } from 'preact/hooks';
-
-const isMetaAreaDoor = ({ name }: MetaArea) => name === 'door';
-const isMetaAreaWindow = ({ name }: MetaArea) => name === 'window';
 
 export const Room: FunctionComponent<{
   element: HierarchyElementRoom;
@@ -31,6 +32,7 @@ export const Room: FunctionComponent<{
 
   const doors = useElementFilter(areas, isMetaAreaDoor);
   const windows = useElementFilter(areas, isMetaAreaWindow);
+  const RGBs = useElementFilter(areas, isMetaAreaRGB);
 
   const properties = useLevelShallow<HierarchyElementProperty>(
     Levels.PROPERTY,
@@ -139,6 +141,9 @@ export const Room: FunctionComponent<{
             {elements.map((element) => (
               <Actuator element={element} />
             ))}
+            {group === 'lighting'
+              ? RGBs.map((element) => <Actuator element={element} />)
+              : null}
           </Grid>
         </Category>
       ))}

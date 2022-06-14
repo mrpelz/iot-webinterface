@@ -29,7 +29,6 @@ export const Cell = bindComponent<CellProps>(
     color: ${colors.fontPrimary()};
     font-size: ${dimensions.fontSizeSmall};
     overflow: hidden;
-
     cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
   `,
   { isHighContrast: false, span: 2 }
@@ -52,9 +51,7 @@ export const Header = styled('cell-header')`
 export const Body = styled('cell-body' as 'section', forwardRef)`
   align-content: flex-start;
   background-color: var(--background-color, none);
-  border-bottom-left-radius: inherit;
   border-bottom-left-radius: var(--border-radius);
-  border-bottom-right-radius: inherit;
   border-bottom-right-radius: var(--border-radius);
   border-bottom: var(--border);
   border-left: var(--border);

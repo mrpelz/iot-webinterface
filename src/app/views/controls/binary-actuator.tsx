@@ -19,7 +19,7 @@ import { Translation } from '../../state/i18n.js';
 import { colors } from '../../style.js';
 import { styled } from 'goober';
 
-export const overlayBodies = {
+export const OverlayBodies = {
   _: styled(BodyLarge)`
     background-color: ${colors.whiteShaded(80)};
     color: ${colors.fontPrimary(undefined, 'light')};
@@ -30,6 +30,22 @@ export const overlayBodies = {
   `,
   lighting: styled(BodyLarge)`
     background-color: hsla(40deg 100% 50% / 80%);
+    color: ${colors.fontPrimary(undefined, 'light')};
+  `,
+  lightingBlue: styled(BodyLarge)`
+    background-color: hsl(240deg 100% 50% / 80%);
+    color: ${colors.fontPrimary(undefined, 'dark')};
+  `,
+  lightingCold: styled(BodyLarge)`
+    background-color: hsl(60deg 100% 60% / 80%);
+    color: ${colors.fontPrimary(undefined, 'light')};
+  `,
+  lightingGreen: styled(BodyLarge)`
+    background-color: hsl(120deg 100% 50% / 80%);
+    color: ${colors.fontPrimary(undefined, 'light')};
+  `,
+  lightingRed: styled(BodyLarge)`
+    background-color: hsl(0deg 100% 50% / 80%);
     color: ${colors.fontPrimary(undefined, 'light')};
   `,
 } as const;
@@ -63,11 +79,11 @@ export const BinaryActuator: FunctionComponent<{
   const handleClick = useCallback(() => flip?.(null), [flip]);
 
   const OverlayBody = useMemo(() => {
-    if (actuated && actuated in overlayBodies) {
-      return overlayBodies[actuated as keyof typeof overlayBodies];
+    if (actuated && actuated in OverlayBodies) {
+      return OverlayBodies[actuated as keyof typeof OverlayBodies];
     }
 
-    return overlayBodies._;
+    return OverlayBodies._;
   }, [actuated]);
 
   return (
