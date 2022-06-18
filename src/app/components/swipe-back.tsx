@@ -3,8 +3,8 @@ import { dependentValue } from '../style/main.js';
 import { styled } from 'goober';
 
 export const SwipeBackWrapper = styled('swipe-back-wrapper')`
+  block-size: 100%;
   display: flex;
-  height: 100%;
   flex-direction: column;
   justify-content: center;
 `;
@@ -20,7 +20,7 @@ export const SwipeBack = styled('swipe-back')<{ isHighContrast: boolean }>`
   display: flex;
 
   & > * {
-    height: ${dimensions.fontSizeLarge};
+    block-size: ${dimensions.fontSizeLarge};
     margin: ${dimensions.fontPadding};
   }
 `;

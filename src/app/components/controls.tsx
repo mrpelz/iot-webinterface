@@ -37,12 +37,12 @@ export const Cell = bindComponent<CellProps>(
 export const Header = styled('cell-header')`
   align-items: center;
   background-color: ${colors.backgroundSecondary()};
-  border-top-left-radius: var(--border-radius);
-  border-top-right-radius: var(--border-radius);
+  block-size: ${multiply(dimensions.controlBase, '4')};
+  border-start-end-radius: var(--border-radius);
+  border-start-start-radius: var(--border-radius);
   border: var(--border);
   display: flex;
   gap: ${dimensions.controlBase};
-  height: ${multiply(dimensions.controlBase, '4')};
   justify-content: space-between;
   overflow: hidden;
   padding: ${dimensions.controlBase};
@@ -51,11 +51,11 @@ export const Header = styled('cell-header')`
 export const Body = styled('cell-body' as 'section', forwardRef)`
   align-content: flex-start;
   background-color: var(--background-color, none);
-  border-bottom-left-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
-  border-bottom: var(--border);
-  border-left: var(--border);
-  border-right: var(--border);
+  border-block-end: var(--border);
+  border-end-end-radius: var(--border-radius);
+  border-end-start-radius: var(--border-radius);
+  border-inline-end: var(--border);
+  border-inline-start: var(--border);
   display: flex;
   flex-wrap: wrap;
   gap: ${dimensions.controlBase};
@@ -82,7 +82,7 @@ export const Tag = styled('tag')`
   display: flex;
   flex-wrap: wrap;
   gap: ${dimensions.controlBase};
-  min-height: ${multiply(dimensions.controlBase, '3')};
+  min-inline-size: ${multiply(dimensions.controlBase, '3')};
   overflow: hidden;
   padding-inline: ${dimensions.controlBase};
 
@@ -97,10 +97,10 @@ export const Tag = styled('tag')`
 
 export const TagGroup = styled('tag-group')`
   align-items: center;
+  block-size: ${multiply(dimensions.controlBase, '3')};
   border-inline-end: solid ${dimensions.hairline} ${colors.fontPrimary()};
   display: flex;
   gap: ${dimensions.controlBase};
-  height: ${multiply(dimensions.controlBase, '3')};
   overflow: hidden;
   padding-inline-end: ${dimensions.controlBase};
 

@@ -94,6 +94,7 @@ export const BinaryActuator: FunctionComponent<{
     >
       <BlendOver
         blendOver={value ? 1 : 0}
+        direction="block"
         overlay={
           value === null ? undefined : (
             <OverlayBody>

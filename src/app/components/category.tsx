@@ -9,14 +9,14 @@ export const CategoryWrapper = styled('category-wrapper')`
 export const CategoryHeader = styled('category-header')<{
   isHighContrast: boolean;
 }>`
+  block-size: ${dimensions.fontSizeLarge};
   display: block;
   font-size: ${dimensions.fontSizeSmall};
   font-weight: 600;
-  height: ${dimensions.fontSizeLarge};
+  inset-block-start: ${dimensions.headerHeightAdaptive};
   line-height: ${dimensions.fontSizeLarge};
   padding: 0 ${dimensions.fontPadding};
   position: sticky;
-  top: ${dimensions.headerHeightAdaptive};
   will-change: contents;
 
   background-color: ${dependentValue(
@@ -29,7 +29,7 @@ export const CategoryHeader = styled('category-header')<{
     () => `solid ${dimensions.hairline()} ${colors.fontPrimary()()}`,
     'none'
   )};
-  margin-bottom: ${dependentValue(
+  margin-block-end: ${dependentValue(
     'isHighContrast',
     () => `-${dimensions.hairline()}`,
     '0'

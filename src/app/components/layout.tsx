@@ -6,22 +6,23 @@ import { styled } from 'goober';
 
 export const Header = styled('header')`
   background-color: ${colors.backgroundSecondary()};
-  left: 0;
+  inline-size: 100%;
+  inset-block-start: 0;
+  inset-inline-start: 0;
   position: fixed;
-  top: 0;
   touch-action: none;
-  width: 100%;
   z-index: 4;
 `;
 
 export const Aside = styled('aside', forwardRef)<{
   isVisible: boolean;
 }>`
-  height: ${dimensions.appHeight};
-  left: 0;
+  block-size: ${dimensions.appHeight};
+  inset-block-start: ${dimensions.headerHeightAdaptive};
+  inset-inline-start: 0;
   position: fixed;
-  top: ${dimensions.headerHeightAdaptive};
-  transition: height 0.3s ease-out, transform 0.3s ease-out, top 0.3s ease-out;
+  transition: block-size 0.3s ease-out, transform 0.3s ease-out,
+    inset-block-start 0.3s ease-out;
   z-index: 4;
 
   transform: ${dependentValue(
@@ -38,29 +39,29 @@ export const Main = styled('main', forwardRef)<{
   background-color: ${colors.backgroundPrimary()};
   color: ${colors.fontPrimary()};
   display: flow-root;
-  margin-top: ${dimensions.headerHeightAdaptive};
-  min-height: ${dimensions.appHeightAdaptive};
+  inline-size: ${dimensions.appWidth};
+  margin-block-start: ${dimensions.headerHeightAdaptive};
+  min-block-size: ${dimensions.appHeightAdaptive};
   position: relative;
   touch-action: ${dependentValue('isAsideVisible', 'none', 'auto')};
-  transition: height 0.3s ease-out, margin-top 0.3s ease-out;
-  width: ${dimensions.appWidth};
+  transition: block-size 0.3s ease-out, margin-block-start 0.3s ease-out;
   z-index: 2;
 
-  margin-left: ${breakpointValue(
+  margin-inline-start: ${breakpointValue(
     mediaQuery(dimensions.breakpointDesktop),
     dimensions.menuWidth,
     'unset'
   )};
 
   &::after {
-    bottom: 0;
     content: '';
-    left: 0;
+    inset-block-end: 0;
+    inset-block-start: 0;
+    inset-inline-start: 0;
     position: absolute;
-    top: 0;
     touch-action: pan-x;
 
-    width: ${({ swipeCaptureWidth }) =>
+    inline-size: ${({ swipeCaptureWidth }) =>
       breakpointValue(
         mediaQuery(dimensions.breakpointDesktop),
         '0',

@@ -3,7 +3,6 @@ import {
   HierarchyElementFloor,
   HierarchyElementProperty,
   HierarchyElementPropertyActuator,
-  HierarchyElementRoom,
   Levels,
   groupBy,
   isMetaPropertyActuator,
@@ -14,7 +13,6 @@ import {
   useChild,
   useElementFilter,
   useHierarchy,
-  useLevelDeep,
   useLevelShallow,
 } from '../../../state/web-api.js';
 import { Actuator } from '../../controls/actuator.js';
@@ -41,12 +39,8 @@ export const Global: FunctionComponent = () => {
       useCallback(({ name }) => name === 'firstFloor', [])
     )
   );
-  const [hallway] = useElementFilter(
-    useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy),
-    useCallback(({ name }) => name === 'hallway', [])
-  );
 
-  const entryDoor = useChild(hallway, 'door') as HierarchyElementArea;
+  const entryDoor = useChild(building, 'entryDoor') as HierarchyElementArea;
 
   const actuators = useElementFilter<
     HierarchyElementProperty,

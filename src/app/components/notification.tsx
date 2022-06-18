@@ -6,13 +6,13 @@ export const Notification = styled('notification' as 'section')<{
   isVisible: boolean;
 }>`
   align-items: center;
+  block-size: ${dependentValue('isVisible', dimensions.titlebarHeight, '0')};
   color: ${colors.backgroundPrimary()};
   cursor: ${dependentValue('onClick', 'pointer', 'default')};
   display: flex;
-  height: ${dependentValue('isVisible', dimensions.titlebarHeight, '0')};
   justify-content: space-between;
   overflow: hidden;
-  transition: background-color 0.3s ease-out, height 0.3s ease-out;
+  transition: background-color 0.3s ease-out, block-size 0.3s ease-out;
 
   background-color: ${dependentValue(
     'isVisible',

@@ -18,7 +18,8 @@ export type WindowSensorElement = HierarchyElementArea & {
   };
 };
 
-export const isMetaAreaDoor = ({ name }: MetaArea): boolean => name === 'door';
+export const isMetaAreaDoor = ({ name }: MetaArea): boolean =>
+  ['door', 'entryDoor'].includes(name);
 export const isMetaAreaWindow = ({ name }: MetaArea): boolean =>
   name === 'window';
 

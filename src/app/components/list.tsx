@@ -13,7 +13,7 @@ export const List = styled('ul')<{ isHighContrast: boolean }>`
     `solid ${dimensions.hairline()} ${colors.fontTertiary()()}`};
   border-block-end-color: ${colors.fontSecondary()};
 
-  width: ${breakpointValue(
+  inline-size: ${breakpointValue(
     mediaQuery(dimensions.breakpointTablet),
     () =>
       breakpointValue(
@@ -60,7 +60,7 @@ export const Button = styled('button')`
   cursor: pointer;
   display: block;
   font-size: ${dimensions.fontSizeSmall};
-  min-height: 3em;
+  inline-size: 100%;
+  min-block-size: 3em;
   padding-inline: ${dimensions.fontPadding};
-  width: 100%;
 `;

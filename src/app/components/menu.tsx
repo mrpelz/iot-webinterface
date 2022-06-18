@@ -7,28 +7,28 @@ import { styled } from 'goober';
 
 export const Menu = styled('nav')<{ isVisible: boolean }>`
   background-color: ${colors.backgroundSecondary()};
+  block-size: ${dimensions.appHeight};
   border-inline-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
-  height: ${dimensions.appHeight};
+  inline-size: ${dimensions.menuWidth};
   overflow-y: auto;
   overscroll-behavior-y: contain;
   padding: ${dimensions.titlebarHeight} 0;
   pointer-events: ${dependentValue('isVisible', 'auto', 'none')};
   scroll-behavior: smooth;
-  width: ${dimensions.menuWidth};
 `;
 
 export const MenuShade = styled('menu-shade' as 'div', forwardRef)<{
   active: boolean;
 }>`
   background-color: black;
+  block-size: ${dimensions.appHeight};
   content: '';
   display: block;
-  height: ${dimensions.appHeight};
-  left: 0;
+  inline-size: ${dimensions.appWidth};
+  inset-block-start: ${dimensions.headerHeightAdaptive};
+  inset-inline-start: 0;
   position: fixed;
-  top: ${dimensions.headerHeightAdaptive};
   transition: opacity 0.3s ease-out;
-  width: ${dimensions.appWidth};
 
   margin-left: ${breakpointValue(
     mediaQuery(dimensions.breakpointDesktop),
@@ -71,12 +71,12 @@ export const MenuListItem = styled('li', forwardRef)<{
   isHovered: boolean;
 }>`
   align-items: center;
+  block-size: ${dimensions.titlebarHeight};
   border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
   border-block-start: ${dimensions.hairline} solid ${colors.fontTertiary()};
   cursor: pointer;
   display: flex;
   font-size: ${dimensions.fontSize};
-  height: ${dimensions.titlebarHeight};
   justify-content: space-between;
   line-height: ${dimensions.fontSize};
   margin: 0;
@@ -108,7 +108,7 @@ export const MenuListItem = styled('li', forwardRef)<{
     )(...args)};
 
   * + & {
-    margin-top: -${dimensions.hairline};
+    margin-block-start: -${dimensions.hairline};
   }
 `;
 
@@ -121,11 +121,11 @@ export const MenuIndicatorItem = styled('menu-indicator-item')<{
   color: string;
 }>`
   background-color: ${({ color }) => color};
+  block-size: ${multiply(dimensions.controlBase, '1.5')};
   border-radius: 50%;
   border: solid ${dimensions.hairline} ${colors.backgroundPrimary()};
   display: block;
   flex-grow: 0;
   flex-shrink: 0;
-  height: ${multiply(dimensions.controlBase, '1.5')};
-  width: ${multiply(dimensions.controlBase, '1.5')};
+  inline-size: ${multiply(dimensions.controlBase, '1.5')};
 `;

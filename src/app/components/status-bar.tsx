@@ -10,8 +10,8 @@ export const StatusBar = styled('status-bar')<{
   animation-fill-mode: forwards;
   animation-name: ${dependentValue('isConnected', 'onConnect', 'none')};
   animation-timing-function: ease-out;
+  block-size: ${strings.safeAreaInsetTop};
   display: block;
-  height: ${strings.safeAreaInsetTop};
   position: relative;
 
   background-color: ${dependentValue(
@@ -32,13 +32,13 @@ export const StatusBar = styled('status-bar')<{
 
   &::before {
     background-color: ${colors.black()};
-    bottom: 0;
     content: '';
     display: ${dependentValue('isLight', 'block', 'none')};
-    left: 0;
+    inset-block-end: 0;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    inset-inline-start: 0;
     position: absolute;
-    right: 0;
-    top: 0;
     z-index: -1;
   }
 `;
