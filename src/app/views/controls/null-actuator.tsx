@@ -1,3 +1,4 @@
+import { BodyLarge, useColorBody } from '../../components/controls.js';
 import {
   HierarchyElement,
   HierarchyElementPropertyActuator,
@@ -5,35 +6,17 @@ import {
   isMetaPropertyActuator,
 } from '../../web-api.js';
 import { useCallback, useEffect, useRef } from 'preact/hooks';
-import { BodyLarge } from '../../components/controls.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
+import { Overlay } from '../../components/overlay.js';
 import { Translation } from '../../state/i18n.js';
-import { colors } from '../../style.js';
-import { forwardRef } from 'preact/compat';
-import { styled } from 'goober';
+import { TriggerBody } from '../../components/null-actuator.js';
 import { useSetter } from '../../state/web-api.js';
 
 export type NullActuatorElement = HierarchyElementPropertyActuator & {
   meta: { valueType: ValueType.NULL };
 };
-
-const Body = styled(BodyLarge, forwardRef)`
-  animation-duration: 1s;
-  animation-fill-mode: forwards;
-  animation-timing-function: ease-out;
-
-  @keyframes onTrigger {
-    from {
-      background-color: ${colors.whiteShaded(80)};
-    }
-
-    to {
-      background-color: var(--background-color);
-    }
-  }
-`;
 
 export const isNullActuatorElement = (
   element: HierarchyElement
@@ -45,29 +28,45 @@ export const NullActuator: FunctionComponent<{
   element: NullActuatorElement;
   title?: I18nKey;
 }> = ({ element, title }) => {
-  const { property } = element;
+  const {
+    property,
+    meta: { actuated },
+  } = element;
 
   const setter = useSetter<null>(element);
   const handleClick = useCallback(() => setter?.(null), [setter]);
 
-  const ref = useRef<HTMLElement>(null);
+  const overlayRef = useRef<HTMLElement>(null);
+  const baseRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
-    const { current: currentRef } = ref;
-    if (!(currentRef instanceof HTMLElement)) return undefined;
+    const { current: overlay } = overlayRef;
+    const { current: base } = baseRef;
 
-    const onClick = () => {
-      currentRef.style.animationName = 'onTrigger';
+    if (!(overlay instanceof HTMLElement)) return undefined;
+    if (!(base instanceof HTMLElement)) return undefined;
 
-      currentRef.addEventListener(
-        'animationend',
-        () => (currentRef.style.animationName = ''),
-        { once: true }
-      );
+    const onClick = async () => {
+      const [animationBase, animationOverlay] = await Promise.all([
+        base.animate([{ opacity: 0 }, { opacity: 1 }], {
+          duration: 1000,
+          easing: 'ease-out',
+        }).finished,
+        overlay.animate([{ opacity: 1 }, { opacity: 0 }], {
+          duration: 1000,
+          easing: 'ease-out',
+        }).finished,
+      ]);
+
+      animationBase.finish();
+      animationOverlay.finish();
     };
 
-    currentRef.addEventListener('click', onClick);
-    return () => currentRef.removeEventListener('clck', onClick);
+    overlay.addEventListener('click', onClick);
+    return () => overlay.removeEventListener('clck', onClick);
   }, []);
+
+  const ColorBody = useColorBody(TriggerBody, property, actuated);
 
   return (
     <Cell
@@ -75,9 +74,17 @@ export const NullActuator: FunctionComponent<{
       onClick={setter ? handleClick : undefined}
       includeBody={false}
     >
-      <Body ref={ref}>
-        <Translation i18nKey="trigger" />
-      </Body>
+      <Overlay
+        overlay={
+          <ColorBody ref={overlayRef}>
+            <Translation i18nKey="trigger" />
+          </ColorBody>
+        }
+      >
+        <BodyLarge ref={baseRef}>
+          <Translation i18nKey="trigger" />
+        </BodyLarge>
+      </Overlay>
     </Cell>
   );
 };

@@ -1,4 +1,9 @@
 import {
+  BodyDisableRoundedCorners,
+  ColorLabel,
+  RGBBody,
+} from '../../components/rgb-actuator.js';
+import {
   BrightnessActuatorElement,
   BrightnessLabel,
   isBrightnessActuatorElement,
@@ -17,13 +22,12 @@ import {
   useGetter,
 } from '../../state/web-api.js';
 import { BlendOver } from '../../components/blend-over.js';
-import { BodyLarge } from '../../components/controls.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
-import { OverlayBodies } from './binary-actuator.js';
+import { StyledVNode } from 'goober';
 import { Translation } from '../../state/i18n.js';
-import { styled } from 'goober';
+import { useColorBody } from '../../components/controls.js';
 
 export type RGBActuatorElement = HierarchyElementArea & {
   children: Record<'r' | 'g' | 'b', BrightnessActuatorElement>;
@@ -46,37 +50,31 @@ export const isRGBActuatorElement = (
       isBrightnessActuatorElement(element.children.b)
   );
 
-const DisableRoundedCorners = styled('disable-rounded-corners' as 'section')`
-  display: contents;
-  --border-radius: 0;
-`;
-
-const ColorWrapper = styled('color-wrapper' as 'section')`
-  display: contents;
-  cursor: pointer;
-`;
-
-const ColorLabel = styled('color-label')`
-  flex-grow: 1;
-`;
-
 const Color: FunctionComponent<{
-  bodyProperty: keyof typeof OverlayBodies;
-  childProperty: string;
-  element: RGBActuatorElement;
-  i18nKey: string;
-}> = ({ bodyProperty, childProperty, element, i18nKey }) => {
-  const child = useChild(element, childProperty);
-  const value = useGetter<boolean>(child);
-  const flip = useChildSetter<null>(child, 'flip');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  base?: StyledVNode<any>;
+  element: BrightnessActuatorElement;
+}> = ({
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  base: Base = RGBBody,
+  element,
+}) => {
+  const {
+    meta: { actuated },
+    property,
+  } = element;
+
+  const value = useGetter<boolean>(element);
+  const flip = useChildSetter<null>(element, 'flip');
   const handleClick = useCallback(() => flip?.(null), [flip]);
-  const loading = useChildGetter<boolean>(child, 'loading');
-  const brightness = useChildGetter<number>(child, 'brightness');
+  const loading = useChildGetter<boolean>(element, 'loading');
+  const brightness = useChildGetter<number>(element, 'brightness');
+
   const label = useMemo(
     () => (
       <>
         <ColorLabel>
-          <Translation i18nKey={i18nKey} />
+          <Translation i18nKey={property} />
         </ColorLabel>
         <BrightnessLabel
           brightness={brightness}
@@ -85,23 +83,18 @@ const Color: FunctionComponent<{
         />
       </>
     ),
-    [brightness, i18nKey, loading, value]
+    [brightness, loading, property, value]
   );
 
-  const OverlayBody = useMemo(
-    () => OverlayBodies[bodyProperty],
-    [bodyProperty]
-  );
+  const ColorBody = useColorBody(Base, property, actuated);
 
   return (
-    <ColorWrapper onClick={handleClick}>
-      <BlendOver
-        blendOver={brightness === null ? 0 : brightness}
-        overlay={<OverlayBody>{label}</OverlayBody>}
-      >
-        <BodyLarge>{label}</BodyLarge>
-      </BlendOver>
-    </ColorWrapper>
+    <BlendOver
+      blendOver={brightness === null ? 0 : brightness}
+      overlay={<ColorBody onClick={handleClick}>{label}</ColorBody>}
+    >
+      <Base onClick={handleClick}>{label}</Base>
+    </BlendOver>
   );
 };
 
@@ -111,31 +104,20 @@ export const RGBActuator: FunctionComponent<{
 }> = ({ element, title }) => {
   const { property } = element;
 
+  const r = useChild(element, 'r') as BrightnessActuatorElement | null;
+  const g = useChild(element, 'g') as BrightnessActuatorElement | null;
+  const b = useChild(element, 'b') as BrightnessActuatorElement | null;
+
+  if (!r || !g || !b) return null;
+
   return (
     <Cell
       includeBody={false}
       title={<Translation i18nKey={title || property} capitalize={true} />}
     >
-      <DisableRoundedCorners>
-        <Color
-          bodyProperty="lightingRed"
-          childProperty="r"
-          element={element}
-          i18nKey="red"
-        />
-        <Color
-          bodyProperty="lightingGreen"
-          childProperty="g"
-          element={element}
-          i18nKey="green"
-        />
-      </DisableRoundedCorners>
-      <Color
-        bodyProperty="lightingBlue"
-        childProperty="b"
-        element={element}
-        i18nKey="blue"
-      />
+      <Color base={BodyDisableRoundedCorners} element={r} />
+      <Color base={BodyDisableRoundedCorners} element={g} />
+      <Color element={b} />
     </Cell>
   );
 };

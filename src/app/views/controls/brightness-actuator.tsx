@@ -1,8 +1,8 @@
 import {
   BinaryActuatorElement,
-  OverlayBodies,
   isBinaryActuatorElement,
 } from './binary-actuator.js';
+import { BodyLarge, useColorBody } from '../../components/controls.js';
 import {
   HierarchyElement,
   HierarchyElementPropertyActuator,
@@ -17,7 +17,6 @@ import {
   useGetter,
 } from '../../state/web-api.js';
 import { BlendOver } from '../../components/blend-over.js';
-import { BodyLarge } from '../../components/controls.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
@@ -63,7 +62,10 @@ export const BrightnessActuator: FunctionComponent<{
   element: BrightnessActuatorElement;
   title?: I18nKey;
 }> = ({ element, title }) => {
-  const { property } = element;
+  const {
+    property,
+    meta: { actuated },
+  } = element;
 
   const value = useGetter<boolean>(element);
 
@@ -73,22 +75,7 @@ export const BrightnessActuator: FunctionComponent<{
   const flip = useChildSetter<null>(element, 'flip');
   const handleClick = useCallback(() => flip?.(null), [flip]);
 
-  const OverlayBody = useMemo(() => {
-    if (property.toLowerCase().includes('red') || property === 'r') {
-      return OverlayBodies.lightingRed;
-    }
-    if (property.toLowerCase().includes('green') || property === 'g') {
-      return OverlayBodies.lightingGreen;
-    }
-    if (property.toLowerCase().includes('blue') || property === 'b') {
-      return OverlayBodies.lightingBlue;
-    }
-    if (property.toLowerCase().includes('cwhite')) {
-      return OverlayBodies.lightingCold;
-    }
-
-    return OverlayBodies.lighting;
-  }, [property]);
+  const ColorBody = useColorBody(BodyLarge, property, actuated);
 
   const label = (
     <BrightnessLabel brightness={brightness} loading={loading} value={value} />
@@ -102,7 +89,7 @@ export const BrightnessActuator: FunctionComponent<{
     >
       <BlendOver
         blendOver={brightness === null ? 0 : brightness}
-        overlay={<OverlayBody>{label}</OverlayBody>}
+        overlay={<ColorBody>{label}</ColorBody>}
       >
         <BodyLarge>{label}</BodyLarge>
       </BlendOver>

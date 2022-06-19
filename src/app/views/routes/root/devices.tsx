@@ -4,6 +4,7 @@ import {
   Levels,
   sortBy,
 } from '../../../web-api.js';
+import { Translation, useI18nKey } from '../../../state/i18n.js';
 import {
   noBackground,
   useSetBackgroundOverride,
@@ -22,7 +23,6 @@ import { Grid } from '../../../components/grid.js';
 import { ShowHide } from '../../../components/show-hide.js';
 import { roomSorting as roomsSorting } from '../../../i18n/mapping.js';
 import { useArray } from '../../../util/use-array-compare.js';
-import { useI18nKey } from '../../../state/i18n.js';
 import { useScrollRestore } from '../../../util/use-scroll-restore.js';
 import { useSegment } from '../../../state/path.js';
 import { useSetTitleOverride } from '../../../state/title.js';
@@ -33,8 +33,6 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   const {
     meta: { name },
   } = room;
-
-  const roomName = useI18nKey(name);
 
   const devices = useElementFilter(
     useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room),
@@ -51,7 +49,9 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   );
 
   return (
-    <Category header={roomName}>
+    <Category
+      header={<Translation capitalize={true} i18nKey={name || undefined} />}
+    >
       <Grid>
         {useMemo(
           () =>

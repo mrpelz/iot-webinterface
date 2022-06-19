@@ -31,7 +31,6 @@ const BlendOverContentBase = styled(BlendOverContent)`
 `;
 
 const BlendOverContentOverlay = styled(BlendOverContent)`
-  pointer-events: none;
   clip-path: ${({ blendOver, direction }) =>
     `inset(${
       direction === 'block' ? String(Math.round((blendOver - 1) * -100)) : '0'
