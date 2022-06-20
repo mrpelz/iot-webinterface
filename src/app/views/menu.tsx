@@ -27,7 +27,7 @@ import { FunctionComponent } from 'preact';
 import { Translation } from '../state/i18n.js';
 import { colors } from '../style.js';
 import { roomSorting } from '../i18n/mapping.js';
-import { useArray } from '../util/use-array-compare.js';
+import { useArray } from '../hooks/use-array-compare.js';
 import { useGoRoot } from '../state/path.js';
 import { useIsMenuVisible } from '../state/menu.js';
 import { useTheme } from '../state/theme.js';

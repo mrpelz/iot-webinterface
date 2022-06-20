@@ -1,7 +1,7 @@
 import { MenuVisible, useIsMenuVisible } from './menu.js';
 import { useLayoutEffect, useRef } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
-import { useHookDebug } from '../util/use-hook-debug.js';
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useSegment } from './path.js';
 
 export const ScrollEffects: FunctionComponent = () => {

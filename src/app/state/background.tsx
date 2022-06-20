@@ -1,7 +1,7 @@
 import { FunctionComponent, createContext } from 'preact';
 import { StateUpdater, useContext, useMemo, useState } from 'preact/hooks';
 import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
-import { useHookDebug } from '../util/use-hook-debug.js';
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useTheme } from './theme.js';
 
 export const noBackground = Symbol('noBackground');

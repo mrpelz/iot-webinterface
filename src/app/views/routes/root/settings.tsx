@@ -20,7 +20,7 @@ import { useFlag, useSetFlag } from '../../../state/flags.js';
 import { useHierarchy, useLevelShallow } from '../../../state/web-api.js';
 import { FunctionComponent } from 'preact';
 import { removeServiceWorkers } from '../../../util/workers.js';
-import { useArray } from '../../../util/use-array-compare.js';
+import { useArray } from '../../../hooks/use-array-compare.js';
 
 export const Settings: FunctionComponent = () => {
   const hierarchy = useHierarchy();

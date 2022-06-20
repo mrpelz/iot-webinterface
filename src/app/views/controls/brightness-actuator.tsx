@@ -10,7 +10,7 @@ import {
   isMetaPropertyActuator,
 } from '../../web-api.js';
 import { NonBreaking, TabularNums } from '../../components/text.js';
-import { useCallback, useMemo } from 'preact/hooks';
+import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
 import {
   useChildGetter,
   useChildSetter,
@@ -21,6 +21,7 @@ import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
+import { useWheel } from '../../hooks/use-wheel.js';
 
 export type BrightnessActuatorElement = BinaryActuatorElement & {
   children: {
@@ -70,10 +71,45 @@ export const BrightnessActuator: FunctionComponent<{
   const value = useGetter<boolean>(element);
 
   const brightness = useChildGetter<number>(element, 'brightness');
+  const brightnessRef = useRef(brightness);
+  useEffect(() => {
+    brightnessRef.current = brightness;
+  }, [brightness]);
+
   const loading = useChildGetter<boolean>(element, 'loading');
+  const loadingRef = useRef(loading);
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
 
   const flip = useChildSetter<null>(element, 'flip');
   const handleClick = useCallback(() => flip?.(null), [flip]);
+
+  const setBrightness = useChildSetter<number>(element, 'brightness');
+  const handleWheel = useCallback(
+    (delta: number) => {
+      const { current: currentBrightness } = brightnessRef;
+      const { current: currentLoading } = loadingRef;
+
+      if (!setBrightness) return;
+      if (currentBrightness === null) return;
+      if (currentLoading) return;
+
+      const newValue = Math.min(
+        Math.max(currentBrightness + delta * 0.01, 0),
+        1
+      );
+
+      setBrightness(newValue);
+    },
+    [setBrightness]
+  );
+
+  const refA = useRef<HTMLElement | null>(null);
+  const refB = useRef<HTMLElement | null>(null);
+
+  useWheel(refA, handleWheel);
+  useWheel(refB, handleWheel);
 
   const ColorBody = useColorBody(BodyLarge, property, actuated);
 
@@ -89,9 +125,9 @@ export const BrightnessActuator: FunctionComponent<{
     >
       <BlendOver
         blendOver={brightness === null ? 0 : brightness}
-        overlay={<ColorBody>{label}</ColorBody>}
+        overlay={<ColorBody ref={refA}>{label}</ColorBody>}
       >
-        <BodyLarge>{label}</BodyLarge>
+        <BodyLarge ref={refB}>{label}</BodyLarge>
       </BlendOver>
     </Cell>
   );

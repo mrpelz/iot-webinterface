@@ -7,7 +7,7 @@ import {
   useState,
 } from 'preact/hooks';
 import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
-import { useHookDebug } from '../util/use-hook-debug.js';
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useI18nKey } from './i18n.js';
 
 export type TTitleContext = readonly [

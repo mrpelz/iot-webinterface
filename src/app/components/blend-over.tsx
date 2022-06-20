@@ -1,6 +1,6 @@
 import { ComponentChildren, FunctionComponent } from 'preact';
 import { styled } from 'goober';
-import { useDelay } from '../util/use-delay.js';
+import { useDelay } from '../hooks/use-delay.js';
 
 export type BlendOverDirection = 'block' | 'inline';
 

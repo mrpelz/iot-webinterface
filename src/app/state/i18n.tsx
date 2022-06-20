@@ -10,7 +10,7 @@ import { useContext, useMemo } from 'preact/hooks';
 import { Capitalize } from '../components/text.js';
 import { universal } from '../i18n/universal.js';
 import { useFlag } from './flags.js';
-import { useHookDebug } from '../util/use-hook-debug.js';
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 
 type TI18nContext = {
   country: string | null;

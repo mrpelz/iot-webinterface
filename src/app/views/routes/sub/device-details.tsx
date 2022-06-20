@@ -10,7 +10,7 @@ import {
 import {
   useAbsoluteTimeLabel,
   useRelativeTimeLabel,
-} from '../../../util/use-time-label.js';
+} from '../../../hooks/use-time-label.js';
 import { useCallback, useMemo } from 'preact/hooks';
 import {
   useChild,

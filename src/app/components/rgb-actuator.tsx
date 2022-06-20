@@ -1,12 +1,13 @@
 import { BodyLarge } from './controls.js';
 import { dimensions } from '../style.js';
+import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 
-export const RGBBody = styled(BodyLarge)`
+export const RGBBody = styled(BodyLarge, forwardRef)`
   cursor: pointer;
 `;
 
-export const BodyDisableRoundedCorners = styled(RGBBody)`
+export const BodyDisableRoundedCorners = styled(RGBBody, forwardRef)`
   border-radius: 0;
 `;
 

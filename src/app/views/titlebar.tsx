@@ -21,7 +21,7 @@ import { useGoPreviousSegment, useGoUp, useSegment } from '../state/path.js';
 import { Capitalize } from '../components/text.js';
 import { FunctionComponent } from 'preact';
 import { dimensions } from '../style.js';
-import { useAwaitEvent } from '../util/use-await-event.js';
+import { useAwaitEvent } from '../hooks/use-await-event.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlipMenuVisible } from '../state/menu.js';
 import { useMediaQuery } from '../style/main.js';

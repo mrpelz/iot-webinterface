@@ -18,11 +18,11 @@ import {
 import {
   useGetLocalStorage,
   useSetLocalStorage,
-} from '../util/use-local-storage.js';
+} from '../hooks/use-local-storage.js';
 import { useLevelShallow, useWebApi } from './web-api.js';
-import { useDelay } from '../util/use-delay.js';
+import { useDelay } from '../hooks/use-delay.js';
 import { useFlag } from './flags.js';
-import { useHookDebug } from '../util/use-hook-debug.js';
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useSegment } from './path.js';
 import { useVisibility } from './visibility.js';
 

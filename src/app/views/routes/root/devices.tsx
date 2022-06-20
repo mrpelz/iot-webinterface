@@ -22,8 +22,8 @@ import { FunctionComponent } from 'preact';
 import { Grid } from '../../../components/grid.js';
 import { ShowHide } from '../../../components/show-hide.js';
 import { roomSorting as roomsSorting } from '../../../i18n/mapping.js';
-import { useArray } from '../../../util/use-array-compare.js';
-import { useScrollRestore } from '../../../util/use-scroll-restore.js';
+import { useArray } from '../../../hooks/use-array-compare.js';
+import { useScrollRestore } from '../../../hooks/use-scroll-restore.js';
 import { useSegment } from '../../../state/path.js';
 import { useSetTitleOverride } from '../../../state/title.js';
 

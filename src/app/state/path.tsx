@@ -15,8 +15,8 @@ import {
   goDown,
   goUp as goUpUtil,
 } from '../util/path.js';
-import { useHookDebug } from '../util/use-hook-debug.js';
-import { usePrevious } from '../util/use-previous.js';
+import { useHookDebug } from '../hooks/use-hook-debug.js';
+import { usePrevious } from '../hooks/use-previous.js';
 import { useVisibility } from './visibility.js';
 
 export type TPathContext = {

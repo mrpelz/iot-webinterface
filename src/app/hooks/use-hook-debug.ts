@@ -1,4 +1,4 @@
-import { getCountry } from './locale.js';
+import { getCountry } from '../util/locale.js';
 import { useEffect } from 'preact/hooks';
 import { useFlag } from '../state/flags.js';
 

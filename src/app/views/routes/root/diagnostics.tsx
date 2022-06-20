@@ -5,7 +5,7 @@ import {
   staticPagesTop,
   useNavigation,
 } from '../../../state/navigation.js';
-import { useFetchJson, useFetchText } from '../../../util/use-fetch.js';
+import { useFetchJson, useFetchText } from '../../../hooks/use-fetch.js';
 import {
   useHierarchy,
   useLevelShallow,

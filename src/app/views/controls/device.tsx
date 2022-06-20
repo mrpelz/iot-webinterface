@@ -17,7 +17,7 @@ import { FunctionComponent } from 'preact';
 import { TabularNums } from '../../components/text.js';
 import { useMemo } from 'preact/hooks';
 import { useTheme } from '../../state/theme.js';
-import { useTimeLabel } from '../../util/use-time-label.js';
+import { useTimeLabel } from '../../hooks/use-time-label.js';
 
 export const OnlineIcon: FunctionComponent = () => {
   const theme = useTheme();

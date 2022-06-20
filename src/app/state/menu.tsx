@@ -10,7 +10,7 @@ import {
 import { useLeaveCallbackRef, usePath } from './path.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
-import { useHookDebug } from '../util/use-hook-debug.js';
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useMediaQuery } from '../style/main.js';
 import { useVisibility } from './visibility.js';
 

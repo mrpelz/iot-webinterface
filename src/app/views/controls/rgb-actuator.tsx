@@ -14,7 +14,7 @@ import {
   MetaArea,
   isMetaArea,
 } from '../../web-api.js';
-import { useCallback, useMemo } from 'preact/hooks';
+import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
 import {
   useChild,
   useChildGetter,
@@ -28,6 +28,7 @@ import { I18nKey } from '../../i18n/main.js';
 import { StyledVNode } from 'goober';
 import { Translation } from '../../state/i18n.js';
 import { useColorBody } from '../../components/controls.js';
+import { useWheel } from '../../hooks/use-wheel.js';
 
 export type RGBActuatorElement = HierarchyElementArea & {
   children: Record<'r' | 'g' | 'b', BrightnessActuatorElement>;
@@ -65,10 +66,47 @@ const Color: FunctionComponent<{
   } = element;
 
   const value = useGetter<boolean>(element);
+
+  const brightness = useChildGetter<number>(element, 'brightness');
+  const brightnessRef = useRef(brightness);
+  useEffect(() => {
+    brightnessRef.current = brightness;
+  }, [brightness]);
+
+  const loading = useChildGetter<boolean>(element, 'loading');
+  const loadingRef = useRef(loading);
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
+
   const flip = useChildSetter<null>(element, 'flip');
   const handleClick = useCallback(() => flip?.(null), [flip]);
-  const loading = useChildGetter<boolean>(element, 'loading');
-  const brightness = useChildGetter<number>(element, 'brightness');
+
+  const setBrightness = useChildSetter<number>(element, 'brightness');
+  const handleWheel = useCallback(
+    (delta: number) => {
+      const { current: currentBrightness } = brightnessRef;
+      const { current: currentLoading } = loadingRef;
+
+      if (!setBrightness) return;
+      if (currentBrightness === null) return;
+      if (currentLoading) return;
+
+      const newValue = Math.min(
+        Math.max(currentBrightness + delta * 0.01, 0),
+        1
+      );
+
+      setBrightness(newValue);
+    },
+    [setBrightness]
+  );
+
+  const refA = useRef<HTMLElement | null>(null);
+  const refB = useRef<HTMLElement | null>(null);
+
+  useWheel(refA, handleWheel);
+  useWheel(refB, handleWheel);
 
   const label = useMemo(
     () => (
@@ -91,9 +129,15 @@ const Color: FunctionComponent<{
   return (
     <BlendOver
       blendOver={brightness === null ? 0 : brightness}
-      overlay={<ColorBody onClick={handleClick}>{label}</ColorBody>}
+      overlay={
+        <ColorBody onClick={handleClick} ref={refA}>
+          {label}
+        </ColorBody>
+      }
     >
-      <Base onClick={handleClick}>{label}</Base>
+      <Base onClick={handleClick} ref={refB}>
+        {label}
+      </Base>
     </BlendOver>
   );
 };
