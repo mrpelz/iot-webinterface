@@ -11,7 +11,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { useArray } from '../hooks/use-array-compare.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
 
-type SetterFunction<T> = (value: T) => void;
+export type SetterFunction<T> = (value: T) => void;
 
 type UseLevelParents = (
   | HierarchyElement

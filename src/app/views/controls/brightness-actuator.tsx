@@ -9,9 +9,16 @@ import {
   ValueType,
   isMetaPropertyActuator,
 } from '../../web-api.js';
-import { NonBreaking, TabularNums } from '../../components/text.js';
-import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
 import {
+  MutableRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'preact/hooks';
+import { NonBreaking, TabularNums } from '../../components/text.js';
+import {
+  SetterFunction,
   useChildGetter,
   useChildSetter,
   useGetter,
@@ -21,6 +28,7 @@ import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
+import { useSwipe } from '../../hooks/use-swipe.js';
 import { useWheel } from '../../hooks/use-wheel.js';
 
 export type BrightnessActuatorElement = BinaryActuatorElement & {
@@ -41,6 +49,73 @@ export const isBrightnessActuatorElement = (
       isMetaPropertyActuator(element.children.brightness.meta) &&
       element.children.brightness.meta.valueType === ValueType.NUMBER
   );
+
+export const useWheelBrightness = (
+  brightnessRef: MutableRef<number | null>,
+  loadingRef: MutableRef<boolean | null>,
+  setBrightness: SetterFunction<number> | null
+): ((delta: number) => void) =>
+  useCallback(
+    (delta) => {
+      const { current: currentBrightness } = brightnessRef;
+      const { current: currentLoading } = loadingRef;
+
+      if (!setBrightness) return;
+      if (currentLoading) return;
+
+      const newValue =
+        Math.round(
+          Math.min(Math.max((currentBrightness || 0) + delta * 0.005, 0), 1) *
+            100
+        ) / 100;
+
+      if (newValue === currentBrightness) return;
+
+      setBrightness(newValue);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setBrightness]
+  );
+
+export const useSwipeBrightness = (
+  brightnessRef: MutableRef<number | null>,
+  loadingRef: MutableRef<boolean | null>,
+  setBrightness: SetterFunction<number> | null
+): ((delta: number | null) => void) => {
+  const startBrightnessRef = useRef<number | null>(null);
+
+  return useCallback(
+    (delta) => {
+      const { current: currentBrightness } = brightnessRef;
+      const { current: currentLoading } = loadingRef;
+
+      if (currentBrightness === null) return;
+      if (currentLoading) return;
+      if (!setBrightness) return;
+
+      if (delta === null) {
+        startBrightnessRef.current = null;
+        return;
+      }
+
+      const { current: startBrightness } = startBrightnessRef;
+
+      const brightness =
+        startBrightness === null ? currentBrightness : startBrightness;
+
+      const newValue =
+        Math.round(Math.min(Math.max(brightness + delta, 0), 1) * 100) / 100;
+
+      if (newValue === currentBrightness) return;
+
+      setBrightness(newValue);
+
+      startBrightnessRef.current = brightness;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setBrightness]
+  );
+};
 
 export const BrightnessLabel: FunctionComponent<{
   brightness: number | null;
@@ -86,30 +161,26 @@ export const BrightnessActuator: FunctionComponent<{
   const handleClick = useCallback(() => flip?.(null), [flip]);
 
   const setBrightness = useChildSetter<number>(element, 'brightness');
-  const handleWheel = useCallback(
-    (delta: number) => {
-      const { current: currentBrightness } = brightnessRef;
-      const { current: currentLoading } = loadingRef;
 
-      if (!setBrightness) return;
-      if (currentBrightness === null) return;
-      if (currentLoading) return;
-
-      const newValue = Math.min(
-        Math.max(currentBrightness + delta * 0.01, 0),
-        1
-      );
-
-      setBrightness(newValue);
-    },
-    [setBrightness]
+  const handleWheel = useWheelBrightness(
+    brightnessRef,
+    loadingRef,
+    setBrightness
+  );
+  const handleSwipe = useSwipeBrightness(
+    brightnessRef,
+    loadingRef,
+    setBrightness
   );
 
   const refA = useRef<HTMLElement | null>(null);
   const refB = useRef<HTMLElement | null>(null);
 
-  useWheel(refA, handleWheel);
-  useWheel(refB, handleWheel);
+  useWheel(refA, handleWheel, 100);
+  useWheel(refB, handleWheel, 100);
+
+  useSwipe(refA, handleSwipe, 100);
+  useSwipe(refB, handleSwipe, 100);
 
   const ColorBody = useColorBody(BodyLarge, property, actuated);
 

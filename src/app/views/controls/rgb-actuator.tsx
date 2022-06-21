@@ -7,6 +7,8 @@ import {
   BrightnessActuatorElement,
   BrightnessLabel,
   isBrightnessActuatorElement,
+  useSwipeBrightness,
+  useWheelBrightness,
 } from './brightness-actuator.js';
 import {
   HierarchyElement,
@@ -28,6 +30,7 @@ import { I18nKey } from '../../i18n/main.js';
 import { StyledVNode } from 'goober';
 import { Translation } from '../../state/i18n.js';
 import { useColorBody } from '../../components/controls.js';
+import { useSwipe } from '../../hooks/use-swipe.js';
 import { useWheel } from '../../hooks/use-wheel.js';
 
 export type RGBActuatorElement = HierarchyElementArea & {
@@ -83,30 +86,26 @@ const Color: FunctionComponent<{
   const handleClick = useCallback(() => flip?.(null), [flip]);
 
   const setBrightness = useChildSetter<number>(element, 'brightness');
-  const handleWheel = useCallback(
-    (delta: number) => {
-      const { current: currentBrightness } = brightnessRef;
-      const { current: currentLoading } = loadingRef;
 
-      if (!setBrightness) return;
-      if (currentBrightness === null) return;
-      if (currentLoading) return;
-
-      const newValue = Math.min(
-        Math.max(currentBrightness + delta * 0.01, 0),
-        1
-      );
-
-      setBrightness(newValue);
-    },
-    [setBrightness]
+  const handleWheel = useWheelBrightness(
+    brightnessRef,
+    loadingRef,
+    setBrightness
+  );
+  const handleSwipe = useSwipeBrightness(
+    brightnessRef,
+    loadingRef,
+    setBrightness
   );
 
   const refA = useRef<HTMLElement | null>(null);
   const refB = useRef<HTMLElement | null>(null);
 
-  useWheel(refA, handleWheel);
-  useWheel(refB, handleWheel);
+  useWheel(refA, handleWheel, 100);
+  useWheel(refB, handleWheel, 100);
+
+  useSwipe(refA, handleSwipe, 100);
+  useSwipe(refB, handleSwipe, 100);
 
   const label = useMemo(
     () => (

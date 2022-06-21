@@ -1,15 +1,24 @@
-import { MutableRef, useCallback, useEffect } from 'preact/hooks';
+import { MutableRef, useCallback, useEffect, useRef } from 'preact/hooks';
 
 export type WheelDirection = 'both' | 'horizontal' | 'vertial';
 
 export const useWheel = <T extends HTMLElement>(
   ref: MutableRef<T | null>,
   setter: (input: number) => void,
+  throttle: number,
   direction: WheelDirection = 'both'
 ): void => {
+  const updateRef = useRef(0);
+
   const onWheel = useCallback(
     (event: WheelEvent) => {
       event.preventDefault();
+
+      const now = Date.now();
+      const timeSinceUpdate = now - updateRef.current;
+
+      if (timeSinceUpdate < throttle) return;
+      updateRef.current = now;
 
       const { deltaX, deltaY } = event;
 
@@ -27,7 +36,7 @@ export const useWheel = <T extends HTMLElement>(
 
       setter(useX ? deltaX : -deltaY);
     },
-    [direction, setter]
+    [direction, setter, throttle]
   );
 
   useEffect(() => {
