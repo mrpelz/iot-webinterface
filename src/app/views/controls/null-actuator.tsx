@@ -1,4 +1,3 @@
-import { BodyLarge, useColorBody } from '../../components/controls.js';
 import {
   HierarchyElement,
   HierarchyElementPropertyActuator,
@@ -6,12 +5,14 @@ import {
   isMetaPropertyActuator,
 } from '../../web-api.js';
 import { useCallback, useEffect, useRef } from 'preact/hooks';
+import { BodyLarge } from '../../components/controls.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Overlay } from '../../components/overlay.js';
 import { Translation } from '../../state/i18n.js';
 import { TriggerBody } from '../../components/null-actuator.js';
+import { useColorBody } from '../../hooks/use-color-body.js';
 import { useSetter } from '../../state/web-api.js';
 
 export type NullActuatorElement = HierarchyElementPropertyActuator & {

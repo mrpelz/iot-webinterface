@@ -38,6 +38,13 @@ export const Background: FunctionComponent = () => {
         }
       })();
 
+      if (previous instanceof HTMLImageElement) {
+        const { src } = previous;
+        if (!src.length) return;
+
+        URL.revokeObjectURL(src);
+      }
+
       previous?.remove();
 
       if (!previous && current) animation?.commitStyles();
@@ -49,6 +56,7 @@ export const Background: FunctionComponent = () => {
     const img = background ? new Image() : null;
 
     if (img && background) {
+      img.crossOrigin = 'use-credentials';
       img.src = background;
 
       img.onload = async () => {
@@ -69,6 +77,13 @@ export const Background: FunctionComponent = () => {
     for (const child of Array.from(wrapper.childNodes)) {
       if (img && child === img) continue;
       if (previous && child === previous) continue;
+
+      if (child instanceof HTMLImageElement) {
+        const { src } = child;
+        if (!src.length) return;
+
+        URL.revokeObjectURL(src);
+      }
 
       child.remove();
     }

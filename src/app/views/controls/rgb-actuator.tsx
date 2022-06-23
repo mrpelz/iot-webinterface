@@ -29,7 +29,7 @@ import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { StyledVNode } from 'goober';
 import { Translation } from '../../state/i18n.js';
-import { useColorBody } from '../../components/controls.js';
+import { useColorBody } from '../../hooks/use-color-body.js';
 import { useSwipe } from '../../hooks/use-swipe.js';
 import { useWheel } from '../../hooks/use-wheel.js';
 

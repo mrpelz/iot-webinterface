@@ -2,7 +2,6 @@ import {
   BinaryActuatorElement,
   isBinaryActuatorElement,
 } from './binary-actuator.js';
-import { BodyLarge, useColorBody } from '../../components/controls.js';
 import {
   HierarchyElement,
   HierarchyElementPropertyActuator,
@@ -24,10 +23,12 @@ import {
   useGetter,
 } from '../../state/web-api.js';
 import { BlendOver } from '../../components/blend-over.js';
+import { BodyLarge } from '../../components/controls.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
+import { useColorBody } from '../../hooks/use-color-body.js';
 import { useSwipe } from '../../hooks/use-swipe.js';
 import { useWheel } from '../../hooks/use-wheel.js';
 

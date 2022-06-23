@@ -7,22 +7,42 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { tmpdir } from 'os';
 
+const PRELOAD_PLACEHOLDER = '<!-- preload -->';
+
 const DIST_DIR = './dist';
 const STATIC_DIR = './static';
+
+const ENTRY_HTML_TEMPLATE_FILE = './static/index.html';
+const ENTRY_HTML_FILE = './index.html';
 
 const ID_FILE = './id.txt';
 const INDEX_FILE = './index.json';
 
 const HASH_EXCLUSIONS = [
-  new RegExp('.js.map$'),
-  new RegExp('^/id.txt$'),
-  new RegExp('^/index.json$'),
-];
-
-const INDEX_EXCLUSIONS = [
+  new RegExp('.DS_Store$'),
   new RegExp('.js.map$'),
   new RegExp('^/id.txt$'),
   new RegExp('^/index.html$'),
+  new RegExp('^/index.json$'),
+];
+
+const LIST_EXCLUSIONS = [
+  new RegExp('.DS_Store$'),
+  new RegExp('.js.map$'),
+  new RegExp('^/index.html$'),
+];
+
+const PRELOAD_TYPES = {
+  worker: [new RegExp('^/js/workers/.*.js$')],
+  // eslint-disable-next-line sort-keys
+  script: [new RegExp('^/js/app/.*.js$'), new RegExp('^/js/lib/.*.js$')],
+  // eslint-disable-next-line sort-keys
+  fetch: [new RegExp('.txt$'), new RegExp('.json$')],
+  image: [new RegExp('.ico$'), new RegExp('.jpg$'), new RegExp('.png$')],
+};
+
+const INDEX_EXCLUSIONS = [
+  new RegExp('^/id.txt$'),
   new RegExp('^/index.json$'),
   new RegExp('^/js/workers/sw.js$'),
   new RegExp('^/manifest.json$'),
@@ -44,6 +64,7 @@ const NGINX_CONFIG = './nginx/main.conf';
 const tasks = process.argv[process.argv.length - 1].split(',');
 
 async function precacheIndex() {
+  const entryHtmlFile = join(process.cwd(), DIST_DIR, ENTRY_HTML_FILE);
   const indexFile = join(process.cwd(), DIST_DIR, INDEX_FILE);
   const idFile = join(process.cwd(), DIST_DIR, ID_FILE);
 
@@ -83,7 +104,7 @@ async function precacheIndex() {
       }
 
       if (
-        INDEX_EXCLUSIONS.find((exclusion) => {
+        LIST_EXCLUSIONS.find((exclusion) => {
           return exclusion.test(prefixedPath);
         })
       ) {
@@ -115,14 +136,37 @@ async function precacheIndex() {
     .flat()
     .sort();
 
-  const result = Object.fromEntries(
+  const list = fileList.filter(
+    (entry) => !INDEX_TIERS.optional.find((inclusion) => inclusion.test(entry))
+  );
+
+  const preloadList = Object.fromEntries(
+    Object.entries(PRELOAD_TYPES).map(([type, matchers]) => {
+      const matchingFiles = [];
+
+      for (const matcher of matchers) {
+        for (const index of list) {
+          if (!matcher.test(index)) continue;
+          matchingFiles.push(index);
+        }
+      }
+
+      return [type, matchingFiles];
+    })
+  );
+
+  const indexList = fileList.filter(
+    (entry) => !INDEX_EXCLUSIONS.find((exclusion) => exclusion.test(entry))
+  );
+
+  const cacheInventory = Object.fromEntries(
     Object.entries(INDEX_TIERS).map(([tier, matchers]) => {
       const matchingFiles = [];
 
       for (const matcher of matchers) {
-        for (const file of fileList) {
-          if (!matcher.test(file)) continue;
-          matchingFiles.push(file);
+        for (const index of indexList) {
+          if (!matcher.test(index)) continue;
+          matchingFiles.push(index);
         }
       }
 
@@ -130,11 +174,48 @@ async function precacheIndex() {
     })
   );
 
-  const filePayload = Buffer.from(`${JSON.stringify(result)}\n`);
+  const cacheInventoryPayload = Buffer.from(
+    `${JSON.stringify(cacheInventory)}\n`
+  );
 
   hashes.push(
     createHash('md5')
-      .update(Buffer.concat([Buffer.from(indexFile), SEPARATOR, filePayload]))
+      .update(
+        Buffer.concat([
+          Buffer.from(indexFile),
+          SEPARATOR,
+          cacheInventoryPayload,
+        ])
+      )
+      .digest('hex')
+  );
+
+  const entryHtmlTemplate = await readFile(ENTRY_HTML_TEMPLATE_FILE, {
+    encoding: 'utf8',
+  });
+  const preloadTags = [];
+
+  for (const [type, urls] of Object.entries(preloadList)) {
+    for (const url of urls) {
+      preloadTags.push(
+        `<link rel="preload" crossorigin="use-credentials" as="${type}" href="${url}">`
+      );
+    }
+  }
+
+  const entryHtmlPayload = Buffer.from(
+    entryHtmlTemplate.replace(
+      PRELOAD_PLACEHOLDER,
+      preloadTags.map((tag, index) => `${index ? '' : '  '}${tag}`).join('\n')
+    ),
+    'utf8'
+  );
+
+  hashes.push(
+    createHash('md5')
+      .update(
+        Buffer.concat([Buffer.from(entryHtmlFile), SEPARATOR, entryHtmlPayload])
+      )
       .digest('hex')
   );
 
@@ -143,7 +224,8 @@ async function precacheIndex() {
     .digest('hex');
 
   await Promise.all([
-    writeFile(indexFile, filePayload),
+    writeFile(entryHtmlFile, entryHtmlPayload),
+    writeFile(indexFile, cacheInventoryPayload),
     writeFile(idFile, `${globalHash}\n`),
   ]);
 }

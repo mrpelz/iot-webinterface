@@ -116,8 +116,11 @@ const isSafari = (() => {
     return response;
   };
 
-  const fetchLive = (request: RequestInfo, cache?: RequestCache) =>
-    fetchFallback(request, 2000, { cache });
+  const fetchLive = (
+    request: RequestInfo,
+    cache?: RequestCache,
+    timeout = 2000
+  ) => fetchFallback(request, timeout, { cache });
 
   const putInCache = async (
     path: string,
@@ -191,7 +194,7 @@ const isSafari = (() => {
       paths.map(async (path) => {
         try {
           if (await cacheCritical.match(path)) return;
-          const [response] = await fetchLive(path, 'no-cache');
+          const [response] = await fetchLive(path, 'no-cache', 10000);
           if (!response) return;
 
           await cacheCritical.put(path, response);
@@ -209,7 +212,7 @@ const isSafari = (() => {
       (optional as string[]).map(async (path) => {
         try {
           if (await cacheOptional.match(path)) return;
-          const [response] = await fetchLive(path, 'no-cache');
+          const [response] = await fetchLive(path, 'no-cache', 10000);
           if (!response) return;
 
           await cacheOptional.put(path, response);
@@ -278,6 +281,11 @@ const isSafari = (() => {
   };
 
   scope.onfetch = (fetchEvent) => {
+    const preloadResponse =
+      'preloadResponse' in fetchEvent
+        ? (fetchEvent.preloadResponse as Promise<Response | undefined>)
+        : null;
+
     const { request } = fetchEvent;
     const { pathname } = new URL(request.url, scope.origin);
 
@@ -349,9 +357,11 @@ const isSafari = (() => {
           livePreferredUrls
         );
         if (isLivePreferred) {
-          const [liveResponse, code] = await fetchLive(
-            pathnameOverride || request
-          );
+          const preloadLiveResponse = (await preloadResponse) || null;
+
+          const [liveResponse, code] = preloadLiveResponse
+            ? [preloadLiveResponse, preloadLiveResponse.status]
+            : await fetchLive(pathnameOverride || request);
 
           if (liveResponse) {
             await putInCache(
@@ -374,9 +384,11 @@ const isSafari = (() => {
 
         if (cachedResponse) return cachedResponse;
 
-        const [liveResponse, code] = await fetchLive(
-          pathnameOverride || request
-        );
+        const preloadLiveResponse = (await preloadResponse) || null;
+
+        const [liveResponse, code] = preloadLiveResponse
+          ? [preloadLiveResponse, preloadLiveResponse.status]
+          : await fetchLive(pathnameOverride || request, undefined, 10000);
 
         if (liveResponse) {
           await putInCache(
@@ -429,6 +441,17 @@ const isSafari = (() => {
       (async () => {
         try {
           await scope.clients.claim();
+
+          if (
+            'navigationPreload' in scope.registration &&
+            scope.registration.navigationPreload
+          ) {
+            try {
+              await scope.registration.navigationPreload.enable();
+            } catch {
+              // noop
+            }
+          }
         } catch (error) {
           wsConsole.error(`onactivate error: ${error}`);
         }

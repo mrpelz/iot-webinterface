@@ -7,6 +7,7 @@ import {
   useState,
 } from 'preact/hooks';
 import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
+import { capitalize } from '../util/string.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useI18nKey } from './i18n.js';
 
@@ -38,7 +39,12 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
   const value = useMemo(() => [title, setTitleOverride] as const, [title]);
 
   useEffect(() => {
-    document.title = [title, appName].filter(Boolean).join(' | ');
+    document.title = [
+      title ? title.split(' ').map(capitalize).join(' ') : null,
+      appName,
+    ]
+      .filter(Boolean)
+      .join(' | ');
   }, [title]);
 
   return (
