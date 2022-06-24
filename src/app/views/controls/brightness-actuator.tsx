@@ -10,10 +10,12 @@ import {
 } from '../../web-api.js';
 import {
   MutableRef,
+  StateUpdater,
   useCallback,
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from 'preact/hooks';
 import { NonBreaking, TabularNums } from '../../components/text.js';
 import {
@@ -29,6 +31,8 @@ import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
+import { useDelay } from '../../hooks/use-delay.js';
+import { useSegment } from '../../state/path.js';
 import { useSwipe } from '../../hooks/use-swipe.js';
 import { useWheel } from '../../hooks/use-wheel.js';
 
@@ -55,8 +59,8 @@ export const useWheelBrightness = (
   brightnessRef: MutableRef<number | null>,
   loadingRef: MutableRef<boolean | null>,
   setBrightness: SetterFunction<number> | null
-): ((delta: number) => void) =>
-  useCallback(
+): ((delta: number) => void) => {
+  return useCallback(
     (delta) => {
       const { current: currentBrightness } = brightnessRef;
       const { current: currentLoading } = loadingRef;
@@ -77,11 +81,13 @@ export const useWheelBrightness = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [setBrightness]
   );
+};
 
 export const useSwipeBrightness = (
   brightnessRef: MutableRef<number | null>,
   loadingRef: MutableRef<boolean | null>,
-  setBrightness: SetterFunction<number> | null
+  setBrightness: SetterFunction<number> | null,
+  setInteracting: StateUpdater<boolean>
 ): ((delta: number | null) => void) => {
   const startBrightnessRef = useRef<number | null>(null);
 
@@ -94,8 +100,14 @@ export const useSwipeBrightness = (
       if (currentLoading) return;
       if (!setBrightness) return;
 
+      if (delta === 0) {
+        setInteracting(true);
+        return;
+      }
+
       if (delta === null) {
         startBrightnessRef.current = null;
+        setInteracting(false);
         return;
       }
 
@@ -163,6 +175,8 @@ export const BrightnessActuator: FunctionComponent<{
 
   const setBrightness = useChildSetter<number>(element, 'brightness');
 
+  const [isInteracting, setInteracting] = useState(false);
+
   const handleWheel = useWheelBrightness(
     brightnessRef,
     loadingRef,
@@ -171,7 +185,8 @@ export const BrightnessActuator: FunctionComponent<{
   const handleSwipe = useSwipeBrightness(
     brightnessRef,
     loadingRef,
-    setBrightness
+    setBrightness,
+    setInteracting
   );
 
   const refA = useRef<HTMLElement | null>(null);
@@ -180,10 +195,13 @@ export const BrightnessActuator: FunctionComponent<{
   useWheel(refA, handleWheel, 100);
   useWheel(refB, handleWheel, 100);
 
-  useSwipe(refA, handleSwipe, 100);
-  useSwipe(refB, handleSwipe, 100);
+  useSwipe(refA, handleSwipe, 50);
+  useSwipe(refB, handleSwipe, 50);
 
   const ColorBody = useColorBody(BodyLarge, property, actuated);
+
+  const [route] = useSegment(0);
+  const allowTransition = Boolean(useDelay(route, 300, true));
 
   const label = (
     <BrightnessLabel brightness={brightness} loading={loading} value={value} />
@@ -198,6 +216,9 @@ export const BrightnessActuator: FunctionComponent<{
       <BlendOver
         blendOver={brightness === null ? 0 : brightness}
         overlay={<ColorBody ref={refA}>{label}</ColorBody>}
+        transition={
+          allowTransition && brightness !== null && !loading && !isInteracting
+        }
       >
         <BodyLarge ref={refB}>{label}</BodyLarge>
       </BlendOver>

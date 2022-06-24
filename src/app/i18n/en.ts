@@ -114,6 +114,7 @@ const d = {
   allCeilingLights: `${s.all} ${s.ceiling} ${p.light}`,
   allLights: `${s.all} ${p.light}`,
   allLightsOff: `${s.all} ${p.light} ${s.off}`,
+  allLightsTimer: `${s.all} ${p.light} ${s.timer}`,
   allOff: `${s.all} ${s.off}`,
   allTimer: `${s.all} ${s.timer}`,
   b: s.blue,

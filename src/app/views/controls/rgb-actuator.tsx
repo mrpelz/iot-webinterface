@@ -16,7 +16,13 @@ import {
   MetaArea,
   isMetaArea,
 } from '../../web-api.js';
-import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 import {
   useChild,
   useChildGetter,
@@ -30,6 +36,8 @@ import { I18nKey } from '../../i18n/main.js';
 import { StyledVNode } from 'goober';
 import { Translation } from '../../state/i18n.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
+import { useDelay } from '../../hooks/use-delay.js';
+import { useSegment } from '../../state/path.js';
 import { useSwipe } from '../../hooks/use-swipe.js';
 import { useWheel } from '../../hooks/use-wheel.js';
 
@@ -87,6 +95,8 @@ const Color: FunctionComponent<{
 
   const setBrightness = useChildSetter<number>(element, 'brightness');
 
+  const [isInteracting, setInteracting] = useState(false);
+
   const handleWheel = useWheelBrightness(
     brightnessRef,
     loadingRef,
@@ -95,7 +105,8 @@ const Color: FunctionComponent<{
   const handleSwipe = useSwipeBrightness(
     brightnessRef,
     loadingRef,
-    setBrightness
+    setBrightness,
+    setInteracting
   );
 
   const refA = useRef<HTMLElement | null>(null);
@@ -104,8 +115,13 @@ const Color: FunctionComponent<{
   useWheel(refA, handleWheel, 100);
   useWheel(refB, handleWheel, 100);
 
-  useSwipe(refA, handleSwipe, 100);
-  useSwipe(refB, handleSwipe, 100);
+  useSwipe(refA, handleSwipe, 50);
+  useSwipe(refB, handleSwipe, 50);
+
+  const ColorBody = useColorBody(Base, property, actuated);
+
+  const [route] = useSegment(0);
+  const allowTransition = Boolean(useDelay(route, 300, true));
 
   const label = useMemo(
     () => (
@@ -123,11 +139,12 @@ const Color: FunctionComponent<{
     [brightness, loading, property, value]
   );
 
-  const ColorBody = useColorBody(Base, property, actuated);
-
   return (
     <BlendOver
       blendOver={brightness === null ? 0 : brightness}
+      transition={
+        allowTransition && brightness !== null && !loading && !isInteracting
+      }
       overlay={
         <ColorBody onClick={handleClick} ref={refA}>
           {label}

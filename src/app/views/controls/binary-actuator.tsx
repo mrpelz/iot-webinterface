@@ -17,6 +17,8 @@ import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
 import { useCallback } from 'preact/hooks';
 import { useColorBody } from '../../hooks/use-color-body.js';
+import { useDelay } from '../../hooks/use-delay.js';
+import { useSegment } from '../../state/path.js';
 
 export type BinaryActuatorElement = HierarchyElementPropertyActuator & {
   meta: { valueType: ValueType.BOOLEAN };
@@ -48,6 +50,9 @@ export const BinaryActuator: FunctionComponent<{
 
   const ColorBody = useColorBody(BodyLarge, property, actuated);
 
+  const [route] = useSegment(0);
+  const allowTransition = Boolean(useDelay(route, 300, true));
+
   return (
     <Cell
       includeBody={false}
@@ -57,6 +62,7 @@ export const BinaryActuator: FunctionComponent<{
       <BlendOver
         blendOver={value ? 1 : 0}
         direction="block"
+        transition={allowTransition && value !== null && !loading}
         overlay={
           value === null ? undefined : (
             <ColorBody>
