@@ -4,7 +4,7 @@ import {
   HierarchyElementPropertySensor,
 } from '../../web-api.js';
 import { NumericSensor, isNumericSensorElement } from './numeric-sensor.js';
-import { WindowSensor, isWindowSensorElement } from './window-sensor.js';
+import { OpenSensor, isOpenSensorElement } from './open-sensor.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 
@@ -12,8 +12,8 @@ export const Sensor: FunctionComponent<{
   element: HierarchyElementPropertySensor | HierarchyElementArea;
   title?: I18nKey;
 }> = ({ element, title }) => {
-  if (isWindowSensorElement(element)) {
-    return <WindowSensor element={element} title={title} />;
+  if (isOpenSensorElement(element)) {
+    return <OpenSensor element={element} title={title} />;
   }
 
   if (isBinarySensorElement(element)) {

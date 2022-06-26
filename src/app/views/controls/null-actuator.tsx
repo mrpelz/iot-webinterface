@@ -6,6 +6,7 @@ import {
 } from '../../web-api.js';
 import { useCallback, useEffect, useRef } from 'preact/hooks';
 import { BodyLarge } from '../../components/controls.js';
+import { Button } from '../../components/list.js';
 import { Cell } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
@@ -73,7 +74,6 @@ export const NullActuator: FunctionComponent<{
     <Cell
       title={<Translation i18nKey={title || property} capitalize={true} />}
       onClick={setter ? handleClick : undefined}
-      includeBody={false}
     >
       <Overlay
         overlay={
@@ -88,4 +88,13 @@ export const NullActuator: FunctionComponent<{
       </Overlay>
     </Cell>
   );
+};
+
+export const NullActuatorButton: FunctionComponent<{
+  element: NullActuatorElement;
+}> = ({ element, children }) => {
+  const setter = useSetter<null>(element);
+  const handleClick = useCallback(() => setter?.(null), [setter]);
+
+  return <Button onClick={handleClick}>{children}</Button>;
 };

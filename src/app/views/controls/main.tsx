@@ -9,12 +9,18 @@ import { ForwardIcon } from '../../components/icons.js';
 import { useMemo } from 'preact/hooks';
 import { useTheme } from '../../state/theme.js';
 
-export const Cell: FunctionComponent<{
+export type CellProps = {
   arrow?: boolean;
-  includeBody?: boolean;
   onClick?: () => void;
   title: ComponentChild;
-}> = ({ arrow, includeBody = true, children, onClick, title }) => {
+};
+
+export const Cell: FunctionComponent<CellProps> = ({
+  arrow,
+  children,
+  onClick,
+  title,
+}) => {
   const theme = useTheme();
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
@@ -24,7 +30,16 @@ export const Cell: FunctionComponent<{
         <Title>{title}</Title>
         {arrow && onClick ? <ForwardIcon height="1em" /> : null}
       </Header>
-      {includeBody ? <Body>{children}</Body> : children}
+      {children}
     </CellComponent>
   );
 };
+
+export const CellWithBody: FunctionComponent<CellProps> = ({
+  children,
+  ...props
+}) => (
+  <Cell {...props}>
+    <Body>{children}</Body>
+  </Cell>
+);

@@ -12,7 +12,7 @@ import {
   useGetter,
   useLevelShallowSkipInput,
 } from '../../state/web-api.js';
-import { Cell } from './main.js';
+import { CellWithBody } from './main.js';
 import { FunctionComponent } from 'preact';
 import { TabularNums } from '../../components/text.js';
 import { useMemo } from 'preact/hooks';
@@ -109,7 +109,7 @@ export const Device: FunctionComponent<{
   );
 
   return (
-    <Cell title={device.meta.name} onClick={onSelect} arrow={true}>
+    <CellWithBody title={device.meta.name} onClick={onSelect} arrow={true}>
       {subDevices.length ? (
         subDevices.map((subDevice) => (
           <Tag>
@@ -128,6 +128,6 @@ export const Device: FunctionComponent<{
           <DeviceOnlineState device={device} />
         </Tag>
       )}
-    </Cell>
+    </CellWithBody>
   );
 };

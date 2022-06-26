@@ -11,7 +11,7 @@ import {
   defaultNumberFormat,
   measuredNumberFormats,
 } from '../../i18n/mapping.js';
-import { Cell } from './main.js';
+import { CellWithBody } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { useGetter } from '../../state/web-api.js';
@@ -68,7 +68,9 @@ export const NumericSensor: FunctionComponent<{
   );
 
   return (
-    <Cell title={<Translation i18nKey={title || measured} capitalize={true} />}>
+    <CellWithBody
+      title={<Translation i18nKey={title || measured} capitalize={true} />}
+    >
       <Tag>
         {value === null ? (
           '?'
@@ -85,6 +87,6 @@ export const NumericSensor: FunctionComponent<{
           </NonBreaking>
         )}
       </Tag>
-    </Cell>
+    </CellWithBody>
   );
 };

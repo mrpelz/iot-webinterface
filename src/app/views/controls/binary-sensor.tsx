@@ -4,7 +4,7 @@ import {
   ValueType,
   isMetaPropertySensor,
 } from '../../web-api.js';
-import { Cell } from './main.js';
+import { CellWithBody } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Tag } from '../../components/controls.js';
@@ -32,7 +32,9 @@ export const BinarySensor: FunctionComponent<{
   const value = useGetter<boolean>(element);
 
   return (
-    <Cell title={<Translation i18nKey={title || property} capitalize={true} />}>
+    <CellWithBody
+      title={<Translation i18nKey={title || property} capitalize={true} />}
+    >
       <Tag>
         {value === null ? (
           '?'
@@ -40,6 +42,6 @@ export const BinarySensor: FunctionComponent<{
           <Translation i18nKey={value ? positiveKey : negativeKey} />
         )}
       </Tag>
-    </Cell>
+    </CellWithBody>
   );
 };

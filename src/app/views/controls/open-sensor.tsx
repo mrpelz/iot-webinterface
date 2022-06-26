@@ -7,12 +7,12 @@ import {
 } from '../../web-api.js';
 import { Tag, TagGroup } from '../../components/controls.js';
 import { useChild, useChildGetter, useGetter } from '../../state/web-api.js';
-import { Cell } from './main.js';
+import { CellWithBody } from './main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
 
-export type WindowSensorElement = HierarchyElementArea & {
+export type OpenSensorElement = HierarchyElementArea & {
   children: {
     open: BinarySensorElement;
   };
@@ -23,9 +23,9 @@ export const isMetaAreaDoor = ({ name }: MetaArea): boolean =>
 export const isMetaAreaWindow = ({ name }: MetaArea): boolean =>
   name === 'window';
 
-export const isWindowSensorElement = (
+export const isOpenSensorElement = (
   element: HierarchyElement
-): element is WindowSensorElement =>
+): element is OpenSensorElement =>
   Boolean(
     isMetaArea(element.meta) &&
       element.children &&
@@ -33,8 +33,8 @@ export const isWindowSensorElement = (
       isBinarySensorElement(element.children.open)
   );
 
-export const WindowSensor: FunctionComponent<{
-  element: WindowSensorElement;
+export const OpenSensor: FunctionComponent<{
+  element: OpenSensorElement;
   negativeKey?: I18nKey;
   positiveKey?: I18nKey;
   title?: I18nKey;
@@ -47,7 +47,9 @@ export const WindowSensor: FunctionComponent<{
   const isReceived = useChildGetter<boolean>(open, 'isReceivedValue');
 
   return (
-    <Cell title={<Translation i18nKey={title || property} capitalize={true} />}>
+    <CellWithBody
+      title={<Translation i18nKey={title || property} capitalize={true} />}
+    >
       <Tag>
         {
           // eslint-disable-next-line no-negated-condition
@@ -65,6 +67,6 @@ export const WindowSensor: FunctionComponent<{
           )}
         </TagGroup>
       </Tag>
-    </Cell>
+    </CellWithBody>
   );
 };

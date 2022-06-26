@@ -20,14 +20,13 @@ import { Device } from '../../controls/device.js';
 import { DeviceDetails } from '../sub/device-details.js';
 import { FunctionComponent } from 'preact';
 import { Grid } from '../../../components/grid.js';
-import { ShowHide } from '../../../components/show-hide.js';
+import { SubRoute } from '../../sub-route.js';
 import { roomSorting as roomsSorting } from '../../../i18n/mapping.js';
 import { useArray } from '../../../hooks/use-array-compare.js';
-import { useScrollRestore } from '../../../hooks/use-scroll-restore.js';
 import { useSegment } from '../../../state/path.js';
 import { useSetTitleOverride } from '../../../state/title.js';
 
-const FAKE_ROUTE_DIVIDER = '❚';
+const FAKE_ROUTE_DIVIDER = '*';
 
 const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   const {
@@ -113,16 +112,11 @@ export const Devices: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [device, roomName]);
 
-  useScrollRestore(!device);
-
   return (
-    <>
-      <ShowHide show={!device}>
-        {roomsSorted.map((aRoom) => (
-          <Room room={aRoom} />
-        ))}
-      </ShowHide>
-      {device ? <DeviceDetails device={device} /> : null}
-    </>
+    <SubRoute subRoute={device ? <DeviceDetails device={device} /> : null}>
+      {roomsSorted.map((aRoom) => (
+        <Room room={aRoom} />
+      ))}
+    </SubRoute>
   );
 };

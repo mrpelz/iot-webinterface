@@ -1,7 +1,10 @@
 import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
-import { Button, Entry as EntryComponent } from '../../../components/list.js';
 import { Entry, List } from '../../list.js';
 import { HierarchyElementDevice, Levels } from '../../../web-api.js';
+import {
+  NullActuatorButton,
+  isNullActuatorElement,
+} from '../../controls/null-actuator.js';
 import {
   OfflineIcon,
   OnlineIcon,
@@ -11,15 +14,15 @@ import {
   useAbsoluteTimeLabel,
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
-import { useCallback, useMemo } from 'preact/hooks';
 import {
   useChild,
   useElementFilter,
   useGetter,
   useLevelShallowSkipInput,
-  useSetter,
 } from '../../../state/web-api.js';
+import { Entry as EntryComponent } from '../../../components/list.js';
 import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
 
 const SHY_CHARACTER = '\u00ad';
 
@@ -215,18 +218,7 @@ export const DeviceDetailsInner: FunctionComponent<{
   const { isSubDevice, name, transportType, type } = meta;
 
   const identifyDevice = useChild(device, 'identifyDevice');
-  const identifyDeviceSetter = useSetter<null>(identifyDevice);
-  const identifyDeviceTrigger = useCallback(
-    () => identifyDeviceSetter?.(null),
-    [identifyDeviceSetter]
-  );
-
   const resetDevice = useChild(device, 'resetDevice');
-  const resetDeviceSetter = useSetter<null>(resetDevice);
-  const resetDeviceTrigger = useCallback(
-    () => resetDeviceSetter?.(null),
-    [resetDeviceSetter]
-  );
 
   return (
     <List>
@@ -244,11 +236,15 @@ export const DeviceDetailsInner: FunctionComponent<{
 
       {identifyDevice || resetDevice ? (
         <EntryComponent>
-          {identifyDevice ? (
-            <Button onClick={identifyDeviceTrigger}>identify device</Button>
+          {identifyDevice && isNullActuatorElement(identifyDevice) ? (
+            <NullActuatorButton element={identifyDevice}>
+              identify device
+            </NullActuatorButton>
           ) : null}
-          {resetDevice ? (
-            <Button onClick={resetDeviceTrigger}>reset device</Button>
+          {resetDevice && isNullActuatorElement(resetDevice) ? (
+            <NullActuatorButton element={resetDevice}>
+              reset device
+            </NullActuatorButton>
           ) : null}
         </EntryComponent>
       ) : null}

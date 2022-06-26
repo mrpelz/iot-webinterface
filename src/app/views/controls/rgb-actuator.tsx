@@ -171,10 +171,7 @@ export const RGBActuator: FunctionComponent<{
   if (!r || !g || !b) return null;
 
   return (
-    <Cell
-      includeBody={false}
-      title={<Translation i18nKey={title || property} capitalize={true} />}
-    >
+    <Cell title={<Translation i18nKey={title || property} capitalize={true} />}>
       <Color base={BodyDisableRoundedCorners} element={r} />
       <Color base={BodyDisableRoundedCorners} element={g} />
       <Color element={b} />

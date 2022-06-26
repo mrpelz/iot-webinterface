@@ -55,7 +55,6 @@ export const BinaryActuator: FunctionComponent<{
 
   return (
     <Cell
-      includeBody={false}
       onClick={flip ? handleClick : undefined}
       title={<Translation i18nKey={title || property} capitalize={true} />}
     >

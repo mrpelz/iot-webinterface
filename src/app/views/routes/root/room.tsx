@@ -14,7 +14,7 @@ import { actuated, measuredCategories } from '../../../i18n/mapping.js';
 import {
   isMetaAreaDoor,
   isMetaAreaWindow,
-} from '../../controls/window-sensor.js';
+} from '../../controls/open-sensor.js';
 import { useElementFilter, useLevelShallow } from '../../../state/web-api.js';
 import { Actuator } from '../../controls/actuator.js';
 import { Category } from '../../category.js';
