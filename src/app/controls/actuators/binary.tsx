@@ -11,7 +11,7 @@ import {
 } from '../../state/web-api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
-import { Cell } from './main.js';
+import { Cell } from '../main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
@@ -33,9 +33,10 @@ export const isBinaryActuatorElement = (
 export const BinaryActuator: FunctionComponent<{
   element: BinaryActuatorElement;
   negativeKey?: I18nKey;
+  onClick?: () => void;
   positiveKey?: I18nKey;
   title?: I18nKey;
-}> = ({ element, negativeKey = 'off', positiveKey = 'on', title }) => {
+}> = ({ element, negativeKey = 'off', onClick, positiveKey = 'on', title }) => {
   const {
     property,
     meta: { actuated },
@@ -55,7 +56,7 @@ export const BinaryActuator: FunctionComponent<{
 
   return (
     <Cell
-      onClick={flip ? handleClick : undefined}
+      onClick={flip && !onClick ? handleClick : onClick}
       title={<Translation i18nKey={title || property} capitalize={true} />}
     >
       <BlendOver

@@ -7,22 +7,21 @@ import {
   groupBy,
   isMetaPropertyActuator,
   sortBy,
-} from '../../../web-api.js';
+} from '../../web-api.js';
 import { useCallback, useMemo } from 'preact/hooks';
 import {
   useChild,
-  useElementFilter,
   useHierarchy,
   useLevelShallow,
-} from '../../../state/web-api.js';
-import { Actuator } from '../../controls/actuator.js';
-import { Category } from '../../category.js';
+  useMetaFilter,
+} from '../../state/web-api.js';
+import { Category } from '../../views/category.js';
+import { Control } from '../../controls/main.js';
 import { FunctionComponent } from 'preact';
-import { Grid } from '../../../components/grid.js';
-import { Sensor } from '../../controls/sensor.js';
-import { Translation } from '../../../state/i18n.js';
-import { actuated } from '../../../i18n/mapping.js';
-import { useNavigationBuilding } from '../../../state/navigation.js';
+import { Grid } from '../../components/grid.js';
+import { Translation } from '../../state/i18n.js';
+import { actuated } from '../../i18n/mapping.js';
+import { useNavigationBuilding } from '../../state/navigation.js';
 
 export const Global: FunctionComponent = () => {
   const hierarchy = useHierarchy();
@@ -34,7 +33,7 @@ export const Global: FunctionComponent = () => {
   );
   const firstFloorProperties = useLevelShallow<HierarchyElementProperty>(
     Levels.PROPERTY,
-    ...useElementFilter(
+    ...useMetaFilter(
       useLevelShallow<HierarchyElementFloor>(Levels.FLOOR, building),
       useCallback(({ name }) => name === 'firstFloor', [])
     )
@@ -42,7 +41,7 @@ export const Global: FunctionComponent = () => {
 
   const entryDoor = useChild(building, 'entryDoor') as HierarchyElementArea;
 
-  const actuators = useElementFilter<
+  const actuators = useMetaFilter<
     HierarchyElementProperty,
     HierarchyElementPropertyActuator
   >(
@@ -68,7 +67,7 @@ export const Global: FunctionComponent = () => {
       {entryDoor ? (
         <Category header={<Translation i18nKey="security" capitalize={true} />}>
           <Grid>
-            <Sensor element={entryDoor} title="entryDoor" />
+            <Control element={entryDoor} title="entryDoor" />
           </Grid>
         </Category>
       ) : null}
@@ -77,7 +76,7 @@ export const Global: FunctionComponent = () => {
         <Category header={<Translation i18nKey={group} capitalize={true} />}>
           <Grid>
             {elements.map((element) => (
-              <Actuator element={element} />
+              <Control element={element} />
             ))}
           </Grid>
         </Category>
@@ -87,7 +86,7 @@ export const Global: FunctionComponent = () => {
         <Category header={<Translation i18nKey="other" capitalize={true} />}>
           <Grid>
             {unlisted.map((element) => (
-              <Actuator element={element} />
+              <Control element={element} />
             ))}
           </Grid>
         </Category>

@@ -1,7 +1,4 @@
-import {
-  BinaryActuatorElement,
-  isBinaryActuatorElement,
-} from './binary-actuator.js';
+import { BinaryActuatorElement, isBinaryActuatorElement } from './binary.js';
 import {
   HierarchyElement,
   HierarchyElementPropertyActuator,
@@ -26,7 +23,7 @@ import {
 } from '../../state/web-api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
-import { Cell } from './main.js';
+import { Cell } from '../main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
@@ -149,8 +146,9 @@ export const BrightnessLabel: FunctionComponent<{
 
 export const BrightnessActuator: FunctionComponent<{
   element: BrightnessActuatorElement;
+  onClick?: () => void;
   title?: I18nKey;
-}> = ({ element, title }) => {
+}> = ({ element, onClick, title }) => {
   const {
     property,
     meta: { actuated },
@@ -209,7 +207,7 @@ export const BrightnessActuator: FunctionComponent<{
 
   return (
     <Cell
-      onClick={flip ? handleClick : undefined}
+      onClick={flip && !onClick ? handleClick : onClick}
       title={<Translation i18nKey={title || property} capitalize={true} />}
     >
       <BlendOver

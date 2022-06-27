@@ -3,28 +3,23 @@ import {
   HierarchyElementRoom,
   Levels,
   sortBy,
-} from '../../../web-api.js';
-import { Translation, useI18nKey } from '../../../state/i18n.js';
+} from '../../web-api.js';
+import { useCallback, useMemo } from 'preact/hooks';
 import {
-  noBackground,
-  useSetBackgroundOverride,
-} from '../../../state/background.js';
-import { useCallback, useEffect, useMemo } from 'preact/hooks';
-import {
-  useElementFilter,
   useHierarchy,
   useLevelDeep,
-} from '../../../state/web-api.js';
-import { Category } from '../../category.js';
+  useMetaFilter,
+} from '../../state/web-api.js';
+import { Category } from '../../views/category.js';
 import { Device } from '../../controls/device.js';
-import { DeviceDetails } from '../sub/device-details.js';
+import { DeviceDetails } from '../sub/device.js';
 import { FunctionComponent } from 'preact';
-import { Grid } from '../../../components/grid.js';
-import { SubRoute } from '../../sub-route.js';
-import { roomSorting as roomsSorting } from '../../../i18n/mapping.js';
-import { useArray } from '../../../hooks/use-array-compare.js';
-import { useSegment } from '../../../state/path.js';
-import { useSetTitleOverride } from '../../../state/title.js';
+import { Grid } from '../../components/grid.js';
+import { SubRoute } from '../../views/route.js';
+import { Translation } from '../../state/i18n.js';
+import { roomSorting as roomsSorting } from '../../i18n/mapping.js';
+import { useArray } from '../../hooks/use-array-compare.js';
+import { useSegment } from '../../state/path.js';
 
 const FAKE_ROUTE_DIVIDER = '*';
 
@@ -33,7 +28,7 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
     meta: { name },
   } = room;
 
-  const devices = useElementFilter(
+  const devices = useMetaFilter(
     useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room),
     useCallback(({ isSubDevice }) => !isSubDevice, [])
   );
@@ -78,42 +73,27 @@ export const Devices: FunctionComponent = () => {
   );
 
   const [route] = useSegment(1);
-  const setBackgroundOverride = useSetBackgroundOverride();
-  const setTitleOverride = useSetTitleOverride();
-
-  useEffect(
-    () => () => setTitleOverride(null),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
 
   const [roomId, deviceId] = useMemo(
     () => route?.split(FAKE_ROUTE_DIVIDER) || ([] as undefined[]),
     [route]
   );
 
-  const [room] = useElementFilter(
+  const [room] = useMetaFilter(
     rooms,
     useCallback(({ name }) => name === roomId, [roomId])
   );
 
-  const [device] = useElementFilter(
+  const [device] = useMetaFilter(
     useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room || null),
     useCallback(({ name }) => name === deviceId, [deviceId])
   );
 
-  const roomName = useI18nKey(roomId);
-
-  useEffect(() => {
-    setBackgroundOverride(roomName && device ? noBackground : null);
-
-    setTitleOverride(device ? device.meta.name : null);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [device, roomName]);
-
   return (
-    <SubRoute subRoute={device ? <DeviceDetails device={device} /> : null}>
+    <SubRoute
+      subRoute={device ? <DeviceDetails device={device} /> : null}
+      title={device?.meta.name}
+    >
       {roomsSorted.map((aRoom) => (
         <Room room={aRoom} />
       ))}

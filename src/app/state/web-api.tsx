@@ -7,7 +7,14 @@ import {
   WebApi,
   getElementsFromLevel,
 } from '../web-api.js';
-import { useContext, useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 import { useArray } from '../hooks/use-array-compare.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
 
@@ -160,13 +167,25 @@ export const useElementFilter = <
   R extends T = T
 >(
   input: T[],
-  filter: (meta: T['meta']) => boolean
+  filter: (element: T) => boolean
 ): R[] => {
   const memoizedInput = useArray(input);
 
   return useMemo(() => {
-    return memoizedInput.filter(({ meta }) => filter(meta));
+    return memoizedInput.filter((element) => filter(element));
   }, [filter, memoizedInput]) as R[];
+};
+
+export const useMetaFilter = <
+  T extends HierarchyElementWithMeta,
+  R extends T = T
+>(
+  input: T[],
+  filter: (meta: T['meta']) => boolean
+): R[] => {
+  const innerFilter = useCallback(({ meta }: T) => filter(meta), [filter]);
+
+  return useElementFilter(input, innerFilter);
 };
 
 export const useChild = (

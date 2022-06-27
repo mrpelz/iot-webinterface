@@ -1,4 +1,4 @@
-import { BinarySensorElement, isBinarySensorElement } from './binary-sensor.js';
+import { BinarySensorElement, isBinarySensorElement } from './binary.js';
 import {
   HierarchyElement,
   HierarchyElementArea,
@@ -7,7 +7,7 @@ import {
 } from '../../web-api.js';
 import { Tag, TagGroup } from '../../components/controls.js';
 import { useChild, useChildGetter, useGetter } from '../../state/web-api.js';
-import { CellWithBody } from './main.js';
+import { CellWithBody } from '../main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
@@ -36,9 +36,16 @@ export const isOpenSensorElement = (
 export const OpenSensor: FunctionComponent<{
   element: OpenSensorElement;
   negativeKey?: I18nKey;
+  onClick?: () => void;
   positiveKey?: I18nKey;
   title?: I18nKey;
-}> = ({ element, negativeKey = 'closed', positiveKey = 'open', title }) => {
+}> = ({
+  element,
+  negativeKey = 'closed',
+  onClick,
+  positiveKey = 'open',
+  title,
+}) => {
   const { property } = element;
 
   const open = useChild(element, 'open') as BinarySensorElement;
@@ -48,6 +55,7 @@ export const OpenSensor: FunctionComponent<{
 
   return (
     <CellWithBody
+      onClick={onClick}
       title={<Translation i18nKey={title || property} capitalize={true} />}
     >
       <Tag>

@@ -44,7 +44,7 @@ export const ForwardIcon: FunctionComponent<SVGStrokeProps> = (props) => (
 
 export const CheckIcon: FunctionComponent<SVGStrokeProps> = (props) => (
   // https://feathericons.com
-  <SvgStroke {...props} fill="" viewBox="0 0 24 24">
+  <SvgStroke {...props} viewBox="0 0 24 24">
     <polyline points="20 6 9 17 4 12" />
   </SvgStroke>
 );
@@ -52,6 +52,23 @@ export const CheckIcon: FunctionComponent<SVGStrokeProps> = (props) => (
 export const CircleIcon: FunctionComponent<SVGProps> = (props) => (
   <Svg {...props} fill="" viewBox="0 0 24 24">
     <circle fill={props.fill} cx="12" cy="12" r="6" />
+  </Svg>
+);
+
+export const ColorIcon: FunctionComponent<SVGProps> = (props) => (
+  <Svg {...props} viewBox="0 0 24 24">
+    <defs xmlns="http://www.w3.org/2000/svg">
+      <linearGradient id="rainbow">
+        <stop offset="0" stop-color="red" />
+        <stop offset="0.2857" stop-color="#ff0" />
+        <stop offset="0.4286" stop-color="#0f0" />
+        <stop offset="0.5714" stop-color="cyan" />
+        <stop offset="0.7142" stop-color="blue" />
+        <stop offset="0.8571" stop-color="#f0f" />
+        <stop offset="1" stop-color="red" />
+      </linearGradient>
+    </defs>
+    <circle fill="url(#rainbow)" cx="12" cy="12" r="9" />
   </Svg>
 );
 

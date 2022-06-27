@@ -1,32 +1,32 @@
 import { Details, Hierarchy, Meta } from '../../controls/diagnostics.js';
-import { ECHO_URL, INVENTORY_URL } from '../../../util/update.js';
+import { ECHO_URL, INVENTORY_URL } from '../../util/update.js';
 import {
   staticPagesBottom,
   staticPagesTop,
   useNavigation,
-} from '../../../state/navigation.js';
-import { useFetchJson, useFetchText } from '../../../hooks/use-fetch.js';
+} from '../../state/navigation.js';
+import { useFetchJson, useFetchText } from '../../hooks/use-fetch.js';
 import {
   useHierarchy,
   useLevelShallow,
   useStreamCount,
   useStreamOnline,
-} from '../../../state/web-api.js';
-import { DiagnosticsContainer } from '../../../components/diagnostics.js';
+} from '../../state/web-api.js';
+import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
-import { Levels } from '../../../web-api.js';
-import { dimensions } from '../../../style.js';
-import { useBreakpoint } from '../../../style/breakpoint.js';
-import { useFlags } from '../../../state/flags.js';
-import { useI18n } from '../../../state/i18n.js';
-import { useIsMenuVisible } from '../../../state/menu.js';
-import { useMediaQuery } from '../../../style/main.js';
+import { Levels } from '../../web-api.js';
+import { dimensions } from '../../style.js';
+import { useBreakpoint } from '../../style/breakpoint.js';
+import { useFlags } from '../../state/flags.js';
+import { useI18n } from '../../state/i18n.js';
+import { useIsMenuVisible } from '../../state/menu.js';
+import { useMediaQuery } from '../../style/main.js';
 import { useMemo } from 'preact/hooks';
-import { useNotification } from '../../../state/notification.js';
-import { usePathContext } from '../../../state/path.js';
-import { useTheme } from '../../../state/theme.js';
-import { useTitle } from '../../../state/title.js';
-import { useVisibility } from '../../../state/visibility.js';
+import { useNotification } from '../../state/notification.js';
+import { usePathContext } from '../../state/path.js';
+import { useTheme } from '../../state/theme.js';
+import { useTitle } from '../../state/title.js';
+import { useVisibility } from '../../state/visibility.js';
 
 const Fallback: FunctionComponent = () => (
   <tr>

@@ -1,6 +1,7 @@
 import { FunctionComponent, createContext } from 'preact';
 import { StateUpdater, useContext, useMemo, useState } from 'preact/hooks';
 import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
+import { useDelay } from '../hooks/use-delay.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useTheme } from './theme.js';
 
@@ -24,6 +25,8 @@ export const BackgroundProvider: FunctionComponent = ({ children }) => {
 
   const isHighContrast = useTheme() === 'highContrast';
 
+  const initialDelay = !useDelay(true, 1000);
+
   const [staticPage] = useNavigationStaticPage();
   const [room] = useNavigationRoom();
 
@@ -32,7 +35,9 @@ export const BackgroundProvider: FunctionComponent = ({ children }) => {
   >(null);
 
   const background = useMemo(() => {
-    if (isHighContrast || backgroundOverride === noBackground) return null;
+    if (isHighContrast || initialDelay || backgroundOverride === noBackground) {
+      return null;
+    }
 
     const identifier =
       backgroundOverride || staticPage || room?.meta.name || null;
@@ -43,7 +48,7 @@ export const BackgroundProvider: FunctionComponent = ({ children }) => {
     );
 
     return [BACKGROUND_PATH, baseName, BACKGROUND_EXTENSION].join('');
-  }, [backgroundOverride, isHighContrast, room, staticPage]);
+  }, [backgroundOverride, initialDelay, isHighContrast, room, staticPage]);
 
   const value = useMemo(
     () => [background, setBackgroundOverride] as const,

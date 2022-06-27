@@ -1,10 +1,10 @@
-import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
-import { Entry, List } from '../../list.js';
-import { HierarchyElementDevice, Levels } from '../../../web-api.js';
+import { AlignRight, BreakAll, TabularNums } from '../../components/text.js';
+import { Entry, List } from '../../views/list.js';
+import { HierarchyElementDevice, Levels } from '../../web-api.js';
 import {
   NullActuatorButton,
   isNullActuatorElement,
-} from '../../controls/null-actuator.js';
+} from '../../controls/actuators/null.js';
 import {
   OfflineIcon,
   OnlineIcon,
@@ -13,14 +13,14 @@ import {
 import {
   useAbsoluteTimeLabel,
   useRelativeTimeLabel,
-} from '../../../hooks/use-time-label.js';
+} from '../../hooks/use-time-label.js';
 import {
   useChild,
-  useElementFilter,
   useGetter,
   useLevelShallowSkipInput,
-} from '../../../state/web-api.js';
-import { Entry as EntryComponent } from '../../../components/list.js';
+  useMetaFilter,
+} from '../../state/web-api.js';
+import { Entry as EntryComponent } from '../../components/list.js';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
@@ -255,7 +255,7 @@ export const DeviceDetailsInner: FunctionComponent<{
 export const DeviceDetails: FunctionComponent<{
   device: HierarchyElementDevice;
 }> = ({ device }) => {
-  const subDevices = useElementFilter(
+  const subDevices = useMetaFilter(
     useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
     filterSubDevices
   );

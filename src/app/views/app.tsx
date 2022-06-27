@@ -2,7 +2,7 @@ import { App as AppComponent } from '../components/app.js';
 import { Background } from './background.js';
 import { FunctionComponent } from 'preact';
 import { Layout } from './layout.js';
-import { RootRoute } from './root-route.js';
+import { RootRoute } from './route.js';
 import { colors } from '../style.js';
 import { useLayoutEffect } from 'preact/hooks';
 

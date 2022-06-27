@@ -4,10 +4,10 @@ import {
   ValueType,
   isMetaPropertyActuator,
 } from '../../web-api.js';
-import { useCallback, useEffect, useRef } from 'preact/hooks';
+import { useCallback, useRef } from 'preact/hooks';
 import { BodyLarge } from '../../components/controls.js';
 import { Button } from '../../components/list.js';
-import { Cell } from './main.js';
+import { Cell } from '../main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Overlay } from '../../components/overlay.js';
@@ -28,27 +28,29 @@ export const isNullActuatorElement = (
 
 export const NullActuator: FunctionComponent<{
   element: NullActuatorElement;
+  onClick?: () => void;
   title?: I18nKey;
-}> = ({ element, title }) => {
+}> = ({ element, onClick, title }) => {
   const {
     property,
     meta: { actuated },
   } = element;
 
   const setter = useSetter<null>(element);
-  const handleClick = useCallback(() => setter?.(null), [setter]);
 
   const overlayRef = useRef<HTMLElement>(null);
   const baseRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
+  const handleClick = useCallback(() => {
     const { current: overlay } = overlayRef;
     const { current: base } = baseRef;
 
-    if (!(overlay instanceof HTMLElement)) return undefined;
-    if (!(base instanceof HTMLElement)) return undefined;
+    setter?.(null);
 
-    const onClick = async () => {
+    if (!(overlay instanceof HTMLElement)) return;
+    if (!(base instanceof HTMLElement)) return;
+
+    (async () => {
       const [animationBase, animationOverlay] = await Promise.all([
         base.animate([{ opacity: 0 }, { opacity: 1 }], {
           duration: 1000,
@@ -62,18 +64,15 @@ export const NullActuator: FunctionComponent<{
 
       animationBase.finish();
       animationOverlay.finish();
-    };
-
-    overlay.addEventListener('click', onClick);
-    return () => overlay.removeEventListener('clck', onClick);
-  }, []);
+    })();
+  }, [setter]);
 
   const ColorBody = useColorBody(TriggerBody, property, actuated);
 
   return (
     <Cell
+      onClick={setter && !onClick ? handleClick : onClick}
       title={<Translation i18nKey={title || property} capitalize={true} />}
-      onClick={setter ? handleClick : undefined}
     >
       <Overlay
         overlay={

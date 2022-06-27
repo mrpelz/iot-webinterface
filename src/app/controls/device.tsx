@@ -1,23 +1,24 @@
 import {
   ActivityIcon,
   CheckIcon,
+  ForwardIcon,
   WiFiIcon,
   XIcon,
-} from '../../components/icons.js';
-import { HierarchyElementDevice, Levels, MetaDevice } from '../../web-api.js';
-import { Tag, TagGroup } from '../../components/controls.js';
+} from '../components/icons.js';
+import { HierarchyElementDevice, Levels, MetaDevice } from '../web-api.js';
+import { Tag, TagGroup } from '../components/controls.js';
 import {
   useChild,
-  useElementFilter,
   useGetter,
   useLevelShallowSkipInput,
-} from '../../state/web-api.js';
+  useMetaFilter,
+} from '../state/web-api.js';
 import { CellWithBody } from './main.js';
 import { FunctionComponent } from 'preact';
-import { TabularNums } from '../../components/text.js';
+import { TabularNums } from '../components/text.js';
 import { useMemo } from 'preact/hooks';
-import { useTheme } from '../../state/theme.js';
-import { useTimeLabel } from '../../hooks/use-time-label.js';
+import { useTheme } from '../state/theme.js';
+import { useTimeLabel } from '../hooks/use-time-label.js';
 
 export const OnlineIcon: FunctionComponent = () => {
   const theme = useTheme();
@@ -103,13 +104,17 @@ export const Device: FunctionComponent<{
   device: HierarchyElementDevice;
   onSelect?: () => void;
 }> = ({ device, onSelect }) => {
-  const subDevices = useElementFilter(
+  const subDevices = useMetaFilter(
     useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
     filterSubDevices
   );
 
   return (
-    <CellWithBody title={device.meta.name} onClick={onSelect} arrow={true}>
+    <CellWithBody
+      icon={<ForwardIcon height="1em" />}
+      onClick={onSelect}
+      title={device.meta.name}
+    >
       {subDevices.length ? (
         subDevices.map((subDevice) => (
           <Tag>

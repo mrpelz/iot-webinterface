@@ -9,7 +9,7 @@ import {
   isBrightnessActuatorElement,
   useSwipeBrightness,
   useWheelBrightness,
-} from './brightness-actuator.js';
+} from './brightness.js';
 import {
   HierarchyElement,
   HierarchyElementArea,
@@ -30,12 +30,14 @@ import {
   useGetter,
 } from '../../state/web-api.js';
 import { BlendOver } from '../../components/blend-over.js';
-import { Cell } from './main.js';
+import { Cell } from '../main.js';
+import { ColorIcon } from '../../components/icons.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { StyledVNode } from 'goober';
 import { Translation } from '../../state/i18n.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
+import { useColorPicker } from '../../hooks/use-color-picker.js';
 import { useDelay } from '../../hooks/use-delay.js';
 import { useSegment } from '../../state/path.js';
 import { useSwipe } from '../../hooks/use-swipe.js';
@@ -91,7 +93,13 @@ const Color: FunctionComponent<{
   }, [loading]);
 
   const flip = useChildSetter<null>(element, 'flip');
-  const handleClick = useCallback(() => flip?.(null), [flip]);
+  const handleClick = useCallback(
+    (event: MouseEvent) => {
+      event.stopPropagation();
+      flip?.(null);
+    },
+    [flip]
+  );
 
   const setBrightness = useChildSetter<number>(element, 'brightness');
 
@@ -160,18 +168,43 @@ const Color: FunctionComponent<{
 
 export const RGBActuator: FunctionComponent<{
   element: RGBActuatorElement;
+  onClick?: () => void;
   title?: I18nKey;
-}> = ({ element, title }) => {
+}> = ({ element, onClick, title }) => {
   const { property } = element;
 
   const r = useChild(element, 'r') as BrightnessActuatorElement | null;
   const g = useChild(element, 'g') as BrightnessActuatorElement | null;
   const b = useChild(element, 'b') as BrightnessActuatorElement | null;
 
+  const rBrightness = useChildGetter<number>(r, 'brightness');
+  const rSetBrightness = useChildSetter<number>(r, 'brightness');
+
+  const gBrightness = useChildGetter<number>(g, 'brightness');
+  const gSetBrightness = useChildSetter<number>(g, 'brightness');
+
+  const bBrightness = useChildGetter<number>(b, 'brightness');
+  const bSetBrightness = useChildSetter<number>(b, 'brightness');
+
+  const [focus, colorPicker] = useColorPicker(
+    useMemo(() => [rBrightness, rSetBrightness], [rBrightness, rSetBrightness]),
+    useMemo(() => [gBrightness, gSetBrightness], [gBrightness, gSetBrightness]),
+    useMemo(() => [bBrightness, bSetBrightness], [bBrightness, bSetBrightness])
+  );
+
   if (!r || !g || !b) return null;
 
   return (
-    <Cell title={<Translation i18nKey={title || property} capitalize={true} />}>
+    <Cell
+      icon={<ColorIcon height="1em" />}
+      onClick={onClick || focus}
+      title={
+        <>
+          {colorPicker}
+          <Translation i18nKey={title || property} capitalize={true} />
+        </>
+      }
+    >
       <Color base={BodyDisableRoundedCorners} element={r} />
       <Color base={BodyDisableRoundedCorners} element={g} />
       <Color element={b} />

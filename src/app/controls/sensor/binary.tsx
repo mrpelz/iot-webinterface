@@ -4,7 +4,7 @@ import {
   ValueType,
   isMetaPropertySensor,
 } from '../../web-api.js';
-import { CellWithBody } from './main.js';
+import { CellWithBody } from '../main.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
 import { Tag } from '../../components/controls.js';
@@ -24,15 +24,17 @@ export const isBinarySensorElement = (
 export const BinarySensor: FunctionComponent<{
   element: BinarySensorElement;
   negativeKey?: I18nKey;
+  onClick?: () => void;
   positiveKey?: I18nKey;
   title?: I18nKey;
-}> = ({ element, negativeKey = 'no', positiveKey = 'yes', title }) => {
+}> = ({ element, negativeKey = 'no', onClick, positiveKey = 'yes', title }) => {
   const { property } = element;
 
   const value = useGetter<boolean>(element);
 
   return (
     <CellWithBody
+      onClick={onClick}
       title={<Translation i18nKey={title || property} capitalize={true} />}
     >
       <Tag>

@@ -1,6 +1,5 @@
 import { connectWorker, updateUrl } from './workers.js';
 import { Notifications } from './notifications.js';
-import { amend } from './path.js';
 import { fetchFallback } from './fetch.js';
 
 type SetupMessage = {
@@ -27,8 +26,6 @@ let clearNotifications: (() => void) | undefined;
 
 export const reload: () => void = () => {
   clearNotifications?.();
-
-  history.replaceState(undefined, '', amend('/'));
   location.reload();
 };
 
