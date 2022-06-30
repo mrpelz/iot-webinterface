@@ -77,7 +77,7 @@ export const NullActuator: FunctionComponent<{
       <Overlay
         overlay={
           <ColorBody ref={overlayRef}>
-            <Translation i18nKey="trigger" />
+            <Translation i18nKey="triggered" />
           </ColorBody>
         }
       >

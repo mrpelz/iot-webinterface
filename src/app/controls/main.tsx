@@ -15,6 +15,7 @@ import {
 } from '../web-api.js';
 import { OpenSensor, isOpenSensorElement } from './sensor/open.js';
 import { RGBActuator, isRGBActuatorElement } from './actuators/rgb.js';
+import { TimerActuator, isTimerActuatorElement } from './timer.js';
 import { Actuator } from './actuators/main.js';
 import { I18nKey } from '../i18n/main.js';
 import { Sensor } from './sensor/main.js';
@@ -61,6 +62,10 @@ export const Control: FunctionComponent<{
   onClick?: () => void;
   title?: I18nKey;
 }> = ({ element, onClick, title }) => {
+  if (isTimerActuatorElement(element)) {
+    return <TimerActuator element={element} onClick={onClick} title={title} />;
+  }
+
   if (isOpenSensorElement(element)) {
     return <OpenSensor element={element} onClick={onClick} title={title} />;
   }

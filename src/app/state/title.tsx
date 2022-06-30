@@ -58,9 +58,13 @@ export const useTitle = (): string | null => {
   return useMemo(() => title, [title]);
 };
 
-export const useSetTitleOverride = (): StateUpdater<string | null> => {
+export const useSetTitleOverride = (override: string | null): void => {
   const [, setTitleOverride] = useContext(TitleContext);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => setTitleOverride, []);
+  useEffect(() => {
+    setTitleOverride(override);
+
+    return () => setTitleOverride(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [override]);
 };

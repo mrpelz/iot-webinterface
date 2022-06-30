@@ -101,9 +101,13 @@ export const filterSubDevices = (
 ): device is MetaDevice & { isSubDevice: true } => Boolean(device.isSubDevice);
 
 export const Device: FunctionComponent<{
-  device: HierarchyElementDevice;
+  element: HierarchyElementDevice;
   onClick?: () => void;
-}> = ({ device, onClick }) => {
+}> = ({ element: device, onClick }) => {
+  const {
+    meta: { name },
+  } = device;
+
   const subDevices = useMetaFilter(
     useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
     filterSubDevices
@@ -113,21 +117,27 @@ export const Device: FunctionComponent<{
     <CellWithBody
       icon={<ForwardIcon height="1em" />}
       onClick={onClick}
-      title={device.meta.name}
+      title={name}
     >
       {subDevices.length ? (
-        subDevices.map((subDevice) => (
-          <Tag>
-            {subDevice.meta.name === 'espNow' ? null : (
+        subDevices.map((subDevice) => {
+          const {
+            meta: { name: subDeviceName },
+          } = subDevice;
+
+          return (
+            <Tag>
+              {subDeviceName === 'espNow' ? null : (
+                <TagGroup>
+                  <WiFiIcon height="1em" />
+                </TagGroup>
+              )}
               <TagGroup>
-                <WiFiIcon height="1em" />
+                <DeviceOnlineState device={subDevice} />
               </TagGroup>
-            )}
-            <TagGroup>
-              <DeviceOnlineState device={subDevice} />
-            </TagGroup>
-          </Tag>
-        ))
+            </Tag>
+          );
+        })
       ) : (
         <Tag>
           <DeviceOnlineState device={device} />

@@ -1,9 +1,9 @@
 import {
+  HierarchyElement,
   HierarchyElementArea,
   HierarchyElementProperty,
   HierarchyElementPropertyActuator,
   HierarchyElementPropertySensor,
-  HierarchyElementRoom,
   Levels,
   groupBy,
   isMetaPropertyActuator,
@@ -15,20 +15,30 @@ import {
   isMetaAreaDoor,
   isMetaAreaWindow,
 } from '../../controls/sensor/open.js';
-import { useLevelShallow, useMetaFilter } from '../../state/web-api.js';
+import { useCallback, useMemo } from 'preact/hooks';
+import {
+  useElementFilter,
+  useElements,
+  useLevelShallow,
+  useMetaFilter,
+} from '../../state/web-api.js';
 import { Category } from '../../views/category.js';
 import { Control } from '../../controls/main.js';
 import { FunctionComponent } from 'preact';
 import { Grid } from '../../components/grid.js';
+import { SubPage } from '../sub/room/main.js';
 import { SubRoute } from '../../views/route.js';
 import { Translation } from '../../state/i18n.js';
 import { isMetaAreaRGB } from '../../controls/actuators/rgb.js';
-import { useMemo } from 'preact/hooks';
+import { useArray } from '../../hooks/use-array-compare.js';
+import { useSegment } from '../../state/path.js';
 
 export const Room: FunctionComponent<{
-  element: HierarchyElementRoom;
-}> = ({ element: room }) => {
-  const areas = useLevelShallow<HierarchyElementArea>(Levels.AREA, room);
+  elements: HierarchyElement[];
+}> = ({ elements: _parents }) => {
+  const parents = useArray(_parents);
+
+  const areas = useLevelShallow<HierarchyElementArea>(Levels.AREA, parents);
 
   const doors = useMetaFilter(areas, isMetaAreaDoor);
   const windows = useMetaFilter(areas, isMetaAreaWindow);
@@ -36,7 +46,7 @@ export const Room: FunctionComponent<{
 
   const properties = useLevelShallow<HierarchyElementProperty>(
     Levels.PROPERTY,
-    room
+    parents
   );
 
   const sensors = useMetaFilter<
@@ -84,8 +94,18 @@ export const Room: FunctionComponent<{
     return [groupBy(listedResults, 'actuated'), unlistedResults] as const;
   }, [actuators]);
 
+  const elements = useElements();
+
+  const [subRouteId] = useSegment(1);
+  const [subRouteElement] = useElementFilter(
+    subRouteId ? elements : null,
+    useCallback(({ id }) => id === subRouteId, [subRouteId])
+  );
+
   return (
-    <SubRoute subRoute={null}>
+    <SubRoute
+      subRoute={subRouteElement ? <SubPage element={subRouteElement} /> : null}
+    >
       {[securitySensors, doors, windows].flat().length ? (
         <Category header={<Translation i18nKey="security" capitalize={true} />}>
           <Grid>
@@ -135,10 +155,10 @@ export const Room: FunctionComponent<{
         </Category>
       ) : null}
 
-      {listedActuators.map(({ elements, group }) => (
+      {listedActuators.map(({ elements: _elements, group }) => (
         <Category header={<Translation i18nKey={group} capitalize={true} />}>
           <Grid>
-            {elements.map((element) => (
+            {_elements.map((element) => (
               <Control element={element} />
             ))}
             {group === 'lighting'

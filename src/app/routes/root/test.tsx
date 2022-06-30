@@ -1,22 +1,14 @@
 import { useGoRoot, useSegment } from '../../state/path.js';
 import { FunctionComponent } from 'preact';
-import { useEffect } from 'preact/hooks';
 import { useSetTitleOverride } from '../../state/title.js';
 
 export const Test: FunctionComponent = () => {
-  const setTitleOverride = useSetTitleOverride();
-
   const goRoot = useGoRoot();
 
   const [route1, setRoute1] = useSegment(1);
   const [route2, setRoute2] = useSegment(2);
 
-  useEffect(() => {
-    setTitleOverride(route2 || route1 || null);
-
-    return () => setTitleOverride(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route1, route2]);
+  useSetTitleOverride(route2 || route1 || null);
 
   return (
     <>

@@ -110,6 +110,10 @@ export type MetaPropertySensor = MetaProperty & {
   valueType: ValueType;
 };
 
+export type MetaPropertySensorDate = MetaPropertySensor & {
+  unit: 'date';
+};
+
 export type MetaPropertyActuator = MetaProperty & {
   actuated?: string;
   type: 'actuator';
@@ -448,7 +452,7 @@ export const isMetaPropertyActuator = (
 
 export const isMetaPropertySensorDate = (
   meta: Meta | undefined
-): meta is MetaPropertySensor => {
+): meta is MetaPropertySensorDate => {
   return isMetaPropertySensor(meta) && meta.unit === 'date';
 };
 

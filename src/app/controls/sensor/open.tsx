@@ -5,12 +5,15 @@ import {
   MetaArea,
   isMetaArea,
 } from '../../web-api.js';
-import { Tag, TagGroup } from '../../components/controls.js';
-import { useChild, useChildGetter, useGetter } from '../../state/web-api.js';
+import { useChild, useGetter } from '../../state/web-api.js';
 import { CellWithBody } from '../main.js';
+import { ForwardIcon } from '../../components/icons.js';
 import { FunctionComponent } from 'preact';
 import { I18nKey } from '../../i18n/main.js';
+import { Tag } from '../../components/controls.js';
 import { Translation } from '../../state/i18n.js';
+import { useCallback } from 'preact/hooks';
+import { useSegment } from '../../state/path.js';
 
 export type OpenSensorElement = HierarchyElementArea & {
   children: {
@@ -46,34 +49,30 @@ export const OpenSensor: FunctionComponent<{
   positiveKey = 'open',
   title,
 }) => {
-  const { property } = element;
+  const { id, property } = element;
+
+  const [, setSubRouteId] = useSegment(1);
+
+  const handleClick = useCallback(
+    () => setSubRouteId?.(id),
+    [id, setSubRouteId]
+  );
 
   const open = useChild(element, 'open') as BinarySensorElement;
   const value = useGetter<boolean>(open);
 
-  const isReceived = useChildGetter<boolean>(open, 'isReceivedValue');
-
   return (
     <CellWithBody
-      onClick={onClick}
+      icon={<ForwardIcon height="1em" />}
+      onClick={onClick ? onClick : handleClick}
       title={<Translation i18nKey={title || property} capitalize={true} />}
     >
       <Tag>
-        {
-          // eslint-disable-next-line no-negated-condition
-          value === null || isReceived !== false ? null : (
-            <TagGroup>
-              <Translation i18nKey="restored" />
-            </TagGroup>
-          )
-        }
-        <TagGroup>
-          {value === null ? (
-            '?'
-          ) : (
-            <Translation i18nKey={value ? positiveKey : negativeKey} />
-          )}
-        </TagGroup>
+        {value === null ? (
+          '?'
+        ) : (
+          <Translation i18nKey={value ? positiveKey : negativeKey} />
+        )}
       </Tag>
     </CellWithBody>
   );

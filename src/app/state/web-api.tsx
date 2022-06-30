@@ -199,10 +199,13 @@ export const useMetaFilter = <
   return useElementFilter(input, innerFilter);
 };
 
-export const useChild = (
-  input: HierarchyElement | null,
-  child: string
-): HierarchyElement | null => {
+export const useChild = <
+  T extends HierarchyElement,
+  K extends keyof NonNullable<T['children']>
+>(
+  input: T | null,
+  child: K
+): NonNullable<T['children']>[K] | null => {
   return useMemo(() => {
     if (!input) return null;
 
@@ -212,7 +215,7 @@ export const useChild = (
     const { [child]: childElement } = children;
     if (!childElement) return null;
 
-    return childElement;
+    return childElement as NonNullable<T['children']>[K];
   }, [child, input]);
 };
 
@@ -236,7 +239,11 @@ export const useChildGetter = <T,>(
 ): T | null => {
   const { useGetterIndex } = useContext(WebApiContext);
 
-  return useGetterIndex(useChild(input, child)?.get);
+  const element = useChild(
+    input,
+    child as keyof NonNullable<typeof input>['children']
+  ) as unknown as HierarchyElement;
+  return useGetterIndex(element?.get);
 };
 
 // eslint-disable-next-line comma-spacing
@@ -255,7 +262,11 @@ export const useChildSetter = <T,>(
 ): SetterFunction<T> | null => {
   const { useSetterIndex } = useContext(WebApiContext);
 
-  return useSetterIndex(useChild(input, child)?.set);
+  const element = useChild(
+    input,
+    child as keyof NonNullable<typeof input>['children']
+  ) as unknown as HierarchyElement;
+  return useSetterIndex(element?.set);
 };
 
 export const useStreamCount = (): number | null => {

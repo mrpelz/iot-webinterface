@@ -7,12 +7,12 @@ import { useMemo } from 'preact/hooks';
 import { useTheme } from '../state/theme.js';
 
 export const Entry: FunctionComponent<{
-  id: string;
-  label: ComponentChild;
+  id?: string;
+  label?: ComponentChild;
 }> = ({ children, id, label }) => {
   return (
     <EntryComponent>
-      <label for={id}>{label}</label>
+      {label ? <label for={id}>{label}</label> : null}
       {children}
     </EntryComponent>
   );

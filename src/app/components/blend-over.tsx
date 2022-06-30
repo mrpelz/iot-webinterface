@@ -2,6 +2,7 @@ import { ComponentChildren, FunctionComponent } from 'preact';
 import { styled } from 'goober';
 import { useDelay } from '../hooks/use-delay.js';
 import { useMemo } from 'preact/hooks';
+import { usePrevious } from '../hooks/use-previous.js';
 
 export type BlendOverDirection = 'block' | 'inline';
 
@@ -38,27 +39,56 @@ const BlendOverContentOverlay = styled(BlendOverContent)`
 export const BlendOver: FunctionComponent<{
   blendOver?: number;
   direction?: BlendOverDirection;
+  invert?: boolean;
   overlay?: ComponentChildren;
   transition?: boolean;
+  transitionDurationOverride?: number;
 }> = ({
   blendOver = 0,
   children,
   direction = 'inline',
+  invert = false,
   overlay,
   transition = true,
+  transitionDurationOverride,
 }) => {
-  const transitionDurationWithoutUserInput = useMemo(
-    () => (direction === 'inline' ? 600 : 300),
-    [direction]
-  );
+  const [blendOverPrevious] = usePrevious(blendOver);
+
+  const transitionDurationWithoutUserInput = useMemo(() => {
+    if (transitionDurationOverride) return transitionDurationOverride;
+    return direction === 'inline' ? 600 : 300;
+  }, [direction, transitionDurationOverride]);
+
+  const transitionDurationFractional = useMemo(() => {
+    if (transitionDurationOverride) return null;
+
+    const delta =
+      blendOverPrevious === null ? 0 : Math.abs(blendOver - blendOverPrevious);
+
+    return transitionDurationWithoutUserInput * delta;
+  }, [
+    blendOver,
+    blendOverPrevious,
+    transitionDurationOverride,
+    transitionDurationWithoutUserInput,
+  ]);
+
   const transitionDurationWithoutUserInputDelayed = useDelay(
     transitionDurationWithoutUserInput,
     transitionDurationWithoutUserInput * 2
   );
 
   const transitionDuration = useMemo(
-    () => (transition && transitionDurationWithoutUserInputDelayed) || 0,
-    [transitionDurationWithoutUserInputDelayed, transition]
+    () =>
+      (transition &&
+        (transitionDurationFractional ||
+          transitionDurationWithoutUserInputDelayed)) ||
+      0,
+    [
+      transition,
+      transitionDurationFractional,
+      transitionDurationWithoutUserInputDelayed,
+    ]
   );
 
   return (
@@ -68,7 +98,7 @@ export const BlendOver: FunctionComponent<{
         direction={direction}
         transitionDuration={transitionDuration}
       >
-        {children}
+        {invert && overlay ? overlay : children}
       </BlendOverContentBase>
       {overlay ? (
         <BlendOverContentOverlay
@@ -76,7 +106,7 @@ export const BlendOver: FunctionComponent<{
           direction={direction}
           transitionDuration={transitionDuration}
         >
-          {overlay}
+          {invert ? children : overlay}
         </BlendOverContentOverlay>
       ) : null}
     </BlendOverWrapper>

@@ -15,7 +15,7 @@ import {
 } from '../../state/web-api.js';
 import { Category } from '../../views/category.js';
 import { Device } from '../../controls/device.js';
-import { DeviceDetails } from '../sub/device.js';
+import { DeviceDetails } from '../sub/devices/device.js';
 import { FunctionComponent } from 'preact';
 import { Grid } from '../../components/grid.js';
 import { SubRoute } from '../../views/route.js';
@@ -46,7 +46,7 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
             devices.map((device) => {
               return (
                 <Device
-                  device={device}
+                  element={device}
                   onClick={() => setDeviceId?.(device.id)}
                 />
               );
@@ -75,10 +75,7 @@ export const Devices: FunctionComponent = () => {
   );
 
   return (
-    <SubRoute
-      subRoute={device ? <DeviceDetails device={device} /> : null}
-      title={device?.meta.name}
-    >
+    <SubRoute subRoute={device ? <DeviceDetails device={device} /> : null}>
       {roomsSorted.map((aRoom) => (
         <Room room={aRoom} />
       ))}

@@ -1,28 +1,31 @@
-import { AlignRight, BreakAll, TabularNums } from '../../components/text.js';
-import { Entry, List } from '../../views/list.js';
-import { HierarchyElementDevice, Levels } from '../../web-api.js';
+import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
+import { Entry, List } from '../../../views/list.js';
+import { HierarchyElementDevice, Levels } from '../../../web-api.js';
 import {
   NullActuatorButton,
   isNullActuatorElement,
-} from '../../controls/actuators/null.js';
+} from '../../../controls/actuators/null.js';
 import {
   OfflineIcon,
   OnlineIcon,
   filterSubDevices,
-} from '../../controls/device.js';
+} from '../../../controls/device.js';
 import {
   useAbsoluteTimeLabel,
+  useDateFromEpoch,
   useRelativeTimeLabel,
-} from '../../hooks/use-time-label.js';
+} from '../../../hooks/use-time-label.js';
 import {
   useChild,
+  useChildGetter,
   useGetter,
   useLevelShallowSkipInput,
   useMetaFilter,
-} from '../../state/web-api.js';
-import { Entry as EntryComponent } from '../../components/list.js';
+} from '../../../state/web-api.js';
+import { Entry as EntryComponent } from '../../../components/list.js';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
+import { useSetTitleOverride } from '../../../state/title.js';
 
 const SHY_CHARACTER = '\u00ad';
 
@@ -99,20 +102,14 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   const online = useChild(device, 'online');
   const isOnlineValue = useGetter<boolean>(online);
 
-  const lastSeen = useChild(device, 'lastSeen');
-  const lastSeenValue = useGetter<number>(lastSeen);
-  const lastSeenDate = useMemo(
-    () => (lastSeenValue ? new Date(lastSeenValue) : null),
-    [lastSeenValue]
+  const lastSeenDate = useDateFromEpoch(
+    useChildGetter<number>(device, 'lastSeen')
   );
   const lastSeenLabelAbsolute = useAbsoluteTimeLabel(lastSeenDate);
   const lastSeenLabelRelative = useRelativeTimeLabel(lastSeenDate);
 
-  const onlineChange = useChild(online, 'lastChange');
-  const onlineChangeValue = useGetter<number>(onlineChange);
-  const onlineChangeDate = useMemo(
-    () => (onlineChangeValue ? new Date(onlineChangeValue) : null),
-    [onlineChangeValue]
+  const onlineChangeDate = useDateFromEpoch(
+    useChildGetter<number>(online, 'lastChange')
   );
   const onlineChangeLabelAbsolute = useAbsoluteTimeLabel(onlineChangeDate);
   const onlineChangeLabelRelative = useRelativeTimeLabel(onlineChangeDate);
@@ -125,7 +122,7 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
             {isOnlineValue ? <OnlineIcon /> : <OfflineIcon />}
           </DeviceDetail>
         ) : null}
-        {onlineChange ? (
+        {onlineChangeDate ? (
           <DeviceDetail label="online change">
             <TabularNums>
               {onlineChangeLabelAbsolute || '—'} <br />(
@@ -133,7 +130,7 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
             </TabularNums>
           </DeviceDetail>
         ) : null}
-        {lastSeen ? (
+        {lastSeenDate ? (
           <DeviceDetail label="last seen">
             <TabularNums>
               {lastSeenLabelAbsolute || '—'} <br />(
@@ -145,11 +142,11 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
     ),
     [
       isOnlineValue,
-      lastSeen,
+      lastSeenDate,
       lastSeenLabelAbsolute,
       lastSeenLabelRelative,
       online,
-      onlineChange,
+      onlineChangeDate,
       onlineChangeLabelAbsolute,
       onlineChangeLabelRelative,
     ]
@@ -159,7 +156,7 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
 const DeviceHello: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   device,
 }) => {
-  const hello = useGetter<string>(useChild(device, 'hello'));
+  const hello = useChildGetter<string>(device, 'hello');
 
   return useMemo(() => {
     if (!hello) return null;
@@ -255,6 +252,12 @@ export const DeviceDetailsInner: FunctionComponent<{
 export const DeviceDetails: FunctionComponent<{
   device: HierarchyElementDevice;
 }> = ({ device }) => {
+  const {
+    meta: { name },
+  } = device;
+
+  useSetTitleOverride(name);
+
   const subDevices = useMetaFilter(
     useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
     filterSubDevices

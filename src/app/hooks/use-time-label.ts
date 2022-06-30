@@ -95,7 +95,7 @@ export const useRelativeTimeLabel = (
 
     if (delta <= nowSpan) return nowLabel;
 
-    let matchingUnit: Unit | null = null;
+    let matchingUnit: Unit = 'second';
 
     for (const unit of units) {
       const epoch = epochs[unit];
@@ -104,13 +104,12 @@ export const useRelativeTimeLabel = (
       matchingUnit = unit;
     }
 
-    if (!matchingUnit) return null;
+    const value = Math.round(diff / epochs[matchingUnit]);
 
-    const value = Math[diff < 0 ? 'ceil' : 'floor'](
-      diff / epochs[matchingUnit]
+    return relativeTimeFormat.format(
+      matchingUnit === 'second' && !value ? 1 : value,
+      matchingUnit
     );
-
-    return relativeTimeFormat.format(value, matchingUnit);
   }, [compareDate, date, nowLabel, nowSpan, relativeTimeFormat]);
 };
 
@@ -141,11 +140,54 @@ export const useAbsoluteTimeLabel = (date: Date | null): string | null => {
   }, [date, effectiveLocale, nextDay]);
 };
 
-export const useTimeLabel = (date: Date | null): string | null => {
+export const useTimeLabel = (
+  date: Date | null,
+  nowSpan?: number
+): string | null => {
   const absoluteTimes = useFlag('absoluteTimes');
 
-  const relativeLabel = useRelativeTimeLabel(absoluteTimes ? null : date);
+  const relativeLabel = useRelativeTimeLabel(
+    absoluteTimes ? null : date,
+    nowSpan
+  );
   const absoluteLabel = useAbsoluteTimeLabel(absoluteTimes ? date : null);
 
   return absoluteTimes ? absoluteLabel : relativeLabel;
 };
+
+export const useTimeSpan = (
+  a: Date | null,
+  b: Date | null
+): [number | null, number | null] => {
+  const compare = useTimeIncrement(a && b ? nextSecondIncrement : null);
+
+  const [start, end] = useMemo(() => {
+    if (!a || !b) return [null, null];
+
+    const aTime = a.getTime();
+    const bTime = b.getTime();
+
+    if (aTime < bTime) return [a, b];
+    return [b, a];
+  }, [a, b]);
+
+  const totalTime = useMemo(
+    () => (end && start ? end.getTime() - start.getTime() : null),
+    [end, start]
+  );
+
+  const elapsedTime = useMemo(
+    () => (compare && start ? compare.getTime() - start.getTime() : null),
+    [compare, start]
+  );
+
+  const fraction = useMemo(
+    () => (elapsedTime && totalTime ? elapsedTime / totalTime : null),
+    [elapsedTime, totalTime]
+  );
+
+  return useMemo(() => [totalTime, fraction], [fraction, totalTime]);
+};
+
+export const useDateFromEpoch = (input: number | null): Date | null =>
+  useMemo(() => (input === null ? null : new Date(input)), [input]);

@@ -1,5 +1,11 @@
 import { FunctionComponent, createContext } from 'preact';
-import { StateUpdater, useContext, useMemo, useState } from 'preact/hooks';
+import {
+  StateUpdater,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'preact/hooks';
 import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
 import { useDelay } from '../hooks/use-delay.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
@@ -68,11 +74,15 @@ export const useBackground = (): string | null => {
   return useMemo(() => background, [background]);
 };
 
-export const useSetBackgroundOverride = (): StateUpdater<
-  string | NoBackground | null
-> => {
+export const useSetBackgroundOverride = (
+  override: string | NoBackground | null
+): void => {
   const [, setBackgroundOverride] = useContext(BackgroundContext);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => setBackgroundOverride, []);
+  useEffect(() => {
+    setBackgroundOverride(override);
+
+    return () => setBackgroundOverride(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [override]);
 };
