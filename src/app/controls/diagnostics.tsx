@@ -51,54 +51,68 @@ export const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
 
   if (!isElementWithMeta(element)) return null;
 
-  const { meta } = element;
+  const { id, meta, property } = element;
 
   if (!Object.keys(meta).length) return null;
 
   return (
-    <tr>
-      <td>
-        <b>Meta</b>
-      </td>
-      <td>
-        <table>
-          {Object.entries(meta).map(([key, value]) => {
-            const idDate =
-              key === 'id' && meta.level === Levels.SYSTEM && country
-                ? new Date(Number(value)).toLocaleString(country)
-                : null;
+    <>
+      <tr>
+        <td>
+          <b>ID</b>
+        </td>
+        <td>{id}</td>
+      </tr>
+      <tr>
+        <td>
+          <b>Property</b>
+        </td>
+        <td>{property}</td>
+      </tr>
+      <tr>
+        <td>
+          <b>Meta</b>
+        </td>
+        <td>
+          <table>
+            {Object.entries(meta).map(([key, value]) => {
+              const idDate =
+                key === 'id' && meta.level === Levels.SYSTEM && country
+                  ? new Date(Number(value)).toLocaleString(country)
+                  : null;
 
-            const level =
-              key === 'level'
-                ? levelToString(value as unknown as Levels)
-                : null;
+              const level =
+                key === 'level'
+                  ? levelToString(value as unknown as Levels)
+                  : null;
 
-            const parentRelation =
-              key === 'parentRelation'
-                ? parentRelationToString(value as unknown as ParentRelation)
-                : null;
+              const parentRelation =
+                key === 'parentRelation'
+                  ? parentRelationToString(value as unknown as ParentRelation)
+                  : null;
 
-            const valueType =
-              key === 'valueType'
-                ? valueTypeToType(value as unknown as ValueType)
-                : null;
+              const valueType =
+                key === 'valueType'
+                  ? valueTypeToType(value as unknown as ValueType)
+                  : null;
 
-            return (
-              <tr>
-                <td>{key}</td>
-                <td>
-                  {level ||
-                    parentRelation ||
-                    valueType ||
-                    JSON.stringify(value)}{' '}
-                  {idDate ? <>({idDate})</> : null}
-                </td>
-              </tr>
-            );
-          })}
-        </table>
-      </td>
-    </tr>
+              return (
+                <tr>
+                  <td>{key}</td>
+                  <td>
+                    {level ||
+                      parentRelation ||
+                      valueType ||
+                      JSON.stringify(value)}{' '}
+                    {idDate ? <>({idDate})</> : null}
+                  </td>
+                </tr>
+              );
+            })}
+          </table>
+        </td>
+      </tr>
+    </>
   );
 };
 
@@ -237,10 +251,13 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
 }) => {
   const { children: hierarchyChildren } = element;
 
-  const openChildList =
-    element.meta?.level === Levels.SYSTEM ||
-    element.meta?.level === Levels.HOME ||
-    element.meta?.level === Levels.BUILDING;
+  const openChildList = useMemo(
+    () =>
+      element.meta?.level === Levels.SYSTEM ||
+      element.meta?.level === Levels.HOME ||
+      element.meta?.level === Levels.BUILDING,
+    [element]
+  );
 
   return (
     <table>

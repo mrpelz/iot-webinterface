@@ -70,7 +70,7 @@ const useNavigationElements = <
 ) => {
   const elements = useLevelShallow<T>(level, parent);
 
-  const storedElement = useGetLocalStorage(persistenceKey);
+  const storedName = useGetLocalStorage(persistenceKey);
 
   const determineElement = useCallback(
     (previousState: T | null) => {
@@ -99,7 +99,7 @@ const useNavigationElements = <
       for (const element of elements) {
         const { meta } = element;
 
-        if (meta.name === storedElement) {
+        if (meta.name === storedName) {
           return element;
         }
       }
@@ -118,11 +118,11 @@ const useNavigationElements = <
 
       return null;
     },
-    [elements, ignorePersistenceInit, override, storedElement]
+    [elements, ignorePersistenceInit, override, storedName]
   );
 
-  const element = useState<T | null>(null);
-  const [state, setState] = element;
+  const result = useState<T | null>(null);
+  const [state, setState] = result;
 
   useEffect(() => {
     setState(() => determineElement(state));
@@ -138,28 +138,28 @@ const useNavigationElements = <
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [override]);
 
-  return element;
+  return result;
 };
 
 const useStaticPage = (
-  stateRoom: HierarchyElementRoom | null,
+  room: HierarchyElementRoom | null,
   override: string | null,
   defer = false
 ) => {
   const fallback = useDelay(defer ? null : START_PAGE, 300);
 
-  const storedStaticPage = useGetLocalStorage(STATIC_PAGE_KEY);
+  const storedName = useGetLocalStorage(STATIC_PAGE_KEY);
 
   const determineStaticPage = useCallback(() => {
     if (override) return override as StaticPage;
-    if (stateRoom) return null;
-    if (storedStaticPage) return storedStaticPage as StaticPage;
+    if (room) return null;
+    if (storedName) return storedName as StaticPage;
 
     return fallback;
-  }, [fallback, override, stateRoom, storedStaticPage]);
+  }, [fallback, override, room, storedName]);
 
-  const staticPage = useState(determineStaticPage);
-  const [state, setState] = staticPage;
+  const result = useState(determineStaticPage);
+  const [state, setState] = result;
 
   useSetLocalStorage(STATIC_PAGE_KEY, state);
 
@@ -177,7 +177,7 @@ const useStaticPage = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fallback]);
 
-  return staticPage;
+  return result;
 };
 
 export const NavigationProvider: FunctionComponent = ({ children }) => {

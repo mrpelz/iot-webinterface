@@ -1,4 +1,5 @@
 import {
+  HierarchyElement,
   HierarchyElementDevice,
   HierarchyElementRoom,
   Levels,
@@ -6,6 +7,8 @@ import {
 } from '../../web-api.js';
 import { useCallback, useMemo } from 'preact/hooks';
 import {
+  useElementFilter,
+  useElements,
   useHierarchy,
   useLevelDeep,
   useMetaFilter,
@@ -21,25 +24,16 @@ import { roomSorting as roomsSorting } from '../../i18n/mapping.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { useSegment } from '../../state/path.js';
 
-const FAKE_ROUTE_DIVIDER = '*';
-
 const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   const {
     meta: { name },
   } = room;
 
+  const [, setDeviceId] = useSegment(1);
+
   const devices = useMetaFilter(
     useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room),
     useCallback(({ isSubDevice }) => !isSubDevice, [])
-  );
-
-  const [, setRoute] = useSegment(1);
-
-  const onSelect = useCallback(
-    (device: string) => {
-      setRoute?.(`${name}${FAKE_ROUTE_DIVIDER}${device}`);
-    },
-    [name, setRoute]
   );
 
   return (
@@ -53,11 +47,11 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
               return (
                 <Device
                   device={device}
-                  onSelect={() => onSelect(device.meta.name)}
+                  onClick={() => setDeviceId?.(device.id)}
                 />
               );
             }),
-          [devices, onSelect]
+          [devices, setDeviceId]
         )}
       </Grid>
     </Category>
@@ -66,27 +60,18 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
 
 export const Devices: FunctionComponent = () => {
   const hierarchy = useHierarchy();
+  const elements = useElements();
+
+  const [deviceId] = useSegment(1);
 
   const rooms = useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy);
   const roomsSorted = useArray(
     useMemo(() => sortBy(rooms, 'name', roomsSorting).all, [rooms])
   );
 
-  const [route] = useSegment(1);
-
-  const [roomId, deviceId] = useMemo(
-    () => route?.split(FAKE_ROUTE_DIVIDER) || ([] as undefined[]),
-    [route]
-  );
-
-  const [room] = useMetaFilter(
-    rooms,
-    useCallback(({ name }) => name === roomId, [roomId])
-  );
-
-  const [device] = useMetaFilter(
-    useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room || null),
-    useCallback(({ name }) => name === deviceId, [deviceId])
+  const [device] = useElementFilter<HierarchyElement, HierarchyElementDevice>(
+    deviceId ? elements : null,
+    useCallback(({ id }) => id === deviceId, [deviceId])
   );
 
   return (

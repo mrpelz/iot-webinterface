@@ -27,6 +27,7 @@ type UseLevelParents = (
 )[];
 
 type TWebApiContext = {
+  elements: HierarchyElement[] | null;
   hierarchy: HierarchyElementSystem | null;
   isStreamOnline: boolean;
   useGetterIndex: <T>(index?: number) => T | null;
@@ -34,6 +35,7 @@ type TWebApiContext = {
 };
 
 const WebApiContext = createContext<TWebApiContext>({
+  elements: null,
   hierarchy: null,
   isStreamOnline: false,
   useGetterIndex: () => null,
@@ -82,11 +84,16 @@ export const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
     null as unknown as HierarchyElementSystem
   );
 
+  const [elements, setElements] = useState<HierarchyElement[]>(
+    null as unknown as HierarchyElement[]
+  );
+
   const [isStreamOnline, setStreamOnline] = useState(false);
 
   useEffect(() => {
-    webApi.onHierarchy((value) => {
-      setHierarchy(value);
+    webApi.onHierarchy((hierarchyInput, elementsInput) => {
+      setHierarchy(hierarchyInput);
+      setElements(elementsInput);
     });
 
     webApi.onStreamOnline((value) => setStreamOnline(value));
@@ -94,6 +101,7 @@ export const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
 
   const value = useMemo(
     () => ({
+      elements,
       hierarchy,
       isStreamOnline,
       // eslint-disable-next-line comma-spacing
@@ -103,7 +111,7 @@ export const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
       useSetterIndex: <T,>(index?: number) =>
         useSetterIndexFactory<T>(webApi, index),
     }),
-    [hierarchy, isStreamOnline, webApi]
+    [elements, hierarchy, isStreamOnline, webApi]
   );
 
   return (
@@ -119,6 +127,12 @@ export const useHierarchy = (): TWebApiContext['hierarchy'] => {
   const { hierarchy } = useContext(WebApiContext);
 
   return useMemo(() => hierarchy, [hierarchy]);
+};
+
+export const useElements = (): TWebApiContext['elements'] => {
+  const { elements } = useContext(WebApiContext);
+
+  return useMemo(() => elements, [elements]);
 };
 
 const useLevel = <T extends HierarchyElementWithMeta>(
@@ -162,17 +176,14 @@ export const useLevelDeepSkipInput = <T extends HierarchyElementWithMeta>(
   return useLevel(level, parents, true, true);
 };
 
-export const useElementFilter = <
-  T extends HierarchyElementWithMeta,
-  R extends T = T
->(
-  input: T[],
+export const useElementFilter = <T extends HierarchyElement, R extends T = T>(
+  input: T[] | null,
   filter: (element: T) => boolean
 ): R[] => {
   const memoizedInput = useArray(input);
 
   return useMemo(() => {
-    return memoizedInput.filter((element) => filter(element));
+    return memoizedInput?.filter((element) => filter(element)) || [];
   }, [filter, memoizedInput]) as R[];
 };
 

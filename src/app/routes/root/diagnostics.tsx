@@ -74,7 +74,13 @@ const Navigation: FunctionComponent = () => {
               <td colSpan={999}>elements</td>
             </tr>
             {homes.map((element) => (
-              <Meta element={element} />
+              <tr>
+                <td>
+                  <table>
+                    <Meta element={element} />
+                  </table>
+                </td>
+              </tr>
             ))}
           </table>
           <table>
@@ -93,7 +99,13 @@ const Navigation: FunctionComponent = () => {
               <td colSpan={999}>elements</td>
             </tr>
             {buildings.map((element) => (
-              <Meta element={element} />
+              <tr>
+                <td>
+                  <table>
+                    <Meta element={element} />
+                  </table>
+                </td>
+              </tr>
             ))}
           </table>
           <table>
@@ -112,7 +124,13 @@ const Navigation: FunctionComponent = () => {
               <td colSpan={999}>elements</td>
             </tr>
             {floors.map((element) => (
-              <Meta element={element} />
+              <tr>
+                <td>
+                  <table>
+                    <Meta element={element} />
+                  </table>
+                </td>
+              </tr>
             ))}
           </table>
         </td>
@@ -125,7 +143,13 @@ const Navigation: FunctionComponent = () => {
               <td colSpan={999}>elements</td>
             </tr>
             {rooms.map((element) => (
-              <Meta element={element} />
+              <tr>
+                <td>
+                  <table>
+                    <Meta element={element} />
+                  </table>
+                </td>
+              </tr>
             ))}
           </table>
           <table>

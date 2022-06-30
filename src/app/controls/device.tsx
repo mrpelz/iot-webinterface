@@ -102,8 +102,8 @@ export const filterSubDevices = (
 
 export const Device: FunctionComponent<{
   device: HierarchyElementDevice;
-  onSelect?: () => void;
-}> = ({ device, onSelect }) => {
+  onClick?: () => void;
+}> = ({ device, onClick }) => {
   const subDevices = useMetaFilter(
     useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
     filterSubDevices
@@ -112,7 +112,7 @@ export const Device: FunctionComponent<{
   return (
     <CellWithBody
       icon={<ForwardIcon height="1em" />}
-      onClick={onSelect}
+      onClick={onClick}
       title={device.meta.name}
     >
       {subDevices.length ? (

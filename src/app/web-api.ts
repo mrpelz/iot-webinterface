@@ -6,7 +6,10 @@ type SetupMessage = {
 };
 
 type GetterCallback<T> = (value: T) => void;
-type HierarchyCallback = (value: HierarchyElementSystem) => void;
+type HierarchyCallback = (
+  hierarchy: HierarchyElementSystem,
+  elements: HierarchyElement[]
+) => void;
 type StreamOnlineCallback = (online: boolean) => void;
 
 type Getter = {
@@ -129,6 +132,7 @@ export type HierarchyChildren = Record<string, HierarchyElement>;
 export type HierarchyElement = {
   children?: HierarchyChildren;
   get?: number;
+  id: string;
   meta?: Meta;
   property: string;
   set?: number;
@@ -262,10 +266,39 @@ export class WebApi {
             }
 
             this._hierarchy = message.hierarchy;
-            this._hierarchyCallback?.(message.hierarchy);
+            this._handleHierarchySet();
         }
       };
     })();
+  }
+
+  private _flat(): HierarchyElement[] | null {
+    if (!this._hierarchy) return null;
+
+    const result = new Set<HierarchyElement>();
+
+    const walk = (element: HierarchyElement) => {
+      result.add(element);
+
+      const children = Object.values(element?.children || {});
+
+      for (const child of children) {
+        walk(child);
+      }
+    };
+
+    walk(this._hierarchy);
+
+    return Array.from(result);
+  }
+
+  private _handleHierarchySet(): void {
+    if (!this._hierarchy) return;
+
+    const elements = this._flat();
+    if (!elements) return;
+
+    this._hierarchyCallback?.(this._hierarchy, elements);
   }
 
   createGetter<T>(index: number, callback: GetterCallback<T>): Getter | null {
@@ -349,9 +382,8 @@ export class WebApi {
 
     this._hierarchyCallback = callback;
 
-    if (!hasCallbackSet && this._hierarchy) {
-      this._hierarchyCallback?.(this._hierarchy);
-      this._hierarchy = undefined;
+    if (!hasCallbackSet) {
+      this._handleHierarchySet();
     }
   }
 
@@ -362,7 +394,6 @@ export class WebApi {
 
     if (!hasCallbackSet && this._isStreamOnline !== undefined) {
       this._streamOnlineCallback?.(this._isStreamOnline);
-      this._isStreamOnline = undefined;
     }
   }
 }
