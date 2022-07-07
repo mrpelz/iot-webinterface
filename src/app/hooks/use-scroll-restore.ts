@@ -10,7 +10,7 @@ export const useScrollRestore = (isOnRestoration: boolean): void => {
       scrollYRef.current = scrollY;
     };
 
-    document.addEventListener('scroll', onScroll);
+    document.addEventListener('scroll', onScroll, { passive: true });
 
     return () => {
       document.removeEventListener('scroll', onScroll);

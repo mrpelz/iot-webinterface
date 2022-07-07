@@ -48,6 +48,8 @@ const isSafari = (() => {
   const INVENTORY_URL = '/B98534B3-903F-4117-B7B7-962ABDAC4C42';
   const ECHO_URL = '/E4B38FA2-08D2-4117-9738-29FC9106CBA0';
 
+  const INVENTORY_STORE = '/A9B51A78-7BD0-4EE0-BF16-8FD399DB061F';
+
   const ERROR_MESSAGE = 'service worker synthesized response';
   const FALLBACK_HTML = `
     <!DOCTYPE html>
@@ -168,7 +170,7 @@ const isSafari = (() => {
 
     const indexCache = reset
       ? null
-      : (await cacheInternal.match(INDEX_ENDPOINT)) || null;
+      : (await cacheInternal.match(INVENTORY_STORE)) || null;
     const [indexLive] = indexCache
       ? [null]
       : await fetchLive(INDEX_ENDPOINT, 'no-store');
@@ -180,7 +182,7 @@ const isSafari = (() => {
 
     if (reset) {
       await cacheInternal.put(
-        INDEX_ENDPOINT,
+        INVENTORY_STORE,
         new Response(JSON.stringify({ date, index }))
       );
     }
@@ -228,7 +230,7 @@ const isSafari = (() => {
       const index = await (
         await (
           await scope.caches.open(CACHE_KEY_INTERNAL)
-        ).match(INDEX_ENDPOINT)
+        ).match(INVENTORY_STORE)
       )?.json();
 
       const persisted =
