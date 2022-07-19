@@ -15,6 +15,7 @@ import { Titlebar } from './titlebar.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useGoUp } from '../state/path.js';
+import { useIsScreensaverActive } from '../state/screensaver.js';
 import { useMediaQuery } from '../style/main.js';
 
 export const swipeCaptureWidth = 30;
@@ -24,6 +25,7 @@ export const Layout: FunctionComponent = ({ children }) => {
 
   const isAsideVisible = useIsMenuVisible();
   const setAsideVisible = useSetMenuVisible();
+  const isScreensaverActive = useIsScreensaverActive();
 
   const goUp = useGoUp();
 
@@ -180,12 +182,17 @@ export const Layout: FunctionComponent = ({ children }) => {
 
   return (
     <>
-      <Header>
+      <Header isVisible={!isScreensaverActive}>
         <StatusBar />
         <Titlebar />
         <Notification />
       </Header>
-      <Aside isVisible={isDesktop || Boolean(isAsideVisible)} ref={menuRef}>
+      <Aside
+        isVisible={
+          (isDesktop && !isScreensaverActive) || Boolean(isAsideVisible)
+        }
+        ref={menuRef}
+      >
         <Menu />
       </Aside>
       {goUp ? (
@@ -194,7 +201,7 @@ export const Layout: FunctionComponent = ({ children }) => {
         </Aside>
       ) : null}
       <Main
-        isAsideVisible={Boolean(isAsideVisible)}
+        isAsideVisible={isScreensaverActive || Boolean(isAsideVisible)}
         onClickCapture={handleAsideOutsideClick}
         ref={mainRef}
         swipeCaptureWidth={swipeCaptureWidth}

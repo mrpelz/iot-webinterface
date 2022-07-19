@@ -4,14 +4,23 @@ import { breakpointValue } from '../style/breakpoint.js';
 import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
 
-export const Header = styled('header')`
+export const Header = styled('header')<{
+  isVisible: boolean;
+}>`
   background-color: ${colors.backgroundSecondary()};
   inline-size: 100%;
   inset-block-start: 0;
   inset-inline-start: 0;
   position: fixed;
   touch-action: none;
+  transition: transform 0.3s ease-out;
   z-index: 4;
+
+  transform: ${dependentValue(
+    'isVisible',
+    'translate3d(0, 0, 0)',
+    'translate3d(0, -100%, 0)'
+  )};
 `;
 
 export const Aside = styled('aside', forwardRef)<{

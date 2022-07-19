@@ -34,14 +34,21 @@ const epochs = (() => {
   };
 })();
 
-const msToNextSecond = (increaseSeconds: number) => {
+export const msToNextSecond = (increaseSeconds: number): number => {
   const next = new Date();
   next.setSeconds(next.getSeconds() + increaseSeconds, 0);
 
   return next.getTime() - Date.now();
 };
 
-const msToNextDay = (increaseDays: number) => {
+export const msToNextMinute = (increaseMinute: number): number => {
+  const next = new Date();
+  next.setMinutes(next.getMinutes() + increaseMinute, 0, 0);
+
+  return next.getTime() - Date.now();
+};
+
+export const msToNextDay = (increaseDays: number): number => {
   const next = new Date();
   next.setHours(0, 0, 0, 0);
   next.setDate(next.getDate() + increaseDays);
@@ -49,10 +56,13 @@ const msToNextDay = (increaseDays: number) => {
   return next.getTime() - Date.now();
 };
 
-const nextSecondIncrement = () => msToNextSecond(1);
-const nextDayIncrement = () => msToNextDay(1);
+export const nextSecondIncrement = (): number => msToNextSecond(1);
+export const nextMinuteIncrement = (): number => msToNextMinute(1);
+export const nextDayIncrement = (): number => msToNextDay(1);
 
-const useTimeIncrement = (incrementCb: (() => number) | null = null) => {
+export const useTimeIncrement = (
+  incrementCb: (() => number) | null = null
+): Date | null => {
   const [compareDate, setCompareDate] = useState(() => new Date());
   useEffect(() => {
     const timeout = incrementCb

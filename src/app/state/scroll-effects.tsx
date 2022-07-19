@@ -1,14 +1,18 @@
-import { MenuVisible, useIsMenuVisible } from './menu.js';
 import { useLayoutEffect, useRef } from 'preact/hooks';
 import { FunctionComponent } from 'preact';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
+import { useIsMenuVisible } from './menu.js';
+import { useIsScreensaverActive } from './screensaver.js';
 import { useSegment } from './path.js';
 
 export const ScrollEffects: FunctionComponent = () => {
   useHookDebug('Scroll');
 
   const isMenuVisible = useIsMenuVisible();
-  const isMenuVisibleRef = useRef<MenuVisible>(isMenuVisible);
+  const isScreensaverActive = useIsScreensaverActive();
+
+  const isScrollLocked = Boolean(isMenuVisible) || isScreensaverActive;
+  const isScrollLockedRef = useRef<boolean>(isScrollLocked);
 
   const [path] = useSegment(0);
   const previousPath = useRef<string | null>(null);
@@ -16,40 +20,40 @@ export const ScrollEffects: FunctionComponent = () => {
   const previousScrollY = useRef(0);
 
   useLayoutEffect(() => {
-    isMenuVisibleRef.current = isMenuVisible;
-  }, [isMenuVisible]);
+    isScrollLockedRef.current = isScrollLocked;
+  }, [isScrollLocked]);
 
   useLayoutEffect(() => {
     const { style } = document.documentElement;
 
     requestAnimationFrame(() => {
-      if (isMenuVisible) {
+      if (isScrollLocked) {
         previousScrollY.current = scrollY;
       }
 
-      style.overflowY = isMenuVisible ? 'hidden' : '';
+      style.overflowY = isScrollLocked ? 'hidden' : '';
 
       scrollTo({
         behavior: 'instant' as ScrollBehavior,
         top:
-          !isMenuVisible && previousPath.current !== path
+          !isScrollLocked && previousPath.current !== path
             ? 0
             : previousScrollY.current,
       });
 
-      if (!isMenuVisible) {
+      if (!isScrollLocked) {
         previousPath.current = path;
         previousScrollY.current = 0;
       }
     });
-  }, [isMenuVisible, path]);
+  }, [isScrollLocked, path]);
 
   useLayoutEffect(() => {
     const onScroll: (
       this: HTMLElement,
       event: HTMLElementEventMap['scroll']
     ) => void = () => {
-      if (!isMenuVisibleRef.current) return;
+      if (!isScrollLockedRef.current) return;
 
       scrollTo({
         behavior: 'instant' as ScrollBehavior,

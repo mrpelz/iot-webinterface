@@ -28,6 +28,8 @@ import { Translation } from '../state/i18n.js';
 import { colors } from '../style.js';
 import { roomSorting } from '../i18n/mapping.js';
 import { useArray } from '../hooks/use-array-compare.js';
+import { useFlag } from '../state/flags.js';
+import { useFlipScreensaverActive } from '../state/screensaver.js';
 import { useGoRoot } from '../state/path.js';
 import { useIsMenuVisible } from '../state/menu.js';
 import { useTheme } from '../state/theme.js';
@@ -141,6 +143,9 @@ export const Floor: FunctionComponent<{
 export const Menu: FunctionComponent = () => {
   const goRoot = useGoRoot();
 
+  const isScreensaverEnabled = useFlag('screensaverEnable');
+  const flipScreensaverActive = useFlipScreensaverActive();
+
   const isMenuVisible = useIsMenuVisible();
 
   const [selectedStaticPage, selectStaticPage] = useNavigationStaticPage();
@@ -201,6 +206,16 @@ export const Menu: FunctionComponent = () => {
             })}
           </MenuList>
         </MenuSubdivision>
+
+        {isScreensaverEnabled ? (
+          <MenuSubdivision>
+            <MenuList>
+              <MenuListItem isActive={false} onClick={flipScreensaverActive}>
+                <Translation capitalize={true} i18nKey="startScreensaver" />
+              </MenuListItem>
+            </MenuList>
+          </MenuSubdivision>
+        ) : null}
       </MenuContent>
     </MenuComponent>
   );

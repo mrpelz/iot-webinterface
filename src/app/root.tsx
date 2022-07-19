@@ -10,6 +10,7 @@ import { MenuVisibleProvider } from './state/menu.js';
 import { NavigationProvider } from './state/navigation.js';
 import { Notifications } from './util/notifications.js';
 import { PathProvider } from './state/path.js';
+import { ScreensaverActiveProvider } from './state/screensaver.js';
 import { ScrollEffects } from './state/scroll-effects.js';
 import { ThemeProvider } from './state/theme.js';
 import { TitleProvider } from './state/title.js';
@@ -79,6 +80,7 @@ export const Root: FunctionComponent<{
   const OuterState = combineComponents(
     _FlagProvider,
     VisibilityProvider,
+    ScreensaverActiveProvider,
     _PathProvider,
     ThemeProvider
   );

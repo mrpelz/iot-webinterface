@@ -5,6 +5,8 @@ export type Flags = {
   enableNotifications: boolean;
   inactivityTimeout: number | null;
   language: string | null;
+  screensaverEnable: boolean;
+  screensaverRandomizePosition: boolean;
   serviceWorker: boolean;
   startPage: string | null;
   theme: string | null;
@@ -19,6 +21,8 @@ const defaultFlags: Flags = {
   enableNotifications: true,
   inactivityTimeout: null,
   language: null,
+  screensaverEnable: false,
+  screensaverRandomizePosition: false,
   serviceWorker: true,
   startPage: null,
   theme: null,
@@ -83,6 +87,18 @@ export const getFlags = (): Flags => {
     language: getFlag(hashFlags, queryFlags, 'language', (input) => {
       return typeof input === 'string' ? input.trim() : undefined;
     }),
+    screensaverEnable: getFlag(
+      hashFlags,
+      queryFlags,
+      'screensaverEnable',
+      (input) => Boolean(input)
+    ),
+    screensaverRandomizePosition: getFlag(
+      hashFlags,
+      queryFlags,
+      'screensaverRandomizePosition',
+      (input) => Boolean(input)
+    ),
     serviceWorker: getFlag(hashFlags, queryFlags, 'serviceWorker', (input) =>
       Boolean(input)
     ),

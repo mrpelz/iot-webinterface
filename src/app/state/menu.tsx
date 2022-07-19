@@ -11,6 +11,7 @@ import { useLeaveCallbackRef, usePath } from './path.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
+import { useIsScreensaverActive } from './screensaver.js';
 import { useMediaQuery } from '../style/main.js';
 import { useVisibility } from './visibility.js';
 
@@ -32,6 +33,7 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
   const leaveCallbackRef = useLeaveCallbackRef();
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
+  const isScreensaverActive = useIsScreensaverActive();
   const isVisible = useVisibility();
   const path = usePath();
 
@@ -68,6 +70,11 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     setMenuVisible(false);
   }, [path, setMenuVisible]);
+
+  useEffect(() => {
+    if (!isScreensaverActive) return;
+    setMenuVisible(false);
+  }, [isScreensaverActive, setMenuVisible]);
 
   const value = useMemo<TMenuVisibleContext>(
     () => ({
