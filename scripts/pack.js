@@ -26,25 +26,17 @@ const HASH_EXCLUSIONS = [
   new RegExp('^/index.json$'),
 ];
 
-const LIST_EXCLUSIONS = [
-  new RegExp('.DS_Store$'),
-  new RegExp('.js.map$'),
-  new RegExp('^/index.html$'),
-];
-
-const PRELOAD_TYPES = {
-  worker: [new RegExp('^/js/workers/.*.js$')],
-  // eslint-disable-next-line sort-keys
-  script: [new RegExp('^/js/app/.*.js$'), new RegExp('^/js/lib/.*.js$')],
-  // eslint-disable-next-line sort-keys
-  fetch: [new RegExp('.txt$'), new RegExp('.json$')],
-  image: [new RegExp('.ico$'), new RegExp('.jpg$'), new RegExp('.png$')],
-};
-
 const INDEX_EXCLUSIONS = [
   new RegExp('^/id.txt$'),
   new RegExp('^/index.json$'),
   new RegExp('^/js/workers/sw.js$'),
+  new RegExp('^/manifest.json$'),
+];
+
+const LIST_EXCLUSIONS = [
+  new RegExp('.DS_Store$'),
+  new RegExp('.js.map$'),
+  new RegExp('^/index.html$'),
   new RegExp('^/manifest.json$'),
 ];
 
@@ -57,6 +49,18 @@ const INDEX_TIERS = {
   optional: [new RegExp('^/images/background/')],
 };
 
+/* eslint-disable sort-keys */
+const PRELOAD_TYPES = {
+  script: [
+    new RegExp('^/js/app/(?!index).*.js$'),
+    new RegExp('^/js/lib/.*.js$'),
+  ],
+  fetch: [new RegExp('.txt$'), new RegExp('.json$')],
+  worker: [new RegExp('^/js/workers/.*.js$')],
+  // image: [new RegExp('.ico$'), new RegExp('.jpg$'), new RegExp('.png$')],
+};
+/* eslint-enable sort-keys */
+
 const SEPARATOR = Buffer.from(':');
 
 const NGINX_CONFIG = './nginx/main.conf';
@@ -64,9 +68,11 @@ const NGINX_CONFIG = './nginx/main.conf';
 const tasks = process.argv[process.argv.length - 1].split(',');
 
 async function precacheIndex() {
-  const entryHtmlFile = join(process.cwd(), DIST_DIR, ENTRY_HTML_FILE);
-  const indexFile = join(process.cwd(), DIST_DIR, INDEX_FILE);
-  const idFile = join(process.cwd(), DIST_DIR, ID_FILE);
+  const distDir = join(process.cwd(), DIST_DIR);
+
+  const entryHtmlFile = join(distDir, ENTRY_HTML_FILE);
+  const indexFile = join(distDir, INDEX_FILE);
+  const idFile = join(distDir, ID_FILE);
 
   /**
    * @type {string[]}
@@ -76,7 +82,7 @@ async function precacheIndex() {
   /**
    * @param {string} path
    * @param {string} root
-   * @returns {string[]}
+   * @returns {Promise<string[]>}
    */
   const walk = async (path, root) => {
     const stats = await stat(path);
@@ -124,28 +130,32 @@ async function precacheIndex() {
     return lists.flat();
   };
 
-  const fileList = (
-    await Promise.all(
-      [DIST_DIR, STATIC_DIR].map(async (path) => {
-        const absolutePath = join(process.cwd(), path);
+  const fileList = [
+    (
+      await Promise.all(
+        [DIST_DIR, STATIC_DIR].map(async (path) => {
+          const absolutePath = join(process.cwd(), path);
 
-        return walk(absolutePath, absolutePath);
-      })
-    )
-  )
-    .flat()
-    .sort();
-
-  const list = fileList.filter(
-    (entry) => !INDEX_TIERS.optional.find((inclusion) => inclusion.test(entry))
-  );
+          return walk(absolutePath, absolutePath);
+        })
+      )
+    ).flat(1),
+    `/${relative(distDir, idFile)}`,
+    `/${relative(distDir, indexFile)}`,
+  ]
+    .flat(1)
+    .sort()
+    .sort((a, b) => (a?.length || 0) - (b?.length || 0))
+    .sort(
+      (a, b) => (a?.split('/')?.length || 0) - (b?.split('/')?.length || 0)
+    );
 
   const preloadList = Object.fromEntries(
     Object.entries(PRELOAD_TYPES).map(([type, matchers]) => {
       const matchingFiles = [];
 
       for (const matcher of matchers) {
-        for (const index of list) {
+        for (const index of fileList) {
           if (!matcher.test(index)) continue;
           matchingFiles.push(index);
         }
@@ -206,7 +216,7 @@ async function precacheIndex() {
   const entryHtmlPayload = Buffer.from(
     entryHtmlTemplate.replace(
       PRELOAD_PLACEHOLDER,
-      preloadTags.map((tag, index) => `${index ? '' : '  '}${tag}`).join('\n')
+      preloadTags.map((tag, index) => `${index ? '  ' : ''}${tag}`).join('\n')
     ),
     'utf8'
   );
