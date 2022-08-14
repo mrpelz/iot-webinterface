@@ -35,7 +35,7 @@ import { useSegment } from '../../state/path.js';
 
 export const Room: FunctionComponent<{
   elements: HierarchyElement[];
-}> = ({ elements: _parents }) => {
+}> = ({ children, elements: _parents }) => {
   const parents = useArray(_parents);
 
   const areas = useLevelShallow<HierarchyElementArea>(Levels.AREA, parents);
@@ -106,6 +106,7 @@ export const Room: FunctionComponent<{
     <SubRoute
       subRoute={subRouteElement ? <SubPage element={subRouteElement} /> : null}
     >
+      {children}
       {[securitySensors, doors, windows].flat().length ? (
         <Category header={<Translation i18nKey="security" capitalize={true} />}>
           <Grid>

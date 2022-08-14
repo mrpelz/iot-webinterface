@@ -10,10 +10,14 @@ import {
   useLevelShallow,
   useMetaFilter,
 } from '../../state/web-api.js';
+import { Category } from '../../views/category.js';
 import { FunctionComponent } from 'preact';
+import { HLSStream } from '../../views/hls-stream.js';
 import { Room } from './room.js';
+import { Translation } from '../../state/i18n.js';
 import { useCallback } from 'preact/hooks';
 import { useNavigationBuilding } from '../../state/navigation.js';
+import { useSegment } from '../../state/path.js';
 
 export const Global: FunctionComponent = () => {
   const hierarchy = useHierarchy();
@@ -33,9 +37,19 @@ export const Global: FunctionComponent = () => {
 
   const entryDoor = useChild(building, 'entryDoor') as HierarchyElementArea;
 
+  const [subRoute] = useSegment(1);
+
   return (
-    <Room
-      elements={[...globalProperties, ...firstFloorProperties, entryDoor]}
-    />
+    <Room elements={[...globalProperties, ...firstFloorProperties, entryDoor]}>
+      <Category
+        header={<Translation i18nKey="surveillance" capitalize={true} />}
+      >
+        <HLSStream
+          playlist={
+            subRoute ? undefined : 'https://nvr.i.wurstsalat.cloud/flur/stream/'
+          }
+        />
+      </Category>
+    </Room>
   );
 };

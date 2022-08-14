@@ -85,6 +85,7 @@ const s = {
   start: 'start',
   state: 'status',
   staticPage: 'statische seite',
+  surveillance: 'überwachung',
   switch: 'umschalten',
   system: 'system',
   tamperSwitch: 'sabotageschalter',

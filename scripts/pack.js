@@ -281,6 +281,7 @@ async function nginx() {
 (async () => {
   if (tasks.includes('transform')) {
     await promisify(execFile)('native-esm-transform');
+    await promisify(execFile)('./scripts/copy-additional-files.sh');
 
     await precacheIndex();
   }

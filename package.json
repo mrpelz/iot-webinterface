@@ -45,6 +45,7 @@
   "type": "module",
   "dependencies": {
     "goober": "^2.0.39",
+    "hls.js": "^1.2.0",
     "preact": "^10.5.14"
   }
 }

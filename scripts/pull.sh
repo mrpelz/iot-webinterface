@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 git reset --hard HEAD~1
 git pull --ff-only origin HEAD

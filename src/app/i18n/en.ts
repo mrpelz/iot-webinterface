@@ -84,6 +84,7 @@ const s = {
   start: 'start',
   state: 'state',
   staticPage: 'static page',
+  surveillance: 'surveillance',
   switch: 'switch',
   system: 'system',
   tamperSwitch: 'tamper switch',

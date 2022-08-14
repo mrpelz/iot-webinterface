@@ -283,18 +283,19 @@ const isSafari = (() => {
   };
 
   scope.onfetch = (fetchEvent) => {
+    const { request } = fetchEvent;
+    const { pathname, href } = new URL(request.url, origin);
+
+    let pathnameOverride: string | null = null;
+
+    const isUnhandled =
+      !href.startsWith(origin) || testPath(pathname, unhandledRequestUrls);
+    if (isUnhandled) return;
+
     const preloadResponse =
       'preloadResponse' in fetchEvent
         ? (fetchEvent.preloadResponse as Promise<Response | undefined>)
         : null;
-
-    const { request } = fetchEvent;
-    const { pathname } = new URL(request.url, scope.origin);
-
-    let pathnameOverride: string | null = null;
-
-    const isUnhandled = testPath(pathname, unhandledRequestUrls);
-    if (isUnhandled) return;
 
     fetchEvent.respondWith(
       // eslint-disable-next-line complexity
