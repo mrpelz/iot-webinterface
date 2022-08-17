@@ -45,7 +45,8 @@ export const Global: FunctionComponent = () => {
         header={<Translation i18nKey="surveillance" capitalize={true} />}
       >
         <HLSStream
-          playlist={
+          poster="https://nvr.i.wurstsalat.cloud/flur/still/"
+          src={
             subRoute ? undefined : 'https://nvr.i.wurstsalat.cloud/flur/stream/'
           }
         />

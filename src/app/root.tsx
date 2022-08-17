@@ -5,6 +5,7 @@ import { BackgroundProvider } from './state/background.js';
 import { FallbackNotificationProvider } from './state/notification.js';
 import { FlagProvider } from './state/flags.js';
 import { Flags } from './util/flags.js';
+import { FocusProvider } from './state/focus.js';
 import { I18nProvider } from './state/i18n.js';
 import { MenuVisibleProvider } from './state/menu.js';
 import { NavigationProvider } from './state/navigation.js';
@@ -80,6 +81,7 @@ export const Root: FunctionComponent<{
   const OuterState = combineComponents(
     _FlagProvider,
     VisibilityProvider,
+    FocusProvider,
     ScreensaverActiveProvider,
     _PathProvider,
     ThemeProvider

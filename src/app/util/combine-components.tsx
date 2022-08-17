@@ -27,7 +27,7 @@ export const bindComponent = <T,>(
 ): FunctionComponent<Partial<T>> => {
   return (innerProps) => {
     return useMemo(
-      () => <Component {...({ ...props, ...innerProps } as T)} />,
+      () => <Component {...{ ...props, ...innerProps }} />,
       [innerProps]
     );
   };

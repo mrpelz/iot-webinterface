@@ -18,8 +18,10 @@ import { Levels } from '../../web-api.js';
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { useFlags } from '../../state/flags.js';
+import { useFocus } from '../../state/focus.js';
 import { useI18n } from '../../state/i18n.js';
 import { useIsMenuVisible } from '../../state/menu.js';
+import { useIsScreensaverActive } from '../../state/screensaver.js';
 import { useMediaQuery } from '../../style/main.js';
 import { useMemo } from 'preact/hooks';
 import { useNotification } from '../../state/notification.js';
@@ -364,6 +366,10 @@ const ServiceWorkerInventory: FunctionComponent = () => {
 export const Diagnostics: FunctionComponent = () => {
   const isVisible = useVisibility();
 
+  const isFocused = useFocus();
+
+  const isScreensaverActive = useIsScreensaverActive();
+
   const { isRoot, path, previousPath } = usePathContext();
 
   const theme = useTheme();
@@ -395,6 +401,25 @@ export const Diagnostics: FunctionComponent = () => {
             <b>isVisible</b>
           </td>
           <td>{useMemo(() => JSON.stringify(isVisible), [isVisible])}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>isFocused</b>
+          </td>
+          <td>{useMemo(() => JSON.stringify(isFocused), [isFocused])}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>isScreensaverActive</b>
+          </td>
+          <td>
+            {useMemo(
+              () => JSON.stringify(isScreensaverActive),
+              [isScreensaverActive]
+            )}
+          </td>
         </tr>
 
         <tr>
