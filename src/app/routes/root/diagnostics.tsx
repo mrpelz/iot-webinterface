@@ -19,6 +19,7 @@ import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { useFlags } from '../../state/flags.js';
 import { useFocus } from '../../state/focus.js';
+import { useGetLocalStorage } from '../../hooks/use-local-storage.js';
 import { useI18n } from '../../state/i18n.js';
 import { useIsMenuVisible } from '../../state/menu.js';
 import { useIsScreensaverActive } from '../../state/screensaver.js';
@@ -385,6 +386,8 @@ export const Diagnostics: FunctionComponent = () => {
 
   const title = useTitle();
 
+  const updateId = useGetLocalStorage('updateId');
+
   return (
     <DiagnosticsContainer>
       <table>
@@ -513,6 +516,13 @@ export const Diagnostics: FunctionComponent = () => {
             <b>title</b>
           </td>
           <td>{useMemo(() => JSON.stringify(title), [title])}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>updateId</b>
+          </td>
+          <td>{useMemo(() => JSON.stringify(updateId), [updateId])}</td>
         </tr>
 
         <tr>

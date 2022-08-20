@@ -36,6 +36,7 @@ const s = {
   highContrast: 'high contrast',
   home: 'home',
   inactivity: 'inactivity',
+  is: 'is',
   kitchen: 'kitchen',
   lamp: 'lamp',
   language: 'language',

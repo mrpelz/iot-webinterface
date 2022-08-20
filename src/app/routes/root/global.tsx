@@ -10,11 +10,9 @@ import {
   useLevelShallow,
   useMetaFilter,
 } from '../../state/web-api.js';
-import { Category } from '../../views/category.js';
 import { FunctionComponent } from 'preact';
 import { HLSStream } from '../../views/hls-stream.js';
 import { Room } from './room.js';
-import { Translation } from '../../state/i18n.js';
 import { useCallback } from 'preact/hooks';
 import { useNavigationBuilding } from '../../state/navigation.js';
 import { useSegment } from '../../state/path.js';
@@ -41,16 +39,12 @@ export const Global: FunctionComponent = () => {
 
   return (
     <Room elements={[...globalProperties, ...firstFloorProperties, entryDoor]}>
-      <Category
-        header={<Translation i18nKey="surveillance" capitalize={true} />}
-      >
-        <HLSStream
-          poster="https://nvr.i.wurstsalat.cloud/flur/still/"
-          src={
-            subRoute ? undefined : 'https://nvr.i.wurstsalat.cloud/flur/stream/'
-          }
-        />
-      </Category>
+      <HLSStream
+        poster="https://nvr.i.wurstsalat.cloud/flur/still/"
+        src={
+          subRoute ? undefined : 'https://nvr.i.wurstsalat.cloud/flur/stream/'
+        }
+      />
     </Room>
   );
 };
