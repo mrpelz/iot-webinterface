@@ -70,6 +70,7 @@ const isSafari = (() => {
   const unhandledRequestUrls: RegExp[] = [
     new RegExp('^/api(?!/hierarchy|/id)$'),
     new RegExp('^/id.txt$'),
+    new RegExp('^/nvr/'),
   ];
   const denyRequestUrls: RegExp[] = [new RegExp('^/favicon')];
   const indexUrl: RegExp[] = [

@@ -55,7 +55,7 @@ export const HLSStream: FunctionComponent<{
     if (!video) return undefined;
 
     if (
-      video.canPlayType('application/vnd.apple.mpegurl') &&
+      video.canPlayType('application/vnd.apple.mpegurl') === 'probably' &&
       !navigator.userAgent.toLowerCase().includes('android')
     ) {
       video.src = effectiveSrc || '';
@@ -97,17 +97,7 @@ export const HLSStream: FunctionComponent<{
 
       hls.on(HLS.Events.ERROR, (_, data) => {
         if (data.fatal) {
-          switch (data.type) {
-            case HLS.ErrorTypes.NETWORK_ERROR:
-              hls.startLoad();
-              break;
-            case HLS.ErrorTypes.MEDIA_ERROR:
-              hls.recoverMediaError();
-              break;
-            default:
-              setActive(false);
-              break;
-          }
+          setActive(false);
         }
       });
 
