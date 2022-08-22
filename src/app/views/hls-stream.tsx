@@ -1,9 +1,5 @@
 import { PauseIcon, PlayIcon } from '../components/icons.js';
-import {
-  msToNextSecond,
-  nextSecondIncrement,
-  useTimeIncrement,
-} from '../hooks/use-time-label.js';
+import { msToNextSecond, useTimeIncrement } from '../hooks/use-time-label.js';
 import {
   useCallback,
   useEffect,
@@ -23,19 +19,26 @@ import { useIsScreensaverActive } from '../state/screensaver.js';
 import { useUMDModule } from '../hooks/use-umd-module.js';
 
 const next10thSecondIncrement = (): number => msToNextSecond(10);
+const next2ndSecondIncrement = (): number => msToNextSecond(2);
 
 export const HLSStream: FunctionComponent<{
   poster?: string;
   src?: string;
 }> = ({ poster, src }) => {
-  const [isFunctional, setFunctional] = useState(true);
+  const [isActive, setActive] = useState(false);
 
   const isFocused = useFocus();
   const isScreensaverActive = useIsScreensaverActive();
 
+  useEffect(() => {
+    if (isFocused && !isScreensaverActive) return;
+
+    setActive(false);
+  }, [isFocused, isScreensaverActive]);
+
   const effectiveSrc = useMemo(
-    () => (isFunctional && isFocused && !isScreensaverActive ? src : undefined),
-    [isFocused, isFunctional, isScreensaverActive, src]
+    () => (isActive ? src : undefined),
+    [isActive, src]
   );
 
   const HLS = useUMDModule<typeof HLT_t>('/js/lib/hls.js/dist/hls.js');
@@ -43,8 +46,8 @@ export const HLSStream: FunctionComponent<{
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    videoRef.current?.addEventListener('error', () => setFunctional(false));
-    videoRef.current?.addEventListener('stalled', () => setFunctional(false));
+    videoRef.current?.addEventListener('error', () => setActive(false));
+    videoRef.current?.addEventListener('stalled', () => setActive(false));
   }, []);
 
   useEffect(() => {
@@ -102,7 +105,7 @@ export const HLSStream: FunctionComponent<{
               hls.recoverMediaError();
               break;
             default:
-              setFunctional(false);
+              setActive(false);
               break;
           }
         }
@@ -127,7 +130,7 @@ export const HLSStream: FunctionComponent<{
   const [posterUrl, setPosterUrl] = useState('');
 
   const refreshHandler = useMemo(
-    () => (effectiveSrc ? next10thSecondIncrement : nextSecondIncrement),
+    () => (effectiveSrc ? next10thSecondIncrement : next2ndSecondIncrement),
     [effectiveSrc]
   );
 
@@ -149,7 +152,7 @@ export const HLSStream: FunctionComponent<{
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nextPosterRefresh, poster]);
 
-  const onClick = useCallback(() => setFunctional((state) => !state), []);
+  const onClick = useCallback(() => setActive((state) => !state), []);
 
   return (
     <Category
