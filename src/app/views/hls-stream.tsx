@@ -55,7 +55,8 @@ export const HLSStream: FunctionComponent<{
     if (!video) return undefined;
 
     if (
-      video.canPlayType('application/vnd.apple.mpegurl') === 'probably' &&
+      (video.canPlayType('application/vnd.apple.mpegurl') === 'probably' ||
+        video.canPlayType('application/vnd.apple.mpegurl') === 'maybe') &&
       !navigator.userAgent.toLowerCase().includes('android')
     ) {
       video.src = effectiveSrc || '';
