@@ -46,8 +46,21 @@ export const HLSStream: FunctionComponent<{
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    videoRef.current?.addEventListener('error', () => setActive(false));
-    videoRef.current?.addEventListener('stalled', () => setActive(false));
+    const { current: video } = videoRef;
+    if (!video) return undefined;
+
+    const abort = new AbortController();
+
+    video.addEventListener(
+      'error',
+      () => {
+        if (!video.src.length) return;
+        setActive(false);
+      },
+      { signal: abort.signal }
+    );
+
+    return () => abort.abort();
   }, []);
 
   useEffect(() => {
@@ -55,8 +68,9 @@ export const HLSStream: FunctionComponent<{
     if (!video) return undefined;
 
     if (
-      (video.canPlayType('application/vnd.apple.mpegurl') === 'probably' ||
-        video.canPlayType('application/vnd.apple.mpegurl') === 'maybe') &&
+      ['maybe', 'probably'].includes(
+        video.canPlayType('application/vnd.apple.mpegurl')
+      ) &&
       !navigator.userAgent.toLowerCase().includes('android')
     ) {
       video.src = effectiveSrc || '';
@@ -141,7 +155,7 @@ export const HLSStream: FunctionComponent<{
 
     return () => URL.revokeObjectURL(posterUrl);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nextPosterRefresh, poster]);
+  }, [isActive, nextPosterRefresh, poster]);
 
   const onClick = useCallback(() => setActive((state) => !state), []);
 

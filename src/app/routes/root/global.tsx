@@ -40,8 +40,10 @@ export const Global: FunctionComponent = () => {
   return (
     <Room elements={[...globalProperties, ...firstFloorProperties, entryDoor]}>
       <HLSStream
-        poster="/nvr/flur/still/jpg/"
-        src={subRoute ? undefined : '/nvr/flur/stream/'}
+        poster="https://nvr.i.wurstsalat.cloud/flur/still/jpg/"
+        src={
+          subRoute ? undefined : 'https://nvr.i.wurstsalat.cloud/flur/stream/'
+        }
       />
     </Room>
   );
