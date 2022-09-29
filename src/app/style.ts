@@ -23,7 +23,6 @@ export const strings = {
   ),
   translucent: cssVar('translucent', '20px'),
   viewportHeight: '100vh',
-  viewportWidth: '100vw',
 };
 
 const staticDimensions = {
@@ -56,8 +55,8 @@ const partialDynamicDimensions = {
     return () =>
       useBreakpointValue(
         useMediaQuery(staticDimensions.breakpointDesktop),
-        subtract(strings.viewportWidth, staticDimensions.menuWidth),
-        strings.viewportWidth
+        subtract('100%', staticDimensions.menuWidth),
+        '100%'
       );
   },
   fontPadding: half(

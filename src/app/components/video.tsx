@@ -1,4 +1,4 @@
-import { colors, dimensions } from '../style.js';
+import { colors } from '../style.js';
 import { dependentValue } from '../style/main.js';
 import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
@@ -10,7 +10,7 @@ export const Poster = styled('img')`
   object-fit: contain;
   object-position: center;
   pointer-events: none;
-  width: ${dimensions.appWidth};
+  inline-size: 100%;
 `;
 
 export const Video = styled('video', forwardRef)`
@@ -21,5 +21,5 @@ export const Video = styled('video', forwardRef)`
   max-height: 640px;
   object-fit: contain;
   object-position: center;
-  width: ${dimensions.appWidth};
+  inline-size: 100%;
 `;
