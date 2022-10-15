@@ -160,6 +160,7 @@ const d = {
   kallaxLedRGB: `Kallax ${s.led} ${s.rgb}`,
   kallaxLedSide: `Kallax Seiten-${s.led}`,
   kallaxLedW: `Kallax ${s.white}e ${s.led}`,
+  kitchenAdjacentBright: `${s.kitchen}-${s.adjacent} hell`,
   kitchenAdjacentChillax: `${s.kitchen}-${s.adjacent} chillax`,
   kitchenAdjacentLights: `${s.kitchen}-${s.adjacent} ${p.light}`,
   ledLeftCWhite: `${s.led} ${s.left} ${s.cold}${s.white}`,
