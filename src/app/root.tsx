@@ -19,6 +19,7 @@ import { VisibilityProvider } from './state/visibility.js';
 import { WebApi } from './web-api.js';
 import { WebApiProvider } from './state/web-api.js';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
+import { dimensions } from './style.js';
 import { prefix } from 'goober/prefixer';
 import { setup } from 'goober';
 import { useMemo } from 'preact/hooks';
@@ -31,7 +32,6 @@ const GlobalStyles = createGlobalStyle`
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     box-sizing: border-box;
-    scroll-behavior: smooth;
     scrollbar-width: none;
     touch-action: manipulation;
     user-select: none;
@@ -44,12 +44,13 @@ const GlobalStyles = createGlobalStyle`
   :root,
   body {
     margin: 0;
-    overscroll-behavior-y: none;
     padding: 0;
   }
 
   :root {
     /* --safe-area-inset-top: 20px; */
+    scroll-snap-type: block;
+    scroll-padding: ${dimensions.headerHeightAdaptive} 0 0 0;
   }
 `;
 

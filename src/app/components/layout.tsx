@@ -52,6 +52,7 @@ export const Main = styled('main', forwardRef)<{
   margin-block-start: ${dimensions.headerHeightAdaptive};
   min-block-size: ${dimensions.appHeightAdaptive};
   position: relative;
+  scroll-behavior: smooth;
   touch-action: ${dependentValue('isAsideVisible', 'none', 'auto')};
   transition: block-size 0.3s ease-out, margin-block-start 0.3s ease-out;
   z-index: 2;

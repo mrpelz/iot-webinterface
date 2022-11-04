@@ -17,9 +17,9 @@ export const Video = styled('video', forwardRef)`
   aspect-ratio: 16 / 9;
   background: ${colors.black(75)};
   cursor: ${dependentValue('onClick', 'pointer', 'default')};
-  margin-block-end: -4px;
+  display: block;
+  inline-size: 100%;
   max-height: 640px;
   object-fit: contain;
   object-position: center;
-  inline-size: 100%;
 `;

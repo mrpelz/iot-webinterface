@@ -11,11 +11,10 @@ import {
   useMetaFilter,
 } from '../../state/web-api.js';
 import { FunctionComponent } from 'preact';
-import { HLSStream } from '../../views/hls-stream.js';
+import { HallwayStream } from '../../views/hallway-stream.js';
 import { Room } from './room.js';
 import { useCallback } from 'preact/hooks';
 import { useNavigationBuilding } from '../../state/navigation.js';
-import { useSegment } from '../../state/path.js';
 
 export const Global: FunctionComponent = () => {
   const hierarchy = useHierarchy();
@@ -35,16 +34,9 @@ export const Global: FunctionComponent = () => {
 
   const entryDoor = useChild(building, 'entryDoor') as HierarchyElementArea;
 
-  const [subRoute] = useSegment(1);
-
   return (
     <Room elements={[...globalProperties, ...firstFloorProperties, entryDoor]}>
-      <HLSStream
-        poster="https://nvr.i.wurstsalat.cloud/flur/still/jpg/"
-        src={
-          subRoute ? undefined : 'https://nvr.i.wurstsalat.cloud/flur/stream/'
-        }
-      />
+      <HallwayStream />
     </Room>
   );
 };

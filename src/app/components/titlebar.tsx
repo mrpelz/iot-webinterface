@@ -36,7 +36,7 @@ export const Title = styled('h1')`
   white-space: nowrap;
 `;
 
-export const IconContainer = styled('icon-container' as 'div', forwardRef)<{
+export const IconContainer = styled('icon-container' as 'section', forwardRef)<{
   right?: true;
 }>`
   align-items: center;

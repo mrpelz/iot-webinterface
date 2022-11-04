@@ -4,6 +4,7 @@ import { styled } from 'goober';
 
 export const CategoryWrapper = styled('category-wrapper')`
   display: flow-root;
+  scroll-snap-align: start;
 `;
 
 export const CategoryHeader = styled('category-header')<{

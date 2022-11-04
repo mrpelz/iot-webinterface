@@ -27,8 +27,8 @@ export const App: FunctionComponent = () => {
     <AppComponent>
       {isScreensaverEnabled ? <Screensaver /> : null}
       <Layout>
-        <Background />
         <RootRoute />
+        <Background />
       </Layout>
     </AppComponent>
   );

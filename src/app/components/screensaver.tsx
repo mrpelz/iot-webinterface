@@ -2,7 +2,7 @@ import { dimensions, strings } from '../style.js';
 import { dependentValue } from '../style/main.js';
 import { styled } from 'goober';
 
-export const Screensaver = styled('screensaver' as 'div')<{
+export const Screensaver = styled('screensaver' as 'section')<{
   isVisible: boolean;
 }>`
   background-color: black;

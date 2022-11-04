@@ -8,7 +8,7 @@ type SetupMessage = {
   serviceWorkerRefresh: boolean;
 };
 
-const isProd = !['localhost', '127.0.0.1'].includes(location.hostname);
+export const isProd = !['localhost', '127.0.0.1'].includes(location.hostname);
 
 export const CHECK_INTERVAL = isProd ? 15000 : 1000;
 const ID_STORAGE_KEY = 'updateId';

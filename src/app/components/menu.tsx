@@ -17,7 +17,7 @@ export const Menu = styled('nav')<{ isVisible: boolean }>`
   scroll-behavior: smooth;
 `;
 
-export const MenuShade = styled('menu-shade' as 'div', forwardRef)<{
+export const MenuShade = styled('menu-shade' as 'section', forwardRef)<{
   active: boolean;
 }>`
   background-color: black;
