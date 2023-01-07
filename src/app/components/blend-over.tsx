@@ -18,8 +18,13 @@ const BlendOverContent = styled('blend-over-content' as 'section')<{
   transitionDuration: number;
 }>`
   grid-area: a;
+  position: relative;
   transition: ${({ transitionDuration }) =>
     `clip-path ${transitionDuration}ms linear`};
+
+  & > * {
+    height: 100%;
+  }
 `;
 
 const BlendOverContentBase = styled(BlendOverContent)`

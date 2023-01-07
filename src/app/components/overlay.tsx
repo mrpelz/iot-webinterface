@@ -9,6 +9,11 @@ const OverlayWrapper = styled('overlay' as 'section')`
 
 const OverlayContent = styled('overlay-content' as 'section')`
   grid-area: a;
+  position: relative;
+
+  & > * {
+    height: 100%;
+  }
 `;
 
 export const Overlay: FunctionComponent<{

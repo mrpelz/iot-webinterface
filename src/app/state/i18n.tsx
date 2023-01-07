@@ -1,13 +1,15 @@
 import { FunctionComponent, createContext } from 'preact';
 import {
   I18nLanguage,
+  I18nNonCapitalization,
   I18nTranslation,
+  nonCapitalizations,
   reconcileLanguage,
   translations,
 } from '../i18n/main.js';
 import { getCountry, getLanguage } from '../util/locale.js';
 import { useContext, useMemo } from 'preact/hooks';
-import { Capitalize } from '../components/text.js';
+import { capitalize as capitalizeUtil } from '../util/string.js';
 import { universal } from '../i18n/universal.js';
 import { useFlag } from './flags.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
@@ -16,6 +18,7 @@ type TI18nContext = {
   country: string | null;
   language: string;
   locale: string | null;
+  nonCapitalization: I18nNonCapitalization;
   translation: I18nTranslation;
   translationLanguage: I18nLanguage;
   translationLocale: string | null;
@@ -53,11 +56,17 @@ export const I18nProvider: FunctionComponent = ({ children }) => {
     [translationLanguage]
   );
 
+  const nonCapitalization = useMemo(
+    () => nonCapitalizations[translationLanguage],
+    [translationLanguage]
+  );
+
   const value = useMemo(
     () => ({
       country,
       language,
       locale,
+      nonCapitalization,
       translation,
       translationLanguage,
       translationLocale,
@@ -66,6 +75,7 @@ export const I18nProvider: FunctionComponent = ({ children }) => {
       country,
       language,
       locale,
+      nonCapitalization,
       translation,
       translationLanguage,
       translationLocale,
@@ -103,9 +113,38 @@ export const useI18nKey = <F extends boolean>(
   }, [fallback, key, result]) as F extends true ? string : string | null;
 };
 
+export const useI18nNonCapitalization = (): string[] => {
+  const { nonCapitalization } = useContext(I18nContext);
+
+  return useMemo(
+    () => nonCapitalization,
+    [nonCapitalization]
+  ) as unknown as string[];
+};
+
 export const useI18nKeyFallback = (
   key?: keyof I18nTranslation | string
 ): string => useI18nKey(key, true);
+
+export const useCapitalization = (text: string | null): string | null => {
+  const nonCapitalization = useI18nNonCapitalization();
+
+  const textWords = useMemo(() => (text ? text.split(' ') : null), [text]);
+
+  return useMemo(() => {
+    if (!textWords) return null;
+
+    return textWords
+      .map((word) => {
+        return nonCapitalization.includes(word) ? word : capitalizeUtil(word);
+      })
+      .join(' ');
+  }, [nonCapitalization, textWords]);
+};
+
+export const Capitalize: FunctionComponent<{ text: string }> = ({ text }) => (
+  <>{useCapitalization(text)}</>
+);
 
 export const Translation: FunctionComponent<{
   capitalize?: boolean;
@@ -114,11 +153,13 @@ export const Translation: FunctionComponent<{
 }> = ({ capitalize, fallback = true, i18nKey }) => {
   const translation = useI18nKey(i18nKey, fallback);
 
-  return useMemo(() => {
-    if (capitalize) {
-      return <Capitalize>{translation}</Capitalize>;
+  const result = useMemo(() => {
+    if (capitalize && translation) {
+      return <Capitalize text={translation} />;
     }
 
-    return <>{translation}</>;
+    return translation;
   }, [capitalize, translation]);
+
+  return <>{result}</>;
 };

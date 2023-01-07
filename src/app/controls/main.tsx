@@ -25,6 +25,7 @@ import { useTheme } from '../state/theme.js';
 export type CellProps = {
   icon?: ComponentChild;
   onClick?: () => void;
+  span?: number;
   title: ComponentChild;
 };
 
@@ -32,13 +33,23 @@ export const Cell: FunctionComponent<CellProps> = ({
   icon,
   children,
   onClick,
+  span,
   title,
 }) => {
   const theme = useTheme();
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
+  const props = useMemo(
+    () => ({
+      isHighContrast,
+      onClick,
+      ...(span ? { span } : {}),
+    }),
+    [isHighContrast, onClick, span]
+  );
+
   return (
-    <CellComponent isHighContrast={isHighContrast} onClick={onClick}>
+    <CellComponent {...props}>
       <Header>
         <Title>{title}</Title>
         {icon && onClick ? icon : null}

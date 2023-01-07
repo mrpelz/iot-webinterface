@@ -5,7 +5,7 @@ import {
   isMetaPropertyActuator,
 } from '../../web-api.js';
 import { useCallback, useRef } from 'preact/hooks';
-import { BodyLarge } from '../../components/controls.js';
+import { Body } from '../../components/controls.js';
 import { Button } from '../../components/list.js';
 import { Cell } from '../main.js';
 import { FunctionComponent } from 'preact';
@@ -72,7 +72,7 @@ export const NullActuator: FunctionComponent<{
   return (
     <Cell
       onClick={setter && !onClick ? handleClick : onClick}
-      title={<Translation i18nKey={title || property} capitalize={true} />}
+      title={<Translation i18nKey="scene" capitalize={true} />}
     >
       <Overlay
         overlay={
@@ -81,9 +81,9 @@ export const NullActuator: FunctionComponent<{
           </ColorBody>
         }
       >
-        <BodyLarge ref={baseRef}>
-          <Translation i18nKey="trigger" />
-        </BodyLarge>
+        <Body ref={baseRef}>
+          <Translation i18nKey={title || property} capitalize={true} />
+        </Body>
       </Overlay>
     </Cell>
   );

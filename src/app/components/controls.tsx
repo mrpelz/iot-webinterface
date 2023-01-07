@@ -63,6 +63,7 @@ export const Body = styled('cell-body' as 'section', forwardRef)`
 `;
 
 export const BodyLarge = styled(Body, forwardRef)`
+  align-content: center;
   font-size: ${dimensions.fontSizeLarge};
   font-weight: bold;
   justify-content: center;
