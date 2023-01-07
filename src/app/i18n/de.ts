@@ -49,7 +49,9 @@ const s = {
   map: 'karte',
   media: 'medien',
   menu: 'menü',
+  mirror: 'spiegel',
   motion: 'bewegung',
+  night: 'nacht',
   nightstand: 'nachttisch',
   no: 'nein',
   notification: 'benachrichtigung',
@@ -89,6 +91,7 @@ const s = {
   surveillance: 'überwachung',
   switch: 'umschalten',
   system: 'system',
+  table: 'tisch',
   tamperSwitch: 'sabotageschalter',
   temperature: 'temperatur',
   theme: 'theme',
@@ -114,10 +117,12 @@ const s = {
 } as const;
 
 const p = {
+  ceilingLights: `${s.ceiling}n${s.lamp}n`,
   device: `${s.device}e`,
   lamp: `${s.lamp}n`,
   led: `${s.led}s`,
   light: `${s.light}er`,
+  nightLights: `${s.night}${s.light}er`,
   notification: `${s.notification}en`,
   things: 'Dinge',
 } as const;
@@ -135,7 +140,6 @@ const d = {
   allTimer: `${s.all} ${p.things} ${s.timer}`,
   b: s.blue,
   bathroom: `${s.bath}${s.room2}`,
-  bathtubBathroom: `Wannen${s.bath}`,
   bedLedDownlightRed: `${s.bed} Boden${s.lamp} ${s.red}`,
   bedLedRGB: `${s.bed} ${s.led} ${s.rgb}`,
   bedLedW: `${s.bed} ${s.led} ${s.white}`,
@@ -151,7 +155,6 @@ const d = {
   enableScreensaver: `${s.screensaver} ${s.enable}`,
   entryDoor: `${s.entry}s${s.door}`,
   entryDoorTimer: `${s.entry} ${s.door} ${s.timer}`,
-  floodLight: `${s.flood}${s.light}`,
   floodLightTimer: `${s.flood}${s.light} ${s.timer}`,
   floodlight: `${s.flood}${s.light}`,
   fuckLight: `Fick${s.light}`,
@@ -174,15 +177,18 @@ const d = {
   livingRoom: `Wohn${s.room2}`,
   mediaOff: `${s.media} ${s.off}`,
   mediaOnOrSwitch: `${s.media} ${s.on}/${s.switch}`,
-  mirrorLight: `Spiegel${s.light}`,
-  nightLight: `Nacht${s.light}`,
-  nightstandLedLeft: `${s.nightstand} ${s.led} ${s.left}`,
-  nightstandLedRight: `${s.nightstand} ${s.led} ${s.right}`,
-  nightstandLeds: `${s.nightstand} ${p.led}`,
+  mirrorHeating: `${s.mirror}heizung`,
+  mirrorLed: `${s.mirror} ${s.led}`,
+  mirrorLight: `${s.mirror} ${s.light}`,
+  mrpelzBathroom: `mrpelz’ ${s.bath}`,
+  nightLight: `${s.night}${s.light}`,
+  nightStand: `${s.night}${s.table}`,
+  nightstandLedLeft: `${s.night}${s.table} ${s.led} ${s.left}`,
+  nightstandLedRight: `${s.night}${s.table} ${s.led} ${s.right}`,
+  nightstandLeds: `${s.night}${s.table} ${p.led}`,
   offTimer: `${s.off} ${s.timer}`,
   r: s.red,
   randomizeScreensaverPosition: `${s.screensaver}-${s.position} ${s.randomize}`,
-  showerBathroom: `Dusch${s.bath}`,
   standingLamp: `Steh${s.lamp}`,
   startPage: `${s.start} ${s.page}`,
   startScreensaver: `${s.start} ${s.screensaver}`,
@@ -190,6 +196,7 @@ const d = {
   storageRoom: `Abstell${s.room}`,
   tableLight: `Tisch${s.lamp}`,
   testRoom: `Test${s.room}`,
+  tsiaBathroom: `tsias ${s.bath}`,
   wWhite: `${s.warm}${s.white}`,
   wakeupLightWeekday: `${s.wakeup}${s.light} ${s.weekday}`,
   wakeupLightWeekend: `${s.wakeup}${s.light} ${s.weekend}`,
@@ -204,4 +211,6 @@ const d = {
   worklightWWhite: `${s.work}${s.light} ${s.warm}${s.white}`,
 } as const;
 
-export const de = { ...s, ...d } as const;
+export const de = { ...s, ...p, ...d } as const;
+
+export const deNonCapitalization = ['mrpelz’', 'tsias'] as const;

@@ -49,8 +49,9 @@ const s = {
   map: 'map',
   media: 'media',
   menu: 'menu',
+  mirror: 'mirror',
   motion: 'motion',
-  nightstand: 'nightstand',
+  night: 'night',
   no: 'no',
   notification: 'notification',
   now: 'now',
@@ -82,6 +83,7 @@ const s = {
   settings: 'settings',
   since: 'since',
   sonninstraße16: 'Sonninstraße 16',
+  stand: 'stand',
   start: 'start',
   state: 'state',
   staticPage: 'static page',
@@ -113,10 +115,12 @@ const s = {
 } as const;
 
 const p = {
+  ceilingLights: `${s.ceiling} ${s.light}s`,
   device: `${s.device}s`,
   diagnostic: `${s.diagnostic}s`,
   led: `${s.led}s`,
   light: `${s.light}s`,
+  nightLights: `${s.night}${s.light}s`,
   notification: `${s.notification}s`,
   things: 'things',
 } as const;
@@ -134,7 +138,6 @@ const d = {
   allTimer: `${s.all} ${p.things} ${s.timer}`,
   b: s.blue,
   bathroom: `${s.bath}${s.room}`,
-  bathtubBathroom: `bathtub ${s.bath}${s.room}`,
   bedLedDownlightRed: `${s.bed} downlight ${s.red}`,
   bedLedRGB: `${s.bed} ${s.led} ${s.rgb}`,
   bedLedW: `${s.bed} ${s.led} ${s.white}`,
@@ -173,15 +176,18 @@ const d = {
   livingRoom: `living ${s.room}`,
   mediaOff: `${s.media} ${s.off}`,
   mediaOnOrSwitch: `${s.media} ${s.on}/${s.switch}`,
-  mirrorLight: `mirror ${s.light}`,
-  nightLight: `night${s.light}`,
-  nightstandLedLeft: `${s.nightstand} ${s.led} ${s.left}`,
-  nightstandLedRight: `${s.nightstand} ${s.led} ${s.right}`,
-  nightstandLeds: `${s.nightstand} ${p.led}`,
+  mirrorHeating: `${s.mirror} heating`,
+  mirrorLed: `${s.mirror} ${s.led}`,
+  mirrorLight: `${s.mirror} ${s.light}`,
+  mrpelzBathroom: `mrpelz’s ${s.bath}${s.room}`,
+  nightLight: `${s.night}${s.light}`,
+  nightStand: `${s.night}${s.stand}`,
+  nightstandLedLeft: `${s.night}${s.stand} ${s.led} ${s.left}`,
+  nightstandLedRight: `${s.night}${s.stand} ${s.led} ${s.right}`,
+  nightstandLeds: `${s.night}${s.stand} ${p.led}`,
   offTimer: `${s.off} ${s.timer}`,
   r: s.red,
   randomizeScreensaverPosition: `${s.randomize} ${s.screensaver} ${s.position}`,
-  showerBathroom: `shower ${s.bath}${s.room}`,
   standingLamp: `standing ${s.lamp}`,
   startPage: `${s.start} ${s.page}`,
   startScreensaver: `${s.start} ${s.screensaver}`,
@@ -189,6 +195,7 @@ const d = {
   storageRoom: `storage ${s.room}`,
   tableLight: `table ${s.light}`,
   testRoom: `test ${s.room}`,
+  tsiaBathroom: `tsia’s ${s.bath}${s.room}`,
   wWhite: `${s.warm}-${s.white}`,
   wakeupLightWeekday: `${s.wakeup}-${s.light} ${s.weekday}`,
   wakeupLightWeekend: `${s.wakeup}-${s.light} ${s.weekend}`,
@@ -203,4 +210,6 @@ const d = {
   worklightWWhite: `${s.work}-${s.light} ${s.warm}-${s.white}`,
 } as const;
 
-export const en = { ...s, ...d } as const;
+export const en = { ...s, ...p, ...d } as const;
+
+export const enNonCapitalization = ['mrpelz’s', 'tsia’s'] as const;

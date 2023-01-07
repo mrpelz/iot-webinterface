@@ -18,15 +18,14 @@ import {
   useState,
 } from 'preact/hooks';
 import { useGoPreviousSegment, useGoUp, useSegment } from '../state/path.js';
-import { Capitalize } from '../components/text.js';
 import { FunctionComponent } from 'preact';
 import { dimensions } from '../style.js';
 import { useAwaitEvent } from '../hooks/use-await-event.js';
 import { useBreakpoint } from '../style/breakpoint.js';
+import { useCapitalizedTitle } from '../state/title.js';
 import { useFlipMenuVisible } from '../state/menu.js';
 import { useMediaQuery } from '../style/main.js';
 import { useStreamOnline } from '../state/web-api.js';
-import { useTitle } from '../state/title.js';
 
 export const IconContainer: FunctionComponent<{
   paddingSetter: (input: number) => void;
@@ -92,7 +91,7 @@ export const Titlebar: FunctionComponent = () => {
     [paddingLeft, paddingRight]
   );
 
-  const title = useTitle();
+  const title = useCapitalizedTitle();
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
@@ -130,11 +129,7 @@ export const Titlebar: FunctionComponent = () => {
 
   return (
     <TitlebarComponent padding={padding}>
-      {title ? (
-        <Title>
-          <Capitalize>{title}</Capitalize>
-        </Title>
-      ) : null}
+      {title ? <Title>{title}</Title> : null}
       {leftIcon ? (
         <IconContainer paddingSetter={setPaddingLeft}>{leftIcon}</IconContainer>
       ) : null}

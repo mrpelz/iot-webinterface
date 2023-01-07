@@ -6,15 +6,15 @@ import {
   useMemo,
   useState,
 } from 'preact/hooks';
+import { useCapitalization, useI18nKey } from './i18n.js';
 import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
-import { capitalize } from '../util/string.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
-import { useI18nKey } from './i18n.js';
 
-export type TTitleContext = readonly [
-  string | null,
-  StateUpdater<string | null>
-];
+export type TTitleContext = {
+  capitalizedTitle: string | null;
+  setTitleOverride: StateUpdater<string | null>;
+  title: string | null;
+};
 
 const TitleContext = createContext(null as unknown as TTitleContext);
 
@@ -36,16 +36,16 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
     [roomName, staticPageName, titleOverride]
   );
 
-  const value = useMemo(() => [title, setTitleOverride] as const, [title]);
+  const capitalizedTitle = useCapitalization(title);
+
+  const value = useMemo(
+    () => ({ capitalizedTitle, setTitleOverride, title } as const),
+    [capitalizedTitle, title]
+  );
 
   useEffect(() => {
-    document.title = [
-      title ? title.split(' ').map(capitalize).join(' ') : null,
-      appName,
-    ]
-      .filter(Boolean)
-      .join(' | ');
-  }, [title]);
+    document.title = [capitalizedTitle, appName].filter(Boolean).join(' | ');
+  }, [capitalizedTitle]);
 
   return (
     <TitleContext.Provider value={value}>{children}</TitleContext.Provider>
@@ -53,13 +53,19 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
 };
 
 export const useTitle = (): string | null => {
-  const [title] = useContext(TitleContext);
+  const { title } = useContext(TitleContext);
 
   return useMemo(() => title, [title]);
 };
 
+export const useCapitalizedTitle = (): string | null => {
+  const { capitalizedTitle } = useContext(TitleContext);
+
+  return useMemo(() => capitalizedTitle, [capitalizedTitle]);
+};
+
 export const useSetTitleOverride = (override: string | null): void => {
-  const [, setTitleOverride] = useContext(TitleContext);
+  const { setTitleOverride } = useContext(TitleContext);
 
   useEffect(() => {
     setTitleOverride(override);

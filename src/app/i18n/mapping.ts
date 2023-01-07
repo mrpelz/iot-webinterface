@@ -4,8 +4,8 @@ export const roomSorting = [
   'kitchen',
   'bedroom',
   'office',
-  'showerBathroom',
-  'bathtubBathroom',
+  'mrpelzBathroom',
+  'tsiaBathroom',
   'storageRoom',
   'hallway',
 ] as const;

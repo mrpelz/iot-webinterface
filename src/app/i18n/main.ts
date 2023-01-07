@@ -1,5 +1,5 @@
-import { de } from './de.js';
-import { en } from './en.js';
+import { de, deNonCapitalization } from './de.js';
+import { en, enNonCapitalization } from './en.js';
 import { universal } from './universal.js';
 
 const i18nLanguageDefault = 'en' as const;
@@ -12,10 +12,17 @@ export const translations = {
   en,
 };
 
+export const nonCapitalizations = {
+  de: deNonCapitalization,
+  en: enNonCapitalization,
+};
+
 export type I18nKey =
   | keyof typeof translations[I18nLanguage]
   | keyof typeof universal;
 export type I18nTranslation = Record<I18nKey, string>;
+
+export type I18nNonCapitalization = typeof nonCapitalizations[I18nLanguage];
 
 export const reconcileLanguage = (input: string): I18nLanguage => {
   const test = input as unknown as I18nLanguage;
