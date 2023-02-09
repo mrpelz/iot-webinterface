@@ -14,7 +14,7 @@ export const actuated = ['lighting'] as const;
 
 export const measuredCategories = {
   airQuality: ['temperature', 'relativeHumidity'],
-  airSafety: ['pm025', 'pm10', 'co2'],
+  airSafety: ['pm025', 'pm10', 'co2', 'tvoc'],
   environmental: ['brightness', 'uvIndex', 'pressure'],
   security: ['motion'],
 } as const;

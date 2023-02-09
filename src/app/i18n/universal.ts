@@ -9,4 +9,5 @@ export const universal = {
   pm10: 'PM₁₀',
   ppb: 'ppb',
   ppm: 'ppm',
+  tvoc: '𝐭VOCs',
 } as const;
