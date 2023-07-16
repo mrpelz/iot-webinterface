@@ -88,6 +88,7 @@ export const installServiceWorker = async (
 
     await navigator.serviceWorker.register(aUrl, {
       scope: '/',
+      type: 'module',
     });
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -130,6 +131,7 @@ export const connectWorker = <T>(
     try {
       const worker = new SharedWorker(debugUrl, {
         name,
+        type: 'module',
       });
 
       const { port: managementPort } = worker;
@@ -166,6 +168,7 @@ export const connectWorker = <T>(
     try {
       const worker = new Worker(debugUrl, {
         name,
+        type: 'module',
       });
 
       worker.postMessage(WorkerCommands.SETUP, [port2]);

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
 
@@ -8,25 +6,25 @@ const workerDebug = Boolean(
 );
 
 /* eslint-disable no-console */
-const workerConsole = {
-  debug: (...args: unknown[]) => {
+export const workerConsole = {
+  debug: (...args: unknown[]): void => {
     if (!workerDebug) return;
     console.debug(`worker "${self.name}":`, ...args);
   },
-  error: (...args: unknown[]) => {
+  error: (...args: unknown[]): void => {
     console.error(`worker "${self.name}":`, ...args);
   },
-  info: (...args: unknown[]) => {
+  info: (...args: unknown[]): void => {
     if (!workerDebug) return;
     console.info(`worker "${self.name}":`, ...args);
   },
 };
 /* eslint-enable no-console */
 
-const scaffold = <T>(
+export const scaffold = <T>(
   scope: DedicatedWorkerGlobalScope | SharedWorkerGlobalScope,
   handleNewPort?: (port: MessagePort) => void
-) => {
+): Promise<[MessagePort, T | null]> => {
   const voidSetup = Symbol('voidSetup');
 
   enum WorkerCommands {

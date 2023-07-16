@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-const defer = (callback: () => void): void => {
+export const defer = (callback: () => void): void => {
   if ('requestIdleCallback' in self) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -16,7 +14,7 @@ const defer = (callback: () => void): void => {
   setTimeout(callback, 0);
 };
 
-const fetchFallback = async (
+export const fetchFallback = async (
   input: RequestInfo,
   timeout = 5000,
   init?: RequestInit
@@ -50,7 +48,7 @@ const fetchFallback = async (
   }
 };
 
-const waitForServiceWorker = (): Promise<void> => {
+export const waitForServiceWorker = (): Promise<void> => {
   const delay = 50;
   const url = '/E4B38FA2-08D2-4117-9738-29FC9106CBA0';
 
@@ -81,7 +79,7 @@ const waitForServiceWorker = (): Promise<void> => {
 
 const indentMatcher = new RegExp('\\s*');
 
-const multiline = (
+export const multiline = (
   strings: TemplateStringsArray | string,
   ...tags: string[]
 ): string => {

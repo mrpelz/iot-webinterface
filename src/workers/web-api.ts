@@ -1,15 +1,11 @@
 /* eslint-disable no-restricted-globals */
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
-// eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
-/// <reference path="util/worker-scaffold.ts" />
-// eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
-/// <reference path="util/main.ts" />
+
+import { fetchFallback, waitForServiceWorker } from './util/main.js';
+import { scaffold, workerConsole } from './util/worker-scaffold.js';
 
 (async () => {
-  importScripts('./util/worker-scaffold.js');
-  importScripts('./util/main.js');
-
   type SetupMessage = {
     apiBaseUrl: string;
     interval: number;

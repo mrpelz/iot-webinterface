@@ -1,7 +1,7 @@
 // eslint-disable-next-line spaced-comment
 /// <reference lib="WebWorker" />
-// eslint-disable-next-line spaced-comment,@typescript-eslint/triple-slash-reference
-/// <reference path="util/main.ts" />
+
+import { fetchFallback, multiline } from './util/main.js';
 
 const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
 
@@ -12,8 +12,6 @@ const isSafari = (() => {
 })();
 
 ((scope) => {
-  importScripts('./util/main.js');
-
   /* eslint-disable no-console */
   const wsConsole = {
     debug: (...args: unknown[]) => {
