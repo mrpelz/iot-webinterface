@@ -1,8 +1,9 @@
-import { colors, dimensions } from '../style.js';
-import { double, half, multiply } from '../style/dimensions.js';
-import { breakpointValue } from '../style/breakpoint.js';
-import { mediaQuery } from '../style/main.js';
 import { styled } from 'goober';
+
+import { colors, dimensions } from '../style.js';
+import { breakpointValue } from '../style/breakpoint.js';
+import { double, half, multiply } from '../style/dimensions.js';
+import { mediaQuery } from '../style/main.js';
 
 export const List = styled('ul')<{ isHighContrast: boolean }>`
   list-style: none;
@@ -19,9 +20,9 @@ export const List = styled('ul')<{ isHighContrast: boolean }>`
       breakpointValue(
         mediaQuery(dimensions.breakpointHuge),
         () => multiply(dimensions.appWidth(), '1/3'),
-        () => half(dimensions.appWidth())
+        () => half(dimensions.appWidth()),
       )(),
-    '100%'
+    '100%',
   )};
 
   &:first-of-type {

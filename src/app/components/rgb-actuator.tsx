@@ -1,7 +1,8 @@
-import { BodyLarge } from './controls.js';
-import { dimensions } from '../style.js';
-import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
+import { forwardRef } from 'preact/compat';
+
+import { dimensions } from '../style.js';
+import { BodyLarge } from './controls.js';
 
 export const RGBBody = styled(BodyLarge, forwardRef)`
   cursor: pointer;

@@ -1,4 +1,5 @@
-import { connectWorker, webApiUrl } from './util/workers.js';
+import { connectWorker } from './util/workers.js';
+import { queryXPath, QueryXPathType } from './util/xpath.js';
 
 type SetupMessage = {
   apiBaseUrl: string;
@@ -6,9 +7,9 @@ type SetupMessage = {
 };
 
 type GetterCallback<T> = (value: T) => void;
-type HierarchyCallback = (
-  hierarchy: HierarchyElementSystem,
-  elements: HierarchyElement[]
+type TreeCallback = (
+  tree: HierarchyElementSystem,
+  elements: HierarchyElement[],
 ) => void;
 type StreamOnlineCallback = (online: boolean) => void;
 
@@ -176,7 +177,7 @@ enum ChildType {
 
 enum WorkerMessageType {
   STREAM,
-  HIERARCHY,
+  TREE,
   CHILD_REQUEST,
 }
 
@@ -186,8 +187,8 @@ type WorkerMessageInbound =
       type: WorkerMessageType.STREAM;
     }
   | {
-      hierarchy: HierarchyElementSystem;
-      type: WorkerMessageType.HIERARCHY;
+      tree: string;
+      type: WorkerMessageType.TREE;
     };
 
 type WorkerMessageOutbound = {
@@ -222,38 +223,38 @@ type SetterMessageOutbound<T> =
 
 const CHECK_INTERVAL = 5000;
 
-export class WebApi {
-  private _hierarchy?: HierarchyElementSystem;
-  private _hierarchyCallback?: HierarchyCallback;
-  private _isStreamOnline?: boolean;
-  private readonly _port: MessagePort | null;
-  private _streamOnlineCallback?: StreamOnlineCallback;
+const webApiUrl = new URL('../workers/web-api.js', import.meta.url).href;
 
-  constructor(
-    apiBaseUrl: string | null,
-    interval: number | null,
-    debug: boolean
-  ) {
+const domParser = new DOMParser();
+
+export class WebApi {
+  private _isStreamOnline?: boolean;
+  private readonly _port?: MessagePort;
+  private _streamOnlineCallback?: StreamOnlineCallback;
+  private _tree?: XMLDocument;
+  private _treeCallback?: TreeCallback;
+
+  constructor(apiBaseUrl: string | null, debug: boolean) {
     this._port = connectWorker<SetupMessage>(
       webApiUrl,
       'web-api',
       {
         apiBaseUrl:
           apiBaseUrl === null ? new URL('/', location.href).href : apiBaseUrl,
-        interval: interval || CHECK_INTERVAL,
+        interval: CHECK_INTERVAL,
       },
-      debug
+      debug,
     );
 
     (() => {
       if (!this._port) return;
 
-      this._port.onmessage = ({ data }) => {
+      this._port.addEventListener('message', ({ data }) => {
         const message = data as WorkerMessageInbound;
 
         // eslint-disable-next-line default-case
         switch (message.type) {
-          case WorkerMessageType.STREAM:
+          case WorkerMessageType.STREAM: {
             if (debug) {
               // eslint-disable-next-line no-console
               console.info(`stream ${message.online ? 'online' : 'offline'}`);
@@ -262,47 +263,95 @@ export class WebApi {
             this._isStreamOnline = message.online;
             this._streamOnlineCallback?.(message.online);
             return;
+          }
 
-          case WorkerMessageType.HIERARCHY:
+          case WorkerMessageType.TREE: {
             if (debug) {
               // eslint-disable-next-line no-console
-              console.info('web-api hierarchy:', message.hierarchy);
+              console.info('web-api hierarchy:', message.tree);
             }
 
-            this._hierarchy = message.hierarchy;
-            this._handleHierarchySet();
+            this._tree = domParser.parseFromString(
+              message.tree,
+              'application/xml',
+            );
+
+            this._handleTreeSet();
+          }
         }
-      };
+      });
     })();
   }
 
-  private _flat(): HierarchyElement[] | null {
-    if (!this._hierarchy) return null;
+  private _handleTreeSet(): void {
+    if (!this._tree) return;
 
-    const result = new Set<HierarchyElement>();
+    console.log(this._tree);
 
-    const walk = (element: HierarchyElement) => {
-      result.add(element);
+    console.log(
+      queryXPath(
+        '//*[@level="SYSTEM"]',
+        this._tree,
+        QueryXPathType.ALL,
+        Element,
+      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
+    );
 
-      const children = Object.values(element?.children || {});
+    console.log(
+      queryXPath(
+        '//*[@level="HOME"]',
+        this._tree,
+        QueryXPathType.ALL,
+        Element,
+      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
+    );
 
-      for (const child of children) {
-        walk(child);
-      }
-    };
+    console.log(
+      queryXPath(
+        '//*[@level="BUILDING"]',
+        this._tree,
+        QueryXPathType.ALL,
+        Element,
+      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
+    );
 
-    walk(this._hierarchy);
+    console.log(
+      queryXPath(
+        '//*[@level="FLOOR"]',
+        this._tree,
+        QueryXPathType.ALL,
+        Element,
+      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
+    );
 
-    return Array.from(result);
-  }
+    console.log(
+      queryXPath(
+        '//*[@level="ROOM"]',
+        this._tree,
+        QueryXPathType.ALL,
+        Element,
+      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
+    );
 
-  private _handleHierarchySet(): void {
-    if (!this._hierarchy) return;
+    console.log(
+      queryXPath(
+        '//*[@level="ROOM"]',
+        this._tree,
+        QueryXPathType.ALL,
+        Element,
+      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
+    );
 
-    const elements = this._flat();
-    if (!elements) return;
+    console.log(
+      queryXPath(
+        '//*[@species="door"]',
+        this._tree,
+        QueryXPathType.ALL,
+        Element,
+      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
+    );
 
-    this._hierarchyCallback?.(this._hierarchy, elements);
+    // this._treeCallback?.(this._tree, elements);
   }
 
   createGetter<T>(index: number, callback: GetterCallback<T>): Getter | null {
@@ -329,12 +378,12 @@ export class WebApi {
       passive: true,
     });
 
-    port1.onmessage = ({ data }) => {
+    port1.addEventListener('message', ({ data }) => {
       const { type, value } = data as GetterMessageInbound<T>;
       if (type !== ChildMessageType.GET) return;
 
       callback(value);
-    };
+    });
 
     return {
       remove,
@@ -381,13 +430,13 @@ export class WebApi {
     };
   }
 
-  onHierarchy(callback: HierarchyCallback): void {
-    const hasCallbackSet = Boolean(this._hierarchyCallback);
+  onHierarchy(callback: TreeCallback): void {
+    const hasCallbackSet = Boolean(this._treeCallback);
 
-    this._hierarchyCallback = callback;
+    this._treeCallback = callback;
 
     if (!hasCallbackSet) {
-      this._handleHierarchySet();
+      this._handleTreeSet();
     }
   }
 
@@ -403,84 +452,79 @@ export class WebApi {
 }
 
 export const isElementWithMeta = (
-  element: HierarchyElement
-): element is HierarchyElementWithMeta => {
-  return Boolean(element?.meta);
-};
+  element: HierarchyElement,
+): element is HierarchyElementWithMeta => Boolean(element?.meta);
 
-export const isMetaSystem = (meta: Meta | undefined): meta is MetaSystem => {
-  return meta?.level === Levels.SYSTEM;
-};
+export const isMetaSystem = (meta: Meta | undefined): meta is MetaSystem =>
+  meta?.level === Levels.SYSTEM;
 
-export const isMetaHome = (meta: Meta | undefined): meta is MetaHome => {
-  return meta?.level === Levels.HOME;
-};
+export const isMetaHome = (meta: Meta | undefined): meta is MetaHome =>
+  meta?.level === Levels.HOME;
 
-export const isMetaBuilding = (
-  meta: Meta | undefined
-): meta is MetaBuilding => {
-  return meta?.level === Levels.BUILDING;
-};
+export const isMetaBuilding = (meta: Meta | undefined): meta is MetaBuilding =>
+  meta?.level === Levels.BUILDING;
 
-export const isMetaFloor = (meta: Meta | undefined): meta is MetaFloor => {
-  return meta?.level === Levels.FLOOR;
-};
+export const isMetaFloor = (meta: Meta | undefined): meta is MetaFloor =>
+  meta?.level === Levels.FLOOR;
 
-export const isMetaRoom = (meta: Meta | undefined): meta is MetaRoom => {
-  return meta?.level === Levels.ROOM;
-};
+export const isMetaRoom = (meta: Meta | undefined): meta is MetaRoom =>
+  meta?.level === Levels.ROOM;
 
-export const isMetaArea = (meta: Meta | undefined): meta is MetaArea => {
-  return meta?.level === Levels.AREA;
-};
+export const isMetaArea = (meta: Meta | undefined): meta is MetaArea =>
+  meta?.level === Levels.AREA;
 
-export const isMetaDevice = (meta: Meta | undefined): meta is MetaDevice => {
-  return meta?.level === Levels.DEVICE;
-};
+export const isMetaDevice = (meta: Meta | undefined): meta is MetaDevice =>
+  meta?.level === Levels.DEVICE;
 
 export const isMetaPropertySensor = (
-  meta: Meta | undefined
-): meta is MetaPropertySensor => {
-  return meta?.level === Levels.PROPERTY && meta.type === 'sensor';
-};
+  meta: Meta | undefined,
+): meta is MetaPropertySensor =>
+  meta?.level === Levels.PROPERTY && meta.type === 'sensor';
 
 export const isMetaPropertyActuator = (
-  meta: Meta | undefined
-): meta is MetaPropertyActuator => {
-  return meta?.level === Levels.PROPERTY && meta.type === 'actuator';
-};
+  meta: Meta | undefined,
+): meta is MetaPropertyActuator =>
+  meta?.level === Levels.PROPERTY && meta.type === 'actuator';
 
 export const isMetaPropertySensorDate = (
-  meta: Meta | undefined
-): meta is MetaPropertySensorDate => {
-  return isMetaPropertySensor(meta) && meta.unit === 'date';
-};
+  meta: Meta | undefined,
+): meta is MetaPropertySensorDate =>
+  isMetaPropertySensor(meta) && meta.unit === 'date';
 
 export const levelToString = (input: Levels): string | null => {
   switch (input) {
-    case Levels.SYSTEM:
+    case Levels.SYSTEM: {
       return 'SYSTEM';
-    case Levels.HOME:
+    }
+    case Levels.HOME: {
       return 'HOME';
-    case Levels.BUILDING:
+    }
+    case Levels.BUILDING: {
       return 'BUILDING';
-    case Levels.FLOOR:
+    }
+    case Levels.FLOOR: {
       return 'FLOOR';
-    case Levels.ROOM:
+    }
+    case Levels.ROOM: {
       return 'ROOM';
-    case Levels.AREA:
+    }
+    case Levels.AREA: {
       return 'AREA';
-    case Levels.DEVICE:
+    }
+    case Levels.DEVICE: {
       return 'DEVICE';
-    case Levels.PROPERTY:
+    }
+    case Levels.PROPERTY: {
       return 'PROPERTY';
-    default:
+    }
+    default: {
       return null;
+    }
   }
 };
 
 export const valueTypeToType = (
-  input: ValueType
+  input: ValueType,
 ):
   | 'null'
   | 'string'
@@ -492,17 +536,21 @@ export const valueTypeToType = (
   | 'object'
   | 'function' => {
   switch (input) {
-    case ValueType.NULL:
+    case ValueType.NULL: {
       return 'null';
-    case ValueType.BOOLEAN:
+    }
+    case ValueType.BOOLEAN: {
       return 'boolean';
-    case ValueType.NUMBER:
+    }
+    case ValueType.NUMBER: {
       return 'number';
-    case ValueType.STRING:
+    }
+    case ValueType.STRING: {
       return 'string';
-    case ValueType.RAW:
-    default:
+    }
+    default: {
       return 'object';
+    }
   }
 };
 
@@ -510,34 +558,43 @@ export const typeToValueType = (input: unknown): ValueType => {
   if (input === null) return ValueType.NULL;
 
   switch (typeof input) {
-    case 'boolean':
+    case 'boolean': {
       return ValueType.BOOLEAN;
-    case 'number':
+    }
+    case 'number': {
       return ValueType.NUMBER;
-    case 'string':
+    }
+    case 'string': {
       return ValueType.STRING;
-    case 'object':
-    default:
+    }
+    default: {
       return ValueType.RAW;
+    }
   }
 };
 
 export const parentRelationToString = (
-  input: ParentRelation
+  input: ParentRelation,
 ): string | null => {
   switch (input) {
-    case ParentRelation.META_RELATION:
+    case ParentRelation.META_RELATION: {
       return 'META_RELATION';
-    case ParentRelation.CONTROL_TRIGGER:
+    }
+    case ParentRelation.CONTROL_TRIGGER: {
       return 'CONTROL_TRIGGER';
-    case ParentRelation.CONTROL_EXTENSION:
+    }
+    case ParentRelation.CONTROL_EXTENSION: {
       return 'CONTROL_EXTENSION';
-    case ParentRelation.DATA_QUALIFIER:
+    }
+    case ParentRelation.DATA_QUALIFIER: {
       return 'DATA_QUALIFIER';
-    case ParentRelation.DATA_AGGREGATION_SOURCE:
+    }
+    case ParentRelation.DATA_AGGREGATION_SOURCE: {
       return 'DATA_AGGREGATION_SOURCE';
-    default:
+    }
+    default: {
       return null;
+    }
   }
 };
 
@@ -545,10 +602,10 @@ export const getElementsFromLevel = <T extends HierarchyElementWithMeta>(
   input: (HierarchyElement | null)[],
   level: T['meta']['level'],
   deep = false,
-  skipInput = false
+  skipInput = false,
 ): T[] => {
   const filteredInput = input.filter((value): value is HierarchyElement =>
-    Boolean(value)
+    Boolean(value),
   );
 
   const result = new Set<T>();
@@ -561,7 +618,7 @@ export const getElementsFromLevel = <T extends HierarchyElementWithMeta>(
       }
     }
 
-    if (!result.size || deep) {
+    if (result.size === 0 || deep) {
       for (const element of elements) {
         get(Object.values(element?.children || {}));
       }
@@ -575,7 +632,7 @@ export const getElementsFromLevel = <T extends HierarchyElementWithMeta>(
 
 type GroupByResult<
   T extends HierarchyElementWithMeta,
-  K extends keyof Required<T['meta']>
+  K extends keyof Required<T['meta']>,
 > = {
   elements: T[];
   group: T['meta'][K];
@@ -583,10 +640,10 @@ type GroupByResult<
 
 export const groupBy = <
   T extends HierarchyElementWithMeta,
-  K extends keyof Required<T['meta']>
+  K extends keyof Required<T['meta']>,
 >(
   input: readonly T[],
-  property: K
+  property: K,
 ): GroupByResult<T, K> => {
   const keys = new Set<T['meta'][K]>();
 
@@ -599,7 +656,7 @@ export const groupBy = <
   for (const key of keys) {
     result.push({
       elements: input.filter(
-        ({ meta }) => property in meta && (meta as T['meta'])[property] === key
+        ({ meta }) => property in meta && (meta as T['meta'])[property] === key,
       ),
       group: key,
     });
@@ -610,20 +667,20 @@ export const groupBy = <
 
 export const sortBy = <
   T extends HierarchyElementWithMeta,
-  K extends keyof Required<T['meta']>
+  K extends keyof Required<T['meta']>,
 >(
   input: readonly T[],
   property: K,
-  list: readonly T['meta'][K][]
+  list: readonly T['meta'][K][],
 ): Record<'all' | 'listedResults' | 'unlistedResults', T[]> => {
   const listedResultsCollection: T[][] = [];
 
   for (const listItem of list) {
     const match = input.filter(
       ({ meta }) =>
-        property in meta && (meta as T['meta'])[property] === listItem
+        property in meta && (meta as T['meta'])[property] === listItem,
     );
-    if (!match.length) continue;
+    if (match.length === 0) continue;
 
     listedResultsCollection.push(match);
   }

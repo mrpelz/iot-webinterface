@@ -1,7 +1,8 @@
-import { FunctionComponent, createContext } from 'preact';
+import { createContext, FunctionComponent } from 'preact';
 import { useContext, useEffect, useLayoutEffect, useState } from 'preact/hooks';
-import { useFlag } from './flags.js';
+
 import { useHookDebug } from '../hooks/use-hook-debug.js';
+import { useFlag } from './flags.js';
 
 const VisibilityContext = createContext(true);
 
@@ -24,7 +25,7 @@ export const VisibilityProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     const listenerAbort = new AbortController();
 
-    let timeout: number | null = null;
+    let timeout: ReturnType<typeof setTimeout> | null = null;
     const abortTimeout = () => {
       if (timeout) clearTimeout(timeout);
       timeout = null;
@@ -70,6 +71,4 @@ export const VisibilityProvider: FunctionComponent = ({ children }) => {
   );
 };
 
-export const useVisibility = (): boolean => {
-  return useContext(VisibilityContext);
-};
+export const useVisibility = (): boolean => useContext(VisibilityContext);

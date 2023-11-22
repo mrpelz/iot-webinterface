@@ -1,31 +1,32 @@
-import {
-  HierarchyElement,
-  HierarchyElementPropertyActuator,
-  ValueType,
-  isMetaPropertyActuator,
-} from '../../web-api.js';
+import { FunctionComponent } from 'preact';
+import { useCallback } from 'preact/hooks';
+
+import { BlendOver } from '../../components/blend-over.js';
+import { BodyLarge } from '../../components/controls.js';
+import { useColorBody } from '../../hooks/use-color-body.js';
+import { useDelay } from '../../hooks/use-delay.js';
+import { I18nKey } from '../../i18n/main.js';
+import { Translation } from '../../state/i18n.js';
+import { useSegment } from '../../state/path.js';
 import {
   useChildGetter,
   useChildSetter,
   useGetter,
 } from '../../state/web-api.js';
-import { BlendOver } from '../../components/blend-over.js';
-import { BodyLarge } from '../../components/controls.js';
+import {
+  HierarchyElement,
+  HierarchyElementPropertyActuator,
+  isMetaPropertyActuator,
+  ValueType,
+} from '../../web-api.js';
 import { Cell } from '../main.js';
-import { FunctionComponent } from 'preact';
-import { I18nKey } from '../../i18n/main.js';
-import { Translation } from '../../state/i18n.js';
-import { useCallback } from 'preact/hooks';
-import { useColorBody } from '../../hooks/use-color-body.js';
-import { useDelay } from '../../hooks/use-delay.js';
-import { useSegment } from '../../state/path.js';
 
 export type BinaryActuatorElement = HierarchyElementPropertyActuator & {
   meta: { valueType: ValueType.BOOLEAN };
 };
 
 export const isBinaryActuatorElement = (
-  element: HierarchyElement
+  element: HierarchyElement,
 ): element is BinaryActuatorElement =>
   isMetaPropertyActuator(element.meta) &&
   element.meta.valueType === ValueType.BOOLEAN;

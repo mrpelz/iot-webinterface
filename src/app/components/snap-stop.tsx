@@ -1,5 +1,5 @@
-import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
+import { forwardRef } from 'preact/compat';
 
 export const SnapStop = styled('snap-stop' as 'section', forwardRef)`
   display: block;

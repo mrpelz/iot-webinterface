@@ -1,5 +1,4 @@
-import { PauseIcon, PlayIcon } from '../components/icons.js';
-import { msToNextSecond, useTimeIncrement } from '../hooks/use-time-label.js';
+import { FunctionComponent } from 'preact';
 import {
   useCallback,
   useEffect,
@@ -7,16 +6,17 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
-import { Category } from './category.js';
-import { FunctionComponent } from 'preact';
-import type HLT_t from 'hls.js';
-import { Translation } from '../state/i18n.js';
+
+import { PauseIcon, PlayIcon } from '../components/icons.js';
 import { Video } from '../components/video.js';
+import { usePromise } from '../hooks/use-promise.js';
+import { msToNextSecond, useTimeIncrement } from '../hooks/use-time-label.js';
+import { useFocus } from '../state/focus.js';
+import { Translation } from '../state/i18n.js';
+import { useIsScreensaverActive } from '../state/screensaver.js';
 import { dimensions } from '../style.js';
 import { fetchFallback } from '../util/fetch.js';
-import { useFocus } from '../state/focus.js';
-import { useIsScreensaverActive } from '../state/screensaver.js';
-import { useUMDModule } from '../hooks/use-umd-module.js';
+import { Category } from './category.js';
 
 const next10thSecondIncrement = (): number => msToNextSecond(10);
 const next2ndSecondIncrement = (): number => msToNextSecond(2);
@@ -38,10 +38,11 @@ export const HLSStream: FunctionComponent<{
 
   const effectiveSrc = useMemo(
     () => (isActive ? src : undefined),
-    [isActive, src]
+    [isActive, src],
   );
 
-  const HLS = useUMDModule<typeof HLT_t>('/js/lib/hls.js/dist/hls.js');
+  const HLS = usePromise(() => import('hls.js'))?.default?.default;
+  // const HLS = useUMDModule<typeof HLT_t.default>('/modules/hls.js');
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -54,10 +55,10 @@ export const HLSStream: FunctionComponent<{
     video.addEventListener(
       'error',
       () => {
-        if (!video.src.length) return;
+        if (video.src.length === 0) return;
         setActive(false);
       },
-      { signal: abort.signal }
+      { signal: abort.signal },
     );
 
     return () => abort.abort();
@@ -69,7 +70,7 @@ export const HLSStream: FunctionComponent<{
 
     if (
       ['maybe', 'probably'].includes(
-        video.canPlayType('application/vnd.apple.mpegurl')
+        video.canPlayType('application/vnd.apple.mpegurl'),
       ) &&
       !navigator.userAgent.toLowerCase().includes('android')
     ) {
@@ -99,7 +100,8 @@ export const HLSStream: FunctionComponent<{
     if (HLS.isSupported()) {
       const hls = new HLS({
         xhrSetup: (xhr) => {
-          xhr.withCredentials = true;
+          xhr.setRequestHeader('x-sw-skip', '1');
+          xhr.withCredentials = false;
         },
       });
 
@@ -136,7 +138,7 @@ export const HLSStream: FunctionComponent<{
 
   const refreshHandler = useMemo(
     () => (effectiveSrc ? next10thSecondIncrement : next2ndSecondIncrement),
-    [effectiveSrc]
+    [effectiveSrc],
   );
 
   const nextPosterRefresh = useTimeIncrement(poster ? refreshHandler : null);
@@ -145,7 +147,13 @@ export const HLSStream: FunctionComponent<{
     if (!poster || !nextPosterRefresh) return undefined;
 
     (async () => {
-      const [response] = await fetchFallback(poster);
+      const [response] = await fetchFallback(poster, undefined, {
+        credentials: 'omit',
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'x-sw-skip': '1',
+        },
+      });
       if (!response) return;
 
       const blob = await response.blob();

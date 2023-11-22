@@ -1,6 +1,7 @@
-import { CategoryHeader, CategoryWrapper } from '../components/category.js';
 import { ComponentChild, FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
+
+import { CategoryHeader, CategoryWrapper } from '../components/category.js';
 import { useTheme } from '../state/theme.js';
 
 export const Category: FunctionComponent<{

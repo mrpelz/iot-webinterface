@@ -1,4 +1,4 @@
-import { FunctionComponent, createContext } from 'preact';
+import { createContext, FunctionComponent } from 'preact';
 import {
   StateUpdater,
   useCallback,
@@ -7,8 +7,9 @@ import {
   useMemo,
   useState,
 } from 'preact/hooks';
-import { useFlag } from './flags.js';
+
 import { useHookDebug } from '../hooks/use-hook-debug.js';
+import { useFlag } from './flags.js';
 import { useVisibility } from './visibility.js';
 
 export type TScreensaverActiveContext = {
@@ -18,7 +19,7 @@ export type TScreensaverActiveContext = {
 };
 
 const ScreensaverActiveContext = createContext<TScreensaverActiveContext>(
-  null as unknown as TScreensaverActiveContext
+  null as unknown as TScreensaverActiveContext,
 );
 
 export const ScreensaverActiveProvider: FunctionComponent = ({ children }) => {
@@ -28,7 +29,7 @@ export const ScreensaverActiveProvider: FunctionComponent = ({ children }) => {
   const isVisible = useVisibility();
 
   const [isScreensaverActive, _setScreensaverActive] = useState(
-    Boolean(isScreensaverEnabled)
+    Boolean(isScreensaverEnabled),
   );
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export const ScreensaverActiveProvider: FunctionComponent = ({ children }) => {
       if (!isScreensaverEnabled) return;
       _setScreensaverActive(...args);
     },
-    [isScreensaverEnabled]
+    [isScreensaverEnabled],
   );
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export const ScreensaverActiveProvider: FunctionComponent = ({ children }) => {
       isScreensaverActive,
       setScreensaverActive,
     }),
-    [flipScreensaverActive, isScreensaverActive, setScreensaverActive]
+    [flipScreensaverActive, isScreensaverActive, setScreensaverActive],
   );
 
   return (

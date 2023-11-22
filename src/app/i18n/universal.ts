@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 export const universal = {
   co2: 'CO₂',
   'deg-c': '°C',

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
-import { useI18n, useI18nKey } from '../state/i18n.js';
+
 import { useFlag } from '../state/flags.js';
+import { useI18n, useI18nKey } from '../state/i18n.js';
 
 const units = [
   'second',
@@ -12,7 +13,7 @@ const units = [
   'year',
 ] as const;
 
-type Unit = typeof units[number];
+type Unit = (typeof units)[number];
 
 const epochs = (() => {
   const second = 1000;
@@ -61,7 +62,7 @@ export const nextMinuteIncrement = (): number => msToNextMinute(1);
 export const nextDayIncrement = (): number => msToNextDay(1);
 
 export const useTimeIncrement = (
-  incrementCb: (() => number) | null = null
+  incrementCb: (() => number) | null = null,
 ): Date | null => {
   const [compareDate, setCompareDate] = useState(() => new Date());
   useEffect(() => {
@@ -80,17 +81,17 @@ export const useTimeIncrement = (
 
 export const useRelativeTimeLabel = (
   date: Date | null,
-  nowSpan = 4000
+  nowSpan = 4000,
 ): string | null => {
   const { translationLanguage, translationLocale } = useI18n();
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
-    [translationLanguage, translationLocale]
+    [translationLanguage, translationLocale],
   );
 
   const relativeTimeFormat = useMemo(
     () => new Intl.RelativeTimeFormat(effectiveLocale),
-    [effectiveLocale]
+    [effectiveLocale],
   );
 
   const nowLabel = useI18nKey('now');
@@ -118,7 +119,7 @@ export const useRelativeTimeLabel = (
 
     return relativeTimeFormat.format(
       matchingUnit === 'second' && !value ? 1 : value,
-      matchingUnit
+      matchingUnit,
     );
   }, [compareDate, date, nowLabel, nowSpan, relativeTimeFormat]);
 };
@@ -127,7 +128,7 @@ export const useAbsoluteTimeLabel = (date: Date | null): string | null => {
   const { translationLanguage, translationLocale } = useI18n();
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
-    [translationLanguage, translationLocale]
+    [translationLanguage, translationLocale],
   );
 
   const nextDay = useTimeIncrement(date ? nextDayIncrement : null);
@@ -152,13 +153,13 @@ export const useAbsoluteTimeLabel = (date: Date | null): string | null => {
 
 export const useTimeLabel = (
   date: Date | null,
-  nowSpan?: number
+  nowSpan?: number,
 ): string | null => {
   const absoluteTimes = useFlag('absoluteTimes');
 
   const relativeLabel = useRelativeTimeLabel(
     absoluteTimes ? null : date,
-    nowSpan
+    nowSpan,
   );
   const absoluteLabel = useAbsoluteTimeLabel(absoluteTimes ? date : null);
 
@@ -167,7 +168,7 @@ export const useTimeLabel = (
 
 export const useTimeSpan = (
   a: Date | null,
-  b: Date | null
+  b: Date | null,
 ): [number | null, number | null] => {
   const compare = useTimeIncrement(a && b ? nextSecondIncrement : null);
 
@@ -183,17 +184,17 @@ export const useTimeSpan = (
 
   const totalTime = useMemo(
     () => (end && start ? end.getTime() - start.getTime() : null),
-    [end, start]
+    [end, start],
   );
 
   const elapsedTime = useMemo(
     () => (compare && start ? compare.getTime() - start.getTime() : null),
-    [compare, start]
+    [compare, start],
   );
 
   const fraction = useMemo(
     () => (elapsedTime && totalTime ? elapsedTime / totalTime : null),
-    [elapsedTime, totalTime]
+    [elapsedTime, totalTime],
   );
 
   return useMemo(() => [totalTime, fraction], [fraction, totalTime]);

@@ -1,7 +1,8 @@
-import { DiagnosticsContainer } from '../components/diagnostics.js';
 import { FunctionComponent } from 'preact';
-import { Hierarchy } from './diagnostics.js';
+
+import { DiagnosticsContainer } from '../components/diagnostics.js';
 import { HierarchyElement } from '../web-api.js';
+import { Hierarchy } from './diagnostics.js';
 
 export const ElementDiagnostics: FunctionComponent<{
   element: HierarchyElement;

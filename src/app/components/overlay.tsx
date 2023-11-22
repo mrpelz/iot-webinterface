@@ -1,5 +1,5 @@
-import { ComponentChildren, FunctionComponent } from 'preact';
 import { styled } from 'goober';
+import { ComponentChildren, FunctionComponent } from 'preact';
 
 const OverlayWrapper = styled('overlay' as 'section')`
   display: grid;
@@ -18,11 +18,9 @@ const OverlayContent = styled('overlay-content' as 'section')`
 
 export const Overlay: FunctionComponent<{
   overlay?: ComponentChildren;
-}> = ({ children, overlay }) => {
-  return (
-    <OverlayWrapper>
-      <OverlayContent>{children}</OverlayContent>
-      {overlay ? <OverlayContent>{overlay}</OverlayContent> : null}
-    </OverlayWrapper>
-  );
-};
+}> = ({ children, overlay }) => (
+  <OverlayWrapper>
+    <OverlayContent>{children}</OverlayContent>
+    {overlay ? <OverlayContent>{overlay}</OverlayContent> : null}
+  </OverlayWrapper>
+);

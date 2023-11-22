@@ -6,7 +6,7 @@ export const useWheel = <T extends HTMLElement>(
   ref: MutableRef<T | null>,
   setter: (input: number) => void,
   throttle: number,
-  direction: WheelDirection = 'both'
+  direction: WheelDirection = 'both',
 ): void => {
   const updateRef = useRef(0);
 
@@ -36,7 +36,7 @@ export const useWheel = <T extends HTMLElement>(
 
       setter(useX ? deltaX : -deltaY);
     },
-    [direction, setter, throttle]
+    [direction, setter, throttle],
   );
 
   useEffect(() => {

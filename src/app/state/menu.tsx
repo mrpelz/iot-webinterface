@@ -1,4 +1,4 @@
-import { FunctionComponent, createContext } from 'preact';
+import { createContext, FunctionComponent } from 'preact';
 import {
   StateUpdater,
   useCallback,
@@ -7,12 +7,13 @@ import {
   useMemo,
   useState,
 } from 'preact/hooks';
-import { useLeaveCallbackRef, usePath } from './path.js';
+
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
-import { useHookDebug } from '../hooks/use-hook-debug.js';
-import { useIsScreensaverActive } from './screensaver.js';
 import { useMediaQuery } from '../style/main.js';
+import { useLeaveCallbackRef, usePath } from './path.js';
+import { useIsScreensaverActive } from './screensaver.js';
 import { useVisibility } from './visibility.js';
 
 export type MenuVisible = boolean | null;
@@ -24,7 +25,7 @@ export type TMenuVisibleContext = {
 };
 
 const MenuVisibleContext = createContext<TMenuVisibleContext>(
-  null as unknown as TMenuVisibleContext
+  null as unknown as TMenuVisibleContext,
 );
 
 export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
@@ -38,7 +39,7 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
   const path = usePath();
 
   const [isMenuVisible, _setMenuVisible] = useState<MenuVisible>(
-    isDesktop ? null : false
+    isDesktop ? null : false,
   );
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
       if (isDesktop) return;
       _setMenuVisible(...args);
     },
-    [isDesktop]
+    [isDesktop],
   );
 
   const flipMenuVisible = useCallback(() => {
@@ -82,7 +83,7 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
       isMenuVisible,
       setMenuVisible,
     }),
-    [flipMenuVisible, isMenuVisible, setMenuVisible]
+    [flipMenuVisible, isMenuVisible, setMenuVisible],
   );
 
   return (

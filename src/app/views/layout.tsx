@@ -1,22 +1,22 @@
-import { Aside, Header, Main } from '../components/layout.js';
 import { FunctionComponent, JSX } from 'preact';
+import { useLayoutEffect, useMemo, useRef } from 'preact/hooks';
+
+import { Aside, Header, Main } from '../components/layout.js';
+import { MenuShade } from '../components/menu.js';
 import {
   MenuVisible,
   useIsMenuVisible,
   useSetMenuVisible,
 } from '../state/menu.js';
-import { useLayoutEffect, useMemo, useRef } from 'preact/hooks';
+import { useGoUp } from '../state/path.js';
+import { useIsScreensaverActive } from '../state/screensaver.js';
+import { dimensions } from '../style.js';
+import { useBreakpoint } from '../style/breakpoint.js';
+import { useMediaQuery } from '../style/main.js';
 import { Menu } from './menu.js';
-import { MenuShade } from '../components/menu.js';
-import { Notification } from './notification.js';
 import { StatusBar } from './status-bar.js';
 import { SwipeBack } from './swipe-back.js';
 import { Titlebar } from './titlebar.js';
-import { dimensions } from '../style.js';
-import { useBreakpoint } from '../style/breakpoint.js';
-import { useGoUp } from '../state/path.js';
-import { useIsScreensaverActive } from '../state/screensaver.js';
-import { useMediaQuery } from '../style/main.js';
 
 export const swipeCaptureWidth = 30;
 
@@ -82,7 +82,7 @@ export const Layout: FunctionComponent = ({ children }) => {
 
     const onTouchStart: (
       this: HTMLElement,
-      event: HTMLElementEventMap['touchstart']
+      event: HTMLElementEventMap['touchstart'],
     ) => void = ({ targetTouches }) => {
       if (isAsideVisibleRef.current) return;
 
@@ -96,7 +96,7 @@ export const Layout: FunctionComponent = ({ children }) => {
 
     const onTouchMove: (
       this: HTMLElement,
-      event: HTMLElementEventMap['touchmove']
+      event: HTMLElementEventMap['touchmove'],
     ) => void = (event) => {
       if (!menuRef.current) return;
 
@@ -116,7 +116,7 @@ export const Layout: FunctionComponent = ({ children }) => {
 
     const onTouchEnd: (
       this: HTMLElement,
-      event: HTMLElementEventMap['touchend']
+      event: HTMLElementEventMap['touchend'],
     ) => void = () => {
       if (!menuRef.current) return;
 
@@ -137,7 +137,7 @@ export const Layout: FunctionComponent = ({ children }) => {
 
     const onTouchCancel: (
       this: HTMLElement,
-      event: HTMLElementEventMap['touchcancel']
+      event: HTMLElementEventMap['touchcancel'],
     ) => void = () => {
       if (!lastX || isAsideVisibleRef.current) return;
 
@@ -171,21 +171,22 @@ export const Layout: FunctionComponent = ({ children }) => {
 
   const handleAsideOutsideClick = useMemo<
     JSX.UIEventHandler<HTMLElement> | undefined
-  >(() => {
-    return isAsideVisible
-      ? (event) => {
-          setAsideVisible(false);
-          event.preventDefault();
-        }
-      : undefined;
-  }, [isAsideVisible, setAsideVisible]);
+  >(
+    () =>
+      isAsideVisible
+        ? (event) => {
+            setAsideVisible(false);
+            event.preventDefault();
+          }
+        : undefined,
+    [isAsideVisible, setAsideVisible],
+  );
 
   return (
     <>
       <Header isVisible={!isScreensaverActive}>
         <StatusBar />
         <Titlebar />
-        <Notification />
       </Header>
       <Aside
         isVisible={

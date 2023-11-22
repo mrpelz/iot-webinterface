@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'preact/hooks';
-import { Background as BackgroundComponent } from '../components/background.js';
 import { FunctionComponent } from 'preact';
+import { useEffect, useRef } from 'preact/hooks';
+
+import { Background as BackgroundComponent } from '../components/background.js';
 import { useBackground } from '../state/background.js';
 
 export const Background: FunctionComponent = () => {
@@ -40,7 +41,7 @@ export const Background: FunctionComponent = () => {
 
       if (previous instanceof HTMLImageElement) {
         const { src } = previous;
-        if (!src.length) return;
+        if (src.length === 0) return;
 
         URL.revokeObjectURL(src);
       }
@@ -59,17 +60,17 @@ export const Background: FunctionComponent = () => {
       img.crossOrigin = 'use-credentials';
       img.src = background;
 
-      img.onload = async () => {
+      img.addEventListener('load', async () => {
         await img.decode?.();
 
         wrapper.prepend(img);
 
         fade(img);
-      };
+      });
 
-      img.onerror = () => {
+      img.addEventListener('error', () => {
         fade(null);
-      };
+      });
     } else {
       fade(null);
     }
@@ -80,7 +81,7 @@ export const Background: FunctionComponent = () => {
 
       if (child instanceof HTMLImageElement) {
         const { src } = child;
-        if (!src.length) return;
+        if (src.length === 0) return;
 
         URL.revokeObjectURL(src);
       }

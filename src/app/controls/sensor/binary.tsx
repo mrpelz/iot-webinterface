@@ -1,22 +1,23 @@
+import { FunctionComponent } from 'preact';
+
+import { Tag } from '../../components/controls.js';
+import { I18nKey } from '../../i18n/main.js';
+import { Translation } from '../../state/i18n.js';
+import { useGetter } from '../../state/web-api.js';
 import {
   HierarchyElement,
   HierarchyElementPropertySensor,
-  ValueType,
   isMetaPropertySensor,
+  ValueType,
 } from '../../web-api.js';
 import { CellWithBody } from '../main.js';
-import { FunctionComponent } from 'preact';
-import { I18nKey } from '../../i18n/main.js';
-import { Tag } from '../../components/controls.js';
-import { Translation } from '../../state/i18n.js';
-import { useGetter } from '../../state/web-api.js';
 
 export type BinarySensorElement = HierarchyElementPropertySensor & {
   meta: { valueType: ValueType.BOOLEAN };
 };
 
 export const isBinarySensorElement = (
-  element: HierarchyElement
+  element: HierarchyElement,
 ): element is BinarySensorElement =>
   isMetaPropertySensor(element.meta) &&
   element.meta.valueType === ValueType.BOOLEAN;

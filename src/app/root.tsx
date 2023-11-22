@@ -1,28 +1,27 @@
+import { setup } from 'goober';
+import { createGlobalStyles as createGlobalStyle } from 'goober/global';
+import { prefix } from 'goober/prefixer';
 import { FunctionComponent, h, render as preactRender } from 'preact';
-import { bindComponent, combineComponents } from './util/combine-components.js';
-import { App } from './views/app.js';
+import { useMemo } from 'preact/hooks';
+
 import { BackgroundProvider } from './state/background.js';
-import { FallbackNotificationProvider } from './state/notification.js';
 import { FlagProvider } from './state/flags.js';
-import { Flags } from './util/flags.js';
 import { FocusProvider } from './state/focus.js';
 import { I18nProvider } from './state/i18n.js';
 import { MenuVisibleProvider } from './state/menu.js';
 import { NavigationProvider } from './state/navigation.js';
-import { Notifications } from './util/notifications.js';
 import { PathProvider } from './state/path.js';
 import { ScreensaverActiveProvider } from './state/screensaver.js';
 import { ScrollEffects } from './state/scroll-effects.js';
 import { ThemeProvider } from './state/theme.js';
 import { TitleProvider } from './state/title.js';
 import { VisibilityProvider } from './state/visibility.js';
-import { WebApi } from './web-api.js';
 import { WebApiProvider } from './state/web-api.js';
-import { createGlobalStyles as createGlobalStyle } from 'goober/global';
 import { dimensions } from './style.js';
-import { prefix } from 'goober/prefixer';
-import { setup } from 'goober';
-import { useMemo } from 'preact/hooks';
+import { bindComponent, combineComponents } from './util/combine-components.js';
+import { Flags } from './util/flags.js';
+import { App } from './views/app.js';
+import { WebApi } from './web-api.js';
 
 const GlobalStyles = createGlobalStyle`
   *:not(input, select, button) {
@@ -50,33 +49,27 @@ const GlobalStyles = createGlobalStyle`
   :root {
     /* --safe-area-inset-top: 20px; */
     scroll-snap-type: block;
-    scroll-padding: ${dimensions.headerHeightAdaptive} 0 0 0;
+    scroll-padding: ${dimensions.headerHeight} 0 0 0;
   }
 `;
 
 export const Root: FunctionComponent<{
   flags: Flags;
-  notifications: Notifications;
   webApi: WebApi;
-}> = ({ flags, notifications, webApi }) => {
+}> = ({ flags, webApi }) => {
   const _PathProvider = bindComponent(
     PathProvider,
-    useMemo(() => ({ rootPathDepth: 1 }), [])
+    useMemo(() => ({ rootPathDepth: 1 }), []),
   );
 
   const _FlagProvider = bindComponent(
     FlagProvider,
-    useMemo(() => ({ flags }), [flags])
+    useMemo(() => ({ flags }), [flags]),
   );
 
   const _WebApiProvider = bindComponent(
     WebApiProvider,
-    useMemo(() => ({ webApi }), [webApi])
-  );
-
-  const _FallbackNotificationProvider = bindComponent(
-    FallbackNotificationProvider,
-    { notifications }
+    useMemo(() => ({ webApi }), [webApi]),
   );
 
   const OuterState = combineComponents(
@@ -85,17 +78,16 @@ export const Root: FunctionComponent<{
     FocusProvider,
     ScreensaverActiveProvider,
     _PathProvider,
-    ThemeProvider
+    ThemeProvider,
   );
 
   const InnerState = combineComponents(
     _WebApiProvider,
-    _FallbackNotificationProvider,
     I18nProvider,
     MenuVisibleProvider,
     NavigationProvider,
     BackgroundProvider,
-    TitleProvider
+    TitleProvider,
   );
 
   return (
@@ -109,15 +101,8 @@ export const Root: FunctionComponent<{
   );
 };
 
-export const render = (
-  flags: Flags,
-  notifications: Notifications,
-  webApi: WebApi
-): void => {
+export const render = (flags: Flags, webApi: WebApi): void => {
   setup(h, prefix);
 
-  preactRender(
-    <Root flags={flags} notifications={notifications} webApi={webApi} />,
-    document.body
-  );
+  preactRender(<Root flags={flags} webApi={webApi} />, document.body);
 };

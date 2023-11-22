@@ -2,32 +2,28 @@ export type Flags = {
   absoluteTimes: boolean;
   apiBaseUrl: string | null;
   debug: boolean;
-  enableNotifications: boolean;
   inactivityTimeout: number | null;
   language: string | null;
+  path: string | null;
   screensaverEnable: boolean;
   screensaverRandomizePosition: boolean;
-  serviceWorker: boolean;
   startPage: string | null;
   theme: string | null;
   updateCheckInterval: number | null;
-  updateUnattended: boolean;
 };
 
 const defaultFlags: Flags = {
   absoluteTimes: false,
   apiBaseUrl: null,
   debug: false,
-  enableNotifications: true,
   inactivityTimeout: null,
   language: null,
+  path: null,
   screensaverEnable: false,
   screensaverRandomizePosition: false,
-  serviceWorker: true,
   startPage: null,
   theme: null,
   updateCheckInterval: null,
-  updateUnattended: false,
 };
 
 export let flags: Flags | null = null;
@@ -36,7 +32,7 @@ const getFlag = <P extends keyof Flags>(
   hashFlags: URLSearchParams,
   queryFlags: URLSearchParams,
   flag: P,
-  typeCast = (input: unknown) => input as Flags[P] | undefined
+  typeCast = (input: unknown) => input as Flags[P] | undefined,
 ) => {
   const storage =
     hashFlags.get(flag) ||
@@ -57,7 +53,7 @@ const getFlag = <P extends keyof Flags>(
           }
         })();
 
-  return value;
+  return { [flag]: value } as Record<P, Flags[P] | undefined>;
 };
 
 export const getFlags = (): Flags => {
@@ -65,65 +61,41 @@ export const getFlags = (): Flags => {
   const queryFlags = new URLSearchParams(location.search);
 
   const readFlags: { [P in keyof Flags]: Flags[P] | undefined } = {
-    absoluteTimes: getFlag(hashFlags, queryFlags, 'absoluteTimes', (input) =>
-      Boolean(input)
+    ...getFlag(hashFlags, queryFlags, 'absoluteTimes', (input) =>
+      Boolean(input),
     ),
-    apiBaseUrl: getFlag(hashFlags, queryFlags, 'apiBaseUrl', (input) => {
-      return typeof input === 'string' ? input.trim() : undefined;
-    }),
-    debug: getFlag(hashFlags, queryFlags, 'debug', (input) => Boolean(input)),
-    enableNotifications: getFlag(
-      hashFlags,
-      queryFlags,
-      'enableNotifications',
-      (input) => Boolean(input)
+    ...getFlag(hashFlags, queryFlags, 'apiBaseUrl', (input) =>
+      typeof input === 'string' ? input.trim() : undefined,
     ),
-    inactivityTimeout: getFlag(
-      hashFlags,
-      queryFlags,
-      'inactivityTimeout',
-      (input) => (typeof input === 'number' ? input : undefined)
+    ...getFlag(hashFlags, queryFlags, 'debug', (input) => Boolean(input)),
+    ...getFlag(hashFlags, queryFlags, 'inactivityTimeout', (input) =>
+      typeof input === 'number' ? input : undefined,
     ),
-    language: getFlag(hashFlags, queryFlags, 'language', (input) => {
-      return typeof input === 'string' ? input.trim() : undefined;
-    }),
-    screensaverEnable: getFlag(
-      hashFlags,
-      queryFlags,
-      'screensaverEnable',
-      (input) => Boolean(input)
+    ...getFlag(hashFlags, queryFlags, 'language', (input) =>
+      typeof input === 'string' ? input.trim() : undefined,
     ),
-    screensaverRandomizePosition: getFlag(
-      hashFlags,
-      queryFlags,
-      'screensaverRandomizePosition',
-      (input) => Boolean(input)
+    ...getFlag(hashFlags, queryFlags, 'path', (input) =>
+      typeof input === 'string' ? input.trim() : undefined,
     ),
-    serviceWorker: getFlag(hashFlags, queryFlags, 'serviceWorker', (input) =>
-      Boolean(input)
+    ...getFlag(hashFlags, queryFlags, 'screensaverEnable', (input) =>
+      Boolean(input),
     ),
-    startPage: getFlag(hashFlags, queryFlags, 'startPage', (input) => {
-      return typeof input === 'string' ? input.trim() : undefined;
-    }),
-    theme: getFlag(hashFlags, queryFlags, 'theme', (input) => {
-      return typeof input === 'string' ? input.trim() : undefined;
-    }),
-    updateCheckInterval: getFlag(
-      hashFlags,
-      queryFlags,
-      'updateCheckInterval',
-      (input) => (typeof input === 'number' ? input : undefined)
+    ...getFlag(hashFlags, queryFlags, 'screensaverRandomizePosition', (input) =>
+      Boolean(input),
     ),
-    updateUnattended: getFlag(
-      hashFlags,
-      queryFlags,
-      'updateUnattended',
-      (input) => Boolean(input)
+    ...getFlag(hashFlags, queryFlags, 'startPage', (input) =>
+      typeof input === 'string' ? input.trim() : undefined,
+    ),
+    ...getFlag(hashFlags, queryFlags, 'theme', (input) =>
+      typeof input === 'string' ? input.trim() : undefined,
+    ),
+    ...getFlag(hashFlags, queryFlags, 'updateCheckInterval', (input) =>
+      typeof input === 'number' ? input : undefined,
     ),
   };
 
   const filteredFlags: Partial<Flags> = Object.fromEntries(
-    Object.entries(readFlags).filter(([, value]) => value !== undefined)
+    Object.entries(readFlags).filter(([, value]) => value !== undefined),
   );
 
   flags = {
@@ -144,14 +116,15 @@ export const getFlags = (): Flags => {
             /* eslint-disable sort-keys */
             {
               set: filteredFlag,
+              // eslint-disable-next-line @typescript-eslint/naming-convention
               '↔️': result === defaultFlag ? '=' : '≠',
               default: defaultFlag,
               result,
             },
             /* eslint-enable sort-keys */
           ];
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -160,18 +133,36 @@ export const getFlags = (): Flags => {
 
 export const setFlag = <P extends keyof Flags>(
   key: P,
-  value: Flags[P]
+  value: Flags[P],
 ): Flags => {
+  const url = new URL(location.href);
+
+  const hashFlags = new URLSearchParams(url.hash.slice(1));
+  const queryFlags = new URLSearchParams(url.search);
+
   if (value === defaultFlags[key]) {
     localStorage.removeItem(`f_${key}`);
+
+    hashFlags.delete(key);
+    queryFlags.delete(key);
   } else {
-    localStorage.setItem(`f_${key}`, JSON.stringify(value));
+    const value_ = JSON.stringify(value);
+
+    localStorage.setItem(`f_${key}`, value_);
+
+    if (hashFlags.has(key)) hashFlags.set(key, value_);
+    if (queryFlags.has(key)) queryFlags.set(key, value_);
   }
 
   flags = {
     ...(flags || defaultFlags),
     [key]: value,
   };
+
+  url.hash = hashFlags.toString();
+  url.search = queryFlags.toString();
+
+  history.replaceState(undefined, '', url);
 
   return flags;
 };

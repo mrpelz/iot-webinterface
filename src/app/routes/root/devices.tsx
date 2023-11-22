@@ -1,11 +1,12 @@
-import {
-  HierarchyElement,
-  HierarchyElementDevice,
-  HierarchyElementRoom,
-  Levels,
-  sortBy,
-} from '../../web-api.js';
+import { FunctionComponent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
+
+import { Grid } from '../../components/grid.js';
+import { Device } from '../../controls/device.js';
+import { useArray } from '../../hooks/use-array-compare.js';
+import { roomSorting as roomsSorting } from '../../i18n/mapping.js';
+import { Translation } from '../../state/i18n.js';
+import { useSegment } from '../../state/path.js';
 import {
   useElementFilter,
   useElements,
@@ -14,15 +15,15 @@ import {
   useMetaFilter,
 } from '../../state/web-api.js';
 import { Category } from '../../views/category.js';
-import { Device } from '../../controls/device.js';
-import { DeviceDetails } from '../sub/devices/device.js';
-import { FunctionComponent } from 'preact';
-import { Grid } from '../../components/grid.js';
 import { SubRoute } from '../../views/route.js';
-import { Translation } from '../../state/i18n.js';
-import { roomSorting as roomsSorting } from '../../i18n/mapping.js';
-import { useArray } from '../../hooks/use-array-compare.js';
-import { useSegment } from '../../state/path.js';
+import {
+  HierarchyElement,
+  HierarchyElementDevice,
+  HierarchyElementRoom,
+  Levels,
+  sortBy,
+} from '../../web-api.js';
+import { DeviceDetails } from '../sub/devices/device.js';
 
 const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
   const {
@@ -33,7 +34,7 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
 
   const devices = useMetaFilter(
     useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room),
-    useCallback(({ isSubDevice }) => !isSubDevice, [])
+    useCallback(({ isSubDevice }) => !isSubDevice, []),
   );
 
   return (
@@ -43,15 +44,13 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
       <Grid>
         {useMemo(
           () =>
-            devices.map((device) => {
-              return (
-                <Device
-                  element={device}
-                  onClick={() => setDeviceId?.(device.id)}
-                />
-              );
-            }),
-          [devices, setDeviceId]
+            devices.map((device) => (
+              <Device
+                element={device}
+                onClick={() => setDeviceId?.(device.id)}
+              />
+            )),
+          [devices, setDeviceId],
         )}
       </Grid>
     </Category>
@@ -66,12 +65,12 @@ export const Devices: FunctionComponent = () => {
 
   const rooms = useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy);
   const roomsSorted = useArray(
-    useMemo(() => sortBy(rooms, 'name', roomsSorting).all, [rooms])
+    useMemo(() => sortBy(rooms, 'name', roomsSorting).all, [rooms]),
   );
 
   const [device] = useElementFilter<HierarchyElement, HierarchyElementDevice>(
     deviceId ? elements : null,
-    useCallback(({ id }) => id === deviceId, [deviceId])
+    useCallback(({ id }) => id === deviceId, [deviceId]),
   );
 
   return (

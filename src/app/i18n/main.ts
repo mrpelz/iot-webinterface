@@ -5,7 +5,7 @@ import { universal } from './universal.js';
 const i18nLanguageDefault = 'en' as const;
 export const i18nLanguages = [i18nLanguageDefault, 'de'] as const;
 
-export type I18nLanguage = typeof i18nLanguages[number];
+export type I18nLanguage = (typeof i18nLanguages)[number];
 
 export const translations = {
   de,
@@ -18,11 +18,11 @@ export const nonCapitalizations = {
 };
 
 export type I18nKey =
-  | keyof typeof translations[I18nLanguage]
+  | keyof (typeof translations)[I18nLanguage]
   | keyof typeof universal;
 export type I18nTranslation = Record<I18nKey, string>;
 
-export type I18nNonCapitalization = typeof nonCapitalizations[I18nLanguage];
+export type I18nNonCapitalization = (typeof nonCapitalizations)[I18nLanguage];
 
 export const reconcileLanguage = (input: string): I18nLanguage => {
   const test = input as unknown as I18nLanguage;

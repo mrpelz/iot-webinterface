@@ -1,8 +1,9 @@
 import { FunctionComponent } from 'preact';
-import { StatusBar as StatusBarComponent } from '../components/status-bar.js';
 import { useMemo } from 'preact/hooks';
-import { useStreamOnline } from '../state/web-api.js';
+
+import { StatusBar as StatusBarComponent } from '../components/status-bar.js';
 import { useTheme } from '../state/theme.js';
+import { useStreamOnline } from '../state/web-api.js';
 
 export const StatusBar: FunctionComponent = () => {
   const streamOnline = useStreamOnline();
@@ -10,7 +11,7 @@ export const StatusBar: FunctionComponent = () => {
 
   const isLight = useMemo(
     () => theme === 'light' || theme === 'highContrast',
-    [theme]
+    [theme],
   );
 
   return <StatusBarComponent isConnected={streamOnline} isLight={isLight} />;

@@ -1,10 +1,11 @@
+import { styled } from 'goober';
+import { forwardRef } from 'preact/compat';
+
 import { colors, dimensions } from '../style.js';
 import { half, multiply } from '../style/dimensions.js';
-import { GridCell } from './grid.js';
-import { bindComponent } from '../util/combine-components.js';
 import { dependentValue } from '../style/main.js';
-import { forwardRef } from 'preact/compat';
-import { styled } from 'goober';
+import { bindComponent } from '../util/combine-components.js';
+import { GridCell } from './grid.js';
 
 type CellProps = {
   isHighContrast: boolean;
@@ -17,13 +18,13 @@ export const Cell = bindComponent<CellProps>(
     --background-color: ${dependentValue(
       'isHighContrast',
       colors.backgroundSecondary(),
-      colors.backgroundSecondary(70)
+      colors.backgroundSecondary(70),
     )};
     --border-radius: 9px;
     --border: ${dependentValue(
       'isHighContrast',
       () => `solid ${dimensions.hairline()} ${colors.fontPrimary()()}`,
-      'none'
+      'none',
     )};
 
     color: ${colors.fontPrimary()};
@@ -31,7 +32,7 @@ export const Cell = bindComponent<CellProps>(
     overflow: hidden;
     cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
   `,
-  { isHighContrast: false, span: 2 }
+  { isHighContrast: false, span: 2 },
 );
 
 export const Header = styled('cell-header')`

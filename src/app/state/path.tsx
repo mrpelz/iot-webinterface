@@ -1,4 +1,4 @@
-import { FunctionComponent, createContext } from 'preact';
+import { createContext, FunctionComponent } from 'preact';
 import {
   MutableRef,
   useCallback,
@@ -8,6 +8,9 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
+
+import { useHookDebug } from '../hooks/use-hook-debug.js';
+import { usePrevious } from '../hooks/use-previous.js';
 import {
   amend,
   getPath,
@@ -15,8 +18,7 @@ import {
   goDown,
   goUp as goUpUtil,
 } from '../util/path.js';
-import { useHookDebug } from '../hooks/use-hook-debug.js';
-import { usePrevious } from '../hooks/use-previous.js';
+import { useFlag, useSetFlag } from './flags.js';
 import { useVisibility } from './visibility.js';
 
 export type TPathContext = {
@@ -29,7 +31,7 @@ export type TPathContext = {
   path: string;
   previousPath: string | null;
   setSegment: (
-    segmentNumber: number
+    segmentNumber: number,
   ) => ((value: string | null) => void) | null;
 };
 
@@ -49,7 +51,15 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
 
   const isVisible = useVisibility();
 
-  const [path, setPath] = useState(location.pathname);
+  const pathFlag = useFlag('path');
+  const pathFlagSetter = useSetFlag('path');
+
+  const [path, setPath] = useState(() => {
+    const result = pathFlag || location.pathname;
+    pathFlagSetter(null);
+
+    return result;
+  });
   const [previousPath] = usePrevious(path);
 
   useEffect(() => {
@@ -63,12 +73,12 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
 
   const isRoot = useMemo(
     () => getSegments(path).length <= rootPathDepth,
-    [path, rootPathDepth]
+    [path, rootPathDepth],
   );
 
   const getSegment = useCallback(
     (segmentNumber: number) => getSegments(path)[segmentNumber] || null,
-    [path]
+    [path],
   );
 
   const goPrevious = useMemo(() => {
@@ -97,7 +107,7 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
         setPath(value ? goDown(basePath, value) : basePath);
       };
     },
-    [path]
+    [path],
   );
 
   const goRoot = useMemo(() => {
@@ -119,7 +129,7 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
       if (isRoot) {
         if (leaveCallback) {
           leaveCallback();
-        } else if (document.referrer.length) {
+        } else if (document.referrer.length > 0) {
           history.back();
         }
 
@@ -133,7 +143,7 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
       history.pushState(undefined, '');
       setPath(goUpUtil(path));
     },
-    [isRoot, path]
+    [isRoot, path],
   );
 
   useEffect(() => {
@@ -166,7 +176,7 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
       path,
       previousPath,
       setSegment,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -185,10 +195,10 @@ export const useGoPrevious = (): TPathContext['goPrevious'] => {
 };
 
 export const useSegment = (
-  segmentNumber: number
+  segmentNumber: number,
 ): [
   ReturnType<TPathContext['getSegment']>,
-  ReturnType<TPathContext['setSegment']>
+  ReturnType<TPathContext['setSegment']>,
 ] => {
   const { getSegment, setSegment } = useContext(PathContext);
 
@@ -199,7 +209,7 @@ export const useSegment = (
 };
 
 export const useGoPreviousSegment = (
-  segmentNumber: number
+  segmentNumber: number,
 ): TPathContext['goPrevious'] => {
   const { getSegment, setSegment } = useContext(PathContext);
 

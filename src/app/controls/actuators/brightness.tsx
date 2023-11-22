@@ -1,10 +1,4 @@
-import { BinaryActuatorElement, isBinaryActuatorElement } from './binary.js';
-import {
-  HierarchyElement,
-  HierarchyElementPropertyActuator,
-  ValueType,
-  isMetaPropertyActuator,
-} from '../../web-api.js';
+import { FunctionComponent } from 'preact';
 import {
   MutableRef,
   StateUpdater,
@@ -14,24 +8,31 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
+
+import { BlendOver } from '../../components/blend-over.js';
+import { BodyLarge } from '../../components/controls.js';
 import { NonBreaking, TabularNums } from '../../components/text.js';
+import { useColorBody } from '../../hooks/use-color-body.js';
+import { useDelay } from '../../hooks/use-delay.js';
+import { useSwipe } from '../../hooks/use-swipe.js';
+import { useWheel } from '../../hooks/use-wheel.js';
+import { I18nKey } from '../../i18n/main.js';
+import { Translation } from '../../state/i18n.js';
+import { useSegment } from '../../state/path.js';
 import {
   SetterFunction,
   useChildGetter,
   useChildSetter,
   useGetter,
 } from '../../state/web-api.js';
-import { BlendOver } from '../../components/blend-over.js';
-import { BodyLarge } from '../../components/controls.js';
+import {
+  HierarchyElement,
+  HierarchyElementPropertyActuator,
+  isMetaPropertyActuator,
+  ValueType,
+} from '../../web-api.js';
 import { Cell } from '../main.js';
-import { FunctionComponent } from 'preact';
-import { I18nKey } from '../../i18n/main.js';
-import { Translation } from '../../state/i18n.js';
-import { useColorBody } from '../../hooks/use-color-body.js';
-import { useDelay } from '../../hooks/use-delay.js';
-import { useSegment } from '../../state/path.js';
-import { useSwipe } from '../../hooks/use-swipe.js';
-import { useWheel } from '../../hooks/use-wheel.js';
+import { BinaryActuatorElement, isBinaryActuatorElement } from './binary.js';
 
 export type BrightnessActuatorElement = BinaryActuatorElement & {
   children: {
@@ -42,22 +43,22 @@ export type BrightnessActuatorElement = BinaryActuatorElement & {
 };
 
 export const isBrightnessActuatorElement = (
-  element: HierarchyElement
+  element: HierarchyElement,
 ): element is BrightnessActuatorElement =>
   Boolean(
     isBinaryActuatorElement(element) &&
       element.children &&
       'brightness' in element.children &&
       isMetaPropertyActuator(element.children.brightness.meta) &&
-      element.children.brightness.meta.valueType === ValueType.NUMBER
+      element.children.brightness.meta.valueType === ValueType.NUMBER,
   );
 
 export const useWheelBrightness = (
   brightnessRef: MutableRef<number | null>,
   loadingRef: MutableRef<boolean | null>,
-  setBrightness: SetterFunction<number> | null
-): ((delta: number) => void) => {
-  return useCallback(
+  setBrightness: SetterFunction<number> | null,
+): ((delta: number) => void) =>
+  useCallback(
     (delta) => {
       const { current: currentBrightness } = brightnessRef;
       const { current: currentLoading } = loadingRef;
@@ -68,7 +69,7 @@ export const useWheelBrightness = (
       const newValue =
         Math.round(
           Math.min(Math.max((currentBrightness || 0) + delta * 0.005, 0), 1) *
-            100
+            100,
         ) / 100;
 
       if (newValue === currentBrightness) return;
@@ -76,15 +77,14 @@ export const useWheelBrightness = (
       setBrightness(newValue);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setBrightness]
+    [setBrightness],
   );
-};
 
 export const useSwipeBrightness = (
   brightnessRef: MutableRef<number | null>,
   loadingRef: MutableRef<boolean | null>,
   setBrightness: SetterFunction<number> | null,
-  setInteracting: StateUpdater<boolean>
+  setInteracting: StateUpdater<boolean>,
 ): ((delta: number | null) => void) => {
   const startBrightnessRef = useRef<number | null>(null);
 
@@ -123,7 +123,7 @@ export const useSwipeBrightness = (
       startBrightnessRef.current = brightness;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setBrightness]
+    [setBrightness],
   );
 };
 
@@ -131,18 +131,16 @@ export const BrightnessLabel: FunctionComponent<{
   brightness: number | null;
   loading: boolean | null;
   value: boolean | null;
-}> = ({ brightness, loading, value }) => {
-  return (
-    <NonBreaking>
-      {useMemo(() => {
-        if (value === null || brightness === null) return '?';
-        if (loading) return '…';
+}> = ({ brightness, loading, value }) => (
+  <NonBreaking>
+    {useMemo(() => {
+      if (value === null || brightness === null) return '?';
+      if (loading) return '…';
 
-        return <TabularNums>{Math.round(brightness * 100)}%</TabularNums>;
-      }, [brightness, loading, value])}
-    </NonBreaking>
-  );
-};
+      return <TabularNums>{Math.round(brightness * 100)}%</TabularNums>;
+    }, [brightness, loading, value])}
+  </NonBreaking>
+);
 
 export const BrightnessActuator: FunctionComponent<{
   element: BrightnessActuatorElement;
@@ -178,13 +176,13 @@ export const BrightnessActuator: FunctionComponent<{
   const handleWheel = useWheelBrightness(
     brightnessRef,
     loadingRef,
-    setBrightness
+    setBrightness,
   );
   const handleSwipe = useSwipeBrightness(
     brightnessRef,
     loadingRef,
     setBrightness,
-    setInteracting
+    setInteracting,
   );
 
   const refA = useRef<HTMLElement | null>(null);

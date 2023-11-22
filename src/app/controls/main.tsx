@@ -1,10 +1,14 @@
+import { ComponentChild, FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
+
 import {
   Body,
   Cell as CellComponent,
   Header,
   Title,
 } from '../components/controls.js';
-import { ComponentChild, FunctionComponent } from 'preact';
+import { I18nKey } from '../i18n/main.js';
+import { useTheme } from '../state/theme.js';
 import {
   HierarchyElementArea,
   HierarchyElementProperty,
@@ -13,14 +17,11 @@ import {
   isMetaPropertyActuator,
   isMetaPropertySensor,
 } from '../web-api.js';
-import { OpenSensor, isOpenSensorElement } from './sensor/open.js';
-import { RGBActuator, isRGBActuatorElement } from './actuators/rgb.js';
-import { TimerActuator, isTimerActuatorElement } from './timer.js';
 import { Actuator } from './actuators/main.js';
-import { I18nKey } from '../i18n/main.js';
+import { isRGBActuatorElement, RGBActuator } from './actuators/rgb.js';
 import { Sensor } from './sensor/main.js';
-import { useMemo } from 'preact/hooks';
-import { useTheme } from '../state/theme.js';
+import { isOpenSensorElement, OpenSensor } from './sensor/open.js';
+import { isTimerActuatorElement, TimerActuator } from './timer.js';
 
 export type CellProps = {
   icon?: ComponentChild;
@@ -45,7 +46,7 @@ export const Cell: FunctionComponent<CellProps> = ({
       onClick,
       ...(span ? { span } : {}),
     }),
-    [isHighContrast, onClick, span]
+    [isHighContrast, onClick, span],
   );
 
   return (

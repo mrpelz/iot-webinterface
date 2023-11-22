@@ -1,6 +1,7 @@
-import { FunctionComponent } from 'preact';
-import { dependentValue } from '../style/main.js';
 import { styled } from 'goober';
+import { FunctionComponent } from 'preact';
+
+import { dependentValue } from '../style/main.js';
 
 const Svg = styled('svg')<{ color?: string; zIndex?: number }>`
   color: ${({ color }) => color || 'currentColor'};

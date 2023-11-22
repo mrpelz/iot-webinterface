@@ -1,5 +1,4 @@
-import { Flags, getFlags, setFlag } from '../util/flags.js';
-import { FunctionComponent, createContext } from 'preact';
+import { createContext, FunctionComponent } from 'preact';
 import {
   StateUpdater,
   useContext,
@@ -8,12 +7,14 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
+
 import { useHookDebug } from '../hooks/use-hook-debug.js';
+import { Flags, getFlags, setFlag } from '../util/flags.js';
 
 type TFlagsContext = readonly [Flags, StateUpdater<Flags>];
 
 const FlagsContext = createContext<TFlagsContext>(
-  [] as unknown as TFlagsContext
+  [] as unknown as TFlagsContext,
 );
 
 export const FlagProvider: FunctionComponent<{ flags: Flags }> = ({
@@ -33,7 +34,7 @@ export const FlagProvider: FunctionComponent<{ flags: Flags }> = ({
 
       hashChange.current = false;
 
-      if (location.hash.trim().length) return;
+      if (location.hash.trim().length > 0) return;
 
       const cleanUrl = new URL(location.href);
       cleanUrl.hash = '';
@@ -66,7 +67,7 @@ export const useFlag = <T extends keyof Flags>(key: T): Flags[T] | null => {
 };
 
 export const useSetFlag = <P extends keyof Flags>(
-  key: P
+  key: P,
 ): StateUpdater<Flags[P]> => {
   const [flags, setFlags] = useContext(FlagsContext);
   const [value, setValue] = useState(flags[key]);

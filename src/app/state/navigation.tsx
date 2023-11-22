@@ -1,12 +1,4 @@
-import { FunctionComponent, createContext } from 'preact';
-import {
-  HierarchyElement,
-  HierarchyElementBuilding,
-  HierarchyElementFloor,
-  HierarchyElementHome,
-  HierarchyElementRoom,
-  Levels,
-} from '../web-api.js';
+import { createContext, FunctionComponent } from 'preact';
 import {
   StateUpdater,
   useCallback,
@@ -15,16 +7,25 @@ import {
   useMemo,
   useState,
 } from 'preact/hooks';
+
+import { useDelay } from '../hooks/use-delay.js';
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import {
   useGetLocalStorage,
   useSetLocalStorage,
 } from '../hooks/use-local-storage.js';
-import { useLevelShallow, useWebApi } from './web-api.js';
-import { useDelay } from '../hooks/use-delay.js';
+import {
+  HierarchyElement,
+  HierarchyElementBuilding,
+  HierarchyElementFloor,
+  HierarchyElementHome,
+  HierarchyElementRoom,
+  Levels,
+} from '../web-api.js';
 import { useFlag } from './flags.js';
-import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useSegment } from './path.js';
 import { useVisibility } from './visibility.js';
+import { useLevelShallow, useWebApi } from './web-api.js';
 
 export const staticPagesTop = ['global', 'map'] as const;
 export const staticPagesBottom = [
@@ -36,8 +37,8 @@ export const staticPagesBottom = [
 export const staticPages = [...staticPagesTop, ...staticPagesBottom];
 
 export type StaticPage =
-  | typeof staticPagesTop[number]
-  | typeof staticPagesBottom[number];
+  | (typeof staticPagesTop)[number]
+  | (typeof staticPagesBottom)[number];
 
 type NavigationElement<T> = readonly [T | null, StateUpdater<T | null>];
 
@@ -52,7 +53,7 @@ const START_PAGE: StaticPage = 'global';
 const STATIC_PAGE_KEY = 'n_staticPage';
 
 const NavigationContext = createContext<TNavigationContext>(
-  null as unknown as TNavigationContext
+  null as unknown as TNavigationContext,
 );
 
 const useNavigationElements = <
@@ -60,13 +61,13 @@ const useNavigationElements = <
     | HierarchyElementHome
     | HierarchyElementBuilding
     | HierarchyElementFloor
-    | HierarchyElementRoom
+    | HierarchyElementRoom,
 >(
   parent: HierarchyElement | null,
   level: T['meta']['level'],
   persistenceKey: string,
   ignorePersistenceInit = false,
-  override?: string | null
+  override?: string | null,
 ) => {
   const elements = useLevelShallow<T>(level, parent);
 
@@ -118,7 +119,7 @@ const useNavigationElements = <
 
       return null;
     },
-    [elements, ignorePersistenceInit, override, storedName]
+    [elements, ignorePersistenceInit, override, storedName],
   );
 
   const result = useState<T | null>(null);
@@ -144,7 +145,7 @@ const useNavigationElements = <
 const useStaticPage = (
   room: HierarchyElementRoom | null,
   override: string | null,
-  defer = false
+  defer = false,
 ) => {
   const fallback = useDelay(defer ? null : START_PAGE, 300);
 
@@ -195,39 +196,39 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   const startPagePathInitial = useMemo(
     () => startPagePath || null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
-  const startPagePathActual = useMemo(
-    () => (settled ? startPagePath : null),
-    [startPagePath, settled]
-  );
-
-  const startPageFlagActual = useMemo(
-    () => (settled && isVisibleDelayed ? null : startPageFlag),
-    [isVisibleDelayed, settled, startPageFlag]
+    [],
   );
 
   const startPage = useMemo(
-    () => startPageFlagActual || startPagePathActual || startPagePathInitial,
-    [startPageFlagActual, startPagePathActual, startPagePathInitial]
+    () =>
+      (settled && isVisibleDelayed ? null : startPageFlag) ||
+      (settled ? startPagePath : null) ||
+      startPagePathInitial,
+    [
+      isVisibleDelayed,
+      settled,
+      startPageFlag,
+      startPagePath,
+      startPagePathInitial,
+    ],
   );
 
-  const staticPageFromFlag = useMemo(() => {
-    return startPage ? staticPages.includes(startPage as StaticPage) : false;
-  }, [startPage]);
+  const staticPageFromFlag = useMemo(
+    () => (startPage ? staticPages.includes(startPage as StaticPage) : false),
+    [startPage],
+  );
 
   const home = useNavigationElements<HierarchyElementHome>(
     hierarchy,
     Levels.HOME,
-    'n_home'
+    'n_home',
   );
   const [stateHome] = home;
 
   const building = useNavigationElements<HierarchyElementBuilding>(
     stateHome,
     Levels.BUILDING,
-    'n_building'
+    'n_building',
   );
   const [stateBuilding] = building;
 
@@ -236,14 +237,14 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
     Levels.ROOM,
     'n_room',
     staticPageFromFlag,
-    staticPageFromFlag || !startPage ? null : startPage
+    staticPageFromFlag || !startPage ? null : startPage,
   );
   const [stateRoom, setRoom] = room;
 
   const staticPage = useStaticPage(
     stateRoom,
     staticPageFromFlag ? startPage : null,
-    !hierarchy
+    !hierarchy,
   );
   const [stateStaticPage, setStaticPage] = staticPage;
 
@@ -263,14 +264,15 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateRoom]);
 
-  const value = useMemo<TNavigationContext>(() => {
-    return {
+  const value = useMemo<TNavigationContext>(
+    () => ({
       building,
       home,
       room,
       staticPage,
-    };
-  }, [building, home, room, staticPage]);
+    }),
+    [building, home, room, staticPage],
+  );
 
   return (
     <NavigationContext.Provider value={value}>
@@ -279,9 +281,8 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   );
 };
 
-export const useNavigation = (): TNavigationContext => {
-  return useContext(NavigationContext);
-};
+export const useNavigation = (): TNavigationContext =>
+  useContext(NavigationContext);
 
 export const useNavigationBuilding = (): TNavigationContext['building'] => {
   const { building } = useContext(NavigationContext);

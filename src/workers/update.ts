@@ -1,48 +1,67 @@
-/* eslint-disable no-restricted-globals */
-// eslint-disable-next-line spaced-comment
-/// <reference lib="WebWorker" />
-
 import { defer, fetchFallback } from './util/main.js';
 import { scaffold, workerConsole } from './util/worker-scaffold.js';
 
+declare const self: SharedWorkerGlobalScope & typeof globalThis;
+
+type SetupMessage = {
+  initialId: string | null;
+  interval: number;
+};
+
+type Update = {
+  id: string;
+  time: number;
+};
+
+const ID_URL = '/dist/update.json';
+
+const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
+const REFRESH_TIMEOUT = 20_000;
+
+const INTERVAL = 5000;
+
+const isUpdate = (input: unknown): input is Update => {
+  if (!input) return false;
+  if (typeof input !== 'object') return false;
+
+  if (!('id' in input)) return false;
+  if (typeof input.id !== 'string') return false;
+
+  if (!('time' in input)) return false;
+  if (typeof input.time !== 'number') return false;
+
+  return true;
+};
+
 (async () => {
-  type SetupMessage = {
-    initialId: string | null;
-    interval: number;
-    serviceWorkerRefresh: boolean;
-  };
-
-  const ID_URL = '/id.txt';
-
-  const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
-  const REFRESH_TIMEOUT = 20000;
-
-  const INTERVAL = 5000;
-
   (async (port: MessagePort, setup: SetupMessage | null) => {
     if (!setup) return;
 
-    const { initialId, interval, serviceWorkerRefresh } = setup;
+    const { initialId, interval } = setup;
 
-    const getLiveId = async () => {
+    const getUpdate = async () => {
       const [response] = await fetchFallback(ID_URL, interval || INTERVAL, {
         cache: 'no-store',
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'x-sw-skip': '1',
+        },
       });
       if (!response) return null;
 
-      const responseText = await response.text();
-      return responseText.trim() || null;
+      return response.json();
     };
 
     workerConsole.info(`initial id: "${initialId}", interval: ${interval}`);
 
     let storedId = initialId;
 
-    const handleUpdate = async () => {
+    const handleUpdate = async (delay: number) => {
       const ok = await (async () => {
-        if (!serviceWorkerRefresh) return false;
+        const url = new URL(REFRESH_URL, self.location.href);
+        url.searchParams.set('delay', delay.toString());
 
-        const [response] = await fetchFallback(REFRESH_URL, REFRESH_TIMEOUT, {
+        const [response] = await fetchFallback(url, REFRESH_TIMEOUT, {
           method: 'POST',
         });
         if (!response) return false;
@@ -56,23 +75,25 @@ import { scaffold, workerConsole } from './util/worker-scaffold.js';
     };
 
     const checkForUpdate = async () => {
-      const liveId = await getLiveId();
+      const update = await getUpdate();
+      if (!isUpdate(update)) return;
 
-      workerConsole.info(`live id: "${liveId}"`);
+      const { id, time } = update;
 
-      if (liveId === null) return;
-      if (storedId === liveId) return;
+      workerConsole.info(`live id: "${id}", time: ${time}`);
+
+      if (storedId === id) return;
 
       workerConsole.info(
-        `id changed from "${storedId}" to "${liveId}", requesting reload`
+        `id changed from "${storedId}" to "${id}", requesting reload`,
       );
 
-      storedId = liveId;
+      storedId = id;
 
-      handleUpdate();
+      handleUpdate(time);
     };
 
-    port.onmessage = () => handleUpdate();
+    port.addEventListener('message', () => handleUpdate(0));
 
     if (interval) setInterval(() => checkForUpdate(), interval);
     defer(() => checkForUpdate());

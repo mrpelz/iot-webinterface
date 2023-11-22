@@ -1,463 +1,306 @@
-// eslint-disable-next-line spaced-comment
-/// <reference lib="WebWorker" />
+import { fetchFallback, sleep } from './util/main.js';
 
-import { fetchFallback, multiline } from './util/main.js';
+declare const self: ServiceWorkerGlobalScope & typeof globalThis;
 
-const swDebug = Boolean(new URL(self.location.href).searchParams.get('debug'));
-
-const isSafari = (() => {
-  const ua = navigator.userAgent.toLowerCase();
-
-  return ua.includes('safari') && !ua.includes('chrome');
-})();
-
-((scope) => {
-  /* eslint-disable no-console */
-  const wsConsole = {
-    debug: (...args: unknown[]) => {
-      if (!swDebug) return;
-      console.debug('service worker:', ...args);
-    },
-    error: (...args: unknown[]) => {
-      console.error('service worker:', ...args);
-    },
-    info: (...args: unknown[]) => {
-      if (!swDebug) return;
-      console.info('service worker:', ...args);
-    },
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare namespace NgxAutoIndex {
+  type Item = {
+    mtime?: string;
+    name: string;
+    type: string;
   };
-  /* eslint-enable no-console */
 
-  const origin = (() => {
-    const url = new URL(scope.origin);
-    url.pathname = '/';
+  type Directory = Item & {
+    type: 'directory';
+  };
 
-    return url.href;
+  type File = Item & {
+    size?: number;
+    type: 'file';
+  };
+}
+
+const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
+
+const INDEX = '/';
+const CACHE_KEY_PRE = 'pre';
+const CACHE_KEY_DYNAMIC = 'dynamic';
+
+const DELAY_MS_CACHE_REVALIDATE = 2000;
+const DELAY_CLIENT_RELOAD = 10_000;
+
+const notificationTagPreCache = `${self.serviceWorker.scriptURL}:preCache`;
+
+let isUpdateFromRefreshUrl = false;
+let isUpdatingCache = false;
+
+const deleteNotification = async (tag: string) => {
+  for (const notification of await self.registration.getNotifications({
+    tag,
+  })) {
+    notification.close();
+  }
+};
+
+const showNotification = (title: string, options?: NotificationOptions) => {
+  if (!('Notification' in self)) return;
+  if (self.Notification.permission !== 'granted') return;
+  if (!self.registration.active) return;
+
+  self.registration.showNotification(title, options);
+};
+
+const isNgxAutoIndexItem = (input: unknown): input is NgxAutoIndex.Item => {
+  if (!input) return false;
+  if (typeof input !== 'object') return false;
+
+  if (!('type' in input)) return false;
+
+  if ('mtime' in input && typeof input.mtime !== 'string') return false;
+
+  if (!('name' in input)) return false;
+  if (typeof input.name !== 'string') return false;
+
+  return true;
+};
+
+const isNgxAutoIndexDirectory = (
+  input: NgxAutoIndex.Item,
+): input is NgxAutoIndex.Directory => {
+  if (input.type !== 'directory') return false;
+
+  return true;
+};
+
+const isNgxAutoIndexFile = (
+  input: NgxAutoIndex.Item,
+): input is NgxAutoIndex.File => {
+  if (input.type !== 'file') return false;
+
+  if ('size' in input && typeof input.size !== 'number') return false;
+
+  return true;
+};
+
+const preCacheDirectory = async (
+  cache: Cache,
+  promises: Promise<unknown>[],
+  entry_: string[] = [],
+) => {
+  const entry = entry_.length > 0 ? `/${entry_.join('/')}/` : '/';
+
+  showNotification('Pre-Caching', {
+    body: `handling "${entry}"`,
+    tag: notificationTagPreCache,
+  });
+
+  const entryRequest = await fetch(entry, {
+    headers: { accept: 'application/json' },
+  }).catch(() => undefined);
+
+  if (!entryRequest) return;
+
+  const list = await entryRequest.json().catch(() => undefined);
+  if (!list || !Array.isArray(list)) return;
+
+  for (const item of list) {
+    if (!isNgxAutoIndexItem(item)) continue;
+
+    const itemPath = [...entry_, item.name].filter((path) => path.length > 0);
+
+    if (isNgxAutoIndexDirectory(item)) {
+      // eslint-disable-next-line no-await-in-loop
+      await preCacheDirectory(cache, promises, itemPath);
+
+      continue;
+    }
+
+    if (isNgxAutoIndexFile(item)) {
+      promises.push(cache.add(`/${itemPath.join('/')}`));
+    }
+  }
+};
+
+const preCacheRefresh = async () => {
+  if (isUpdatingCache) return;
+  isUpdatingCache = true;
+
+  await caches.delete(CACHE_KEY_PRE);
+  const cache = await caches.open(CACHE_KEY_PRE);
+
+  const promises: Promise<unknown>[] = [cache.add(INDEX)];
+
+  await preCacheDirectory(cache, promises);
+
+  await Promise.all(promises);
+  await deleteNotification(notificationTagPreCache);
+
+  // eslint-disable-next-line require-atomic-updates
+  isUpdatingCache = false;
+};
+
+const cleanResponse = async (response: Response) => {
+  const { body, headers, status, statusText } = response;
+
+  return new Response(body ?? (await response.blob()), {
+    headers,
+    status,
+    statusText,
+  });
+};
+
+const fetchWithCache = async (
+  input: URL | RequestInfo,
+  waitToCache?: Promise<unknown>,
+) => {
+  const url = new URL(input instanceof Request ? input.url : input.toString());
+  url.hash = '';
+
+  const cache = await caches.open(CACHE_KEY_DYNAMIC);
+  const cachedResponse = await caches.match(url);
+
+  const doFetch = async () => {
+    const [response] = await fetchFallback(input);
+    if (!response) return undefined;
+
+    return response.redirected ? cleanResponse(response) : response;
+  };
+
+  const networkResponsePromise = cachedResponse
+    ? sleep(DELAY_MS_CACHE_REVALIDATE).then(() => doFetch())
+    : doFetch();
+
+  const deferredCaching = (async () => {
+    const networkResponse = await networkResponsePromise.catch(() => undefined);
+    if (!networkResponse) return;
+
+    const clonedResponse = networkResponse.clone();
+
+    if (!clonedResponse.ok) return;
+
+    if (
+      clonedResponse.headers.get('x-original-pathname') === INDEX &&
+      clonedResponse.url !== INDEX
+    ) {
+      return;
+    }
+
+    if (waitToCache) await waitToCache;
+
+    await cache.put(url, clonedResponse);
   })();
 
-  const INDEX_ENDPOINT = '/index.json';
-
-  const INDEX_PATH = '/';
-
-  const CACHE_KEY_INTERNAL = 'internal';
-
-  const REFRESH_URL = '/DA6A9D49-D5E1-454D-BA19-DD53F5AA9935';
-  const WARM_URL = '/1C941CA2-2CE3-48DB-B953-2DF891321BAF';
-  const INVENTORY_URL = '/B98534B3-903F-4117-B7B7-962ABDAC4C42';
-  const ECHO_URL = '/E4B38FA2-08D2-4117-9738-29FC9106CBA0';
-
-  const INVENTORY_STORE = '/A9B51A78-7BD0-4EE0-BF16-8FD399DB061F';
-
-  const ERROR_MESSAGE = 'service worker synthesized response';
-  const FALLBACK_HTML = `
-    <!DOCTYPE html>
-    <html lang="en" style="background-color: #000000; color: #FFFFFF; padding-top: env(safe-area-inset-top);">
-    <head>
-      <meta charset="utf-8" />
-      <title>Offline…</title>
-      <meta name="viewport" content="viewport-fit=cover, width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
-    </head>
-    <body>
-      <button onclick="location.reload();">reload</button>
-    </body>
-    </html>
-  `;
-
-  const laxCacheUrls: RegExp[] = [new RegExp('^/$')];
-
-  const unhandledRequestUrls: RegExp[] = [
-    new RegExp('^/api(?!/hierarchy|/id)$'),
-    new RegExp('^/id.txt$'),
-    new RegExp('^/nvr/'),
-  ];
-  const denyRequestUrls: RegExp[] = [new RegExp('^/favicon')];
-  const indexUrl: RegExp[] = [
-    new RegExp('^/index.html$'),
-    new RegExp('^/(?:(?!api|\\.).)*$'),
-  ];
-  const livePreferredUrls: RegExp[] = [
-    new RegExp('^/api/id$'),
-    new RegExp('^/index.json$'),
-    new RegExp('^/manifest.json$'),
-  ];
-
-  const testPath = (path: string, list: RegExp[]) => {
-    for (const regex of list) {
-      if (regex.test(path)) return true;
-    }
-
-    return false;
+  return {
+    deferredCaching,
+    response: cachedResponse ?? networkResponsePromise,
   };
+};
 
-  const syntheticError = (status: number, label: string, message: string) => {
-    const response = new Response(
-      multiline`
-        Status: ${status.toString()}
-        ${ERROR_MESSAGE}
+const refreshClients = async (reloadDelay: number) => {
+  await self.clients.claim();
 
-        <label>
-          ${label}
-        </label>
+  const clients = await self.clients.matchAll({
+    includeUncontrolled: true,
+    type: 'window',
+  });
 
-        <msg>
-          ${message}
-        </msg>
-      `,
-      {
-        headers: {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          'Content-Type': 'text/plain; charset=utf-8',
-          'x-sw-error': message,
-          'x-sw-synthetic': '1',
-        },
-        status,
-      }
-    );
+  for (const client of clients) {
+    client.postMessage(reloadDelay);
+  }
+};
 
-    return response;
-  };
+self.addEventListener('install', async (event) => {
+  const { type } = event;
 
-  const fetchLive = (
-    request: RequestInfo,
-    cache?: RequestCache,
-    timeout = 2000
-  ) => fetchFallback(request, timeout, { cache });
+  const tag = `${self.serviceWorker.scriptURL}:${type}`;
 
-  const putInCache = async (
-    path: string,
-    response: Response,
-    cacheKey: string
-  ) => {
-    const cloned = response.clone();
-    const cache = await scope.caches.open(cacheKey);
+  showNotification('Installing ServiceWorker', {
+    body: 'filling pre-cache',
+    tag,
+  });
 
-    try {
-      await cache.put(path, cloned);
-    } catch {
-      // noop
-    }
-  };
+  self.skipWaiting();
 
-  const refreshSW = async () => {
-    wsConsole.debug('refreshSW');
+  event.waitUntil(
+    (async (): Promise<void> => {
+      await preCacheRefresh();
+      await deleteNotification(tag);
+    })(),
+  );
+});
 
-    try {
-      await scope.clients.claim();
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    (async () => {
+      await caches.delete(CACHE_KEY_DYNAMIC);
 
-      if (scope.registration.active) {
-        await scope.registration.update();
-      }
-    } catch {
-      // noop
-    }
-  };
+      if (isUpdateFromRefreshUrl) return;
 
-  const refreshCache = async (reset = false) => {
-    wsConsole.debug('refreshCache');
+      await deleteNotification('reload');
+      await refreshClients(DELAY_CLIENT_RELOAD);
+    })(),
+  );
+});
 
-    const date = Date.now();
+self.addEventListener('fetch', (event) => {
+  const {
+    handled,
+    request,
+    request: { url: url_ },
+  } = event;
 
-    if (reset) {
-      const cacheKeys = await scope.caches.keys();
-      for (const cacheKey of cacheKeys) {
-        // eslint-disable-next-line no-await-in-loop
-        await scope.caches.delete(cacheKey);
-      }
-    }
+  if (request.headers.get('x-sw-skip') === '1') return;
 
-    const cacheInternal = await scope.caches.open(CACHE_KEY_INTERNAL);
+  const url = new URL(url_);
 
-    const indexCache = reset
-      ? null
-      : (await cacheInternal.match(INVENTORY_STORE)) || null;
-    const [indexLive] = indexCache
-      ? [null]
-      : await fetchLive(INDEX_ENDPOINT, 'no-store');
+  event.respondWith(
+    (async () => {
+      if (url.pathname === REFRESH_URL) {
+        isUpdateFromRefreshUrl = true;
 
-    const indexResponse = indexCache || indexLive;
-    if (!indexResponse) return;
+        event.waitUntil(
+          (async () => {
+            await self.registration.update();
 
-    const index = (await indexResponse.json()) || {};
+            await preCacheRefresh();
+            await caches.delete(CACHE_KEY_DYNAMIC);
 
-    if (reset) {
-      await cacheInternal.put(
-        INVENTORY_STORE,
-        new Response(JSON.stringify({ date, index }))
-      );
-    }
+            const delay = url.searchParams.get('delay');
 
-    const { critical = [], optional = [] } = index;
-    const paths = [INDEX_PATH].concat(critical);
-
-    const cacheCritical = await scope.caches.open('pre:critical');
-
-    await Promise.all(
-      paths.map(async (path) => {
-        try {
-          if (await cacheCritical.match(path)) return;
-          const [response] = await fetchLive(path, 'no-cache', 10000);
-          if (!response) return;
-
-          await cacheCritical.put(path, response);
-        } catch {
-          // noop
-        }
-      })
-    );
-
-    if (isSafari) return;
-
-    const cacheOptional = await scope.caches.open('pre:optional');
-
-    await Promise.all(
-      (optional as string[]).map(async (path) => {
-        try {
-          if (await cacheOptional.match(path)) return;
-          const [response] = await fetchLive(path, 'no-cache', 10000);
-          if (!response) return;
-
-          await cacheOptional.put(path, response);
-        } catch {
-          // noop
-        }
-      })
-    );
-  };
-
-  const inventory = async () => {
-    try {
-      const index = await (
-        await (
-          await scope.caches.open(CACHE_KEY_INTERNAL)
-        ).match(INVENTORY_STORE)
-      )?.json();
-
-      const persisted =
-        'storage' in scope.navigator &&
-        'persisted' in scope.navigator.storage &&
-        (await scope.navigator.storage.persisted());
-
-      const cacheKeys = await scope.caches.keys();
-
-      const caches = Object.fromEntries(
-        await Promise.all(
-          cacheKeys.map(async (cacheKey) => {
-            const cache = await scope.caches.open(cacheKey);
-            const responses = await cache.matchAll();
-
-            return [
-              cacheKey,
-              responses.map(({ url }) => {
-                if (!url?.length) return null;
-                if (!url.startsWith(origin)) return url;
-
-                return url.replace(origin, '/');
-              }),
-            ] as const;
-          })
-        )
-      );
-
-      return new Response(JSON.stringify({ caches, index, persisted }), {
-        headers: {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          'Content-Type': 'application/json; charset=utf-8',
-          'x-sw-special': 'inventory',
-          'x-sw-synthetic': '1',
-        },
-      });
-    } catch (error) {
-      syntheticError(
-        500,
-        INVENTORY_URL,
-        `error creating cache inventory: ${error}`
-      );
-    }
-
-    return syntheticError(
-      500,
-      INVENTORY_URL,
-      'unknown error creating cache inventory'
-    );
-  };
-
-  scope.onfetch = (fetchEvent) => {
-    const { request } = fetchEvent;
-    const { pathname, href } = new URL(request.url, origin);
-
-    let pathnameOverride: string | null = null;
-
-    const isUnhandled =
-      !href.startsWith(origin) || testPath(pathname, unhandledRequestUrls);
-    if (isUnhandled) return;
-
-    const preloadResponse =
-      'preloadResponse' in fetchEvent
-        ? (fetchEvent.preloadResponse as Promise<Response | undefined>)
-        : null;
-
-    fetchEvent.respondWith(
-      // eslint-disable-next-line complexity
-      (async () => {
-        if (request.method === 'POST' && pathname === REFRESH_URL) {
-          await refreshSW();
-          await refreshCache(true);
-
-          return new Response(REFRESH_URL, {
-            headers: {
-              'x-sw-special': 'refresh',
-              'x-sw-synthetic': '1',
-            },
-          });
-        }
-
-        if (request.method === 'POST' && pathname === WARM_URL) {
-          await refreshCache();
-
-          return new Response(WARM_URL, {
-            headers: {
-              'x-sw-special': 'warm',
-              'x-sw-synthetic': '1',
-            },
-          });
-        }
-
-        if (request.method === 'POST' && pathname === INVENTORY_URL) {
-          return inventory();
-        }
-
-        if (request.method === 'POST' && pathname === ECHO_URL) {
-          return new Response(ECHO_URL, {
-            headers: {
-              'x-sw-special': 'echo',
-              'x-sw-synthetic': '1',
-            },
-          });
-        }
-
-        const isDenied = testPath(pathname, denyRequestUrls);
-        if (isDenied) {
-          return syntheticError(403, request.url, 'denied resource');
-        }
-
-        const isIndex = testPath(pathname, indexUrl);
-        if (isIndex) {
-          pathnameOverride = INDEX_PATH;
-        }
-
-        const isLaxCache = testPath(pathnameOverride || pathname, laxCacheUrls);
-
-        const cachedResponse = await scope.caches
-          .match(pathnameOverride || request, {
-            ignoreSearch: isLaxCache,
-            ignoreVary: true,
-          })
-          .catch(() => undefined);
-
-        const isLivePreferred = testPath(
-          pathnameOverride || pathname,
-          livePreferredUrls
-        );
-        if (isLivePreferred) {
-          const preloadLiveResponse = (await preloadResponse) || null;
-
-          const [liveResponse, code] = preloadLiveResponse
-            ? [preloadLiveResponse, preloadLiveResponse.status]
-            : await fetchLive(pathnameOverride || request);
-
-          if (liveResponse) {
-            await putInCache(
-              pathnameOverride || request.url,
-              liveResponse,
-              'post:livePreferred'
+            await refreshClients(
+              (delay ? Number.parseInt(delay, 10) : null) ??
+                DELAY_CLIENT_RELOAD,
             );
 
-            return liveResponse;
-          }
-
-          if (cachedResponse) return cachedResponse;
-
-          return syntheticError(
-            code || 504,
-            request.url,
-            'live-preferred resource not available from live or from cache'
-          );
-        }
-
-        if (cachedResponse) return cachedResponse;
-
-        const preloadLiveResponse = (await preloadResponse) || null;
-
-        const [liveResponse, code] = preloadLiveResponse
-          ? [preloadLiveResponse, preloadLiveResponse.status]
-          : await fetchLive(pathnameOverride || request, undefined, 10000);
-
-        if (liveResponse) {
-          await putInCache(
-            pathnameOverride || request.url,
-            liveResponse,
-            'post:cachePreferred'
-          );
-
-          return liveResponse;
-        }
-
-        if (isIndex) {
-          return new Response(FALLBACK_HTML, {
-            headers: {
-              // eslint-disable-next-line @typescript-eslint/naming-convention
-              'Content-Type': 'text/html; charset=utf-8',
-            },
-            status: 504,
-          });
-        }
-
-        return syntheticError(
-          code || 504,
-          request.url,
-          'cache-preferred resource not available from cache or from live'
+            isUpdateFromRefreshUrl = false;
+          })(),
         );
-      })()
-    );
-  };
 
-  scope.oninstall = (installEvent) => {
-    wsConsole.debug('oninstall');
+        return new Response(REFRESH_URL);
+      }
 
-    installEvent.waitUntil(
-      (async () => {
-        try {
-          await refreshCache(true);
-          await scope.skipWaiting();
-        } catch (error) {
-          wsConsole.error(`oninstall error: ${error}`);
-        }
-      })()
-    );
-  };
+      const { deferredCaching, response } = await fetchWithCache(
+        request,
+        handled,
+      );
 
-  scope.onactivate = (activateEvent) => {
-    wsConsole.debug('onactivate');
+      event.waitUntil(deferredCaching);
 
-    activateEvent.waitUntil(
-      (async () => {
-        try {
-          await scope.clients.claim();
+      return Promise.resolve(response).then((result) => {
+        if (result) return result;
 
-          if (
-            'navigationPreload' in scope.registration &&
-            scope.registration.navigationPreload
-          ) {
-            try {
-              await scope.registration.navigationPreload.enable();
-            } catch {
-              // noop
-            }
-          }
-        } catch (error) {
-          wsConsole.error(`onactivate error: ${error}`);
-        }
-      })()
-    );
-  };
-})(self as unknown as ServiceWorkerGlobalScope);
+        url.hash = new URLSearchParams({
+          path: JSON.stringify(url.pathname),
+        }).toString();
+        url.pathname = '';
+
+        return new Response(undefined, {
+          headers: {
+            location: url.href,
+          },
+          status: 307,
+        });
+      });
+    })(),
+  );
+});

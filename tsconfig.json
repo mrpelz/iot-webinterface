@@ -1,15 +1,10 @@
 {
-  "extends": "./tsconfig.common.json",
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
-    "lib": [
-      "esnext",
-      "dom"
-    ],
-    "outDir": "./build/app"
+    "lib": ["DOM", "ESNext"],
+    "outDir": "dist/app"
   },
-  "include": [
-    "./src/app/**/*"
-  ]
+  "extends": "./tsconfig.common.json",
+  "include": ["src/app/**/*"]
 }

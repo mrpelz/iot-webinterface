@@ -1,3 +1,7 @@
+import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
+
+import { Tag, TagGroup } from '../components/controls.js';
 import {
   ActivityIcon,
   CheckIcon,
@@ -5,20 +9,17 @@ import {
   WiFiIcon,
   XIcon,
 } from '../components/icons.js';
-import { HierarchyElementDevice, Levels, MetaDevice } from '../web-api.js';
-import { Tag, TagGroup } from '../components/controls.js';
+import { TabularNums } from '../components/text.js';
+import { useTimeLabel } from '../hooks/use-time-label.js';
+import { useTheme } from '../state/theme.js';
 import {
   useChild,
   useGetter,
   useLevelShallowSkipInput,
   useMetaFilter,
 } from '../state/web-api.js';
+import { HierarchyElementDevice, Levels, MetaDevice } from '../web-api.js';
 import { CellWithBody } from './main.js';
-import { FunctionComponent } from 'preact';
-import { TabularNums } from '../components/text.js';
-import { useMemo } from 'preact/hooks';
-import { useTheme } from '../state/theme.js';
-import { useTimeLabel } from '../hooks/use-time-label.js';
 
 export const OnlineIcon: FunctionComponent = () => {
   const theme = useTheme();
@@ -59,12 +60,12 @@ const DeviceOnlineState: FunctionComponent<{
       if (!epoch) return null;
 
       return new Date(epoch);
-    }, [lastSeenValue, onlineLastChangeValue])
+    }, [lastSeenValue, onlineLastChangeValue]),
   );
 
   const time = useMemo(
     () => <TabularNums>{timeLabel || '—'}</TabularNums>,
-    [timeLabel]
+    [timeLabel],
   );
 
   if (lastSeen) {
@@ -97,7 +98,7 @@ const DeviceOnlineState: FunctionComponent<{
 };
 
 export const filterSubDevices = (
-  device: MetaDevice
+  device: MetaDevice,
 ): device is MetaDevice & { isSubDevice: true } => Boolean(device.isSubDevice);
 
 export const Device: FunctionComponent<{
@@ -110,7 +111,7 @@ export const Device: FunctionComponent<{
 
   const subDevices = useMetaFilter(
     useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
-    filterSubDevices
+    filterSubDevices,
   );
 
   return (
@@ -119,7 +120,7 @@ export const Device: FunctionComponent<{
       onClick={onClick}
       title={name}
     >
-      {subDevices.length ? (
+      {subDevices.length > 0 ? (
         subDevices.map((subDevice) => {
           const {
             meta: { name: subDeviceName },

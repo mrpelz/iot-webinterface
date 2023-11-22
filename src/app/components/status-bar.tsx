@@ -1,6 +1,7 @@
+import { styled } from 'goober';
+
 import { colors, strings } from '../style.js';
 import { dependentValue } from '../style/main.js';
-import { styled } from 'goober';
 
 export const StatusBar = styled('status-bar')<{
   isConnected: boolean;
@@ -17,7 +18,7 @@ export const StatusBar = styled('status-bar')<{
   background-color: ${dependentValue(
     'isConnected',
     'rgba(0, 255, 0, 0.4)',
-    'rgba(255, 0, 0, 0.8)'
+    'rgba(255, 0, 0, 0.8)',
   )};
 
   @keyframes onConnect {

@@ -1,6 +1,7 @@
+import { styled } from 'goober';
+
 import { colors, dimensions } from '../style.js';
 import { dependentValue } from '../style/main.js';
-import { styled } from 'goober';
 
 export const Notification = styled('notification' as 'section')<{
   isVisible: boolean;
@@ -12,12 +13,14 @@ export const Notification = styled('notification' as 'section')<{
   display: flex;
   justify-content: space-between;
   overflow: hidden;
-  transition: background-color 0.3s ease-out, block-size 0.3s ease-out;
+  transition:
+    background-color 0.3s ease-out,
+    block-size 0.3s ease-out;
 
   background-color: ${dependentValue(
     'isVisible',
     colors.selection(),
-    'rgba(0, 0, 0, 0)'
+    'rgba(0, 0, 0, 0)',
   )};
 `;
 

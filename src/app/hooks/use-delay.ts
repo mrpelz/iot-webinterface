@@ -3,11 +3,11 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 export const useDelay = <T>(
   value: T,
   delay: number,
-  resetOnDelayStart = false
+  resetOnDelayStart = false,
 ): T | null => {
   const [state, setState] = useState<T | null>(null);
 
-  const timeoutRef = useRef<number | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (resetOnDelayStart) {

@@ -1,7 +1,7 @@
 export const fetchFallback = async (
   input: RequestInfo,
   timeout = 5000,
-  init?: RequestInit
+  init?: RequestInit,
 ): Promise<readonly [Response | null, number | null, AbortController]> => {
   const abortController = new AbortController();
 

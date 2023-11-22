@@ -1,16 +1,17 @@
+import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
+
 import { AlignRight, TabularNums } from '../../../components/text.js';
-import { Entry, List } from '../../../views/list.js';
-import { Translation, useI18nKey } from '../../../state/i18n.js';
+import { OpenSensorElement } from '../../../controls/sensor/open.js';
 import {
   useAbsoluteTimeLabel,
   useDateFromEpoch,
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
-import { useChild, useChildGetter, useGetter } from '../../../state/web-api.js';
-import { FunctionComponent } from 'preact';
-import { OpenSensorElement } from '../../../controls/sensor/open.js';
-import { useMemo } from 'preact/hooks';
+import { Translation, useI18nKey } from '../../../state/i18n.js';
 import { useSetTitleOverride } from '../../../state/title.js';
+import { useChild, useChildGetter, useGetter } from '../../../state/web-api.js';
+import { Entry, List } from '../../../views/list.js';
 
 export const OpenSensor: FunctionComponent<{
   element: OpenSensorElement;
@@ -23,7 +24,7 @@ export const OpenSensor: FunctionComponent<{
   const openValue = useGetter<boolean>(open);
 
   const openLastChangeDate = useDateFromEpoch(
-    useChildGetter<number>(open, 'lastChange')
+    useChildGetter<number>(open, 'lastChange'),
   );
   const openLastChangeRelative = useRelativeTimeLabel(openLastChangeDate);
   const openLastChangeAbsolute = useAbsoluteTimeLabel(openLastChangeDate);
@@ -32,13 +33,13 @@ export const OpenSensor: FunctionComponent<{
   const tamperSwitchValue = useGetter<boolean>(tamperSwitch);
 
   const tamperSwitchLastChangeDate = useDateFromEpoch(
-    useChildGetter<number>(tamperSwitch, 'lastChange')
+    useChildGetter<number>(tamperSwitch, 'lastChange'),
   );
   const tamperSwitchLastChangeRelative = useRelativeTimeLabel(
-    useDateFromEpoch(useChildGetter<number>(tamperSwitch, 'lastChange'))
+    useDateFromEpoch(useChildGetter<number>(tamperSwitch, 'lastChange')),
   );
   const tamperSwitchLastChangeAbsolute = useAbsoluteTimeLabel(
-    useDateFromEpoch(useChildGetter<number>(tamperSwitch, 'lastChange'))
+    useDateFromEpoch(useChildGetter<number>(tamperSwitch, 'lastChange')),
   );
 
   const openIsReceived = useChildGetter<boolean>(open, 'isReceivedValue');
@@ -80,13 +81,11 @@ export const OpenSensor: FunctionComponent<{
       </List>
       <List>
         <Entry label={<Translation i18nKey="tamperSwitch" capitalize={true} />}>
-          {useMemo(() => {
-            return tamperSwitchValue ? (
-              <Translation i18nKey="triggered" />
-            ) : (
-              '—'
-            );
-          }, [tamperSwitchValue])}
+          {useMemo(
+            () =>
+              tamperSwitchValue ? <Translation i18nKey="triggered" /> : '—',
+            [tamperSwitchValue],
+          )}
         </Entry>
         <Entry
           label={
@@ -110,13 +109,15 @@ export const OpenSensor: FunctionComponent<{
       </List>
       <List>
         <Entry label={<Translation i18nKey="restored" />}>
-          {useMemo(() => {
-            return openIsReceived ? (
-              <Translation i18nKey="no" />
-            ) : (
-              <Translation i18nKey="yes" />
-            );
-          }, [openIsReceived])}
+          {useMemo(
+            () =>
+              openIsReceived ? (
+                <Translation i18nKey="no" />
+              ) : (
+                <Translation i18nKey="yes" />
+              ),
+            [openIsReceived],
+          )}
         </Entry>
       </List>
     </>

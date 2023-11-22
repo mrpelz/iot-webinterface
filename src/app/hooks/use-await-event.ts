@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 export const useAwaitEvent = (
   state: boolean,
   eventResolves: boolean,
-  expectCalls = 1
+  expectCalls = 1,
 ): [boolean, () => void] => {
   const [innerState, setInnerState] = useState(state);
   const remainingCalls = useRef(expectCalls);

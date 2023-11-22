@@ -9,7 +9,7 @@ export const iOSScrollToTop = (): void => {
         top: 0,
       });
     },
-    { passive: true }
+    { passive: true },
   );
 };
 

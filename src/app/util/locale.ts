@@ -432,10 +432,7 @@ export const getCountry = (): string | null => {
 
 const languageMatcher = new RegExp('^\\w+');
 
-export const getLanguage = (): string => {
-  return (
-    languageMatcher.exec(navigator.language)?.[0] ||
-    navigator.languages.find((aLanguage) => !aLanguage.includes('-')) ||
-    navigator.language
-  );
-};
+export const getLanguage = (): string =>
+  languageMatcher.exec(navigator.language)?.[0] ||
+  navigator.languages.find((aLanguage) => !aLanguage.includes('-')) ||
+  navigator.language;

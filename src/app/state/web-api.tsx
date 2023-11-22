@@ -1,12 +1,4 @@
-import { FunctionComponent, createContext } from 'preact';
-import {
-  HierarchyElement,
-  HierarchyElementSystem,
-  HierarchyElementWithMeta,
-  Setter,
-  WebApi,
-  getElementsFromLevel,
-} from '../web-api.js';
+import { createContext, FunctionComponent } from 'preact';
 import {
   useCallback,
   useContext,
@@ -15,8 +7,17 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
+
 import { useArray } from '../hooks/use-array-compare.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
+import {
+  getElementsFromLevel,
+  HierarchyElement,
+  HierarchyElementSystem,
+  HierarchyElementWithMeta,
+  Setter,
+  WebApi,
+} from '../web-api.js';
 
 export type SetterFunction<T> = (value: T) => void;
 
@@ -81,11 +82,11 @@ export const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
   useHookDebug('useInitWebApi');
 
   const [hierarchy, setHierarchy] = useState<HierarchyElementSystem>(
-    null as unknown as HierarchyElementSystem
+    null as unknown as HierarchyElementSystem,
   );
 
   const [elements, setElements] = useState<HierarchyElement[]>(
-    null as unknown as HierarchyElement[]
+    null as unknown as HierarchyElement[],
   );
 
   const [isStreamOnline, setStreamOnline] = useState(false);
@@ -111,7 +112,7 @@ export const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
       useSetterIndex: <T,>(index?: number) =>
         useSetterIndexFactory<T>(webApi, index),
     }),
-    [elements, hierarchy, isStreamOnline, webApi]
+    [elements, hierarchy, isStreamOnline, webApi],
   );
 
   return (
@@ -119,9 +120,7 @@ export const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
   );
 };
 
-export const useWebApi = (): TWebApiContext => {
-  return useContext(WebApiContext);
-};
+export const useWebApi = (): TWebApiContext => useContext(WebApiContext);
 
 export const useHierarchy = (): TWebApiContext['hierarchy'] => {
   const { hierarchy } = useContext(WebApiContext);
@@ -139,60 +138,54 @@ const useLevel = <T extends HierarchyElementWithMeta>(
   level: T['meta']['level'],
   parents: UseLevelParents,
   deep?: boolean,
-  skipInput?: boolean
+  skipInput?: boolean,
 ) => {
   const memoizedParents = useArray(parents.flat());
 
-  return useMemo(() => {
-    return getElementsFromLevel<T>(memoizedParents, level, deep, skipInput);
-  }, [deep, level, memoizedParents, skipInput]);
+  return useMemo(
+    () => getElementsFromLevel<T>(memoizedParents, level, deep, skipInput),
+    [deep, level, memoizedParents, skipInput],
+  );
 };
 
 export const useLevelShallow = <T extends HierarchyElementWithMeta>(
   level: T['meta']['level'],
   ...parents: UseLevelParents
-): T[] => {
-  return useLevel(level, parents);
-};
+): T[] => useLevel(level, parents);
 
 export const useLevelDeep = <T extends HierarchyElementWithMeta>(
   level: T['meta']['level'],
   ...parents: UseLevelParents
-): T[] => {
-  return useLevel(level, parents, true);
-};
+): T[] => useLevel(level, parents, true);
 
 export const useLevelShallowSkipInput = <T extends HierarchyElementWithMeta>(
   level: T['meta']['level'],
   ...parents: UseLevelParents
-): T[] => {
-  return useLevel(level, parents, undefined, true);
-};
+): T[] => useLevel(level, parents, undefined, true);
 
 export const useLevelDeepSkipInput = <T extends HierarchyElementWithMeta>(
   level: T['meta']['level'],
   ...parents: UseLevelParents
-): T[] => {
-  return useLevel(level, parents, true, true);
-};
+): T[] => useLevel(level, parents, true, true);
 
 export const useElementFilter = <T extends HierarchyElement, R extends T = T>(
   input: T[] | null,
-  filter: (element: T) => boolean
+  filter: (element: T) => boolean,
 ): R[] => {
   const memoizedInput = useArray(input);
 
-  return useMemo(() => {
-    return memoizedInput?.filter((element) => filter(element)) || [];
-  }, [filter, memoizedInput]) as R[];
+  return useMemo(
+    () => memoizedInput?.filter((element) => filter(element)) || [],
+    [filter, memoizedInput],
+  ) as R[];
 };
 
 export const useMetaFilter = <
   T extends HierarchyElementWithMeta,
-  R extends T = T
+  R extends T = T,
 >(
   input: T[],
-  filter: (meta: T['meta']) => boolean
+  filter: (meta: T['meta']) => boolean,
 ): R[] => {
   const innerFilter = useCallback(({ meta }: T) => filter(meta), [filter]);
 
@@ -201,12 +194,12 @@ export const useMetaFilter = <
 
 export const useChild = <
   T extends HierarchyElement,
-  K extends keyof NonNullable<T['children']>
+  K extends keyof NonNullable<T['children']>,
 >(
   input: T | null,
-  child: K
-): NonNullable<T['children']>[K] | null => {
-  return useMemo(() => {
+  child: K,
+): NonNullable<T['children']>[K] | null =>
+  useMemo(() => {
     if (!input) return null;
 
     const { children } = input;
@@ -217,7 +210,6 @@ export const useChild = <
 
     return childElement as NonNullable<T['children']>[K];
   }, [child, input]);
-};
 
 export const useStreamOnline = (): TWebApiContext['isStreamOnline'] => {
   const { isStreamOnline } = useContext(WebApiContext);
@@ -235,20 +227,20 @@ export const useGetter = <T,>(element: HierarchyElement | null): T | null => {
 // eslint-disable-next-line comma-spacing
 export const useChildGetter = <T,>(
   input: HierarchyElement | null,
-  child: string
+  child: string,
 ): T | null => {
   const { useGetterIndex } = useContext(WebApiContext);
 
   const element = useChild(
     input,
-    child as keyof NonNullable<typeof input>['children']
+    child as keyof NonNullable<typeof input>['children'],
   ) as unknown as HierarchyElement;
   return useGetterIndex(element?.get);
 };
 
 // eslint-disable-next-line comma-spacing
 export const useSetter = <T,>(
-  element: HierarchyElement | null
+  element: HierarchyElement | null,
 ): SetterFunction<T> | null => {
   const { useSetterIndex } = useContext(WebApiContext);
 
@@ -258,13 +250,13 @@ export const useSetter = <T,>(
 // eslint-disable-next-line comma-spacing
 export const useChildSetter = <T,>(
   input: HierarchyElement | null,
-  child: string
+  child: string,
 ): SetterFunction<T> | null => {
   const { useSetterIndex } = useContext(WebApiContext);
 
   const element = useChild(
     input,
-    child as keyof NonNullable<typeof input>['children']
+    child as keyof NonNullable<typeof input>['children'],
   ) as unknown as HierarchyElement;
   return useSetterIndex(element?.set);
 };

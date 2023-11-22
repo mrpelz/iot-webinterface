@@ -1,20 +1,21 @@
-import {
-  HierarchyElementArea,
-  HierarchyElementFloor,
-  HierarchyElementProperty,
-  Levels,
-} from '../../web-api.js';
+import { FunctionComponent } from 'preact';
+import { useCallback } from 'preact/hooks';
+
+import { useNavigationBuilding } from '../../state/navigation.js';
 import {
   useChild,
   useHierarchy,
   useLevelShallow,
   useMetaFilter,
 } from '../../state/web-api.js';
-import { FunctionComponent } from 'preact';
 import { HallwayStream } from '../../views/hallway-stream.js';
+import {
+  HierarchyElementArea,
+  HierarchyElementFloor,
+  HierarchyElementProperty,
+  Levels,
+} from '../../web-api.js';
 import { Room } from './room.js';
-import { useCallback } from 'preact/hooks';
-import { useNavigationBuilding } from '../../state/navigation.js';
 
 export const Global: FunctionComponent = () => {
   const hierarchy = useHierarchy();
@@ -22,14 +23,14 @@ export const Global: FunctionComponent = () => {
 
   const globalProperties = useLevelShallow<HierarchyElementProperty>(
     Levels.PROPERTY,
-    hierarchy
+    hierarchy,
   );
   const firstFloorProperties = useLevelShallow<HierarchyElementProperty>(
     Levels.PROPERTY,
     ...useMetaFilter(
       useLevelShallow<HierarchyElementFloor>(Levels.FLOOR, building),
-      useCallback(({ name }) => name === 'firstFloor', [])
-    )
+      useCallback(({ name }) => name === 'firstFloor', []),
+    ),
   );
 
   const entryDoor = useChild(building, 'entryDoor') as HierarchyElementArea;

@@ -1,10 +1,11 @@
+import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
+
+import { BackIcon } from '../components/icons.js';
 import {
   SwipeBack as SwipeBackComponent,
   SwipeBackWrapper,
 } from '../components/swipe-back.js';
-import { BackIcon } from '../components/icons.js';
-import { FunctionComponent } from 'preact';
-import { useMemo } from 'preact/hooks';
 import { useTheme } from '../state/theme.js';
 
 export const SwipeBack: FunctionComponent = () => {

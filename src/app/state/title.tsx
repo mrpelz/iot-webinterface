@@ -1,4 +1,4 @@
-import { FunctionComponent, createContext } from 'preact';
+import { createContext, FunctionComponent } from 'preact';
 import {
   StateUpdater,
   useContext,
@@ -6,9 +6,10 @@ import {
   useMemo,
   useState,
 } from 'preact/hooks';
+
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useCapitalization, useI18nKey } from './i18n.js';
 import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
-import { useHookDebug } from '../hooks/use-hook-debug.js';
 
 export type TTitleContext = {
   capitalizedTitle: string | null;
@@ -33,14 +34,14 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
 
   const title = useMemo(
     () => titleOverride || staticPageName || roomName,
-    [roomName, staticPageName, titleOverride]
+    [roomName, staticPageName, titleOverride],
   );
 
   const capitalizedTitle = useCapitalization(title);
 
   const value = useMemo(
-    () => ({ capitalizedTitle, setTitleOverride, title } as const),
-    [capitalizedTitle, title]
+    () => ({ capitalizedTitle, setTitleOverride, title }) as const,
+    [capitalizedTitle, title],
   );
 
   useEffect(() => {

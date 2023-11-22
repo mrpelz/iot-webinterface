@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useRef } from 'preact/hooks';
 import { ComponentChild } from 'preact';
+import { useCallback, useMemo, useRef } from 'preact/hooks';
+
 import { VisuallyHidden } from '../components/visually-hidden.js';
 
 export type Channel = [number | null, ((value: number) => void) | null];
@@ -15,7 +16,7 @@ const colorStringToValue = (input: string) => {
   /* eslint-disable no-bitwise */
   const r = (colorValue >> 16) & 0xff;
   const g = (colorValue >> 8) & 0xff;
-  const b = (colorValue >> 0) & 0xff;
+  const b = Math.trunc(colorValue) & 0xff;
   /* eslint-enable no-bitwise */
 
   return [byteToDecimal(r), byteToDecimal(g), byteToDecimal(b)] as const;
@@ -29,13 +30,13 @@ const valueToColorString = (input: number[]) =>
 export const useColorPicker = (
   [r, rSetter]: Channel,
   [g, gSetter]: Channel,
-  [b, bSetter]: Channel
+  [b, bSetter]: Channel,
 ): [() => void, ComponentChild] => {
   const colorPickerRef = useRef<HTMLInputElement>(null);
 
   const colorValue = useMemo(
     () => valueToColorString([r || 0, g || 0, b || 0]),
-    [b, g, r]
+    [b, g, r],
   );
 
   const handleColorInput = useCallback(() => {
@@ -71,7 +72,7 @@ export const useColorPicker = (
         />
       </VisuallyHidden>
     ),
-    [colorValue, handleColorInput]
+    [colorValue, handleColorInput],
   );
 
   return useMemo(() => [focus, component], [component, focus]);

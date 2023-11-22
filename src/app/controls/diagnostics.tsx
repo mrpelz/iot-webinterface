@@ -1,21 +1,22 @@
 import { ComponentChildren, FunctionComponent } from 'preact';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+
+import { Summary } from '../components/diagnostics.js';
+import { useI18n } from '../state/i18n.js';
+import { useGetter, useSetter } from '../state/web-api.js';
 import {
   HierarchyElement,
-  Levels,
-  ParentRelation,
-  ValueType,
   isElementWithMeta,
   isMetaPropertyActuator,
   isMetaPropertySensorDate,
+  Levels,
   levelToString,
+  ParentRelation,
   parentRelationToString,
   typeToValueType,
+  ValueType,
   valueTypeToType,
 } from '../web-api.js';
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
-import { useGetter, useSetter } from '../state/web-api.js';
-import { Summary } from '../components/diagnostics.js';
-import { useI18n } from '../state/i18n.js';
 
 export const Details: FunctionComponent<{
   open?: boolean;
@@ -53,7 +54,7 @@ export const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
 
   const { id, meta, property } = element;
 
-  if (!Object.keys(meta).length) return null;
+  if (Object.keys(meta).length === 0) return null;
 
   return (
     <>
@@ -125,11 +126,13 @@ const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
   const { country } = useI18n();
 
   const rawState = useGetter<unknown>(element);
-  const state = useMemo(() => {
-    return isDate && country && rawState
-      ? new Date(rawState as number).toLocaleString(country)
-      : JSON.stringify(rawState, undefined, 2);
-  }, [isDate, country, rawState]);
+  const state = useMemo(
+    () =>
+      isDate && country && rawState
+        ? new Date(rawState as number).toLocaleString(country)
+        : JSON.stringify(rawState, undefined, 2),
+    [isDate, country, rawState],
+  );
 
   if (get === undefined) return null;
 
@@ -164,7 +167,7 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
   > = ({ currentTarget }) => {
     const { value } = currentTarget;
 
-    if (!value.length) {
+    if (value.length === 0) {
       currentTarget.setCustomValidity('');
       setInput(undefined);
 
@@ -178,7 +181,7 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
 
       if (inputType !== valueType) {
         currentTarget.setCustomValidity(
-          `parsed type does not match the required type! Needed: ${namedValueType}, parsed: ${namedInputType}`
+          `parsed type does not match the required type! Needed: ${namedValueType}, parsed: ${namedInputType}`,
         );
 
         return;
@@ -251,13 +254,16 @@ export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
 }) => {
   const { children: hierarchyChildren } = element;
 
-  const openChildList = useMemo(
-    () =>
-      element.meta?.level === Levels.SYSTEM ||
-      element.meta?.level === Levels.HOME ||
-      element.meta?.level === Levels.BUILDING,
-    [element]
-  );
+  const openChildList = useMemo(() => {
+    const { meta: { level = undefined } = {} } = element ?? {};
+    if (level === undefined) return false;
+
+    return (
+      level === Levels.SYSTEM ||
+      level === Levels.HOME ||
+      level === Levels.BUILDING
+    );
+  }, [element]);
 
   return (
     <table>

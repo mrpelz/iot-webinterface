@@ -1,5 +1,6 @@
-import { FunctionComponent, createContext } from 'preact';
+import { createContext, FunctionComponent } from 'preact';
 import { useContext, useEffect, useLayoutEffect, useState } from 'preact/hooks';
+
 import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useVisibility } from './visibility.js';
 
@@ -34,6 +35,4 @@ export const FocusProvider: FunctionComponent = ({ children }) => {
   );
 };
 
-export const useFocus = (): boolean => {
-  return useContext(FocusContext);
-};
+export const useFocus = (): boolean => useContext(FocusContext);

@@ -1,21 +1,22 @@
-import {
-  HierarchyElement,
-  HierarchyElementPropertySensor,
-  ValueType,
-  isMetaPropertySensor,
-} from '../../web-api.js';
-import { NonBreaking, TabularNums } from '../../components/text.js';
+import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
+
 import { Tag, TagGroup } from '../../components/controls.js';
-import { Translation, useI18n } from '../../state/i18n.js';
+import { NonBreaking, TabularNums } from '../../components/text.js';
+import { I18nKey } from '../../i18n/main.js';
 import {
   defaultNumberFormat,
   measuredNumberFormats,
 } from '../../i18n/mapping.js';
-import { CellWithBody } from '../main.js';
-import { FunctionComponent } from 'preact';
-import { I18nKey } from '../../i18n/main.js';
+import { Translation, useI18n } from '../../state/i18n.js';
 import { useGetter } from '../../state/web-api.js';
-import { useMemo } from 'preact/hooks';
+import {
+  HierarchyElement,
+  HierarchyElementPropertySensor,
+  isMetaPropertySensor,
+  ValueType,
+} from '../../web-api.js';
+import { CellWithBody } from '../main.js';
 
 export type NumericSensorElement = HierarchyElementPropertySensor & {
   meta: {
@@ -28,12 +29,12 @@ export type NumericSensorElement = HierarchyElementPropertySensor & {
 };
 
 export const isNumericSensorElement = (
-  element: HierarchyElement
+  element: HierarchyElement,
 ): element is NumericSensorElement =>
   Boolean(
     isMetaPropertySensor(element.meta) &&
       element.meta.valueType === ValueType.NUMBER &&
-      element.meta.measured
+      element.meta.measured,
   );
 
 export const NumericSensor: FunctionComponent<{
@@ -48,7 +49,7 @@ export const NumericSensor: FunctionComponent<{
   const { translationLanguage, translationLocale } = useI18n();
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
-    [translationLanguage, translationLocale]
+    [translationLanguage, translationLocale],
   );
 
   const numberFormat = useMemo(
@@ -57,15 +58,15 @@ export const NumericSensor: FunctionComponent<{
         effectiveLocale,
         measured && measured in measuredNumberFormats
           ? measuredNumberFormats[measured]
-          : defaultNumberFormat
+          : defaultNumberFormat,
       ),
-    [effectiveLocale, measured]
+    [effectiveLocale, measured],
   );
 
   const value = useGetter<number>(element);
   const formattedValue = useMemo(
     () => (value === null ? null : numberFormat.format(value)),
-    [numberFormat, value]
+    [numberFormat, value],
   );
 
   return (

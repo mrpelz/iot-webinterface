@@ -1,13 +1,14 @@
-import { FunctionComponent, createContext } from 'preact';
+import { createContext, FunctionComponent } from 'preact';
 import { useContext, useMemo } from 'preact/hooks';
+
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { strings } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useFlag } from './flags.js';
-import { useHookDebug } from '../hooks/use-hook-debug.js';
 
 export const themes = ['light', 'dark', 'highContrast'] as const;
 
-export type Theme = typeof themes[number];
+export type Theme = (typeof themes)[number];
 
 const ThemeContext = createContext(null as unknown as Theme);
 
@@ -36,7 +37,7 @@ export const ThemeProvider: FunctionComponent = ({ children }) => {
       browserPreferredTheme ||
       'light',
 
-    [browserPreferredTheme, flagPreferredTheme]
+    [browserPreferredTheme, flagPreferredTheme],
   );
 
   return (
@@ -44,6 +45,4 @@ export const ThemeProvider: FunctionComponent = ({ children }) => {
   );
 };
 
-export const useTheme = (): Theme => {
-  return useContext(ThemeContext);
-};
+export const useTheme = (): Theme => useContext(ThemeContext);

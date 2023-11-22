@@ -1,4 +1,4 @@
-import { FunctionComponent, createContext } from 'preact';
+import { createContext, FunctionComponent } from 'preact';
 import {
   StateUpdater,
   useContext,
@@ -6,9 +6,10 @@ import {
   useMemo,
   useState,
 } from 'preact/hooks';
-import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
+
 import { useDelay } from '../hooks/use-delay.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
+import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
 import { useTheme } from './theme.js';
 
 export const noBackground = Symbol('noBackground');
@@ -16,12 +17,12 @@ type NoBackground = typeof noBackground;
 
 export type TBackgroundContext = readonly [
   string | null,
-  StateUpdater<string | NoBackground | null>
+  StateUpdater<string | NoBackground | null>,
 ];
 
 const BackgroundContext = createContext(null as unknown as TBackgroundContext);
 
-const BACKGROUND_PATH = '/images/background/';
+const BACKGROUND_PATH = '/static/images/background/';
 const BACKGROUND_EXTENSION = '.png';
 
 const camelCase = new RegExp('[A-Z]', 'g');
@@ -50,7 +51,7 @@ export const BackgroundProvider: FunctionComponent = ({ children }) => {
     if (!identifier) return null;
 
     const baseName = encodeURIComponent(
-      identifier.replace(camelCase, (letter) => `-${letter.toLowerCase()}`)
+      identifier.replaceAll(camelCase, (letter) => `-${letter.toLowerCase()}`),
     );
 
     return [BACKGROUND_PATH, baseName, BACKGROUND_EXTENSION].join('');
@@ -58,7 +59,7 @@ export const BackgroundProvider: FunctionComponent = ({ children }) => {
 
   const value = useMemo(
     () => [background, setBackgroundOverride] as const,
-    [background]
+    [background],
   );
 
   return (
@@ -75,7 +76,7 @@ export const useBackground = (): string | null => {
 };
 
 export const useSetBackgroundOverride = (
-  override: string | NoBackground | null
+  override: string | NoBackground | null,
 ): void => {
   const [, setBackgroundOverride] = useContext(BackgroundContext);
 

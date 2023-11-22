@@ -1,4 +1,7 @@
-import { FunctionComponent, createContext } from 'preact';
+import { createContext, FunctionComponent } from 'preact';
+import { useContext, useMemo } from 'preact/hooks';
+
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import {
   I18nLanguage,
   I18nNonCapitalization,
@@ -7,12 +10,10 @@ import {
   reconcileLanguage,
   translations,
 } from '../i18n/main.js';
-import { getCountry, getLanguage } from '../util/locale.js';
-import { useContext, useMemo } from 'preact/hooks';
-import { capitalize as capitalizeUtil } from '../util/string.js';
 import { universal } from '../i18n/universal.js';
+import { getCountry, getLanguage } from '../util/locale.js';
+import { capitalize as capitalizeUtil } from '../util/string.js';
 import { useFlag } from './flags.js';
-import { useHookDebug } from '../hooks/use-hook-debug.js';
 
 type TI18nContext = {
   country: string | null;
@@ -25,7 +26,7 @@ type TI18nContext = {
 };
 
 const I18nContext = createContext<TI18nContext>(
-  null as unknown as TI18nContext
+  null as unknown as TI18nContext,
 );
 
 export const I18nProvider: FunctionComponent = ({ children }) => {
@@ -38,27 +39,27 @@ export const I18nProvider: FunctionComponent = ({ children }) => {
 
   const translationLanguage = useMemo(
     () => reconcileLanguage(languageOverride || language),
-    [language, languageOverride]
+    [language, languageOverride],
   );
 
   const locale = useMemo(
     () => (country ? `${language}-${country}` : null),
-    [country, language]
+    [country, language],
   );
 
   const translationLocale = useMemo(
     () => (country ? `${translationLanguage}-${country}` : null),
-    [country, translationLanguage]
+    [country, translationLanguage],
   );
 
   const translation = useMemo(
     () => ({ ...universal, ...translations[translationLanguage] }),
-    [translationLanguage]
+    [translationLanguage],
   );
 
   const nonCapitalization = useMemo(
     () => nonCapitalizations[translationLanguage],
-    [translationLanguage]
+    [translationLanguage],
   );
 
   const value = useMemo(
@@ -79,19 +80,17 @@ export const I18nProvider: FunctionComponent = ({ children }) => {
       translation,
       translationLanguage,
       translationLocale,
-    ]
+    ],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 };
 
-export const useI18n = (): TI18nContext => {
-  return useContext(I18nContext);
-};
+export const useI18n = (): TI18nContext => useContext(I18nContext);
 
 export const useI18nKey = <F extends boolean>(
   key?: keyof I18nTranslation | string,
-  fallback?: F
+  fallback?: F,
 ): F extends true ? string : string | null => {
   const { translation } = useContext(I18nContext);
 
@@ -118,12 +117,12 @@ export const useI18nNonCapitalization = (): string[] => {
 
   return useMemo(
     () => nonCapitalization,
-    [nonCapitalization]
+    [nonCapitalization],
   ) as unknown as string[];
 };
 
 export const useI18nKeyFallback = (
-  key?: keyof I18nTranslation | string
+  key?: keyof I18nTranslation | string,
 ): string => useI18nKey(key, true);
 
 export const useCapitalization = (text: string | null): string | null => {
@@ -135,9 +134,9 @@ export const useCapitalization = (text: string | null): string | null => {
     if (!textWords) return null;
 
     return textWords
-      .map((word) => {
-        return nonCapitalization.includes(word) ? word : capitalizeUtil(word);
-      })
+      .map((word) =>
+        nonCapitalization.includes(word) ? word : capitalizeUtil(word),
+      )
       .join(' ');
   }, [nonCapitalization, textWords]);
 };

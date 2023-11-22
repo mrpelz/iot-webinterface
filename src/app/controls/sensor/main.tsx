@@ -1,8 +1,9 @@
-import { BinarySensor, isBinarySensorElement } from './binary.js';
-import { NumericSensor, isNumericSensorElement } from './numeric.js';
 import { FunctionComponent } from 'preact';
-import { HierarchyElementPropertySensor } from '../../web-api.js';
+
 import { I18nKey } from '../../i18n/main.js';
+import { HierarchyElementPropertySensor } from '../../web-api.js';
+import { BinarySensor, isBinarySensorElement } from './binary.js';
+import { isNumericSensorElement, NumericSensor } from './numeric.js';
 
 export const Sensor: FunctionComponent<{
   element: HierarchyElementPropertySensor;

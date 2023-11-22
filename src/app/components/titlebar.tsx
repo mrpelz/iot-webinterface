@@ -1,9 +1,10 @@
-import { add, invert } from '../style/dimensions.js';
-import { colors, dimensions } from '../style.js';
-import { dependentValue, mediaQuery } from '../style/main.js';
-import { breakpointValue } from '../style/breakpoint.js';
-import { forwardRef } from 'preact/compat';
 import { styled } from 'goober';
+import { forwardRef } from 'preact/compat';
+
+import { colors, dimensions } from '../style.js';
+import { breakpointValue } from '../style/breakpoint.js';
+import { add, invert } from '../style/dimensions.js';
+import { dependentValue, mediaQuery } from '../style/main.js';
 
 export const Titlebar = styled('titlebar')<{ padding: number }>`
   align-items: center;
@@ -20,9 +21,9 @@ export const Titlebar = styled('titlebar')<{ padding: number }>`
       breakpointValue(
         mediaQuery(dimensions.breakpointDesktop),
         dimensions.menuWidth,
-        '0px'
+        '0px',
       )(),
-      `${padding}px`
+      `${padding}px`,
     )};
   padding-inline-end: ${({ padding }) => `${padding}px`};
 `;

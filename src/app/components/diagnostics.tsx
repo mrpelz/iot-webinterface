@@ -1,5 +1,6 @@
-import { colors } from '../style.js';
 import { styled } from 'goober';
+
+import { colors } from '../style.js';
 
 export const DiagnosticsContainer = styled('diagnostics-container')`
   background-color: white;

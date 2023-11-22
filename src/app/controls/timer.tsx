@@ -1,17 +1,19 @@
-import {
-  BinaryActuatorElement,
-  isBinaryActuatorElement,
-} from './actuators/binary.js';
-import {
-  HierarchyElement,
-  MetaPropertySensorDate,
-  isMetaPropertySensorDate,
-} from '../web-api.js';
-import {
-  NullActuatorElement,
-  isNullActuatorElement,
-} from './actuators/null.js';
+import { FunctionComponent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
+
+import { BlendOver } from '../components/blend-over.js';
+import { BodyLarge } from '../components/controls.js';
+import { TabularNums } from '../components/text.js';
+import { useColorBody } from '../hooks/use-color-body.js';
+import { useDelay } from '../hooks/use-delay.js';
+import {
+  useDateFromEpoch,
+  useTimeLabel,
+  useTimeSpan,
+} from '../hooks/use-time-label.js';
+import { I18nKey } from '../i18n/main.js';
+import { Translation } from '../state/i18n.js';
+import { useSegment } from '../state/path.js';
 import {
   useChild,
   useChildGetter,
@@ -19,20 +21,19 @@ import {
   useGetter,
 } from '../state/web-api.js';
 import {
-  useDateFromEpoch,
-  useTimeLabel,
-  useTimeSpan,
-} from '../hooks/use-time-label.js';
-import { BlendOver } from '../components/blend-over.js';
-import { BodyLarge } from '../components/controls.js';
+  HierarchyElement,
+  isMetaPropertySensorDate,
+  MetaPropertySensorDate,
+} from '../web-api.js';
+import {
+  BinaryActuatorElement,
+  isBinaryActuatorElement,
+} from './actuators/binary.js';
+import {
+  isNullActuatorElement,
+  NullActuatorElement,
+} from './actuators/null.js';
 import { Cell } from './main.js';
-import { FunctionComponent } from 'preact';
-import { I18nKey } from '../i18n/main.js';
-import { TabularNums } from '../components/text.js';
-import { Translation } from '../state/i18n.js';
-import { useColorBody } from '../hooks/use-color-body.js';
-import { useDelay } from '../hooks/use-delay.js';
-import { useSegment } from '../state/path.js';
 
 export type TimerActuatorElement = BinaryActuatorElement & {
   children: {
@@ -49,7 +50,7 @@ export type TimerActuatorElement = BinaryActuatorElement & {
 };
 
 export const isTimerActuatorElement = (
-  element: HierarchyElement
+  element: HierarchyElement,
 ): element is TimerActuatorElement =>
   Boolean(
     isBinaryActuatorElement(element) &&
@@ -66,7 +67,7 @@ export const isTimerActuatorElement = (
       'runoutTime' in element.children &&
       isMetaPropertySensorDate(element.children.runoutTime.meta) &&
       'triggerTime' in element.children &&
-      isMetaPropertySensorDate(element.children.triggerTime.meta)
+      isMetaPropertySensorDate(element.children.triggerTime.meta),
   );
 
 export const TimerActuator: FunctionComponent<{
@@ -85,15 +86,15 @@ export const TimerActuator: FunctionComponent<{
   const activeValue = useGetter<boolean>(active);
 
   const runoutTimeDate = useDateFromEpoch(
-    useChildGetter<number>(activeValue ? element : null, 'runoutTime')
+    useChildGetter<number>(activeValue ? element : null, 'runoutTime'),
   );
   const runoutTimeLabel = useTimeLabel(runoutTimeDate, 0);
 
   const [, fraction] = useTimeSpan(
     useDateFromEpoch(
-      useChildGetter<number>(activeValue ? element : null, 'triggerTime')
+      useChildGetter<number>(activeValue ? element : null, 'triggerTime'),
     ),
-    runoutTimeDate
+    runoutTimeDate,
   );
 
   const flip = useChildSetter<null>(element, 'flip');

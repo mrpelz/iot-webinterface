@@ -1,16 +1,17 @@
-import { breakpointValue } from '../style/breakpoint.js';
-import { dimensions } from '../style.js';
-import { forwardRef } from 'preact/compat';
-import { mediaQuery } from '../style/main.js';
 import { styled } from 'goober';
+import { forwardRef } from 'preact/compat';
+
+import { dimensions } from '../style.js';
+import { breakpointValue } from '../style/breakpoint.js';
+import { mediaQuery } from '../style/main.js';
 
 export const Background = styled('background' as 'section', forwardRef)`
   display: contents;
 
   & > * {
-    block-size: ${dimensions.appHeightAdaptive};
+    block-size: ${dimensions.appHeight};
     inline-size: ${dimensions.appWidth};
-    inset-block-start: ${dimensions.headerHeightAdaptive};
+    inset-block-start: ${dimensions.headerHeight};
     object-fit: cover;
     object-position: center;
     overflow: hidden;
@@ -20,7 +21,7 @@ export const Background = styled('background' as 'section', forwardRef)`
     inset-inline-start: ${breakpointValue(
       mediaQuery(dimensions.breakpointDesktop),
       dimensions.menuWidth,
-      'unset'
+      'unset',
     )};
   }
 `;

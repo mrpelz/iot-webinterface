@@ -1,3 +1,12 @@
+import { FunctionComponent } from 'preact';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
+
 import {
   BackIcon,
   MapIcon,
@@ -10,22 +19,14 @@ import {
   Title,
   Titlebar as TitlebarComponent,
 } from '../components/titlebar.js';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'preact/hooks';
-import { useGoPreviousSegment, useGoUp, useSegment } from '../state/path.js';
-import { FunctionComponent } from 'preact';
-import { dimensions } from '../style.js';
 import { useAwaitEvent } from '../hooks/use-await-event.js';
-import { useBreakpoint } from '../style/breakpoint.js';
-import { useCapitalizedTitle } from '../state/title.js';
 import { useFlipMenuVisible } from '../state/menu.js';
-import { useMediaQuery } from '../style/main.js';
+import { useGoPreviousSegment, useGoUp, useSegment } from '../state/path.js';
+import { useCapitalizedTitle } from '../state/title.js';
 import { useStreamOnline } from '../state/web-api.js';
+import { dimensions } from '../style.js';
+import { useBreakpoint } from '../style/breakpoint.js';
+import { useMediaQuery } from '../style/main.js';
 
 export const IconContainer: FunctionComponent<{
   paddingSetter: (input: number) => void;
@@ -63,7 +64,7 @@ const WaitIconView: FunctionComponent = () => {
 
   const [isStreamOnlineDelayed, handleEvent] = useAwaitEvent(
     isStreamOnline,
-    true
+    true,
   );
 
   const onAnimationIteration = useCallback<
@@ -74,7 +75,7 @@ const WaitIconView: FunctionComponent = () => {
 
       handleEvent();
     },
-    [handleEvent]
+    [handleEvent],
   );
 
   if (isStreamOnlineDelayed) return null;
@@ -88,7 +89,7 @@ export const Titlebar: FunctionComponent = () => {
 
   const padding = useMemo(
     () => Math.max(paddingLeft, paddingRight),
-    [paddingLeft, paddingRight]
+    [paddingLeft, paddingRight],
   );
 
   const title = useCapitalizedTitle();

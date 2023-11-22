@@ -1,9 +1,6 @@
-import {
-  HierarchyElementFloor,
-  HierarchyElementRoom,
-  Levels,
-  sortBy,
-} from '../web-api.js';
+import { FunctionComponent } from 'preact';
+import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
+
 import {
   Menu as MenuComponent,
   MenuContent,
@@ -14,6 +11,11 @@ import {
   MenuSubdivision,
   MenuSubdivisionHeader,
 } from '../components/menu.js';
+import { useArray } from '../hooks/use-array-compare.js';
+import { roomSorting } from '../i18n/mapping.js';
+import { useFlag } from '../state/flags.js';
+import { Translation } from '../state/i18n.js';
+import { useIsMenuVisible } from '../state/menu.js';
 import {
   staticPagesBottom,
   staticPagesTop,
@@ -21,18 +23,17 @@ import {
   useNavigationRoom,
   useNavigationStaticPage,
 } from '../state/navigation.js';
-import { useChild, useChildGetter, useLevelShallow } from '../state/web-api.js';
-import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
-import { FunctionComponent } from 'preact';
-import { Translation } from '../state/i18n.js';
-import { colors } from '../style.js';
-import { roomSorting } from '../i18n/mapping.js';
-import { useArray } from '../hooks/use-array-compare.js';
-import { useFlag } from '../state/flags.js';
-import { useFlipScreensaverActive } from '../state/screensaver.js';
 import { useGoRoot } from '../state/path.js';
-import { useIsMenuVisible } from '../state/menu.js';
+import { useFlipScreensaverActive } from '../state/screensaver.js';
 import { useTheme } from '../state/theme.js';
+import { useChild, useChildGetter, useLevelShallow } from '../state/web-api.js';
+import { colors } from '../style.js';
+import {
+  HierarchyElementFloor,
+  HierarchyElementRoom,
+  Levels,
+  sortBy,
+} from '../web-api.js';
 
 const AllLightState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
   room,
@@ -106,7 +107,7 @@ export const Floor: FunctionComponent<{
 
   const elements = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, floor);
   const sortedElements = useArray(
-    useMemo(() => sortBy(elements, 'name', roomSorting).all, [elements])
+    useMemo(() => sortBy(elements, 'name', roomSorting).all, [elements]),
   );
 
   const [selectedRoom, selectRoom] = useNavigationRoom();
@@ -155,7 +156,7 @@ export const Menu: FunctionComponent = () => {
 
   const isVisible = useMemo(
     () => (isMenuVisible === null ? true : isMenuVisible),
-    [isMenuVisible]
+    [isMenuVisible],
   );
 
   return (
@@ -170,9 +171,9 @@ export const Menu: FunctionComponent = () => {
                 <MenuListItem
                   key={key}
                   isActive={isActive}
-                  onClick={() => {
-                    return isActive ? goRoot?.() : selectStaticPage(staticPage);
-                  }}
+                  onClick={() =>
+                    isActive ? goRoot?.() : selectStaticPage(staticPage)
+                  }
                 >
                   <Translation capitalize={true} i18nKey={staticPage} />
                 </MenuListItem>
@@ -196,9 +197,9 @@ export const Menu: FunctionComponent = () => {
                 <MenuListItem
                   key={key}
                   isActive={isActive}
-                  onClick={() => {
-                    return isActive ? goRoot?.() : selectStaticPage(staticPage);
-                  }}
+                  onClick={() =>
+                    isActive ? goRoot?.() : selectStaticPage(staticPage)
+                  }
                 >
                   <Translation capitalize={true} i18nKey={staticPage} />
                 </MenuListItem>

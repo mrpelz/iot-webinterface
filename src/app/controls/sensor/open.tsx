@@ -1,19 +1,20 @@
-import { BinarySensorElement, isBinarySensorElement } from './binary.js';
+import { FunctionComponent } from 'preact';
+import { useCallback } from 'preact/hooks';
+
+import { Tag } from '../../components/controls.js';
+import { ForwardIcon } from '../../components/icons.js';
+import { I18nKey } from '../../i18n/main.js';
+import { Translation } from '../../state/i18n.js';
+import { useSegment } from '../../state/path.js';
+import { useChild, useGetter } from '../../state/web-api.js';
 import {
   HierarchyElement,
   HierarchyElementArea,
-  MetaArea,
   isMetaArea,
+  MetaArea,
 } from '../../web-api.js';
-import { useChild, useGetter } from '../../state/web-api.js';
 import { CellWithBody } from '../main.js';
-import { ForwardIcon } from '../../components/icons.js';
-import { FunctionComponent } from 'preact';
-import { I18nKey } from '../../i18n/main.js';
-import { Tag } from '../../components/controls.js';
-import { Translation } from '../../state/i18n.js';
-import { useCallback } from 'preact/hooks';
-import { useSegment } from '../../state/path.js';
+import { BinarySensorElement, isBinarySensorElement } from './binary.js';
 
 export type OpenSensorElement = HierarchyElementArea & {
   children: {
@@ -27,13 +28,13 @@ export const isMetaAreaWindow = ({ name }: MetaArea): boolean =>
   name === 'window';
 
 export const isOpenSensorElement = (
-  element: HierarchyElement
+  element: HierarchyElement,
 ): element is OpenSensorElement =>
   Boolean(
     isMetaArea(element.meta) &&
       element.children &&
       'open' in element.children &&
-      isBinarySensorElement(element.children.open)
+      isBinarySensorElement(element.children.open),
   );
 
 export const OpenSensor: FunctionComponent<{
@@ -55,7 +56,7 @@ export const OpenSensor: FunctionComponent<{
 
   const handleClick = useCallback(
     () => setSubRouteId?.(id),
-    [id, setSubRouteId]
+    [id, setSubRouteId],
   );
 
   const open = useChild(element, 'open') as BinarySensorElement;
@@ -64,7 +65,7 @@ export const OpenSensor: FunctionComponent<{
   return (
     <CellWithBody
       icon={<ForwardIcon height="1em" />}
-      onClick={onClick ? onClick : handleClick}
+      onClick={onClick ?? handleClick}
       title={<Translation i18nKey={title || property} capitalize={true} />}
     >
       <Tag>

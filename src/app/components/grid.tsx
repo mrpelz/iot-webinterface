@@ -1,5 +1,6 @@
-import { dimensions } from '../style.js';
 import { styled } from 'goober';
+
+import { dimensions } from '../style.js';
 
 export const Grid = styled('grid')`
   display: grid;

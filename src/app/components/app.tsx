@@ -1,5 +1,6 @@
-import { dimensions, strings } from '../style.js';
 import { styled } from 'goober';
+
+import { dimensions, strings } from '../style.js';
 
 export const App = styled('app')`
   color-scheme: ${strings.colorScheme};

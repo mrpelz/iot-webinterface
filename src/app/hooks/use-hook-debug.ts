@@ -1,6 +1,7 @@
-import { getCountry } from '../util/locale.js';
 import { useEffect } from 'preact/hooks';
+
 import { useFlag } from '../state/flags.js';
+import { getCountry } from '../util/locale.js';
 
 const country = getCountry() || undefined;
 
@@ -13,7 +14,7 @@ export const useHookDebug = (label: string, force = false): void => {
   if (debug || force) {
     // eslint-disable-next-line no-console
     console.log(
-      `${new Date().toLocaleTimeString(country)}\t→\trender\t${label}`
+      `${new Date().toLocaleTimeString(country)}\t→\trender\t${label}`,
     );
   }
 
@@ -26,7 +27,7 @@ export const useHookDebug = (label: string, force = false): void => {
       console.log(`${now}\t→${memoized || 'null'}\tmount\t${label}`);
     }
 
-    if (memoized && !memo.length) {
+    if (memoized && memo.length === 0) {
       rerenderCount += 1;
 
       if (debug || force) {
@@ -36,14 +37,14 @@ export const useHookDebug = (label: string, force = false): void => {
     }
 
     return () => {
-      const salt = Math.floor(Math.random() * 100000).toString(16);
+      const salt = Math.floor(Math.random() * 100_000).toString(16);
 
       if (debug || force) {
         // eslint-disable-next-line no-console
         console.log(
           `${new Date().toLocaleTimeString(
-            country
-          )}\t→${salt}\tunmount\t${label}`
+            country,
+          )}\t→${salt}\tunmount\t${label}`,
         );
       }
 

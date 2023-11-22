@@ -17,8 +17,8 @@ const hex = (arrayBuffer: ArrayBuffer) => {
   return hexOctets.join('');
 };
 
-export const hash = async (input: string): Promise<string> => {
-  return hex(
-    (await crypto.subtle.digest('SHA-1', textEncoder.encode(input))).slice(17)
+export const hash = async (input: string): Promise<string> =>
+  hex(
+    // eslint-disable-next-line unicorn/no-await-expression-member
+    (await crypto.subtle.digest('SHA-1', textEncoder.encode(input))).slice(17),
   );
-};

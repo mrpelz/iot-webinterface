@@ -1,20 +1,23 @@
+import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
+
+import { Entry as EntryComponent } from '../../../components/list.js';
 import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
-import { Entry, List } from '../../../views/list.js';
-import { HierarchyElementDevice, Levels } from '../../../web-api.js';
 import {
-  NullActuatorButton,
   isNullActuatorElement,
+  NullActuatorButton,
 } from '../../../controls/actuators/null.js';
 import {
+  filterSubDevices,
   OfflineIcon,
   OnlineIcon,
-  filterSubDevices,
 } from '../../../controls/device.js';
 import {
   useAbsoluteTimeLabel,
   useDateFromEpoch,
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
+import { useSetTitleOverride } from '../../../state/title.js';
 import {
   useChild,
   useChildGetter,
@@ -22,18 +25,18 @@ import {
   useLevelShallowSkipInput,
   useMetaFilter,
 } from '../../../state/web-api.js';
-import { Entry as EntryComponent } from '../../../components/list.js';
-import { FunctionComponent } from 'preact';
-import { useMemo } from 'preact/hooks';
-import { useSetTitleOverride } from '../../../state/title.js';
+import { Entry, List } from '../../../views/list.js';
+import { HierarchyElementDevice, Levels } from '../../../web-api.js';
 
-const SHY_CHARACTER = '\u00ad';
+const SHY_CHARACTER = '\u00AD';
 
 const DeviceDetail: FunctionComponent<{ label: string }> = ({
   label,
   children,
 }) => {
-  if (!children || (Array.isArray(children) && !children.length)) return null;
+  if (!children || (Array.isArray(children) && children.length === 0)) {
+    return null;
+  }
 
   return (
     <Entry id={label} label={label}>
@@ -46,8 +49,8 @@ const DeviceDetail: FunctionComponent<{ label: string }> = ({
 
 const DeviceAddress: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   device,
-}) => {
-  return useMemo(() => {
+}) =>
+  useMemo(() => {
     const { host, identifier, port, type } = device.meta;
 
     if (type === 'ESPNowDevice') {
@@ -94,7 +97,6 @@ const DeviceAddress: FunctionComponent<{ device: HierarchyElementDevice }> = ({
 
     return null;
   }, [device]);
-};
 
 const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   device,
@@ -103,13 +105,13 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
   const isOnlineValue = useGetter<boolean>(online);
 
   const lastSeenDate = useDateFromEpoch(
-    useChildGetter<number>(device, 'lastSeen')
+    useChildGetter<number>(device, 'lastSeen'),
   );
   const lastSeenLabelAbsolute = useAbsoluteTimeLabel(lastSeenDate);
   const lastSeenLabelRelative = useRelativeTimeLabel(lastSeenDate);
 
   const onlineChangeDate = useDateFromEpoch(
-    useChildGetter<number>(online, 'lastChange')
+    useChildGetter<number>(online, 'lastChange'),
   );
   const onlineChangeLabelAbsolute = useAbsoluteTimeLabel(onlineChangeDate);
   const onlineChangeLabelRelative = useRelativeTimeLabel(onlineChangeDate);
@@ -149,7 +151,7 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
       onlineChangeDate,
       onlineChangeLabelAbsolute,
       onlineChangeLabelRelative,
-    ]
+    ],
   );
 };
 
@@ -260,7 +262,7 @@ export const DeviceDetails: FunctionComponent<{
 
   const subDevices = useMetaFilter(
     useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
-    filterSubDevices
+    filterSubDevices,
   );
 
   return (

@@ -1,7 +1,8 @@
-import { StyledVNode, styled } from 'goober';
-import { colors } from '../style.js';
+import { styled, StyledVNode } from 'goober';
 import { forwardRef } from 'preact/compat';
 import { useMemo } from 'preact/hooks';
+
+import { colors } from '../style.js';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 const colorBodies = <P extends Object = {}>(base: StyledVNode<P>) =>
@@ -38,13 +39,14 @@ const colorBodies = <P extends Object = {}>(base: StyledVNode<P>) =>
       background-color: hsl(30deg 100% 50% / 80%);
       color: ${colors.fontPrimary(undefined, 'light')};
     `,
-  } as const);
+  }) as const;
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/ban-types
 export const useColorBody = <P extends Object = {}>(
   base: StyledVNode<P>,
   property?: string,
-  actuated?: string
+  actuated?: string,
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 ) => {
   const component = useMemo(() => {
     const mixedinOverlayBodies = colorBodies(base);

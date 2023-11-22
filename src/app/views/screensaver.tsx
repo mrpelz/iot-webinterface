@@ -1,3 +1,6 @@
+import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
+
 import {
   Screensaver as ScreensaverComponent,
   Time,
@@ -6,14 +9,12 @@ import {
   nextMinuteIncrement,
   useTimeIncrement,
 } from '../hooks/use-time-label.js';
+import { useFlag } from '../state/flags.js';
+import { useI18n } from '../state/i18n.js';
 import {
   useFlipScreensaverActive,
   useIsScreensaverActive,
 } from '../state/screensaver.js';
-import { FunctionComponent } from 'preact';
-import { useFlag } from '../state/flags.js';
-import { useI18n } from '../state/i18n.js';
-import { useMemo } from 'preact/hooks';
 
 const nextMinutePlusDelayIncrement = () => nextMinuteIncrement() + 50;
 
@@ -21,18 +22,18 @@ export const Screensaver: FunctionComponent = () => {
   const { country, translationLocale } = useI18n();
   const effectiveLocale = useMemo(
     () => translationLocale || country,
-    [country, translationLocale]
+    [country, translationLocale],
   );
 
   const isScreensaverPositionRandomized = useFlag(
-    'screensaverRandomizePosition'
+    'screensaverRandomizePosition',
   );
 
   const isScreensaverActive = useIsScreensaverActive();
   const flipScreensaverActive = useFlipScreensaverActive();
 
   const nextMinute = useTimeIncrement(
-    isScreensaverActive ? nextMinutePlusDelayIncrement : null
+    isScreensaverActive ? nextMinutePlusDelayIncrement : null,
   );
 
   const [date = null, time = null, x = 0, y = 0] = useMemo(() => {

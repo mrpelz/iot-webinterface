@@ -24,10 +24,11 @@ export const goUp = (basePath: string): string =>
 
 export const getCommonSegments = (
   segmentsA: string[],
-  segmentsB: string[]
+  segmentsB: string[],
 ): string[] => {
   const commonSegments: string[] = [];
 
+  // eslint-disable-next-line unicorn/no-for-loop
   for (let index = 0; index < segmentsA.length; index += 1) {
     const segmentA = segmentsA[index];
     const segmentB = segmentsB[index];

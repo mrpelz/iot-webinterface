@@ -1,21 +1,17 @@
-import {
-  HierarchyElement,
-  HierarchyElementArea,
-  HierarchyElementProperty,
-  HierarchyElementPropertyActuator,
-  HierarchyElementPropertySensor,
-  Levels,
-  groupBy,
-  isMetaPropertyActuator,
-  isMetaPropertySensor,
-  sortBy,
-} from '../../web-api.js';
-import { actuated, measuredCategories } from '../../i18n/mapping.js';
+import { FunctionComponent } from 'preact';
+import { useCallback, useMemo } from 'preact/hooks';
+
+import { Grid } from '../../components/grid.js';
+import { isMetaAreaRGB } from '../../controls/actuators/rgb.js';
+import { Control } from '../../controls/main.js';
 import {
   isMetaAreaDoor,
   isMetaAreaWindow,
 } from '../../controls/sensor/open.js';
-import { useCallback, useMemo } from 'preact/hooks';
+import { useArray } from '../../hooks/use-array-compare.js';
+import { actuated, measuredCategories } from '../../i18n/mapping.js';
+import { Translation } from '../../state/i18n.js';
+import { useSegment } from '../../state/path.js';
 import {
   useElementFilter,
   useElements,
@@ -23,15 +19,20 @@ import {
   useMetaFilter,
 } from '../../state/web-api.js';
 import { Category } from '../../views/category.js';
-import { Control } from '../../controls/main.js';
-import { FunctionComponent } from 'preact';
-import { Grid } from '../../components/grid.js';
-import { SubPage } from '../sub/room/main.js';
 import { SubRoute } from '../../views/route.js';
-import { Translation } from '../../state/i18n.js';
-import { isMetaAreaRGB } from '../../controls/actuators/rgb.js';
-import { useArray } from '../../hooks/use-array-compare.js';
-import { useSegment } from '../../state/path.js';
+import {
+  groupBy,
+  HierarchyElement,
+  HierarchyElementArea,
+  HierarchyElementProperty,
+  HierarchyElementPropertyActuator,
+  HierarchyElementPropertySensor,
+  isMetaPropertyActuator,
+  isMetaPropertySensor,
+  Levels,
+  sortBy,
+} from '../../web-api.js';
+import { SubPage } from '../sub/room/main.js';
 
 export const Room: FunctionComponent<{
   elements: HierarchyElement[];
@@ -46,7 +47,7 @@ export const Room: FunctionComponent<{
 
   const properties = useLevelShallow<HierarchyElementProperty>(
     Levels.PROPERTY,
-    parents
+    parents,
   );
 
   const sensors = useMetaFilter<
@@ -57,26 +58,26 @@ export const Room: FunctionComponent<{
   const securitySensors = useMemo(
     () =>
       sortBy(sensors, 'measured', measuredCategories.security).listedResults,
-    [sensors]
+    [sensors],
   );
 
   const airQualitySensors = useMemo(
     () =>
       sortBy(sensors, 'measured', measuredCategories.airQuality).listedResults,
-    [sensors]
+    [sensors],
   );
 
   const airSafetySensors = useMemo(
     () =>
       sortBy(sensors, 'measured', measuredCategories.airSafety).listedResults,
-    [sensors]
+    [sensors],
   );
 
   const environmentalSensors = useMemo(
     () =>
       sortBy(sensors, 'measured', measuredCategories.environmental)
         .listedResults,
-    [sensors]
+    [sensors],
   );
 
   const actuators = useMetaFilter<
@@ -88,7 +89,7 @@ export const Room: FunctionComponent<{
     const { listedResults, unlistedResults } = sortBy(
       actuators,
       'actuated',
-      actuated
+      actuated,
     );
 
     return [groupBy(listedResults, 'actuated'), unlistedResults] as const;
@@ -99,7 +100,7 @@ export const Room: FunctionComponent<{
   const [subRouteId] = useSegment(1);
   const [subRouteElement] = useElementFilter(
     subRouteId ? elements : null,
-    useCallback(({ id }) => id === subRouteId, [subRouteId])
+    useCallback(({ id }) => id === subRouteId, [subRouteId]),
   );
 
   return (
@@ -107,7 +108,7 @@ export const Room: FunctionComponent<{
       subRoute={subRouteElement ? <SubPage element={subRouteElement} /> : null}
     >
       {children}
-      {[securitySensors, doors, windows].flat().length ? (
+      {[securitySensors, doors, windows].flat().length > 0 ? (
         <Category header={<Translation i18nKey="security" capitalize={true} />}>
           <Grid>
             {securitySensors.map((element) => (
@@ -122,7 +123,7 @@ export const Room: FunctionComponent<{
           </Grid>
         </Category>
       ) : null}
-      {airQualitySensors.length ? (
+      {airQualitySensors.length > 0 ? (
         <Category
           header={<Translation i18nKey="airQuality" capitalize={true} />}
         >
@@ -133,7 +134,7 @@ export const Room: FunctionComponent<{
           </Grid>
         </Category>
       ) : null}
-      {airSafetySensors.length ? (
+      {airSafetySensors.length > 0 ? (
         <Category
           header={<Translation i18nKey="airSafety" capitalize={true} />}
         >
@@ -144,7 +145,7 @@ export const Room: FunctionComponent<{
           </Grid>
         </Category>
       ) : null}
-      {environmentalSensors.length ? (
+      {environmentalSensors.length > 0 ? (
         <Category
           header={<Translation i18nKey="environmental" capitalize={true} />}
         >
@@ -169,7 +170,7 @@ export const Room: FunctionComponent<{
         </Category>
       ))}
 
-      {unlistedActuators.length ? (
+      {unlistedActuators.length > 0 ? (
         <Category header={<Translation i18nKey="other" capitalize={true} />}>
           <Grid>
             {unlistedActuators.map((element) => (

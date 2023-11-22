@@ -1,35 +1,33 @@
+import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
+
+import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { Details, Hierarchy, Meta } from '../../controls/diagnostics.js';
-import { ECHO_URL, INVENTORY_URL } from '../../util/update.js';
+import { useGetLocalStorage } from '../../hooks/use-local-storage.js';
+import { useFlags } from '../../state/flags.js';
+import { useFocus } from '../../state/focus.js';
+import { useI18n } from '../../state/i18n.js';
+import { useIsMenuVisible } from '../../state/menu.js';
 import {
   staticPagesBottom,
   staticPagesTop,
   useNavigation,
 } from '../../state/navigation.js';
-import { useFetchJson, useFetchText } from '../../hooks/use-fetch.js';
+import { usePathContext } from '../../state/path.js';
+import { useIsScreensaverActive } from '../../state/screensaver.js';
+import { useTheme } from '../../state/theme.js';
+import { useTitle } from '../../state/title.js';
+import { useVisibility } from '../../state/visibility.js';
 import {
   useHierarchy,
   useLevelShallow,
   useStreamCount,
   useStreamOnline,
 } from '../../state/web-api.js';
-import { DiagnosticsContainer } from '../../components/diagnostics.js';
-import { FunctionComponent } from 'preact';
-import { Levels } from '../../web-api.js';
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
-import { useFlags } from '../../state/flags.js';
-import { useFocus } from '../../state/focus.js';
-import { useGetLocalStorage } from '../../hooks/use-local-storage.js';
-import { useI18n } from '../../state/i18n.js';
-import { useIsMenuVisible } from '../../state/menu.js';
-import { useIsScreensaverActive } from '../../state/screensaver.js';
 import { useMediaQuery } from '../../style/main.js';
-import { useMemo } from 'preact/hooks';
-import { useNotification } from '../../state/notification.js';
-import { usePathContext } from '../../state/path.js';
-import { useTheme } from '../../state/theme.js';
-import { useTitle } from '../../state/title.js';
-import { useVisibility } from '../../state/visibility.js';
+import { Levels } from '../../web-api.js';
 
 const Fallback: FunctionComponent = () => (
   <tr>
@@ -205,29 +203,6 @@ const Navigation: FunctionComponent = () => {
   );
 };
 
-const FallbackNotification: FunctionComponent = () => {
-  const fallbackNotification = useNotification();
-
-  return (
-    <table>
-      {fallbackNotification ? (
-        <>
-          <tr>
-            <td>title</td>
-            <td>{JSON.stringify(fallbackNotification.title)}</td>
-          </tr>
-          <tr>
-            <td>body</td>
-            <td>{JSON.stringify(fallbackNotification.body)}</td>
-          </tr>
-        </>
-      ) : (
-        <Fallback />
-      )}
-    </table>
-  );
-};
-
 const I18n: FunctionComponent = () => {
   // prettier-ignore
   const {
@@ -259,7 +234,7 @@ const I18n: FunctionComponent = () => {
           <td>
             {useMemo(
               () => JSON.stringify(translationLanguage),
-              [translationLanguage]
+              [translationLanguage],
             )}
           </td>
         </tr>
@@ -268,7 +243,7 @@ const I18n: FunctionComponent = () => {
           <td>
             {useMemo(
               () => JSON.stringify(translationLocale),
-              [translationLocale]
+              [translationLocale],
             )}
           </td>
         </tr>
@@ -284,84 +259,6 @@ const I18n: FunctionComponent = () => {
       </table>
     </>
   );
-};
-
-const ServiceWorkerInventory: FunctionComponent = () => {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-
-  const { locale } = useI18n();
-
-  const echo = useFetchText(ECHO_URL, 'POST');
-  const inventory = useFetchJson(INVENTORY_URL, 'POST');
-
-  const {
-    caches = {},
-    index: { date = null, index = {} } = {},
-    persisted = null,
-  } = (inventory as any) || {};
-
-  return (
-    <>
-      <table>
-        <tr>
-          <td>handling requests</td>
-          <td>{useMemo(() => JSON.stringify(echo === ECHO_URL), [echo])}</td>
-        </tr>
-        <tr>
-          <td>index date</td>
-          <td>
-            {typeof date === 'number'
-              ? new Date(date).toLocaleString(locale || 'en')
-              : null}
-          </td>
-        </tr>
-        <tr>
-          <td>StorageManager persisted</td>
-          <td>{useMemo(() => JSON.stringify(persisted), [persisted])}</td>
-        </tr>
-      </table>
-
-      <table>
-        {Object.entries(index).map(([key, values]) => (
-          <>
-            <tr>
-              <td>
-                <b>{key}</b>
-              </td>
-            </tr>
-
-            {Array.isArray(values)
-              ? values.map((value: any) => (
-                  <tr>
-                    <td>{value}</td>
-                  </tr>
-                ))
-              : null}
-          </>
-        ))}
-      </table>
-
-      <table>
-        {Object.entries(caches).map(([key, values]) => (
-          <>
-            <tr>
-              <td colSpan={999}>
-                <b>{key}</b>
-              </td>
-            </tr>
-
-            {((values as any) || []).map((value: any) => (
-              <tr>
-                <td>{value}</td>
-              </tr>
-            ))}
-          </>
-        ))}
-      </table>
-    </>
-  );
-
-  /* eslint-enable @typescript-eslint/no-explicit-any */
 };
 
 export const Diagnostics: FunctionComponent = () => {
@@ -420,7 +317,7 @@ export const Diagnostics: FunctionComponent = () => {
           <td>
             {useMemo(
               () => JSON.stringify(isScreensaverActive),
-              [isScreensaverActive]
+              [isScreensaverActive],
             )}
           </td>
         </tr>
@@ -488,14 +385,6 @@ export const Diagnostics: FunctionComponent = () => {
 
         <tr>
           <td colSpan={999}>
-            <Details summary={<b>fallback notification</b>}>
-              <FallbackNotification />
-            </Details>
-          </td>
-        </tr>
-
-        <tr>
-          <td colSpan={999}>
             <Details summary={<b>i18n</b>}>
               <I18n />
             </Details>
@@ -523,14 +412,6 @@ export const Diagnostics: FunctionComponent = () => {
             <b>updateId</b>
           </td>
           <td>{useMemo(() => JSON.stringify(updateId), [updateId])}</td>
-        </tr>
-
-        <tr>
-          <td colSpan={999}>
-            <Details summary={<b>ServiceWorker inventory</b>}>
-              <ServiceWorkerInventory />
-            </Details>
-          </td>
         </tr>
       </table>
 

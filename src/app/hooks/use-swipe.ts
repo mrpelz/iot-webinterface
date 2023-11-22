@@ -6,7 +6,7 @@ export const useSwipe = <T extends HTMLElement>(
   ref: MutableRef<T | null>,
   setter: (input: number | null) => void,
   throttle: number,
-  direction: SwipeDirection = 'horizontal'
+  direction: SwipeDirection = 'horizontal',
 ): void => {
   useEffect(() => {
     const { current: element } = ref;
@@ -23,7 +23,7 @@ export const useSwipe = <T extends HTMLElement>(
 
     const onTouchStart: (
       this: HTMLElement,
-      event: HTMLElementEventMap['touchstart']
+      event: HTMLElementEventMap['touchstart'],
     ) => void = ({ targetTouches }) => {
       const touch = targetTouches.item(0);
       if (!touch) return;
@@ -42,7 +42,7 @@ export const useSwipe = <T extends HTMLElement>(
 
     const onTouchMove: (
       this: HTMLElement,
-      event: HTMLElementEventMap['touchmove']
+      event: HTMLElementEventMap['touchmove'],
     ) => void = (event) => {
       const { targetTouches } = event;
 
@@ -87,7 +87,7 @@ export const useSwipe = <T extends HTMLElement>(
       this: HTMLElement,
       event:
         | HTMLElementEventMap['touchend']
-        | HTMLElementEventMap['touchcancel']
+        | HTMLElementEventMap['touchcancel'],
     ) => void = () => {
       update = 0;
 

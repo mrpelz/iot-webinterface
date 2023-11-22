@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
+
 import { fetchFallback } from '../util/fetch.js';
 
 export const useFetch = (url: string, method = 'GET'): Response | null => {

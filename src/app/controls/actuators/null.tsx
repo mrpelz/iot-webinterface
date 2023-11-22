@@ -1,27 +1,28 @@
+import { FunctionComponent } from 'preact';
+import { useCallback, useRef } from 'preact/hooks';
+
+import { Body } from '../../components/controls.js';
+import { Button } from '../../components/list.js';
+import { TriggerBody } from '../../components/null-actuator.js';
+import { Overlay } from '../../components/overlay.js';
+import { useColorBody } from '../../hooks/use-color-body.js';
+import { I18nKey } from '../../i18n/main.js';
+import { Translation } from '../../state/i18n.js';
+import { useSetter } from '../../state/web-api.js';
 import {
   HierarchyElement,
   HierarchyElementPropertyActuator,
-  ValueType,
   isMetaPropertyActuator,
+  ValueType,
 } from '../../web-api.js';
-import { useCallback, useRef } from 'preact/hooks';
-import { Body } from '../../components/controls.js';
-import { Button } from '../../components/list.js';
 import { Cell } from '../main.js';
-import { FunctionComponent } from 'preact';
-import { I18nKey } from '../../i18n/main.js';
-import { Overlay } from '../../components/overlay.js';
-import { Translation } from '../../state/i18n.js';
-import { TriggerBody } from '../../components/null-actuator.js';
-import { useColorBody } from '../../hooks/use-color-body.js';
-import { useSetter } from '../../state/web-api.js';
 
 export type NullActuatorElement = HierarchyElementPropertyActuator & {
   meta: { valueType: ValueType.NULL };
 };
 
 export const isNullActuatorElement = (
-  element: HierarchyElement
+  element: HierarchyElement,
 ): element is NullActuatorElement =>
   isMetaPropertyActuator(element.meta) &&
   element.meta.valueType === ValueType.NULL;

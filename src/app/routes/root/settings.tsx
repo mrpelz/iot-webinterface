@@ -1,4 +1,21 @@
+import { FunctionComponent } from 'preact';
+import { useCallback, useMemo } from 'preact/hooks';
+
 import { Button, Entry as EntryComponent } from '../../components/list.js';
+import { ShowHide } from '../../components/show-hide.js';
+import { useArray } from '../../hooks/use-array-compare.js';
+import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
+import { useFlag, useSetFlag } from '../../state/flags.js';
+import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
+import {
+  staticPages,
+  useNavigationBuilding,
+  useNavigationHome,
+} from '../../state/navigation.js';
+import { Theme, themes } from '../../state/theme.js';
+import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
+import { removeServiceWorkers } from '../../util/service-worker.js';
+import { triggerUpdate } from '../../util/update.js';
 import { Entry, List } from '../../views/list.js';
 import {
   HierarchyElementBuilding,
@@ -6,22 +23,6 @@ import {
   HierarchyElementRoom,
   Levels,
 } from '../../web-api.js';
-import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
-import { Theme, themes } from '../../state/theme.js';
-import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
-import { reload, triggerUpdate } from '../../util/update.js';
-import {
-  staticPages,
-  useNavigationBuilding,
-  useNavigationHome,
-} from '../../state/navigation.js';
-import { useCallback, useMemo } from 'preact/hooks';
-import { useFlag, useSetFlag } from '../../state/flags.js';
-import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
-import { FunctionComponent } from 'preact';
-import { ShowHide } from '../../components/show-hide.js';
-import { removeServiceWorkers } from '../../util/workers.js';
-import { useArray } from '../../hooks/use-array-compare.js';
 
 export const Settings: FunctionComponent = () => {
   const hierarchy = useHierarchy();
@@ -30,13 +31,13 @@ export const Settings: FunctionComponent = () => {
 
   const buildings = useLevelShallow<HierarchyElementBuilding>(
     Levels.BUILDING,
-    home
+    home,
   );
   const [building, setBuilding] = useNavigationBuilding();
 
   const rooms = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, hierarchy);
   const roomNames = useArray(
-    useMemo(() => rooms.map(({ meta: { name } }) => name), [rooms])
+    useMemo(() => rooms.map(({ meta: { name } }) => name), [rooms]),
   );
 
   const startPages = useMemo(() => [...staticPages, ...roomNames], [roomNames]);
@@ -50,9 +51,6 @@ export const Settings: FunctionComponent = () => {
   const language = useFlag('language');
   const setLanguage = useSetFlag('language');
 
-  const enableNotifications = useFlag('enableNotifications');
-  const setEnableNotifications = useSetFlag('enableNotifications');
-
   const absoluteTimes = useFlag('absoluteTimes');
   const setAbsoluteTimes = useSetFlag('absoluteTimes');
 
@@ -64,20 +62,11 @@ export const Settings: FunctionComponent = () => {
 
   const screensaverRandomizePosition = useFlag('screensaverRandomizePosition');
   const setScreensaverRandomizePosition = useSetFlag(
-    'screensaverRandomizePosition'
+    'screensaverRandomizePosition',
   );
 
   const debug = useFlag('debug');
   const setDebug = useSetFlag('debug');
-
-  const updateCheckInterval = useFlag('updateCheckInterval');
-  const setAutoReloadCheckInterval = useSetFlag('updateCheckInterval');
-
-  const updateUnattended = useFlag('updateUnattended');
-  const setAutoReloadUnattended = useSetFlag('updateUnattended');
-
-  const serviceWorker = useFlag('serviceWorker');
-  const setServiceWorker = useSetFlag('serviceWorker');
 
   const apiBaseUrl = useFlag('apiBaseUrl');
   const setApiBaseUrl = useSetFlag('apiBaseUrl');
@@ -96,7 +85,7 @@ export const Settings: FunctionComponent = () => {
             onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
               ({ currentTarget: { value } }) => {
                 const matchingHome = homes.find(
-                  ({ meta: { name } }) => name === value
+                  ({ meta: { name } }) => name === value,
                 );
                 if (!matchingHome || matchingHome === home) {
                   return;
@@ -104,7 +93,7 @@ export const Settings: FunctionComponent = () => {
 
                 setHome(matchingHome);
               },
-              [homes, setHome, home]
+              [homes, setHome, home],
             )}
           >
             {homes.map((aHome) => (
@@ -125,7 +114,7 @@ export const Settings: FunctionComponent = () => {
             onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
               ({ currentTarget: { value } }) => {
                 const matchingBuilding = buildings.find(
-                  ({ meta: { name } }) => name === value
+                  ({ meta: { name } }) => name === value,
                 );
                 if (!matchingBuilding || matchingBuilding === building) {
                   return;
@@ -133,7 +122,7 @@ export const Settings: FunctionComponent = () => {
 
                 setBuilding(matchingBuilding);
               },
-              [buildings, setBuilding, building]
+              [buildings, setBuilding, building],
             )}
           >
             {buildings.map((aBuilding) => (
@@ -166,32 +155,28 @@ export const Settings: FunctionComponent = () => {
 
                 setStartPage(selectedOverride);
               },
-              [startPages, setStartPage]
+              [startPages, setStartPage],
             )}
           >
             <option value="auto" selected={startPage === null}>
               <Translation i18nKey="auto" />
             </option>
             <optgroup label={useI18nKeyFallback('staticPage')}>
-              {staticPages.map((aStaticPage) => {
-                return (
-                  <option
-                    value={aStaticPage}
-                    selected={aStaticPage === startPage}
-                  >
-                    <Translation i18nKey={aStaticPage} />
-                  </option>
-                );
-              })}
+              {staticPages.map((aStaticPage) => (
+                <option
+                  value={aStaticPage}
+                  selected={aStaticPage === startPage}
+                >
+                  <Translation i18nKey={aStaticPage} />
+                </option>
+              ))}
             </optgroup>
             <optgroup label={useI18nKeyFallback('room')}>
-              {roomNames.map((aRoom) => {
-                return (
-                  <option value={aRoom} selected={aRoom === startPage}>
-                    <Translation i18nKey={aRoom} />
-                  </option>
-                );
-              })}
+              {roomNames.map((aRoom) => (
+                <option value={aRoom} selected={aRoom === startPage}>
+                  <Translation i18nKey={aRoom} />
+                </option>
+              ))}
             </optgroup>
           </select>
         </Entry>
@@ -221,19 +206,17 @@ export const Settings: FunctionComponent = () => {
 
                 setTheme(selectedTheme);
               },
-              [setTheme, theme]
+              [setTheme, theme],
             )}
           >
             <option value="auto" selected={theme === null}>
               <Translation i18nKey="auto" />
             </option>
-            {themes.map((aTheme) => {
-              return (
-                <option value={aTheme} selected={aTheme === theme}>
-                  <Translation i18nKey={aTheme} />
-                </option>
-              );
-            })}
+            {themes.map((aTheme) => (
+              <option value={aTheme} selected={aTheme === theme}>
+                <Translation i18nKey={aTheme} />
+              </option>
+            ))}
           </select>
         </Entry>
         <Entry
@@ -260,39 +243,18 @@ export const Settings: FunctionComponent = () => {
 
                 setLanguage(selectedLanguage);
               },
-              [language, setLanguage]
+              [language, setLanguage],
             )}
           >
             <option value="auto" selected={language === null}>
               <Translation i18nKey="auto" />
             </option>
-            {i18nLanguages.map((aLanguage) => {
-              return (
-                <option value={aLanguage} selected={aLanguage === language}>
-                  <Translation i18nKey={aLanguage} />
-                </option>
-              );
-            })}
+            {i18nLanguages.map((aLanguage) => (
+              <option value={aLanguage} selected={aLanguage === language}>
+                <Translation i18nKey={aLanguage} />
+              </option>
+            ))}
           </select>
-        </Entry>
-        <Entry
-          id="enableNotifications"
-          label={
-            <Translation capitalize={true} i18nKey="enableNotifications" />
-          }
-        >
-          <input
-            checked={Boolean(enableNotifications)}
-            id="enableNotifications"
-            name="enableNotifications"
-            type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
-              ({ currentTarget: { checked: selectedEnableNotifications } }) => {
-                setEnableNotifications(selectedEnableNotifications);
-              },
-              [setEnableNotifications]
-            )}
-          />
         </Entry>
         <Entry
           id="absoluteTimes"
@@ -307,7 +269,7 @@ export const Settings: FunctionComponent = () => {
               ({ currentTarget: { checked: selectedAbsoluteTimes } }) => {
                 setAbsoluteTimes(selectedAbsoluteTimes);
               },
-              [setAbsoluteTimes]
+              [setAbsoluteTimes],
             )}
           />
         </Entry>
@@ -328,7 +290,7 @@ export const Settings: FunctionComponent = () => {
               ({ currentTarget: { value } }) => {
                 const selectedInactivityTimeout = Number.parseInt(
                   value.trim(),
-                  10
+                  10,
                 );
                 if (
                   !selectedInactivityTimeout ||
@@ -341,7 +303,7 @@ export const Settings: FunctionComponent = () => {
 
                 setInactivityTimeout(selectedInactivityTimeout);
               },
-              [setInactivityTimeout]
+              [setInactivityTimeout],
             )}
           />
         </Entry>
@@ -362,7 +324,7 @@ export const Settings: FunctionComponent = () => {
                   setScreensaverRandomizePosition(false);
                 }
               },
-              [setScreensaverEnable, setScreensaverRandomizePosition]
+              [setScreensaverEnable, setScreensaverRandomizePosition],
             )}
           />
         </Entry>
@@ -388,10 +350,10 @@ export const Settings: FunctionComponent = () => {
                   },
                 }) => {
                   setScreensaverRandomizePosition(
-                    selectedscreensaverRandomizePosition
+                    selectedscreensaverRandomizePosition,
                   );
                 },
-                [setScreensaverRandomizePosition]
+                [setScreensaverRandomizePosition],
               )}
             />
           </Entry>
@@ -411,77 +373,7 @@ export const Settings: FunctionComponent = () => {
               ({ currentTarget: { checked: selectedDebug } }) => {
                 setDebug(selectedDebug);
               },
-              [setDebug]
-            )}
-          />
-        </Entry>
-        <Entry
-          id="updateCheckInterval"
-          label={
-            <Translation capitalize={true} i18nKey="updateCheckInterval" />
-          }
-        >
-          <input
-            id="updateCheckInterval"
-            inputMode="numeric"
-            name="updateCheckInterval"
-            pattern="[0-9]*"
-            placeholder={useI18nKeyFallback('auto')}
-            value={updateCheckInterval === null ? '' : updateCheckInterval}
-            onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
-              ({ currentTarget: { value } }) => {
-                const selectedAutoReloadCheckInterval = Number.parseInt(
-                  value.trim(),
-                  10
-                );
-                if (
-                  selectedAutoReloadCheckInterval < 0 ||
-                  Number.isNaN(selectedAutoReloadCheckInterval) ||
-                  !Number.isInteger(selectedAutoReloadCheckInterval)
-                ) {
-                  setAutoReloadCheckInterval(null);
-                  return;
-                }
-
-                setAutoReloadCheckInterval(selectedAutoReloadCheckInterval);
-              },
-              [setAutoReloadCheckInterval]
-            )}
-          />
-        </Entry>
-        <Entry
-          id="updateUnattended"
-          label={<Translation capitalize={true} i18nKey="updateUnattended" />}
-        >
-          <input
-            checked={Boolean(updateUnattended)}
-            id="updateUnattended"
-            name="updateUnattended"
-            type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
-              ({
-                currentTarget: { checked: selectedAutoReloadUnattended },
-              }) => {
-                setAutoReloadUnattended(selectedAutoReloadUnattended);
-              },
-              [setAutoReloadUnattended]
-            )}
-          />
-        </Entry>
-        <Entry
-          id="serviceWorker"
-          label={<Translation capitalize={true} i18nKey="serviceWorker" />}
-        >
-          <input
-            checked={Boolean(serviceWorker)}
-            id="serviceWorker"
-            name="serviceWorker"
-            type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
-              ({ currentTarget: { checked: selectedServiceWorker } }) => {
-                setServiceWorker(selectedServiceWorker);
-              },
-              [setServiceWorker]
+              [setDebug],
             )}
           />
         </Entry>
@@ -498,7 +390,7 @@ export const Settings: FunctionComponent = () => {
             onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { value } }) => {
                 const selectedApiBaseUrl = value.trim();
-                if (!selectedApiBaseUrl.length) {
+                if (selectedApiBaseUrl.length === 0) {
                   setApiBaseUrl(null);
                   return;
                 }
@@ -510,15 +402,17 @@ export const Settings: FunctionComponent = () => {
                   setApiBaseUrl(null);
                 }
               },
-              [setApiBaseUrl]
+              [setApiBaseUrl],
             )}
           />
         </Entry>
         <EntryComponent>
           <Button onClick={useCallback(() => triggerUpdate?.(), [])}>
-            refresh ServiceWorker
+            update
           </Button>
-          <Button onClick={useCallback(() => reload(), [])}>reload</Button>
+          <Button onClick={useCallback(() => location.reload(), [])}>
+            reload
+          </Button>
           <Button
             onClick={useCallback(() => {
               removeServiceWorkers();

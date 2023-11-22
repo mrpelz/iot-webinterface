@@ -1,14 +1,13 @@
 import { useEffect, useMemo } from 'preact/hooks';
 
-export const useGetLocalStorage = (key: string): string | null => {
-  return useMemo(() => {
+export const useGetLocalStorage = (key: string): string | null =>
+  useMemo(() => {
     try {
       return localStorage.getItem(key);
     } catch {
       return null;
     }
   }, [key]);
-};
 
 export const useSetLocalStorage = (key: string, value: string | null): void => {
   useEffect(() => {

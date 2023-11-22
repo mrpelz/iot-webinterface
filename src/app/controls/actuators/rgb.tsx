@@ -1,21 +1,5 @@
-import {
-  BodyDisableRoundedCorners,
-  ColorLabel,
-  RGBBody,
-} from '../../components/rgb-actuator.js';
-import {
-  BrightnessActuatorElement,
-  BrightnessLabel,
-  isBrightnessActuatorElement,
-  useSwipeBrightness,
-  useWheelBrightness,
-} from './brightness.js';
-import {
-  HierarchyElement,
-  HierarchyElementArea,
-  MetaArea,
-  isMetaArea,
-} from '../../web-api.js';
+import { StyledVNode } from 'goober';
+import { FunctionComponent } from 'preact';
 import {
   useCallback,
   useEffect,
@@ -23,25 +7,42 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
+
+import { BlendOver } from '../../components/blend-over.js';
+import { ColorIcon } from '../../components/icons.js';
+import {
+  BodyDisableRoundedCorners,
+  ColorLabel,
+  RGBBody,
+} from '../../components/rgb-actuator.js';
+import { useColorBody } from '../../hooks/use-color-body.js';
+import { useColorPicker } from '../../hooks/use-color-picker.js';
+import { useDelay } from '../../hooks/use-delay.js';
+import { useSwipe } from '../../hooks/use-swipe.js';
+import { useWheel } from '../../hooks/use-wheel.js';
+import { I18nKey } from '../../i18n/main.js';
+import { Translation } from '../../state/i18n.js';
+import { useSegment } from '../../state/path.js';
 import {
   useChild,
   useChildGetter,
   useChildSetter,
   useGetter,
 } from '../../state/web-api.js';
-import { BlendOver } from '../../components/blend-over.js';
+import {
+  HierarchyElement,
+  HierarchyElementArea,
+  isMetaArea,
+  MetaArea,
+} from '../../web-api.js';
 import { Cell } from '../main.js';
-import { ColorIcon } from '../../components/icons.js';
-import { FunctionComponent } from 'preact';
-import { I18nKey } from '../../i18n/main.js';
-import { StyledVNode } from 'goober';
-import { Translation } from '../../state/i18n.js';
-import { useColorBody } from '../../hooks/use-color-body.js';
-import { useColorPicker } from '../../hooks/use-color-picker.js';
-import { useDelay } from '../../hooks/use-delay.js';
-import { useSegment } from '../../state/path.js';
-import { useSwipe } from '../../hooks/use-swipe.js';
-import { useWheel } from '../../hooks/use-wheel.js';
+import {
+  BrightnessActuatorElement,
+  BrightnessLabel,
+  isBrightnessActuatorElement,
+  useSwipeBrightness,
+  useWheelBrightness,
+} from './brightness.js';
 
 export type RGBActuatorElement = HierarchyElementArea & {
   children: Record<'r' | 'g' | 'b', BrightnessActuatorElement>;
@@ -51,7 +52,7 @@ export const isMetaAreaRGB = ({ name }: MetaArea): boolean =>
   name.toLowerCase().includes('rgb');
 
 export const isRGBActuatorElement = (
-  element: HierarchyElement
+  element: HierarchyElement,
 ): element is RGBActuatorElement =>
   Boolean(
     isMetaArea(element.meta) &&
@@ -61,7 +62,7 @@ export const isRGBActuatorElement = (
       'g' in element.children &&
       isBrightnessActuatorElement(element.children.g) &&
       'b' in element.children &&
-      isBrightnessActuatorElement(element.children.b)
+      isBrightnessActuatorElement(element.children.b),
   );
 
 const Color: FunctionComponent<{
@@ -98,7 +99,7 @@ const Color: FunctionComponent<{
       event.stopPropagation();
       flip?.(null);
     },
-    [flip]
+    [flip],
   );
 
   const setBrightness = useChildSetter<number>(element, 'brightness');
@@ -108,13 +109,13 @@ const Color: FunctionComponent<{
   const handleWheel = useWheelBrightness(
     brightnessRef,
     loadingRef,
-    setBrightness
+    setBrightness,
   );
   const handleSwipe = useSwipeBrightness(
     brightnessRef,
     loadingRef,
     setBrightness,
-    setInteracting
+    setInteracting,
   );
 
   const refA = useRef<HTMLElement | null>(null);
@@ -144,7 +145,7 @@ const Color: FunctionComponent<{
         />
       </>
     ),
-    [brightness, loading, property, value]
+    [brightness, loading, property, value],
   );
 
   return (
@@ -189,7 +190,7 @@ export const RGBActuator: FunctionComponent<{
   const [focus, colorPicker] = useColorPicker(
     useMemo(() => [rBrightness, rSetBrightness], [rBrightness, rSetBrightness]),
     useMemo(() => [gBrightness, gSetBrightness], [gBrightness, gSetBrightness]),
-    useMemo(() => [bBrightness, bSetBrightness], [bBrightness, bSetBrightness])
+    useMemo(() => [bBrightness, bSetBrightness], [bBrightness, bSetBrightness]),
   );
 
   if (!r || !g || !b) return null;

@@ -1,7 +1,8 @@
-import { ComponentChildren, FunctionComponent } from 'preact';
 import { styled } from 'goober';
-import { useDelay } from '../hooks/use-delay.js';
+import { ComponentChildren, FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
+
+import { useDelay } from '../hooks/use-delay.js';
 import { usePrevious } from '../hooks/use-previous.js';
 
 export type BlendOverDirection = 'block' | 'inline';
@@ -80,7 +81,7 @@ export const BlendOver: FunctionComponent<{
 
   const transitionDurationWithoutUserInputDelayed = useDelay(
     transitionDurationWithoutUserInput,
-    transitionDurationWithoutUserInput * 2
+    transitionDurationWithoutUserInput * 2,
   );
 
   const transitionDuration = useMemo(
@@ -93,7 +94,7 @@ export const BlendOver: FunctionComponent<{
       transition,
       transitionDurationFractional,
       transitionDurationWithoutUserInputDelayed,
-    ]
+    ],
   );
 
   return (

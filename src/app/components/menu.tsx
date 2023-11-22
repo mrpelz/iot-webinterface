@@ -1,9 +1,10 @@
-import { colors, dimensions } from '../style.js';
-import { dependentValue, mediaQuery } from '../style/main.js';
-import { breakpointValue } from '../style/breakpoint.js';
-import { forwardRef } from 'preact/compat';
-import { multiply } from '../style/dimensions.js';
 import { styled } from 'goober';
+import { forwardRef } from 'preact/compat';
+
+import { colors, dimensions } from '../style.js';
+import { breakpointValue } from '../style/breakpoint.js';
+import { multiply } from '../style/dimensions.js';
+import { dependentValue, mediaQuery } from '../style/main.js';
 
 export const Menu = styled('nav')<{ isVisible: boolean }>`
   background-color: ${colors.backgroundSecondary()};
@@ -25,7 +26,7 @@ export const MenuShade = styled('menu-shade' as 'section', forwardRef)<{
   content: '';
   display: block;
   inline-size: ${dimensions.appWidth};
-  inset-block-start: ${dimensions.headerHeightAdaptive};
+  inset-block-start: ${dimensions.headerHeight};
   inset-inline-start: 0;
   position: fixed;
   transition: opacity 0.3s ease-out;
@@ -33,7 +34,7 @@ export const MenuShade = styled('menu-shade' as 'section', forwardRef)<{
   margin-left: ${breakpointValue(
     mediaQuery(dimensions.breakpointDesktop),
     dimensions.menuWidth,
-    'unset'
+    'unset',
   )};
   opacity: ${dependentValue('active', '0.5', '0')};
   pointer-events: ${dependentValue('active', 'all', 'none')};
@@ -89,8 +90,8 @@ export const MenuListItem = styled('li', forwardRef)<{
       dependentValue(
         'isHovered',
         colors.fontTertiary(),
-        colors.backgroundPrimary()
-      )(...args)
+        colors.backgroundPrimary(),
+      )(...args),
     )(...args)};
   color: ${(...args) =>
     dependentValue(
@@ -101,10 +102,10 @@ export const MenuListItem = styled('li', forwardRef)<{
         dependentValue(
           'isHovered',
           colors.backgroundPrimary(),
-          colors.fontPrimary()
+          colors.fontPrimary(),
         )(...args),
-        colors.fontPrimary()
-      )(...args)
+        colors.fontPrimary(),
+      )(...args),
     )(...args)};
 
   * + & {

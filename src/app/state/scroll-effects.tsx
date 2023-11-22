@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'preact';
-import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useLayoutEffect } from 'preact/hooks';
+
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useSegment } from './path.js';
 
 export const ScrollEffects: FunctionComponent = () => {
@@ -13,7 +14,7 @@ export const ScrollEffects: FunctionComponent = () => {
       scrollTo({
         behavior: 'instant' as ScrollBehavior,
         top: 0,
-      })
+      }),
     );
   }, [segment0]);
 

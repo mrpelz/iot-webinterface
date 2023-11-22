@@ -1,12 +1,13 @@
+import { FunctionComponent } from 'preact';
+
+import { I18nKey } from '../../i18n/main.js';
+import { HierarchyElementPropertyActuator } from '../../web-api.js';
 import { BinaryActuator, isBinaryActuatorElement } from './binary.js';
 import {
   BrightnessActuator,
   isBrightnessActuatorElement,
 } from './brightness.js';
-import { NullActuator, isNullActuatorElement } from './null.js';
-import { FunctionComponent } from 'preact';
-import { HierarchyElementPropertyActuator } from '../../web-api.js';
-import { I18nKey } from '../../i18n/main.js';
+import { isNullActuatorElement, NullActuator } from './null.js';
 
 export const Actuator: FunctionComponent<{
   element: HierarchyElementPropertyActuator;

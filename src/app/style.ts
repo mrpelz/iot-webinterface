@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
+import { stripIndents } from 'proper-tags';
+
 import { Theme, useTheme } from './state/theme.js';
-import { add, dimension, half, subtract } from './style/dimensions.js';
-import { color, useThemedValue } from './style/colors.js';
-import { cssEnv, cssVar, useMediaQuery } from './style/main.js';
-import { multiline } from './util/string.js';
 import { useBreakpointValue } from './style/breakpoint.js';
-import { useNotification } from './state/notification.js';
+import { color, useThemedValue } from './style/colors.js';
+import { add, dimension, half, subtract } from './style/dimensions.js';
+import { cssEnv, cssVar, useMediaQuery } from './style/main.js';
 
 export const strings = {
   get colorScheme() {
@@ -19,7 +19,7 @@ export const strings = {
   prefersMoreContrast: '(prefers-contrast: more)',
   safeAreaInsetTop: cssVar(
     'safe-area-inset-top',
-    cssEnv('safe-area-inset-top')
+    cssEnv('safe-area-inset-top'),
   ),
   translucent: cssVar('translucent', '20px'),
   viewportHeight: '100vh',
@@ -39,35 +39,35 @@ const staticDimensions = {
   titlebarHeight: dimension(44),
 };
 
-const partialDynamicDimensions = {
+const dynamicDimensions = {
   appHeight: subtract(
     strings.viewportHeight,
     strings.safeAreaInsetTop,
-    staticDimensions.titlebarHeight
+    staticDimensions.titlebarHeight,
   ),
   appHeightShiftDown: subtract(
     strings.viewportHeight,
     strings.safeAreaInsetTop,
     staticDimensions.titlebarHeight,
-    staticDimensions.titlebarHeight
+    staticDimensions.titlebarHeight,
   ),
   get appWidth() {
     return () =>
       useBreakpointValue(
         useMediaQuery(staticDimensions.breakpointDesktop),
         subtract('100%', staticDimensions.menuWidth),
-        '100%'
+        '100%',
       );
   },
   fontPadding: half(
-    subtract(staticDimensions.titlebarHeight, staticDimensions.fontSize)
+    subtract(staticDimensions.titlebarHeight, staticDimensions.fontSize),
   ),
   get fontSizeLargeAdaptive() {
     return () =>
       useBreakpointValue(
         useMediaQuery(staticDimensions.breakpointDesktop),
         staticDimensions.fontSizeLarge,
-        staticDimensions.fontSize
+        staticDimensions.fontSize,
       );
   },
   get hairline() {
@@ -78,26 +78,8 @@ const partialDynamicDimensions = {
   headerHeightShiftDown: add(
     strings.safeAreaInsetTop,
     staticDimensions.titlebarHeight,
-    staticDimensions.titlebarHeight
+    staticDimensions.titlebarHeight,
   ),
-};
-
-const dynamicDimensions = {
-  ...partialDynamicDimensions,
-  get appHeightAdaptive() {
-    return () => {
-      return useNotification()
-        ? partialDynamicDimensions.appHeightShiftDown
-        : partialDynamicDimensions.appHeight;
-    };
-  },
-  get headerHeightAdaptive() {
-    return () => {
-      return useNotification()
-        ? partialDynamicDimensions.headerHeightShiftDown
-        : partialDynamicDimensions.headerHeight;
-    };
-  },
 };
 
 export const dimensions = {
@@ -133,7 +115,7 @@ const themedColors = {
         highContrast: staticColors.white,
         light: staticColors.white,
       },
-      themeOverride
+      themeOverride,
     )(a),
   backgroundSecondary: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -142,7 +124,7 @@ const themedColors = {
         highContrast: staticColors.white,
         light: staticColors.whiteShaded,
       },
-      themeOverride
+      themeOverride,
     )(a),
   backgroundTertiary: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -151,7 +133,7 @@ const themedColors = {
         highContrast: staticColors.white,
         light: staticColors.greyLight,
       },
-      themeOverride
+      themeOverride,
     )(a),
   fontPrimary: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -160,7 +142,7 @@ const themedColors = {
         highContrast: staticColors.black,
         light: staticColors.black,
       },
-      themeOverride
+      themeOverride,
     )(a),
   fontSecondary: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -169,7 +151,7 @@ const themedColors = {
         highContrast: staticColors.black,
         light: staticColors.greyLow,
       },
-      themeOverride
+      themeOverride,
     )(a),
   fontTertiary: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -178,7 +160,7 @@ const themedColors = {
         highContrast: staticColors.black,
         light: staticColors.greyMid,
       },
-      themeOverride
+      themeOverride,
     )(a),
   selection: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -187,7 +169,7 @@ const themedColors = {
         highContrast: staticColors.black,
         light: staticColors.blue,
       },
-      themeOverride
+      themeOverride,
     )(a),
   statusBarBackground: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -196,7 +178,7 @@ const themedColors = {
         highContrast: staticColors.black,
         light: staticColors.black,
       },
-      themeOverride
+      themeOverride,
     )(a),
   surface0: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -205,7 +187,7 @@ const themedColors = {
         highContrast: color(brand.hue, 10, 15),
         light: color(brand.hue, 25, 70),
       },
-      themeOverride
+      themeOverride,
     )(a),
   surface1: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -214,7 +196,7 @@ const themedColors = {
         highContrast: color(brand.hue, 10, 20),
         light: color(brand.hue, 25, 90),
       },
-      themeOverride
+      themeOverride,
     )(a),
   surface2: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -223,7 +205,7 @@ const themedColors = {
         highContrast: color(brand.hue, 10, 25),
         light: color(brand.hue, 20, 99),
       },
-      themeOverride
+      themeOverride,
     )(a),
   surface3: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -232,7 +214,7 @@ const themedColors = {
         highContrast: color(brand.hue, 5, 30),
         light: color(brand.hue, 20, 92),
       },
-      themeOverride
+      themeOverride,
     )(a),
   surface4: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -241,7 +223,7 @@ const themedColors = {
         highContrast: color(brand.hue, 5, 35),
         light: color(brand.hue, 20, 85),
       },
-      themeOverride
+      themeOverride,
     )(a),
   surfaceShadow: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -250,7 +232,7 @@ const themedColors = {
         highContrast: color(brand.hue, 30, 13),
         light: color(brand.hue, 10, 20),
       },
-      themeOverride
+      themeOverride,
     )(a),
   text1: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -259,7 +241,7 @@ const themedColors = {
         highContrast: color(brand.hue, 15, 75),
         light: color(brand.hue, brand.saturation, 10),
       },
-      themeOverride
+      themeOverride,
     )(a),
   text2: (a?: number, themeOverride?: Theme) => () =>
     useThemedValue(
@@ -268,7 +250,7 @@ const themedColors = {
         highContrast: color(brand.hue, 10, 61),
         light: color(brand.hue, 30, 10),
       },
-      themeOverride
+      themeOverride,
     )(a),
 };
 
@@ -277,27 +259,25 @@ export const colors = {
   ...themedColors,
 };
 
-export const shadow = (themeOverride?: Theme) => {
-  return () => {
-    const shadowSurface = colors.surfaceShadow;
-    const shadowStength = useThemedValue(
-      {
-        dark: 80,
-        highContrast: 20,
-        light: 2,
-      },
-      themeOverride
-    );
+export const shadow = (themeOverride?: Theme) => () => {
+  const shadowSurface = colors.surfaceShadow;
+  const shadowStength = useThemedValue(
+    {
+      dark: 80,
+      highContrast: 20,
+      light: 2,
+    },
+    themeOverride,
+  );
 
-    const result = multiline`
-      0 2.8px 2.2px ${shadowSurface(shadowStength + 3)()},
-      0 6.7px 5.3px ${shadowSurface(shadowStength + 1)()},
-      0 12.5px 10px ${shadowSurface(shadowStength + 2)()},
-      0 22.3px 17.9px ${shadowSurface(shadowStength + 2)()},
-      0 41.8px 33.4px ${shadowSurface(shadowStength + 3)()},
-      0 100px 80px ${shadowSurface(shadowStength)()}
-    `;
+  const result = stripIndents`
+    0 2.8px 2.2px ${shadowSurface(shadowStength + 3)()},
+    0 6.7px 5.3px ${shadowSurface(shadowStength + 1)()},
+    0 12.5px 10px ${shadowSurface(shadowStength + 2)()},
+    0 22.3px 17.9px ${shadowSurface(shadowStength + 2)()},
+    0 41.8px 33.4px ${shadowSurface(shadowStength + 3)()},
+    0 100px 80px ${shadowSurface(shadowStength)()}
+  `;
 
-    return result;
-  };
+  return result;
 };

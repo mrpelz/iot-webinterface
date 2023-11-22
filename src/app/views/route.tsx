@@ -1,18 +1,19 @@
 import { ComponentChildren, FunctionComponent } from 'preact';
-import { noBackground, useSetBackgroundOverride } from '../state/background.js';
-import {
-  useNavigationRoom,
-  useNavigationStaticPage,
-} from '../state/navigation.js';
+import { useMemo } from 'preact/hooks';
+
+import { ShowHide } from '../components/show-hide.js';
+import { useScrollRestore } from '../hooks/use-scroll-restore.js';
 import { Devices } from '../routes/root/devices.js';
 import { Diagnostics } from '../routes/root/diagnostics.js';
 import { Global } from '../routes/root/global.js';
 import { Room } from '../routes/root/room.js';
 import { Settings } from '../routes/root/settings.js';
-import { ShowHide } from '../components/show-hide.js';
-import { Test } from '../routes/root/test.js';
-import { useMemo } from 'preact/hooks';
-import { useScrollRestore } from '../hooks/use-scroll-restore.js';
+import { Test } from '../routes/root/test-route.js';
+import { noBackground, useSetBackgroundOverride } from '../state/background.js';
+import {
+  useNavigationRoom,
+  useNavigationStaticPage,
+} from '../state/navigation.js';
 
 export const RootRoute: FunctionComponent = () => {
   const [staticPage] = useNavigationStaticPage();
@@ -47,7 +48,7 @@ export const SubRoute: FunctionComponent<{
   return (
     <>
       <ShowHide show={!subRoute}>{children}</ShowHide>
-      {subRoute ? subRoute : null}
+      {subRoute ?? null}
     </>
   );
 };

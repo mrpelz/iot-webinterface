@@ -1,5 +1,6 @@
-import { useGoRoot, useSegment } from '../../state/path.js';
 import { FunctionComponent } from 'preact';
+
+import { useGoRoot, useSegment } from '../../state/path.js';
 import { useSetTitleOverride } from '../../state/title.js';
 
 export const Test: FunctionComponent = () => {
