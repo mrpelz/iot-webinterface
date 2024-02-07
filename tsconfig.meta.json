@@ -1,5 +1,5 @@
 {
   "exclude": ["dist/**/*", "node_modules/**/*", "packages/**/*", "src/**/*"],
-  "extends": "@mrpelz/boilerplate-common/config/tsconfig.meta.json",
+  "extends": "@mrpelz/boilerplate-preact/tsconfig.meta.json",
   "include": ["**/*.js", "**/*.mjs"]
 }

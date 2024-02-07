@@ -1,11 +1,9 @@
-import { connectWorker } from './workers.js';
+import { wrap } from 'comlink';
 
 type SetupMessage = {
   initialId: string | null;
   interval: number;
 };
-
-const updateUrl = new URL('../../workers/update.js', import.meta.url).href;
 
 export const isProd = !['localhost', '127.0.0.1'].includes(location.hostname);
 
@@ -17,15 +15,16 @@ const getInitialId = () => localStorage.getItem(ID_STORAGE_KEY);
 export let triggerUpdate: (() => void) | undefined;
 
 export const update = (interval: number | null, debug: boolean): void => {
-  const port = connectWorker<SetupMessage>(
-    updateUrl,
-    'update',
-    {
-      initialId: getInitialId(),
-      interval: interval === null ? CHECK_INTERVAL : interval,
-    },
-    debug,
+  const worker = new SharedWorker(
+    /* webpackChunkName: "worker-update" */ new URL(
+      '/src/workers/update.js',
+      import.meta.url,
+    ),
   );
+
+  const workerProxy = wrap(worker.port);
+
+  const port = undefined as unknown as Worker;
 
   if (!port) return;
 

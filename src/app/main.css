@@ -1,0 +1,43 @@
+html {
+  --inset-size: env(safe-area-inset-top, 1px);
+}
+
+html[static]>body {
+  position: fixed;
+  margin: 0;
+  background-image: url('/static/images/icons/favicon-192.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  inset: var(--inset-size) 0 0 0;
+}
+
+@keyframes on-init {
+  0% {
+    transform: translate3d(-100%, 0, 0);
+  }
+
+  90%,
+  100% {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+html[static]>body::before {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: var(--inset-size);
+  animation-direction: alternate;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-name: on-init;
+  animation-timing-function: ease-in-out;
+  background-color: #abd037;
+  content: '';
+  transform: translate3d(-100%, 0, 0);
+}
+
+html[static]>body>* {
+  display: none
+}

@@ -1,42 +1,26 @@
 import {
-  config,
+  config as configUpstream,
   configMeta,
-  plugins,
-  rules,
   // @ts-ignore
-} from '@mrpelz/boilerplate-common/config/eslint.config.js';
-// @ts-ignore
-import pluginReactHooks from 'eslint-plugin-react-hooks';
-
-Object.assign(plugins, { 'react-hooks': pluginReactHooks });
-Object.assign(rules, { ...pluginReactHooks.configs.recommended.rules });
-
-config.files = ['src/app/**/*.{js,ts,tsx}'];
+} from '@mrpelz/boilerplate-preact/eslint.config.js';
+import { merge } from 'ts-deepmerge';
 
 /** @type {import('eslint').Linter.FlatConfig} */
-const configWorkers = {
-  ...config,
-  files: ['src/workers/**/*.{js,ts}'],
+export const configApp = merge(configUpstream);
+configApp.files = ['src/app/**/*.{js,jsx,ts,tsx}'];
+
+/** @type {import('eslint').Linter.FlatConfig} */
+const configDownstreamWorkers = {
   languageOptions: {
-    ...config.languageOptions,
     parserOptions: {
-      ...config.languageOptions?.parserOptions,
       project: 'src/workers/tsconfig.json',
-    },
-  },
-  settings: {
-    ...config.settings,
-    'import/resolver': {
-      typescript: {
-        enforceExtension: true,
-        extensionAlias: {
-          '.js': ['.js', '.ts'],
-        },
-        project: 'src/workers/tsconfig.json',
-      },
     },
   },
 };
 
+/** @type {import('eslint').Linter.FlatConfig} */
+export const configWorkers = merge(configUpstream, configDownstreamWorkers);
+configWorkers.files = ['src/workers/*/*.{js,ts}'];
+
 /** @type {import('eslint').Linter.FlatConfig[]} */
-export default [configMeta, config, configWorkers];
+export default [configMeta, configApp, configWorkers];

@@ -1,3 +1,7 @@
+const workerDebug = Boolean(
+  new URL(self.location.href).searchParams.get('debug'),
+);
+
 export const defer = (callback: () => void): void => {
   if ('requestIdleCallback' in self) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -50,3 +54,19 @@ export const fetchFallback = async (
 
 export const sleep = (ms: number): Promise<void> =>
   new Promise<void>((resolve) => setTimeout(() => resolve(), ms));
+
+/* eslint-disable no-console */
+export const workerConsole = {
+  debug: (...args: unknown[]): void => {
+    if (!workerDebug) return;
+    console.debug(`worker "${self.name}":`, ...args);
+  },
+  error: (...args: unknown[]): void => {
+    console.error(`worker "${self.name}":`, ...args);
+  },
+  info: (...args: unknown[]): void => {
+    if (!workerDebug) return;
+    console.info(`worker "${self.name}":`, ...args);
+  },
+};
+/* eslint-enable no-console */

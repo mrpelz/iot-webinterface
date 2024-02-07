@@ -14,7 +14,6 @@ import {
 } from '../../state/navigation.js';
 import { Theme, themes } from '../../state/theme.js';
 import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
-import { removeServiceWorkers } from '../../util/service-worker.js';
 import { triggerUpdate } from '../../util/update.js';
 import { Entry, List } from '../../views/list.js';
 import {
@@ -415,7 +414,6 @@ export const Settings: FunctionComponent = () => {
           </Button>
           <Button
             onClick={useCallback(() => {
-              removeServiceWorkers();
               localStorage.clear();
             }, [])}
           >

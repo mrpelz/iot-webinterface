@@ -1,5 +1,4 @@
-import { fetchFallback } from './util/main.js';
-import { scaffold, workerConsole } from './util/worker-scaffold.js';
+import { fetchFallback, workerConsole } from './util.js';
 
 declare const self: SharedWorkerGlobalScope & typeof globalThis;
 
@@ -370,77 +369,70 @@ const createSetter = (
 let _handleStreamOnline: ((port: MessagePort) => void) | undefined;
 let _handleTree: ((port: MessagePort) => void) | undefined;
 
-(async () => {
-  (async (port: MessagePort, setup: SetupMessage | null) => {
-    if (!setup) return;
+const _fn = async (port: MessagePort, setup: SetupMessage | null) => {
+  if (!setup) return;
 
-    const { apiBaseUrl, interval } = setup;
+  const { apiBaseUrl, interval } = setup;
 
-    const handleStreamOnline = (online: boolean) => {
-      _handleStreamOnline = (childPort) => {
-        const message: WorkerMessageOutbound = {
-          online,
-          type: WorkerMessageType.STREAM,
-        };
-
-        childPort.postMessage(message);
+  const handleStreamOnline = (online: boolean) => {
+    _handleStreamOnline = (childPort) => {
+      const message: WorkerMessageOutbound = {
+        online,
+        type: WorkerMessageType.STREAM,
       };
 
-      _handleStreamOnline(port);
+      childPort.postMessage(message);
     };
 
-    const { sendMessage, setId } = setupStream(
-      apiBaseUrl,
-      handleMessage,
-      handleStreamOnline,
-    );
+    _handleStreamOnline(port);
+  };
 
-    port.addEventListener('message', ({ data, ports }) => {
-      const [childPort] = ports;
-      if (!childPort) return;
+  const { sendMessage, setId } = setupStream(
+    apiBaseUrl,
+    handleMessage,
+    handleStreamOnline,
+  );
 
-      childPort.start();
+  port.addEventListener('message', ({ data, ports }) => {
+    const [childPort] = ports;
+    if (!childPort) return;
 
-      const { childType, index, type } = data as WorkerMessageInbound;
-      if (type !== WorkerMessageType.CHILD_REQUEST) return;
+    childPort.start();
 
-      switch (childType) {
-        case ChildType.GETTER: {
-          createGetter(index, childPort);
-          return;
-        }
-        case ChildType.SETTER: {
-          createSetter(index, childPort, (value) => sendMessage(value));
-          return;
-        }
-        default: {
-          childPort.close();
-        }
+    const { childType, index, type } = data as WorkerMessageInbound;
+    if (type !== WorkerMessageType.CHILD_REQUEST) return;
+
+    switch (childType) {
+      case ChildType.GETTER: {
+        createGetter(index, childPort);
+        return;
       }
-    });
+      case ChildType.SETTER: {
+        createSetter(index, childPort, (value) => sendMessage(value));
+        return;
+      }
+      default: {
+        childPort.close();
+      }
+    }
+  });
 
-    await getId(apiBaseUrl, interval, async (id) => {
-      const tree = await getTree(apiBaseUrl, interval, id);
+  await getId(apiBaseUrl, interval, async (id) => {
+    const tree = await getTree(apiBaseUrl, interval, id);
 
-      _handleTree = (childPort) => {
-        if (!tree) return;
+    _handleTree = (childPort) => {
+      if (!tree) return;
 
-        const message: WorkerMessageOutbound = {
-          tree,
-          type: WorkerMessageType.TREE,
-        };
-
-        childPort.postMessage(message);
+      const message: WorkerMessageOutbound = {
+        tree,
+        type: WorkerMessageType.TREE,
       };
 
-      _handleTree(port);
+      childPort.postMessage(message);
+    };
 
-      setId(id);
-    });
-  })(
-    ...(await scaffold<SetupMessage>(self, (port) => {
-      _handleTree?.(port);
-      _handleStreamOnline?.(port);
-    })),
-  );
-})();
+    _handleTree(port);
+
+    setId(id);
+  });
+};

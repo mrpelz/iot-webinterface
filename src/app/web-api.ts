@@ -1,11 +1,3 @@
-import { connectWorker } from './util/workers.js';
-import { queryXPath, QueryXPathType } from './util/xpath.js';
-
-type SetupMessage = {
-  apiBaseUrl: string;
-  interval: number;
-};
-
 type GetterCallback<T> = (value: T) => void;
 type TreeCallback = (
   tree: HierarchyElementSystem,
@@ -221,10 +213,6 @@ type SetterMessageOutbound<T> =
       value: T;
     };
 
-const CHECK_INTERVAL = 5000;
-
-const webApiUrl = new URL('../workers/web-api.js', import.meta.url).href;
-
 const domParser = new DOMParser();
 
 export class WebApi {
@@ -235,17 +223,6 @@ export class WebApi {
   private _treeCallback?: TreeCallback;
 
   constructor(apiBaseUrl: string | null, debug: boolean) {
-    this._port = connectWorker<SetupMessage>(
-      webApiUrl,
-      'web-api',
-      {
-        apiBaseUrl:
-          apiBaseUrl === null ? new URL('/', location.href).href : apiBaseUrl,
-        interval: CHECK_INTERVAL,
-      },
-      debug,
-    );
-
     (() => {
       if (!this._port) return;
 
@@ -284,74 +261,7 @@ export class WebApi {
   }
 
   private _handleTreeSet(): void {
-    if (!this._tree) return;
-
-    console.log(this._tree);
-
-    console.log(
-      queryXPath(
-        '//*[@level="SYSTEM"]',
-        this._tree,
-        QueryXPathType.ALL,
-        Element,
-      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
-    );
-
-    console.log(
-      queryXPath(
-        '//*[@level="HOME"]',
-        this._tree,
-        QueryXPathType.ALL,
-        Element,
-      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
-    );
-
-    console.log(
-      queryXPath(
-        '//*[@level="BUILDING"]',
-        this._tree,
-        QueryXPathType.ALL,
-        Element,
-      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
-    );
-
-    console.log(
-      queryXPath(
-        '//*[@level="FLOOR"]',
-        this._tree,
-        QueryXPathType.ALL,
-        Element,
-      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
-    );
-
-    console.log(
-      queryXPath(
-        '//*[@level="ROOM"]',
-        this._tree,
-        QueryXPathType.ALL,
-        Element,
-      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
-    );
-
-    console.log(
-      queryXPath(
-        '//*[@level="ROOM"]',
-        this._tree,
-        QueryXPathType.ALL,
-        Element,
-      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
-    );
-
-    console.log(
-      queryXPath(
-        '//*[@species="door"]',
-        this._tree,
-        QueryXPathType.ALL,
-        Element,
-      )?.map((node) => (node.cloneNode() as unknown as Element).outerHTML),
-    );
-
-    // this._treeCallback?.(this._tree, elements);
+    // noop
   }
 
   createGetter<T>(index: number, callback: GetterCallback<T>): Getter | null {

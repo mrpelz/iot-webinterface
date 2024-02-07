@@ -9,43 +9,23 @@
   "license": "UNLICENSED",
   "author": "Lennart Pelz <mail@mrpelz.de>",
   "type": "module",
-  "main": "dist/app/main.js",
-  "module": "dist/app/main.js",
-  "types": "dist/app/main.d.ts",
+  "main": "dist/main.js",
+  "module": "dist/main.js",
+  "types": "dist/main.d.ts",
   "files": [
     "dist/**/*.{js,map,ts}"
   ],
-  "scripts": {
-    "build": "npm run --silent clear && npm run --silent tsc && npm run --silent pack:transform",
-    "build:clean": "npm run --silent clear:build && npm run --silent tsc && npm run --silent pack:transform",
-    "build:clean:serve": "npm run --silent clear:build && tsc-watch --build tsconfig.json src/workers/tsconfig.json --watch --onSuccess \"npm run --silent pack:all\"",
-    "build:clean:watch": "npm run --silent clear:build && tsc-watch --build tsconfig.json src/workers/tsconfig.json --watch --onSuccess \"npm run --silent pack:transform\"",
-    "build:serve": "npm run --silent clear && tsc-watch --build tsconfig.json src/workers/tsconfig.json --watch --onSuccess \"npm run --silent pack:all\"",
-    "build:watch": "npm run --silent clear && tsc-watch --build tsconfig.json src/workers/tsconfig.json --watch --onSuccess \"npm run --silent pack:transform\"",
-    "clear": "rm -rf dist",
-    "clear:build": "rm -rf build dist",
-    "deploy": "scripts/deploy.sh",
-    "format:verify": "prettier --check '**/*.{js,jsx,json,ts,tsx}'",
-    "format:write": "prettier --write '**/*.{js,jsx,json,ts,tsx}'",
-    "lint": "tsc --project tsconfig.json --noEmit; tsc --project src/workers/tsconfig.json --noEmit; eslint --ext js,jsx,ts,tsx src",
-    "lint:fix": "eslint --fix --ext js,jsx,ts,tsx src",
-    "lint:ts-only": "tsc --project tsconfig.json --noEmit; tsc --project src/workers/tsconfig.json --noEmit; eslint --ext ts,tsx src",
-    "pack:all": "scripts/pack.js transform,serve",
-    "pack:serve": "scripts/pack.js serve",
-    "pack:transform": "scripts/pack.js transform",
-    "push": "git push origin HEAD --force && git push github HEAD --force",
-    "tsc": "tsc --build tsconfig.json src/workers/tsconfig.json",
-    "tsc:watch": "tsc --build tsconfig.json src/workers/tsconfig.json --watch"
-  },
   "dependencies": {
+    "comlink": "latest",
     "goober": "latest",
     "hls.js": "latest",
     "preact": "latest",
-    "proper-tags": "latest"
+    "proper-tags": "latest",
+    "workbox-precaching": "latest",
+    "workbox-window": "latest"
   },
   "devDependencies": {
-    "@mrpelz/boilerplate-common": "latest",
-    "@mrpelz/esm-kit": "latest",
-    "eslint-plugin-react-hooks": "latest"
+    "@mrpelz/boilerplate-preact": "latest",
+    "workbox-webpack-plugin": "latest"
   }
 }

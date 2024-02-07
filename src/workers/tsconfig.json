@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
+    "declaration": false,
+    "declarationMap": false,
     "lib": ["ESNext", "WebWorker"],
-    "outDir": "../../dist/workers"
   },
-  "extends": "../../tsconfig.common.json",
+  "extends": "@mrpelz/boilerplate-common/tsconfig.json",
   "include": ["**/*"]
 }

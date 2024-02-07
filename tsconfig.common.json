@@ -1,6 +1,0 @@
-{
-  "compilerOptions": {
-    "skipLibCheck": true
-  },
-  "extends": "@mrpelz/boilerplate-common/config/tsconfig.base.json"
-}

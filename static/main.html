@@ -2,8 +2,6 @@
 <html lang="en" style="background-color: rgb(0, 0, 0);" static="">
 
 <head>
-  <script async type="module" src="/dist/app/main.js" crossorigin="use-credentials" fetchpriority="high"></script>
-
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
@@ -12,106 +10,57 @@
   <meta name="viewport"
     content="viewport-fit=cover, width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
 
-  <style>
-    html {
-      --inset-size: env(safe-area-inset-top, 1px);
-    }
-
-    html[static]>body {
-      background-image: url('/static/images/icons/favicon-192.png');
-      background-position: center;
-      background-repeat: no-repeat;
-      bottom: 0;
-      left: 0;
-      margin: 0;
-      position: fixed;
-      right: 0;
-      top: var(--inset-size);
-    }
-
-    @keyframes onInit {
-      0% {
-        transform: translate3d(-100%, 0, 0);
-      }
-
-      90%,
-      100% {
-        transform: translate3d(100%, 0, 0);
-      }
-    }
-
-    html[static]>body::before {
-      animation-direction: alternate;
-      animation-duration: 2s;
-      animation-iteration-count: infinite;
-      animation-name: onInit;
-      animation-timing-function: ease-in-out;
-      background-color: #abd037;
-      content: '';
-      height: var(--inset-size);
-      left: 0;
-      position: fixed;
-      right: 0;
-      top: 0;
-      transform: translate3d(-100%, 0, 0);
-    }
-
-    html[static]>body>* {
-      display: none
-    }
-  </style>
-
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="manifest" href="/static/manifest.json">
+  <link rel="manifest" href="/manifest.json">
 
-  <link rel="shortcut icon" href="/static/images/icons/favicon.ico">
-  <link rel="apple-touch-icon" href="/static/images/icons/favicon-192.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/static/images/icons/favicon-152.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="/static/images/icons/favicon-167.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/static/images/icons/favicon-180.png">
+  <link rel="shortcut icon" href="/images/icons/favicon.ico">
+  <link rel="apple-touch-icon" href="/images/icons/favicon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/images/icons/favicon-152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/images/icons/favicon-167.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/icons/favicon-180.png">
 
   <meta name="apple-mobile-web-app-title" content="wurstsalat IoT">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <!-- iPhone 5, 5s, SE -->
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-640x1136.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-640x1136.png"
     media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-1136x640.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-1136x640.png"
     media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
   <!-- iPhone 6, 6s, 7, 8 -->
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-750x1334.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-750x1334.png"
     media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-1334x750.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-1334x750.png"
     media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
   <!-- iPhone 6 Plus, 6s Plus, 7 Plus, 8 Plus -->
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-1242x2208.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-1242x2208.png"
     media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-2208x1242.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-2208x1242.png"
     media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
   <!-- iPhone Xr -->
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-828x1792.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-828x1792.png"
     media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-1792x828.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-1792x828.png"
     media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
   <!-- iPhone Xs -->
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-1125x2436.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-1125x2436.png"
     media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-2436x1125.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-2436x1125.png"
     media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
   <!-- 9.7 in iPad, 7.9 in iPad mini -->
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-1536x2048.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-1536x2048.png"
     media="(min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-2048x1536.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-2048x1536.png"
     media="(min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape)">
   <!-- 10.5 in iPad Pro -->
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-1668x2224.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-1668x2224.png"
     media="(min-device-width: 834px) and (max-device-width: 834px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-2224x1668.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-2224x1668.png"
     media="(min-device-width: 834px) and (max-device-width: 834px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape)">
   <!-- 12.9 in iPad Pro -->
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-2048x2732.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-2048x2732.png"
     media="(min-device-width: 1024px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/static/images/splash/launch-2732x2048.png"
+  <link rel="apple-touch-startup-image" href="/images/splash/launch-2732x2048.png"
     media="(min-device-width: 1024px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape)">
 </head>
 
