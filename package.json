@@ -26,6 +26,11 @@
   },
   "devDependencies": {
     "@mrpelz/boilerplate-preact": "latest",
+    "@types/glob": "latest",
+    "favicons-webpack-plugin": "latest",
+    "glob": "latest",
+    "html-inline-css-webpack-plugin": "latest",
+    "html-inline-script-webpack-plugin": "latest",
     "workbox-webpack-plugin": "latest"
   }
 }

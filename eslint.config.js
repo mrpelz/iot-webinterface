@@ -20,7 +20,7 @@ const configDownstreamWorkers = {
 
 /** @type {import('eslint').Linter.FlatConfig} */
 export const configWorkers = merge(configUpstream, configDownstreamWorkers);
-configWorkers.files = ['src/workers/*/*.{js,ts}'];
+configWorkers.files = ['src/workers/**/*.{js,ts}'];
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [configMeta, configApp, configWorkers];
