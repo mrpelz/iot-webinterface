@@ -21,13 +21,14 @@ import { InjectManifest } from 'workbox-webpack-plugin';
 /** @type {import('@mrpelz/boilerplate-dom/webpack.config.js').ConfigurationExtended} */
 const configDownstream = {
   devServer: {
+    allowedHosts: 'all',
     client: {
       logging: 'error',
       overlay: false,
     },
     historyApiFallback: true,
     hot: false,
-    liveReload: true,
+    liveReload: false,
     static: [
       {
         directory: resolve(dirBase, 'node_modules'),
