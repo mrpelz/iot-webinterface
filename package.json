@@ -31,6 +31,8 @@
     "glob": "latest",
     "html-inline-css-webpack-plugin": "latest",
     "html-inline-script-webpack-plugin": "latest",
+    "source-map-loader": "latest",
+    "modify-source-webpack-plugin": "latest",
     "workbox-webpack-plugin": "latest"
   }
 }

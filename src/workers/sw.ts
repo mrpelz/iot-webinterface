@@ -103,7 +103,11 @@ self.addEventListener('notificationclick', (event) =>
       const windowClients = await self.clients.matchAll({ type: 'window' });
 
       for (const windowClient of windowClients) {
-        windowClient.navigate(windowClient.url);
+        try {
+          windowClient.navigate(windowClient.url);
+        } catch {
+          // noop
+        }
       }
     })(),
   ),

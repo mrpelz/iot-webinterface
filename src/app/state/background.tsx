@@ -22,7 +22,7 @@ export type TBackgroundContext = readonly [
 
 const BackgroundContext = createContext(null as unknown as TBackgroundContext);
 
-const BACKGROUND_PATH = '/images/background/';
+const BACKGROUND_PATH = '/assets/';
 const BACKGROUND_EXTENSION = '.png';
 
 const camelCase = new RegExp('[A-Z]', 'g');

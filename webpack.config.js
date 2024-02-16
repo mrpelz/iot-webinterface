@@ -3,17 +3,20 @@ import { relative, resolve } from 'node:path';
 import {
   dirBase,
   dirSrc,
-  dirStatic,
   // @ts-ignore
 } from '@mrpelz/boilerplate-dom/webpack.config.js';
 // @ts-ignore
 import configUpstream from '@mrpelz/boilerplate-preact/webpack.config.js';
 import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
-import glob from 'glob';
+import { glob } from 'glob';
 import { PluginForHtmlWebpackPluginV4 } from 'html-inline-css-webpack-plugin/build/core/v4.js';
 import HtmlInlineScriptPlugin from 'html-inline-script-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import {
+  ConcatOperation,
+  ModifySourcePlugin,
+} from 'modify-source-webpack-plugin';
 import { merge } from 'ts-deepmerge';
 import { InjectManifest } from 'workbox-webpack-plugin';
 
@@ -36,11 +39,10 @@ const configDownstream = {
       },
     ],
   },
-  optimization: {
-    runtimeChunk: 'single',
-  },
   output: {
-    publicPath: '',
+    assetModuleFilename: 'assets/[name][ext]',
+    chunkFormat: false,
+    publicPath: '/',
   },
   performance: false,
 };
@@ -83,15 +85,47 @@ if (config.module) {
       ],
     },
     {
+      enforce: 'pre',
+      test: /\.js$/i,
+      use: ['source-map-loader'],
+    },
+    {
       test: /\.css$/i,
       use: [MiniCssExtractPlugin.loader, 'css-loader'],
+    },
+    {
+      test: /\.png$/i,
+      type: 'asset/resource',
     },
   ];
 }
 
 config.plugins = [
+  new ModifySourcePlugin({
+    rules: [
+      {
+        operations: [
+          new ConcatOperation(
+            'start',
+            `// @ts-expect-error
+            __webpack_base_uri__ = new URL('/', location.href).href;\n\n`,
+          ),
+          new ConcatOperation(
+            'start',
+            glob
+              .sync(resolve(dirSrc, 'common/images/background/*'))
+              .map((path) => relative(resolve(dirSrc, 'app'), path))
+              .map((path) => `import "${path}"`)
+              .join('\n'),
+          ),
+        ],
+        test: new RegExp(`^${resolve(dirSrc, 'app/main.ts')}$`),
+      },
+    ],
+  }),
   new MiniCssExtractPlugin(),
   new HtmlWebpackPlugin({
+    scriptLoading: 'module',
     template: resolve(dirSrc, 'common/main.html'),
   }),
   new HtmlInlineScriptPlugin({
@@ -104,9 +138,7 @@ config.plugins = [
     mode: 'webapp',
   }),
   new InjectManifest({
-    additionalManifestEntries: glob
-      .sync(resolve(dirStatic, 'images/background/*'))
-      .map((path) => relative(dirStatic, path)),
+    maximumFileSizeToCacheInBytes: 10 * 1_000_000,
     swSrc: resolve(dirSrc, 'workers/sw.ts'),
   }),
 ];
