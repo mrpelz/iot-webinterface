@@ -2,6 +2,8 @@ import { computed, ReadonlySignal, Signal } from '@preact/signals';
 
 export type AnySignal<T> = Signal<T> | ReadonlySignal<T>;
 
+export const getSignal = <T>(signal: AnySignal<T>): T => signal.value;
+
 export const readOnly = <T>(signal: Signal<T>): ReadonlySignal<T> =>
   computed(() => signal.value);
 
@@ -33,7 +35,7 @@ export const callback = <
   const $combinedInputs = combinedSignal(signals);
 
   return computed(() => {
-    const { value: combinedInputs } = $combinedInputs;
+    const combinedInputs = getSignal($combinedInputs);
 
     return (...args: A) => handler(combinedInputs, ...args);
   });

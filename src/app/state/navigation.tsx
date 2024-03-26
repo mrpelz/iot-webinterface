@@ -16,6 +16,7 @@ import {
   useSetLocalStorage,
 } from '../hooks/use-local-storage.js';
 import { flags } from '../util/flags.js';
+import { getSignal } from '../util/signal.js';
 import {
   HierarchyElement,
   HierarchyElementBuilding,
@@ -24,7 +25,7 @@ import {
   HierarchyElementRoom,
   Levels,
 } from '../web-api.js';
-import { useSegment } from './path.js';
+import { $rootPath, $setRootPath } from './path.js';
 import { $isVisible } from './visibility.js';
 import { useLevelShallow, useWebApi } from './web-api.js';
 
@@ -188,17 +189,19 @@ const useStaticPage = (
 export const NavigationProvider: FunctionComponent = ({ children }) => {
   useHookDebug('NavigationProvider');
 
-  const { value: isVisible } = $isVisible;
+  const isVisible = getSignal($isVisible);
   const isVisibleDelayed = useDelay(isVisible, 300);
 
   const { hierarchy } = useWebApi();
   const settled = useDelay(Boolean(hierarchy), 500);
 
-  const { value: startPageFlag } = flags.startPage;
-  const [startPagePath, setStartPagePath] = useSegment(0);
+  const startPageFlag = getSignal(flags.startPage);
+
+  const rootPath = getSignal($rootPath);
+  const setRootPath = getSignal($setRootPath);
 
   const startPagePathInitial = useMemo(
-    () => startPagePath || null,
+    () => rootPath || null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
@@ -206,15 +209,9 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   const startPage = useMemo(
     () =>
       (settled && isVisibleDelayed ? null : startPageFlag) ||
-      (settled ? startPagePath : null) ||
+      (settled ? rootPath : null) ||
       startPagePathInitial,
-    [
-      isVisibleDelayed,
-      settled,
-      startPageFlag,
-      startPagePath,
-      startPagePathInitial,
-    ],
+    [isVisibleDelayed, settled, startPageFlag, rootPath, startPagePathInitial],
   );
 
   const staticPageFromFlag = useMemo(
@@ -255,7 +252,7 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     if (!stateStaticPage) return;
 
-    setStartPagePath?.(stateStaticPage);
+    setRootPath(stateStaticPage);
     setRoom(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateStaticPage]);
@@ -263,7 +260,7 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     if (!stateRoom) return;
 
-    setStartPagePath?.(stateRoom.meta.name);
+    setRootPath(stateRoom.meta.name);
     setStaticPage(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateRoom]);

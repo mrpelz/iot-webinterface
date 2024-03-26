@@ -16,6 +16,7 @@ import { Translation } from '../state/i18n.js';
 import { $isScreensaverActive } from '../state/screensaver.js';
 import { dimensions } from '../style.js';
 import { fetchFallback } from '../util/fetch.js';
+import { getSignal } from '../util/signal.js';
 import { Category } from './category.js';
 
 const next10thSecondIncrement = (): number => msToNextSecond(10);
@@ -27,8 +28,8 @@ export const HLSStream: FunctionComponent<{
 }> = ({ poster, src }) => {
   const [isActive, setActive] = useState(false);
 
-  const { value: isFocused } = $isFocused;
-  const { value: isScreensaverActive } = $isScreensaverActive;
+  const isFocused = getSignal($isFocused);
+  const isScreensaverActive = getSignal($isScreensaverActive);
 
   useEffect(() => {
     if (isFocused && !isScreensaverActive) return;

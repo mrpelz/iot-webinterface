@@ -11,13 +11,14 @@ import {
 import { useArray } from '../../hooks/use-array-compare.js';
 import { actuated, measuredCategories } from '../../i18n/mapping.js';
 import { Translation } from '../../state/i18n.js';
-import { useSegment } from '../../state/path.js';
+import { $subPath } from '../../state/path.js';
 import {
   useElementFilter,
   useElements,
   useLevelShallow,
   useMetaFilter,
 } from '../../state/web-api.js';
+import { getSignal } from '../../util/signal.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
 import {
@@ -97,7 +98,7 @@ export const Room: FunctionComponent<{
 
   const elements = useElements();
 
-  const [subRouteId] = useSegment(1);
+  const subRouteId = getSignal($subPath);
   const [subRouteElement] = useElementFilter(
     subRouteId ? elements : null,
     useCallback(({ id }) => id === subRouteId, [subRouteId]),

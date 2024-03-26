@@ -2,8 +2,9 @@ import { ComponentChildren, FunctionComponent, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import { Summary } from '../components/diagnostics.js';
-import { useI18n } from '../state/i18n.js';
+import { $i18n } from '../state/i18n.js';
 import { useGetter, useSetter } from '../state/web-api.js';
+import { getSignal } from '../util/signal.js';
 import {
   HierarchyElement,
   isElementWithMeta,
@@ -48,7 +49,7 @@ export const Details: FunctionComponent<{
 export const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
   element,
 }) => {
-  const { country } = useI18n();
+  const { country } = getSignal($i18n);
 
   if (!isElementWithMeta(element)) return null;
 
@@ -123,7 +124,7 @@ const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
   const { get, meta } = element;
   const isDate = isMetaPropertySensorDate(meta);
 
-  const { country } = useI18n();
+  const { country } = getSignal($i18n);
 
   const rawState = useGetter<unknown>(element);
   const state = useMemo(

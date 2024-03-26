@@ -8,8 +8,9 @@ import {
   defaultNumberFormat,
   measuredNumberFormats,
 } from '../../i18n/mapping.js';
-import { Translation, useI18n } from '../../state/i18n.js';
+import { $i18n, Translation } from '../../state/i18n.js';
 import { useGetter } from '../../state/web-api.js';
+import { getSignal } from '../../util/signal.js';
 import {
   HierarchyElement,
   HierarchyElementPropertySensor,
@@ -46,7 +47,7 @@ export const NumericSensor: FunctionComponent<{
     meta: { measured, unit },
   } = element;
 
-  const { translationLanguage, translationLocale } = useI18n();
+  const { translationLanguage, translationLocale } = getSignal($i18n);
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
     [translationLanguage, translationLocale],

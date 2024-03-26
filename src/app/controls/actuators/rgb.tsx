@@ -22,13 +22,14 @@ import { useSwipe } from '../../hooks/use-swipe.js';
 import { useWheel } from '../../hooks/use-wheel.js';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
-import { useSegment } from '../../state/path.js';
+import { $rootPath } from '../../state/path.js';
 import {
   useChild,
   useChildGetter,
   useChildSetter,
   useGetter,
 } from '../../state/web-api.js';
+import { getSignal } from '../../util/signal.js';
 import {
   HierarchyElement,
   HierarchyElementArea,
@@ -129,7 +130,7 @@ const Color: FunctionComponent<{
 
   const ColorBody = useColorBody(Base, property, actuated);
 
-  const [route] = useSegment(0);
+  const route = getSignal($rootPath);
   const allowTransition = Boolean(useDelay(route, 300, true));
 
   const label = useMemo(

@@ -5,10 +5,7 @@ import { FunctionComponent, h, render as preactRender } from 'preact';
 import { useMemo } from 'preact/hooks';
 
 import { BackgroundProvider } from './state/background.js';
-import { I18nProvider } from './state/i18n.js';
-import { MenuVisibleProvider } from './state/menu.js';
 import { NavigationProvider } from './state/navigation.js';
-import { PathProvider } from './state/path.js';
 import { ScrollEffects } from './state/scroll-effects.js';
 import { TitleProvider } from './state/title.js';
 import { WebApiProvider } from './state/web-api.js';
@@ -50,35 +47,26 @@ const GlobalStyles = createGlobalStyle`
 export const Root: FunctionComponent<{
   webApi: WebApi;
 }> = ({ webApi }) => {
-  const _PathProvider = bindComponent(
-    PathProvider,
-    useMemo(() => ({ rootPathDepth: 1 }), []),
-  );
-
   const _WebApiProvider = bindComponent(
     WebApiProvider,
     useMemo(() => ({ webApi }), [webApi]),
   );
 
-  const OuterState = combineComponents(_PathProvider);
-
   const InnerState = combineComponents(
     _WebApiProvider,
-    I18nProvider,
-    MenuVisibleProvider,
     NavigationProvider,
     BackgroundProvider,
     TitleProvider,
   );
 
   return (
-    <OuterState>
+    <>
       <GlobalStyles />
       <InnerState>
         <ScrollEffects />
         <App />
       </InnerState>
-    </OuterState>
+    </>
   );
 };
 

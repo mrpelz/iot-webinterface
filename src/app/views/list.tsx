@@ -6,6 +6,7 @@ import {
   List as ListComponent,
 } from '../components/list.js';
 import { $theme } from '../state/theme.js';
+import { getSignal } from '../util/signal.js';
 
 export const Entry: FunctionComponent<{
   id?: string;
@@ -18,7 +19,7 @@ export const Entry: FunctionComponent<{
 );
 
 export const List: FunctionComponent = ({ children }) => {
-  const { value: theme } = $theme;
+  const theme = getSignal($theme);
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
   return (

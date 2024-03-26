@@ -1,4 +1,5 @@
 import { $theme, Theme } from '../state/theme.js';
+import { getSignal } from '../util/signal.js';
 
 export type Color = (a?: number) => string;
 
@@ -6,7 +7,7 @@ export const useThemedValue = <T>(
   themedColors: Record<Theme, T>,
   themeOverride?: Theme,
 ): T => {
-  const { value: theme } = $theme;
+  const theme = getSignal($theme);
 
   return themedColors[themeOverride || theme];
 };

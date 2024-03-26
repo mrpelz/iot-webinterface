@@ -5,8 +5,9 @@ import { Tag } from '../../components/controls.js';
 import { ForwardIcon } from '../../components/icons.js';
 import { I18nKey } from '../../i18n/main.js';
 import { Translation } from '../../state/i18n.js';
-import { useSegment } from '../../state/path.js';
+import { $setSubPath } from '../../state/path.js';
 import { useChild, useGetter } from '../../state/web-api.js';
+import { getSignal } from '../../util/signal.js';
 import {
   HierarchyElement,
   HierarchyElementArea,
@@ -52,12 +53,7 @@ export const OpenSensor: FunctionComponent<{
 }) => {
   const { id, property } = element;
 
-  const [, setSubRouteId] = useSegment(1);
-
-  const handleClick = useCallback(
-    () => setSubRouteId?.(id),
-    [id, setSubRouteId],
-  );
+  const handleClick = useCallback(() => getSignal($setSubPath)(id), [id]);
 
   const open = useChild(element, 'open') as BinarySensorElement;
   const value = useGetter<boolean>(open);

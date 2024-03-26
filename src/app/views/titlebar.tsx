@@ -20,13 +20,20 @@ import {
   Titlebar as TitlebarComponent,
 } from '../components/titlebar.js';
 import { useAwaitEvent } from '../hooks/use-await-event.js';
-import { useFlipMenuVisible } from '../state/menu.js';
-import { useGoPreviousSegment, useGoUp, useSegment } from '../state/path.js';
+import { flipMenuVisible } from '../state/menu.js';
+import {
+  $isRoot,
+  $rootPath,
+  $setRootPath,
+  goPrevious,
+  goUp,
+} from '../state/path.js';
 import { useCapitalizedTitle } from '../state/title.js';
 import { useStreamOnline } from '../state/web-api.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
-import { useMediaQuery } from '../style/main.js';
+import { getMediaQuery } from '../style/main.js';
+import { getSignal } from '../util/signal.js';
 
 export const IconContainer: FunctionComponent<{
   paddingSetter: (input: number) => void;
@@ -94,39 +101,35 @@ export const Titlebar: FunctionComponent = () => {
 
   const title = useCapitalizedTitle();
 
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
+  const isDesktop = useBreakpoint(getMediaQuery(dimensions.breakpointDesktop));
 
-  const flipMenuVisible = useFlipMenuVisible();
+  const rootPath = getSignal($rootPath);
+  const setRootPath = getSignal($setRootPath);
 
-  const goUp = useGoUp();
-
-  const [page, setPage] = useSegment(0);
-  const isMap = useMemo(() => page === 'map', [page]);
-
-  const goPrevious = useGoPreviousSegment(0);
+  const isMap = useMemo(() => rootPath === 'map', [rootPath]);
+  const isRoot = getSignal($isRoot);
 
   const leftIcon = useMemo(() => {
-    if (goUp) {
+    if (!isRoot) {
       return <BackIcon onClick={goUp} />;
     }
 
     if (isDesktop) return null;
 
     return <MenuIcon onClick={flipMenuVisible} />;
-  }, [flipMenuVisible, goUp, isDesktop]);
+  }, [isDesktop, isRoot]);
 
   const rightIcon = useMemo(() => {
-    if (goUp) {
+    if (!isRoot) {
       return <MenuIcon onClick={flipMenuVisible} />;
     }
 
     if (isMap) {
-      return goPrevious ? <ReturnIcon onClick={() => goPrevious()} /> : null;
+      return <ReturnIcon onClick={() => goPrevious()} />;
     }
 
-    return setPage ? <MapIcon onClick={() => setPage('map')} /> : null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [goPrevious, goUp, isMap, setPage]);
+    return <MapIcon onClick={() => setRootPath('map')} />;
+  }, [isMap, isRoot, setRootPath]);
 
   return (
     <TitlebarComponent padding={padding}>

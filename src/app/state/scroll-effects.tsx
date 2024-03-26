@@ -2,12 +2,13 @@ import { FunctionComponent } from 'preact';
 import { useLayoutEffect } from 'preact/hooks';
 
 import { useHookDebug } from '../hooks/use-hook-debug.js';
-import { useSegment } from './path.js';
+import { getSignal } from '../util/signal.js';
+import { $rootPath } from './path.js';
 
 export const ScrollEffects: FunctionComponent = () => {
   useHookDebug('Scroll');
 
-  const [segment0] = useSegment(0);
+  const segment0 = getSignal($rootPath);
 
   useLayoutEffect(() => {
     requestAnimationFrame(() =>

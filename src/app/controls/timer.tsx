@@ -13,13 +13,14 @@ import {
 } from '../hooks/use-time-label.js';
 import { I18nKey } from '../i18n/main.js';
 import { Translation } from '../state/i18n.js';
-import { useSegment } from '../state/path.js';
+import { $rootPath } from '../state/path.js';
 import {
   useChild,
   useChildGetter,
   useChildSetter,
   useGetter,
 } from '../state/web-api.js';
+import { getSignal } from '../util/signal.js';
 import {
   HierarchyElement,
   isMetaPropertySensorDate,
@@ -111,7 +112,7 @@ export const TimerActuator: FunctionComponent<{
 
   const ColorBody = useColorBody(BodyLarge, property, actuated);
 
-  const [route] = useSegment(0);
+  const route = getSignal($rootPath);
   const allowTransition = Boolean(useDelay(route, 300, true));
 
   const label = useMemo(() => {

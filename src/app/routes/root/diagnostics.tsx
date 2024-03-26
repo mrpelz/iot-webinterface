@@ -5,14 +5,14 @@ import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { Details, Hierarchy, Meta } from '../../controls/diagnostics.js';
 import { useGetLocalStorage } from '../../hooks/use-local-storage.js';
 import { $isFocused } from '../../state/focus.js';
-import { useI18n } from '../../state/i18n.js';
-import { useIsMenuVisible } from '../../state/menu.js';
+import { $i18n } from '../../state/i18n.js';
+import { $isMenuVisible } from '../../state/menu.js';
 import {
   staticPagesBottom,
   staticPagesTop,
   useNavigation,
 } from '../../state/navigation.js';
-import { usePathContext } from '../../state/path.js';
+import { $isRoot, $path, $previousPath } from '../../state/path.js';
 import { $isScreensaverActive } from '../../state/screensaver.js';
 import { $theme } from '../../state/theme.js';
 import { useTitle } from '../../state/title.js';
@@ -25,8 +25,9 @@ import {
 } from '../../state/web-api.js';
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
-import { useMediaQuery } from '../../style/main.js';
+import { getMediaQuery } from '../../style/main.js';
 import { flags } from '../../util/flags.js';
+import { getSignal } from '../../util/signal.js';
 import { Levels } from '../../web-api.js';
 
 const Fallback: FunctionComponent = () => (
@@ -208,7 +209,7 @@ const I18n: FunctionComponent = () => {
     translation,
     translationLanguage,
     translationLocale
-  } = useI18n();
+  } = getSignal($i18n);
 
   return (
     <>
@@ -258,24 +259,26 @@ const I18n: FunctionComponent = () => {
 };
 
 export const Diagnostics: FunctionComponent = () => {
-  const { value: isVisible } = $isVisible;
+  const isVisible = getSignal($isVisible);
 
-  const { value: isFocused } = $isFocused;
+  const isFocused = getSignal($isFocused);
 
-  const { value: isScreensaverActive } = $isScreensaverActive;
+  const isScreensaverActive = getSignal($isScreensaverActive);
 
-  const { isRoot, path, previousPath } = usePathContext();
+  const isRoot = getSignal($isRoot);
+  const path = getSignal($path);
+  const previousPath = getSignal($previousPath);
 
-  const { value: theme } = $theme;
+  const theme = getSignal($theme);
 
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
+  const isDesktop = useBreakpoint(getMediaQuery(dimensions.breakpointDesktop));
 
   const isStreamOnline = useStreamOnline();
   const streamCount = useStreamCount();
 
   const hierarchy = useHierarchy();
 
-  const isMenuVisible = useIsMenuVisible();
+  const isMenuVisible = getSignal($isMenuVisible);
 
   const title = useTitle();
 

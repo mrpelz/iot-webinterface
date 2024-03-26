@@ -15,6 +15,7 @@ import {
 import { Theme, themes } from '../../state/theme.js';
 import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
 import { flags } from '../../util/flags.js';
+import { getSignal } from '../../util/signal.js';
 import { swProxy } from '../../util/sw.js';
 import { Entry, List } from '../../views/list.js';
 import {
@@ -42,17 +43,17 @@ export const Settings: FunctionComponent = () => {
 
   const startPages = useMemo(() => [...staticPages, ...roomNames], [roomNames]);
 
-  const { value: startPage } = flags.startPage;
-  const { value: theme } = flags.theme;
-  const { value: language } = flags.language;
-  const { value: absoluteTimes } = flags.absoluteTimes;
-  const { value: inactivityTimeout } = flags.inactivityTimeout;
-  const { value: screensaverEnable } = flags.screensaverEnable;
+  const startPage = getSignal(flags.startPage);
+  const theme = getSignal(flags.theme);
+  const language = getSignal(flags.language);
+  const absoluteTimes = getSignal(flags.absoluteTimes);
+  const inactivityTimeout = getSignal(flags.inactivityTimeout);
+  const screensaverEnable = getSignal(flags.screensaverEnable);
   const { value: screensaverRandomizePosition } =
     flags.screensaverRandomizePosition;
-  const { value: updateUnattended } = flags.updateUnattended;
-  const { value: debug } = flags.debug;
-  const { value: apiBaseUrl } = flags.apiBaseUrl;
+  const updateUnattended = getSignal(flags.updateUnattended);
+  const debug = getSignal(flags.debug);
+  const apiBaseUrl = getSignal(flags.apiBaseUrl);
 
   return (
     <>

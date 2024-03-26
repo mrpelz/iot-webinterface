@@ -14,7 +14,7 @@ import {
 import { useArray } from '../hooks/use-array-compare.js';
 import { roomSorting } from '../i18n/mapping.js';
 import { Translation } from '../state/i18n.js';
-import { useIsMenuVisible } from '../state/menu.js';
+import { $isMenuVisible } from '../state/menu.js';
 import {
   staticPagesBottom,
   staticPagesTop,
@@ -22,12 +22,13 @@ import {
   useNavigationRoom,
   useNavigationStaticPage,
 } from '../state/navigation.js';
-import { useGoRoot } from '../state/path.js';
+import { goRoot } from '../state/path.js';
 import { flipScreensaverActive } from '../state/screensaver.js';
 import { $theme } from '../state/theme.js';
 import { useChild, useChildGetter, useLevelShallow } from '../state/web-api.js';
 import { colors } from '../style.js';
 import { flags } from '../util/flags.js';
+import { getSignal } from '../util/signal.js';
 import {
   HierarchyElementFloor,
   HierarchyElementRoom,
@@ -65,7 +66,7 @@ const MenuListItem: FunctionComponent<{
   isActive: boolean;
   onClick: () => void;
 }> = ({ isActive: active, onClick, children }) => {
-  const isMenuVisible = useIsMenuVisible();
+  const isMenuVisible = getSignal($isMenuVisible);
   const isHighContrast = $theme.value === 'highContrast';
 
   const [isHovered, setHovered] = useState(false);
@@ -103,8 +104,6 @@ const MenuListItem: FunctionComponent<{
 export const Floor: FunctionComponent<{
   floor: HierarchyElementFloor;
 }> = ({ floor }) => {
-  const goRoot = useGoRoot();
-
   const elements = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, floor);
   const sortedElements = useArray(
     useMemo(() => sortBy(elements, 'name', roomSorting).all, [elements]),
@@ -125,7 +124,7 @@ export const Floor: FunctionComponent<{
             <MenuListItem
               key={key}
               isActive={isActive}
-              onClick={() => (isActive ? goRoot?.() : selectRoom(room))}
+              onClick={() => (isActive ? goRoot() : selectRoom(room))}
             >
               <Translation capitalize={true} i18nKey={room.meta.name} />
               <MenuIndicatorSection>
@@ -142,11 +141,9 @@ export const Floor: FunctionComponent<{
 };
 
 export const Menu: FunctionComponent = () => {
-  const goRoot = useGoRoot();
+  const isScreensaverEnabled = getSignal(flags.screensaverEnable);
 
-  const { value: isScreensaverEnabled } = flags.screensaverEnable;
-
-  const isMenuVisible = useIsMenuVisible();
+  const isMenuVisible = getSignal($isMenuVisible);
 
   const [selectedStaticPage, selectStaticPage] = useNavigationStaticPage();
   const [building] = useNavigationBuilding();

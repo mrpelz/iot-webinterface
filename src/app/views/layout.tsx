@@ -3,16 +3,13 @@ import { useLayoutEffect, useMemo, useRef } from 'preact/hooks';
 
 import { Aside, Header, Main } from '../components/layout.js';
 import { MenuShade } from '../components/menu.js';
-import {
-  MenuVisible,
-  useIsMenuVisible,
-  useSetMenuVisible,
-} from '../state/menu.js';
-import { useGoUp } from '../state/path.js';
+import { $isMenuVisible, MenuVisible, setMenuVisible } from '../state/menu.js';
+import { $isRoot, goUp } from '../state/path.js';
 import { $isScreensaverActive } from '../state/screensaver.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
-import { useMediaQuery } from '../style/main.js';
+import { getMediaQuery } from '../style/main.js';
+import { getSignal } from '../util/signal.js';
 import { Menu } from './menu.js';
 import { StatusBar } from './status-bar.js';
 import { SwipeBack } from './swipe-back.js';
@@ -21,13 +18,10 @@ import { Titlebar } from './titlebar.js';
 export const swipeCaptureWidth = 30;
 
 export const Layout: FunctionComponent = ({ children }) => {
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
+  const isDesktop = useBreakpoint(getMediaQuery(dimensions.breakpointDesktop));
 
-  const isAsideVisible = useIsMenuVisible();
-  const setAsideVisible = useSetMenuVisible();
-  const { value: isScreensaverActive } = $isScreensaverActive;
-
-  const goUp = useGoUp();
+  const isAsideVisible = getSignal($isMenuVisible);
+  const isScreensaverActive = getSignal($isScreensaverActive);
 
   const menuRef = useRef<HTMLElement>(null);
   const menuShadeRef = useRef<HTMLDivElement>(null);
@@ -37,15 +31,12 @@ export const Layout: FunctionComponent = ({ children }) => {
   const mainRef = useRef<HTMLElement>(null);
 
   const isAsideVisibleRef = useRef<MenuVisible>(null);
-  const isGoUpActiveRef = useRef<typeof goUp>(null);
+
+  const isRoot = getSignal($isRoot);
 
   useLayoutEffect(() => {
     isAsideVisibleRef.current = isAsideVisible;
   }, [isAsideVisible]);
-
-  useLayoutEffect(() => {
-    isGoUpActiveRef.current = goUp;
-  }, [goUp]);
 
   useLayoutEffect(() => {
     const { current: mainCurrent } = mainRef;
@@ -124,12 +115,12 @@ export const Layout: FunctionComponent = ({ children }) => {
 
       if (!lastX || isAsideVisibleRef.current) return;
 
-      if (isGoUpActiveRef.current && slideElement !== menuRef.current) {
+      if (slideElement !== menuRef.current) {
         if (lastX >= slideElement.offsetWidth - 1) {
-          isGoUpActiveRef.current?.();
+          goUp();
         }
       } else if (lastX >= slideElement.offsetWidth / 3) {
-        setAsideVisible(true);
+        setMenuVisible(true);
       }
 
       setTransform(0);
@@ -175,11 +166,11 @@ export const Layout: FunctionComponent = ({ children }) => {
     () =>
       isAsideVisible
         ? (event) => {
-            setAsideVisible(false);
+            setMenuVisible(false);
             event.preventDefault();
           }
         : undefined,
-    [isAsideVisible, setAsideVisible],
+    [isAsideVisible],
   );
 
   return (
@@ -196,11 +187,11 @@ export const Layout: FunctionComponent = ({ children }) => {
       >
         <Menu />
       </Aside>
-      {goUp ? (
+      {isRoot ? null : (
         <Aside isVisible={false} ref={swipeBackRef}>
           <SwipeBack />
         </Aside>
-      ) : null}
+      )}
       <Main
         isAsideVisible={isScreensaverActive || Boolean(isAsideVisible)}
         onClickCapture={handleAsideOutsideClick}

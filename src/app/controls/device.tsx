@@ -18,11 +18,12 @@ import {
   useLevelShallowSkipInput,
   useMetaFilter,
 } from '../state/web-api.js';
+import { getSignal } from '../util/signal.js';
 import { HierarchyElementDevice, Levels, MetaDevice } from '../web-api.js';
 import { CellWithBody } from './main.js';
 
 export const OnlineIcon: FunctionComponent = () => {
-  const { value: theme } = $theme;
+  const theme = getSignal($theme);
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
   return (
@@ -34,7 +35,7 @@ export const OnlineIcon: FunctionComponent = () => {
 };
 
 export const OfflineIcon: FunctionComponent = () => {
-  const { value: theme } = $theme;
+  const theme = getSignal($theme);
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
   return (

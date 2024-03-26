@@ -1,10 +1,8 @@
-import { createContext, FunctionComponent } from 'preact';
-import { useContext, useMemo } from 'preact/hooks';
+import { computed } from '@preact/signals';
+import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
 
-import { useHookDebug } from '../hooks/use-hook-debug.js';
 import {
-  I18nLanguage,
-  I18nNonCapitalization,
   I18nTranslation,
   nonCapitalizations,
   reconcileLanguage,
@@ -13,86 +11,43 @@ import {
 import { universal } from '../i18n/universal.js';
 import { flags } from '../util/flags.js';
 import { getCountry, getLanguage } from '../util/locale.js';
+import { getSignal } from '../util/signal.js';
 import { capitalize as capitalizeUtil } from '../util/string.js';
 
-type TI18nContext = {
-  country: string | null;
-  language: string;
-  locale: string | null;
-  nonCapitalization: I18nNonCapitalization;
-  translation: I18nTranslation;
-  translationLanguage: I18nLanguage;
-  translationLocale: string | null;
-};
+const country = getCountry();
+const language = getLanguage();
 
-const I18nContext = createContext<TI18nContext>(
-  null as unknown as TI18nContext,
-);
+export const $i18n = computed(() => {
+  const languageOverride = getSignal(flags.language);
 
-export const I18nProvider: FunctionComponent = ({ children }) => {
-  useHookDebug('I18nProvider');
+  const translationLanguage = reconcileLanguage(languageOverride || language);
 
-  const { value: languageOverride } = flags.language;
+  const locale = country ? `${language}-${country}` : null;
 
-  const country = useMemo(() => getCountry(), []);
-  const language = useMemo(() => getLanguage(), []);
+  const translationLocale = country
+    ? `${translationLanguage}-${country}`
+    : null;
 
-  const translationLanguage = useMemo(
-    () => reconcileLanguage(languageOverride || language),
-    [language, languageOverride],
-  );
+  const translation = { ...universal, ...translations[translationLanguage] };
 
-  const locale = useMemo(
-    () => (country ? `${language}-${country}` : null),
-    [country, language],
-  );
+  const nonCapitalization = nonCapitalizations[translationLanguage];
 
-  const translationLocale = useMemo(
-    () => (country ? `${translationLanguage}-${country}` : null),
-    [country, translationLanguage],
-  );
-
-  const translation = useMemo(
-    () => ({ ...universal, ...translations[translationLanguage] }),
-    [translationLanguage],
-  );
-
-  const nonCapitalization = useMemo(
-    () => nonCapitalizations[translationLanguage],
-    [translationLanguage],
-  );
-
-  const value = useMemo(
-    () => ({
-      country,
-      language,
-      locale,
-      nonCapitalization,
-      translation,
-      translationLanguage,
-      translationLocale,
-    }),
-    [
-      country,
-      language,
-      locale,
-      nonCapitalization,
-      translation,
-      translationLanguage,
-      translationLocale,
-    ],
-  );
-
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
-};
-
-export const useI18n = (): TI18nContext => useContext(I18nContext);
+  return {
+    country,
+    language,
+    locale,
+    nonCapitalization,
+    translation,
+    translationLanguage,
+    translationLocale,
+  };
+});
 
 export const useI18nKey = <F extends boolean>(
   key?: keyof I18nTranslation | string,
   fallback?: F,
 ): F extends true ? string : string | null => {
-  const { translation } = useContext(I18nContext);
+  const { translation } = getSignal($i18n);
 
   const result = useMemo(() => {
     if (!key || !(key in translation)) return null;
@@ -113,7 +68,7 @@ export const useI18nKey = <F extends boolean>(
 };
 
 export const useI18nNonCapitalization = (): string[] => {
-  const { nonCapitalization } = useContext(I18nContext);
+  const { nonCapitalization } = getSignal($i18n);
 
   return useMemo(
     () => nonCapitalization,

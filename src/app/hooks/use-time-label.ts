@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
-import { useI18n, useI18nKey } from '../state/i18n.js';
+import { $i18n, useI18nKey } from '../state/i18n.js';
 import { flags } from '../util/flags.js';
+import { getSignal } from '../util/signal.js';
 
 const units = [
   'second',
@@ -83,7 +84,7 @@ export const useRelativeTimeLabel = (
   date: Date | null,
   nowSpan = 4000,
 ): string | null => {
-  const { translationLanguage, translationLocale } = useI18n();
+  const { translationLanguage, translationLocale } = getSignal($i18n);
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
     [translationLanguage, translationLocale],
@@ -125,7 +126,7 @@ export const useRelativeTimeLabel = (
 };
 
 export const useAbsoluteTimeLabel = (date: Date | null): string | null => {
-  const { translationLanguage, translationLocale } = useI18n();
+  const { translationLanguage, translationLocale } = getSignal($i18n);
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
     [translationLanguage, translationLocale],
@@ -155,7 +156,7 @@ export const useTimeLabel = (
   date: Date | null,
   nowSpan?: number,
 ): string | null => {
-  const { value: absoluteTimes } = flags.absoluteTimes;
+  const absoluteTimes = getSignal(flags.absoluteTimes);
 
   const relativeLabel = useRelativeTimeLabel(
     absoluteTimes ? null : date,

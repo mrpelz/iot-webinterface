@@ -6,7 +6,7 @@ import { Device } from '../../controls/device.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { roomSorting as roomsSorting } from '../../i18n/mapping.js';
 import { Translation } from '../../state/i18n.js';
-import { useSegment } from '../../state/path.js';
+import { $setSubPath, $subPath } from '../../state/path.js';
 import {
   useElementFilter,
   useElements,
@@ -14,6 +14,7 @@ import {
   useLevelDeep,
   useMetaFilter,
 } from '../../state/web-api.js';
+import { getSignal } from '../../util/signal.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
 import {
@@ -30,8 +31,6 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
     meta: { name },
   } = room;
 
-  const [, setDeviceId] = useSegment(1);
-
   const devices = useMetaFilter(
     useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room),
     useCallback(({ isSubDevice }) => !isSubDevice, []),
@@ -47,10 +46,12 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
             devices.map((device) => (
               <Device
                 element={device}
-                onClick={() => setDeviceId?.(device.id)}
+                onClick={() => {
+                  getSignal($setSubPath)(device.id);
+                }}
               />
             )),
-          [devices, setDeviceId],
+          [devices],
         )}
       </Grid>
     </Category>
@@ -61,7 +62,7 @@ export const Devices: FunctionComponent = () => {
   const hierarchy = useHierarchy();
   const elements = useElements();
 
-  const [deviceId] = useSegment(1);
+  const subPath = getSignal($subPath);
 
   const rooms = useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy);
   const roomsSorted = useArray(
@@ -69,8 +70,8 @@ export const Devices: FunctionComponent = () => {
   );
 
   const [device] = useElementFilter<HierarchyElement, HierarchyElementDevice>(
-    deviceId ? elements : null,
-    useCallback(({ id }) => id === deviceId, [deviceId]),
+    subPath ? elements : null,
+    useCallback(({ id }) => id === subPath, [subPath]),
   );
 
   return (
