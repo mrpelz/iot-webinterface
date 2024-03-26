@@ -1,5 +1,6 @@
 import { createContext, FunctionComponent } from 'preact';
 import {
+  Dispatch,
   StateUpdater,
   useCallback,
   useContext,
@@ -13,15 +14,15 @@ import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useMediaQuery } from '../style/main.js';
 import { useLeaveCallbackRef, usePath } from './path.js';
-import { useIsScreensaverActive } from './screensaver.js';
-import { useVisibility } from './visibility.js';
+import { $isScreensaverActive } from './screensaver.js';
+import { $isVisible } from './visibility.js';
 
 export type MenuVisible = boolean | null;
 
 export type TMenuVisibleContext = {
   flipMenuVisible: () => void;
   isMenuVisible: MenuVisible;
-  setMenuVisible: StateUpdater<MenuVisible>;
+  setMenuVisible: Dispatch<StateUpdater<MenuVisible>>;
 };
 
 const MenuVisibleContext = createContext<TMenuVisibleContext>(
@@ -34,8 +35,8 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
   const leaveCallbackRef = useLeaveCallbackRef();
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
-  const isScreensaverActive = useIsScreensaverActive();
-  const isVisible = useVisibility();
+  const { value: isScreensaverActive } = $isScreensaverActive;
+  const { value: isVisible } = $isVisible;
   const path = usePath();
 
   const [isMenuVisible, _setMenuVisible] = useState<MenuVisible>(
@@ -46,7 +47,7 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
     _setMenuVisible(isDesktop ? null : false);
   }, [isDesktop]);
 
-  const setMenuVisible = useCallback<StateUpdater<MenuVisible>>(
+  const setMenuVisible = useCallback<Dispatch<StateUpdater<MenuVisible>>>(
     (...args) => {
       if (isDesktop) return;
       _setMenuVisible(...args);
@@ -98,7 +99,7 @@ export const useIsMenuVisible = (): MenuVisible => {
   return useMemo(() => isMenuVisible, [isMenuVisible]);
 };
 
-export const useSetMenuVisible = (): StateUpdater<MenuVisible> => {
+export const useSetMenuVisible = (): Dispatch<StateUpdater<MenuVisible>> => {
   const { setMenuVisible } = useContext(MenuVisibleContext);
   return useMemo(() => setMenuVisible, [setMenuVisible]);
 };

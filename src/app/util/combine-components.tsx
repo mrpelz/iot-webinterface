@@ -1,4 +1,4 @@
-import { FunctionComponent, PreactDOMAttributes } from 'preact';
+import { FunctionComponent, JSX, PreactDOMAttributes } from 'preact';
 import { useMemo } from 'preact/hooks';
 
 export const combineComponents = (

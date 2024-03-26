@@ -1,5 +1,6 @@
 import { createContext, FunctionComponent } from 'preact';
 import {
+  Dispatch,
   StateUpdater,
   useContext,
   useEffect,
@@ -13,7 +14,7 @@ import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
 
 export type TTitleContext = {
   capitalizedTitle: string | null;
-  setTitleOverride: StateUpdater<string | null>;
+  setTitleOverride: Dispatch<StateUpdater<string | null>>;
   title: string | null;
 };
 

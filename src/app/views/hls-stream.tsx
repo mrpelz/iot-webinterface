@@ -11,9 +11,9 @@ import { PauseIcon, PlayIcon } from '../components/icons.js';
 import { Video } from '../components/video.js';
 import { usePromise } from '../hooks/use-promise.js';
 import { msToNextSecond, useTimeIncrement } from '../hooks/use-time-label.js';
-import { useFocus } from '../state/focus.js';
+import { $isFocused } from '../state/focus.js';
 import { Translation } from '../state/i18n.js';
-import { useIsScreensaverActive } from '../state/screensaver.js';
+import { $isScreensaverActive } from '../state/screensaver.js';
 import { dimensions } from '../style.js';
 import { fetchFallback } from '../util/fetch.js';
 import { Category } from './category.js';
@@ -27,8 +27,8 @@ export const HLSStream: FunctionComponent<{
 }> = ({ poster, src }) => {
   const [isActive, setActive] = useState(false);
 
-  const isFocused = useFocus();
-  const isScreensaverActive = useIsScreensaverActive();
+  const { value: isFocused } = $isFocused;
+  const { value: isScreensaverActive } = $isScreensaverActive;
 
   useEffect(() => {
     if (isFocused && !isScreensaverActive) return;

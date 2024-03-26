@@ -1,3 +1,4 @@
+import { computed, effect, signal } from '@preact/signals';
 import { createContext, FunctionComponent } from 'preact';
 import {
   MutableRef,
@@ -11,6 +12,8 @@ import {
 
 import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { usePrevious } from '../hooks/use-previous.js';
+import { previous } from '../signals/previous.js';
+import { flags } from '../util/flags.js';
 import {
   amend,
   getPath,
@@ -18,8 +21,138 @@ import {
   goDown,
   goUp as goUpUtil,
 } from '../util/path.js';
-import { useFlag, useSetFlag } from './flags.js';
-import { useVisibility } from './visibility.js';
+import { callbackSignal, callbackUnwrapped, readOnly } from '../util/signal.js';
+import { $isVisible } from './visibility.js';
+
+const TRIGGER_STATE = 'C0AAB99B-77E0-45C8-AB13-7EFFA083BC19';
+const ROOT_PATH_DEPTH = 1;
+
+const disableBackcapture =
+  'standalone' in navigator && navigator['standalone' as keyof Navigator];
+
+const $setPath = signal(flags.path.value || location.pathname);
+flags.path.value = null;
+
+export const setPath = (input: string): void => {
+  $setPath.value = input;
+};
+
+const $setLeaveCallback = signal<(() => void) | null>(null);
+
+export const setLeaveCallback = (
+  input: (typeof $setLeaveCallback)['value'],
+): void => {
+  $setLeaveCallback.value = input;
+};
+
+export const $path = readOnly($setPath);
+
+export const [$previousPath] = previous($path);
+
+export const goPrevious = callbackUnwrapped(
+  ({ previousPath }) => {
+    if (!previousPath || getSegments(previousPath).length < ROOT_PATH_DEPTH) {
+      return;
+    }
+
+    setPath(previousPath);
+  },
+  { previousPath: $previousPath },
+);
+
+export const $isRoot = computed(() => {
+  const { value: path } = $path;
+
+  return getSegments(path).length <= ROOT_PATH_DEPTH;
+});
+
+export const goUp = callbackUnwrapped(
+  ({ isRoot, path }) => {
+    if (isRoot) return;
+
+    setPath(goUpUtil(path));
+  },
+  { isRoot: $isRoot, path: $path },
+);
+
+export const getSegment = callbackSignal(
+  ({ path }, segmentNumber: number) => getSegments(path)[segmentNumber] || null,
+  {
+    path: $path,
+  },
+);
+
+export const setSegment = callbackUnwrapped(
+  ({ path }, segmentNumber: number) => {
+    const segments = getSegments(path);
+    if (segments.length < segmentNumber) return null;
+
+    return (input: string | null) => {
+      const segment = segments[segmentNumber];
+      if (segment === input) return;
+
+      const basePath = getPath(segments.slice(0, segmentNumber));
+      setPath(input ? goDown(basePath, input) : basePath);
+    };
+  },
+  { path: $path },
+);
+
+export const goRoot = callbackUnwrapped(
+  ({ isRoot }) => {
+    if (isRoot) return;
+
+    const setter = setSegment(ROOT_PATH_DEPTH);
+    if (!setter) return;
+
+    setter(null);
+  },
+  { isRoot: $isRoot },
+);
+
+const onPopstate = callbackUnwrapped(
+  ({ isRoot, leaveCallback, path }, { state }: PopStateEvent) => {
+    if (disableBackcapture) return;
+    if (state !== TRIGGER_STATE) return;
+
+    if (isRoot) {
+      if (leaveCallback) {
+        leaveCallback();
+      } else if (document.referrer.length > 0) {
+        history.back();
+      }
+
+      setTimeout(() => {
+        history.pushState(undefined, '', amend(path));
+      }, 100);
+
+      return;
+    }
+
+    history.pushState(undefined, '');
+    setPath(goUpUtil(path));
+  },
+  {
+    isRoot: $isRoot,
+    leaveCallback: $setLeaveCallback,
+    path: $path,
+  },
+);
+
+effect(() => {
+  const { value: path } = $path;
+
+  history.replaceState(undefined, '', amend(path));
+});
+
+effect(() => {
+  const { value: isVisible } = $isVisible;
+  if (isVisible) return;
+
+  goRoot();
+});
+
+window.addEventListener('popstate', onPopstate);
 
 export type TPathContext = {
   getSegment: (segmentNumber: number) => string | null;
@@ -35,10 +168,6 @@ export type TPathContext = {
   ) => ((value: string | null) => void) | null;
 };
 
-const triggerState = 'C0AAB99B-77E0-45C8-AB13-7EFFA083BC19';
-const disableBackcapture =
-  'standalone' in navigator && navigator['standalone' as keyof Navigator];
-
 const PathContext = createContext(null as unknown as TPathContext);
 
 export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
@@ -49,14 +178,12 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
 
   const leaveCallbackRef = useRef<(() => void) | null>(null);
 
-  const isVisible = useVisibility();
-
-  const pathFlag = useFlag('path');
-  const pathFlagSetter = useSetFlag('path');
+  const { value: isVisible } = $isVisible;
+  const { value: pathFlag } = flags.path;
 
   const [path, setPath] = useState(() => {
     const result = pathFlag || location.pathname;
-    pathFlagSetter(null);
+    flags.path.value = null;
 
     return result;
   });
@@ -67,7 +194,7 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
 
     history.scrollRestoration = 'manual';
 
-    history.replaceState(triggerState, '');
+    history.replaceState(TRIGGER_STATE, '');
     history.pushState(undefined, '');
   }, []);
 
@@ -122,7 +249,7 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
   const onPopstate = useCallback(
     ({ state }: PopStateEvent) => {
       if (disableBackcapture) return;
-      if (state !== triggerState) return;
+      if (state !== TRIGGER_STATE) return;
 
       const { current: leaveCallback } = leaveCallbackRef;
 

@@ -2,7 +2,7 @@
 
 import { stripIndents } from 'proper-tags';
 
-import { Theme, useTheme } from './state/theme.js';
+import { $theme, Theme } from './state/theme.js';
 import { useBreakpointValue } from './style/breakpoint.js';
 import { color, useThemedValue } from './style/colors.js';
 import { add, dimension, half, subtract } from './style/dimensions.js';
@@ -10,7 +10,7 @@ import { cssEnv, cssVar, useMediaQuery } from './style/main.js';
 
 export const strings = {
   get colorScheme() {
-    return () => useTheme();
+    return () => $theme.value;
   },
   font: '-apple-system, SF UI Text, Helvetica Neue, Helvetica, Arial, sans-serif',
   isRetina: '(-webkit-min-device-pixel-ratio: 2)',

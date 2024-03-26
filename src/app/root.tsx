@@ -5,21 +5,15 @@ import { FunctionComponent, h, render as preactRender } from 'preact';
 import { useMemo } from 'preact/hooks';
 
 import { BackgroundProvider } from './state/background.js';
-import { FlagProvider } from './state/flags.js';
-import { FocusProvider } from './state/focus.js';
 import { I18nProvider } from './state/i18n.js';
 import { MenuVisibleProvider } from './state/menu.js';
 import { NavigationProvider } from './state/navigation.js';
 import { PathProvider } from './state/path.js';
-import { ScreensaverActiveProvider } from './state/screensaver.js';
 import { ScrollEffects } from './state/scroll-effects.js';
-import { ThemeProvider } from './state/theme.js';
 import { TitleProvider } from './state/title.js';
-import { VisibilityProvider } from './state/visibility.js';
 import { WebApiProvider } from './state/web-api.js';
 import { dimensions } from './style.js';
 import { bindComponent, combineComponents } from './util/combine-components.js';
-import { Flags } from './util/flags.js';
 import { App } from './views/app.js';
 import { WebApi } from './web-api.js';
 
@@ -51,20 +45,14 @@ const GlobalStyles = createGlobalStyle`
     scroll-snap-type: block;
     scroll-padding: ${dimensions.headerHeight} 0 0 0;
   }
-`;
+` as unknown as FunctionComponent;
 
 export const Root: FunctionComponent<{
-  flags: Flags;
   webApi: WebApi;
-}> = ({ flags, webApi }) => {
+}> = ({ webApi }) => {
   const _PathProvider = bindComponent(
     PathProvider,
     useMemo(() => ({ rootPathDepth: 1 }), []),
-  );
-
-  const _FlagProvider = bindComponent(
-    FlagProvider,
-    useMemo(() => ({ flags }), [flags]),
   );
 
   const _WebApiProvider = bindComponent(
@@ -72,14 +60,7 @@ export const Root: FunctionComponent<{
     useMemo(() => ({ webApi }), [webApi]),
   );
 
-  const OuterState = combineComponents(
-    _FlagProvider,
-    VisibilityProvider,
-    FocusProvider,
-    ScreensaverActiveProvider,
-    _PathProvider,
-    ThemeProvider,
-  );
+  const OuterState = combineComponents(_PathProvider);
 
   const InnerState = combineComponents(
     _WebApiProvider,
@@ -101,8 +82,8 @@ export const Root: FunctionComponent<{
   );
 };
 
-export const render = (flags: Flags, webApi: WebApi): void => {
+export const render = (webApi: WebApi): void => {
   setup(h, prefix);
 
-  preactRender(<Root flags={flags} webApi={webApi} />, document.body);
+  preactRender(<Root webApi={webApi} />, document.body);
 };

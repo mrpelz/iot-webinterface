@@ -1,11 +1,11 @@
-import { FunctionComponent } from 'preact';
+import { clear } from 'idb-keyval';
+import { FunctionComponent, JSX } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import { Button, Entry as EntryComponent } from '../../components/list.js';
 import { ShowHide } from '../../components/show-hide.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
-import { useFlag, useSetFlag } from '../../state/flags.js';
 import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
 import {
   staticPages,
@@ -14,7 +14,8 @@ import {
 } from '../../state/navigation.js';
 import { Theme, themes } from '../../state/theme.js';
 import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
-import { triggerUpdate } from '../../util/update.js';
+import { flags } from '../../util/flags.js';
+import { swProxy } from '../../util/sw.js';
 import { Entry, List } from '../../views/list.js';
 import {
   HierarchyElementBuilding,
@@ -41,34 +42,17 @@ export const Settings: FunctionComponent = () => {
 
   const startPages = useMemo(() => [...staticPages, ...roomNames], [roomNames]);
 
-  const startPage = useFlag('startPage');
-  const setStartPage = useSetFlag('startPage');
-
-  const theme = useFlag('theme');
-  const setTheme = useSetFlag('theme');
-
-  const language = useFlag('language');
-  const setLanguage = useSetFlag('language');
-
-  const absoluteTimes = useFlag('absoluteTimes');
-  const setAbsoluteTimes = useSetFlag('absoluteTimes');
-
-  const inactivityTimeout = useFlag('inactivityTimeout');
-  const setInactivityTimeout = useSetFlag('inactivityTimeout');
-
-  const screensaverEnable = useFlag('screensaverEnable');
-  const setScreensaverEnable = useSetFlag('screensaverEnable');
-
-  const screensaverRandomizePosition = useFlag('screensaverRandomizePosition');
-  const setScreensaverRandomizePosition = useSetFlag(
-    'screensaverRandomizePosition',
-  );
-
-  const debug = useFlag('debug');
-  const setDebug = useSetFlag('debug');
-
-  const apiBaseUrl = useFlag('apiBaseUrl');
-  const setApiBaseUrl = useSetFlag('apiBaseUrl');
+  const { value: startPage } = flags.startPage;
+  const { value: theme } = flags.theme;
+  const { value: language } = flags.language;
+  const { value: absoluteTimes } = flags.absoluteTimes;
+  const { value: inactivityTimeout } = flags.inactivityTimeout;
+  const { value: screensaverEnable } = flags.screensaverEnable;
+  const { value: screensaverRandomizePosition } =
+    flags.screensaverRandomizePosition;
+  const { value: updateUnattended } = flags.updateUnattended;
+  const { value: debug } = flags.debug;
+  const { value: apiBaseUrl } = flags.apiBaseUrl;
 
   return (
     <>
@@ -145,16 +129,16 @@ export const Settings: FunctionComponent = () => {
               ({ currentTarget: { value } }) => {
                 const selectedOverride = value;
                 if (selectedOverride === 'auto') {
-                  setStartPage(null);
+                  flags.startPage.value = null;
                 }
 
                 if (!startPages.includes(selectedOverride)) {
                   return;
                 }
 
-                setStartPage(selectedOverride);
+                flags.startPage.value = selectedOverride;
               },
-              [startPages, setStartPage],
+              [startPages],
             )}
           >
             <option value="auto" selected={startPage === null}>
@@ -192,7 +176,7 @@ export const Settings: FunctionComponent = () => {
               ({ currentTarget: { value } }) => {
                 const selectedTheme = value as Theme | 'auto';
                 if (selectedTheme === 'auto') {
-                  setTheme(null);
+                  flags.theme.value = null;
                   return;
                 }
 
@@ -203,9 +187,9 @@ export const Settings: FunctionComponent = () => {
                   return;
                 }
 
-                setTheme(selectedTheme);
+                flags.theme.value = selectedTheme;
               },
-              [setTheme, theme],
+              [theme],
             )}
           >
             <option value="auto" selected={theme === null}>
@@ -229,7 +213,7 @@ export const Settings: FunctionComponent = () => {
               ({ currentTarget: { value } }) => {
                 const selectedLanguage = value as I18nLanguage | 'auto';
                 if (selectedLanguage === 'auto') {
-                  setLanguage(null);
+                  flags.language.value = null;
                   return;
                 }
 
@@ -240,9 +224,9 @@ export const Settings: FunctionComponent = () => {
                   return;
                 }
 
-                setLanguage(selectedLanguage);
+                flags.language.value = selectedLanguage;
               },
-              [language, setLanguage],
+              [language],
             )}
           >
             <option value="auto" selected={language === null}>
@@ -266,9 +250,9 @@ export const Settings: FunctionComponent = () => {
             type="checkbox"
             onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked: selectedAbsoluteTimes } }) => {
-                setAbsoluteTimes(selectedAbsoluteTimes);
+                flags.absoluteTimes.value = selectedAbsoluteTimes;
               },
-              [setAbsoluteTimes],
+              [],
             )}
           />
         </Entry>
@@ -296,13 +280,13 @@ export const Settings: FunctionComponent = () => {
                   Number.isNaN(selectedInactivityTimeout) ||
                   !Number.isInteger(selectedInactivityTimeout)
                 ) {
-                  setInactivityTimeout(null);
+                  flags.inactivityTimeout.value = null;
                   return;
                 }
 
-                setInactivityTimeout(selectedInactivityTimeout);
+                flags.inactivityTimeout.value = selectedInactivityTimeout;
               },
-              [setInactivityTimeout],
+              [],
             )}
           />
         </Entry>
@@ -317,13 +301,13 @@ export const Settings: FunctionComponent = () => {
             type="checkbox"
             onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked: selectedScreensaverEnable } }) => {
-                setScreensaverEnable(selectedScreensaverEnable);
+                flags.screensaverEnable.value = selectedScreensaverEnable;
 
                 if (!selectedScreensaverEnable) {
-                  setScreensaverRandomizePosition(false);
+                  flags.screensaverRandomizePosition.value = false;
                 }
               },
-              [setScreensaverEnable, setScreensaverRandomizePosition],
+              [],
             )}
           />
         </Entry>
@@ -348,11 +332,10 @@ export const Settings: FunctionComponent = () => {
                     checked: selectedscreensaverRandomizePosition,
                   },
                 }) => {
-                  setScreensaverRandomizePosition(
-                    selectedscreensaverRandomizePosition,
-                  );
+                  flags.screensaverRandomizePosition.value =
+                    selectedscreensaverRandomizePosition;
                 },
-                [setScreensaverRandomizePosition],
+                [],
               )}
             />
           </Entry>
@@ -370,9 +353,26 @@ export const Settings: FunctionComponent = () => {
             type="checkbox"
             onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked: selectedDebug } }) => {
-                setDebug(selectedDebug);
+                flags.debug.value = selectedDebug;
               },
-              [setDebug],
+              [],
+            )}
+          />
+        </Entry>
+        <Entry
+          id="updateUnattended"
+          label={<Translation capitalize={true} i18nKey="updateUnattended" />}
+        >
+          <input
+            checked={Boolean(updateUnattended)}
+            id="updateUnattended"
+            name="updateUnattended"
+            type="checkbox"
+            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+              ({ currentTarget: { checked: selectedupdateUnattended } }) => {
+                flags.updateUnattended.value = selectedupdateUnattended;
+              },
+              [],
             )}
           />
         </Entry>
@@ -390,34 +390,53 @@ export const Settings: FunctionComponent = () => {
               ({ currentTarget: { value } }) => {
                 const selectedApiBaseUrl = value.trim();
                 if (selectedApiBaseUrl.length === 0) {
-                  setApiBaseUrl(null);
+                  flags.apiBaseUrl.value = null;
                   return;
                 }
 
                 try {
                   const url = new URL(selectedApiBaseUrl);
-                  setApiBaseUrl(url.href);
+                  flags.apiBaseUrl.value = url.href;
                 } catch {
-                  setApiBaseUrl(null);
+                  flags.apiBaseUrl.value = null;
                 }
               },
-              [setApiBaseUrl],
+              [],
             )}
           />
         </Entry>
         <EntryComponent>
-          <Button onClick={useCallback(() => triggerUpdate?.(), [])}>
+          <Button
+            onClick={useCallback(() => swProxy?.removeRegistration(), [])}
+          >
             update
           </Button>
-          <Button onClick={useCallback(() => location.reload(), [])}>
+          <Button onClick={useCallback(() => swProxy?.reload(), [])}>
             reload
           </Button>
           <Button
             onClick={useCallback(() => {
               localStorage.clear();
+              clear();
             }, [])}
           >
-            reset persistent storage
+            reset local storage
+          </Button>
+        </EntryComponent>
+        <EntryComponent>
+          <Button
+            onClick={useCallback(() => {
+              swProxy?.showNotification('test', { requireInteraction: true });
+            }, [])}
+          >
+            test notification
+          </Button>
+          <Button
+            onClick={useCallback(() => {
+              swProxy?.clearNotifications();
+            }, [])}
+          >
+            remove notifications
           </Button>
         </EntryComponent>
       </List>

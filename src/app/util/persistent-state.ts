@@ -1,8 +1,8 @@
-import { StateUpdater, useEffect, useState } from 'preact/hooks';
+import { Dispatch, StateUpdater, useEffect, useState } from 'preact/hooks';
 
 export const persistentState = <T>(): ((
   initialValue: T | (() => T),
-) => [T, StateUpdater<T>]) => {
+) => [T, Dispatch<StateUpdater<T>>]) => {
   let persist: T;
 
   return (initialValue) => {

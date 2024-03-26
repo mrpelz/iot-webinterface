@@ -13,7 +13,6 @@ import {
 } from '../components/menu.js';
 import { useArray } from '../hooks/use-array-compare.js';
 import { roomSorting } from '../i18n/mapping.js';
-import { useFlag } from '../state/flags.js';
 import { Translation } from '../state/i18n.js';
 import { useIsMenuVisible } from '../state/menu.js';
 import {
@@ -24,10 +23,11 @@ import {
   useNavigationStaticPage,
 } from '../state/navigation.js';
 import { useGoRoot } from '../state/path.js';
-import { useFlipScreensaverActive } from '../state/screensaver.js';
-import { useTheme } from '../state/theme.js';
+import { flipScreensaverActive } from '../state/screensaver.js';
+import { $theme } from '../state/theme.js';
 import { useChild, useChildGetter, useLevelShallow } from '../state/web-api.js';
 import { colors } from '../style.js';
+import { flags } from '../util/flags.js';
 import {
   HierarchyElementFloor,
   HierarchyElementRoom,
@@ -66,7 +66,7 @@ const MenuListItem: FunctionComponent<{
   onClick: () => void;
 }> = ({ isActive: active, onClick, children }) => {
   const isMenuVisible = useIsMenuVisible();
-  const isHighContrast = useTheme() === 'highContrast';
+  const isHighContrast = $theme.value === 'highContrast';
 
   const [isHovered, setHovered] = useState(false);
 
@@ -144,8 +144,7 @@ export const Floor: FunctionComponent<{
 export const Menu: FunctionComponent = () => {
   const goRoot = useGoRoot();
 
-  const isScreensaverEnabled = useFlag('screensaverEnable');
-  const flipScreensaverActive = useFlipScreensaverActive();
+  const { value: isScreensaverEnabled } = flags.screensaverEnable;
 
   const isMenuVisible = useIsMenuVisible();
 

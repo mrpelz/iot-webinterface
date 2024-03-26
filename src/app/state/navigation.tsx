@@ -1,5 +1,6 @@
 import { createContext, FunctionComponent } from 'preact';
 import {
+  Dispatch,
   StateUpdater,
   useCallback,
   useContext,
@@ -14,6 +15,7 @@ import {
   useGetLocalStorage,
   useSetLocalStorage,
 } from '../hooks/use-local-storage.js';
+import { flags } from '../util/flags.js';
 import {
   HierarchyElement,
   HierarchyElementBuilding,
@@ -22,9 +24,8 @@ import {
   HierarchyElementRoom,
   Levels,
 } from '../web-api.js';
-import { useFlag } from './flags.js';
 import { useSegment } from './path.js';
-import { useVisibility } from './visibility.js';
+import { $isVisible } from './visibility.js';
 import { useLevelShallow, useWebApi } from './web-api.js';
 
 export const staticPagesTop = ['global', 'map'] as const;
@@ -40,7 +41,10 @@ export type StaticPage =
   | (typeof staticPagesTop)[number]
   | (typeof staticPagesBottom)[number];
 
-type NavigationElement<T> = readonly [T | null, StateUpdater<T | null>];
+type NavigationElement<T> = readonly [
+  T | null,
+  Dispatch<StateUpdater<T | null>>,
+];
 
 type TNavigationContext = {
   building: NavigationElement<HierarchyElementBuilding>;
@@ -184,13 +188,13 @@ const useStaticPage = (
 export const NavigationProvider: FunctionComponent = ({ children }) => {
   useHookDebug('NavigationProvider');
 
-  const isVisible = useVisibility();
+  const { value: isVisible } = $isVisible;
   const isVisibleDelayed = useDelay(isVisible, 300);
 
   const { hierarchy } = useWebApi();
   const settled = useDelay(Boolean(hierarchy), 500);
 
-  const startPageFlag = useFlag('startPage');
+  const { value: startPageFlag } = flags.startPage;
   const [startPagePath, setStartPagePath] = useSegment(0);
 
   const startPagePathInitial = useMemo(

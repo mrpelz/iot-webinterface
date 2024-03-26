@@ -2,33 +2,30 @@ import { stripIndent } from 'proper-tags';
 
 import { render } from './root.js';
 import { defer } from './util/defer.js';
-import { getFlags } from './util/flags.js';
+import { flags } from './util/flags.js';
 import { iOSHoverStyles, iOSScrollToTop } from './util/ios-fixes.js';
 import { requestNotificationPermission } from './util/notifications.js';
-import { registerServiceWorker } from './util/service-worker.js';
 import { persist } from './util/storage.js';
-import { update } from './util/update.js';
+import { registerServiceWorker } from './util/sw.js';
 import { WebApi } from './web-api.js';
 
 try {
-  const flags = getFlags();
   const { apiBaseUrl, debug, updateCheckInterval } = flags;
 
-  const webApi = new WebApi(apiBaseUrl, debug);
+  const webApi = new WebApi(apiBaseUrl.value, debug.value);
 
-  render(flags, webApi);
+  render(webApi);
   document.documentElement.removeAttribute('static');
 
   defer(async () => {
-    registerServiceWorker();
-
-    update(updateCheckInterval, debug);
-
     requestNotificationPermission();
-    persist();
 
     iOSHoverStyles();
     iOSScrollToTop();
+
+    await registerServiceWorker(updateCheckInterval.value ?? undefined);
+
+    await persist();
   });
 } catch (error) {
   if (

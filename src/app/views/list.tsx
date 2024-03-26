@@ -5,7 +5,7 @@ import {
   Entry as EntryComponent,
   List as ListComponent,
 } from '../components/list.js';
-import { useTheme } from '../state/theme.js';
+import { $theme } from '../state/theme.js';
 
 export const Entry: FunctionComponent<{
   id?: string;
@@ -18,7 +18,7 @@ export const Entry: FunctionComponent<{
 );
 
 export const List: FunctionComponent = ({ children }) => {
-  const theme = useTheme();
+  const { value: theme } = $theme;
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
   return (

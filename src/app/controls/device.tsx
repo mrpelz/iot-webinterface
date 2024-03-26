@@ -11,7 +11,7 @@ import {
 } from '../components/icons.js';
 import { TabularNums } from '../components/text.js';
 import { useTimeLabel } from '../hooks/use-time-label.js';
-import { useTheme } from '../state/theme.js';
+import { $theme } from '../state/theme.js';
 import {
   useChild,
   useGetter,
@@ -22,7 +22,7 @@ import { HierarchyElementDevice, Levels, MetaDevice } from '../web-api.js';
 import { CellWithBody } from './main.js';
 
 export const OnlineIcon: FunctionComponent = () => {
-  const theme = useTheme();
+  const { value: theme } = $theme;
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
   return (
@@ -34,7 +34,7 @@ export const OnlineIcon: FunctionComponent = () => {
 };
 
 export const OfflineIcon: FunctionComponent = () => {
-  const theme = useTheme();
+  const { value: theme } = $theme;
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
   return (

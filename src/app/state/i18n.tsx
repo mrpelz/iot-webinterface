@@ -11,9 +11,9 @@ import {
   translations,
 } from '../i18n/main.js';
 import { universal } from '../i18n/universal.js';
+import { flags } from '../util/flags.js';
 import { getCountry, getLanguage } from '../util/locale.js';
 import { capitalize as capitalizeUtil } from '../util/string.js';
-import { useFlag } from './flags.js';
 
 type TI18nContext = {
   country: string | null;
@@ -32,7 +32,7 @@ const I18nContext = createContext<TI18nContext>(
 export const I18nProvider: FunctionComponent = ({ children }) => {
   useHookDebug('I18nProvider');
 
-  const languageOverride = useFlag('language');
+  const { value: languageOverride } = flags.language;
 
   const country = useMemo(() => getCountry(), []);
   const language = useMemo(() => getLanguage(), []);

@@ -8,7 +8,7 @@ import {
   Title,
 } from '../components/controls.js';
 import { I18nKey } from '../i18n/main.js';
-import { useTheme } from '../state/theme.js';
+import { $theme } from '../state/theme.js';
 import {
   HierarchyElementArea,
   HierarchyElementProperty,
@@ -37,7 +37,7 @@ export const Cell: FunctionComponent<CellProps> = ({
   span,
   title,
 }) => {
-  const theme = useTheme();
+  const { value: theme } = $theme;
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
   const props = useMemo(

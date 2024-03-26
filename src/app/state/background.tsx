@@ -1,5 +1,6 @@
 import { createContext, FunctionComponent } from 'preact';
 import {
+  Dispatch,
   StateUpdater,
   useContext,
   useEffect,
@@ -10,14 +11,14 @@ import {
 import { useDelay } from '../hooks/use-delay.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
-import { useTheme } from './theme.js';
+import { $theme } from './theme.js';
 
 export const noBackground = Symbol('noBackground');
 type NoBackground = typeof noBackground;
 
 export type TBackgroundContext = readonly [
   string | null,
-  StateUpdater<string | NoBackground | null>,
+  Dispatch<StateUpdater<string | NoBackground | null>>,
 ];
 
 const BackgroundContext = createContext(null as unknown as TBackgroundContext);
@@ -30,7 +31,7 @@ const camelCase = new RegExp('[A-Z]', 'g');
 export const BackgroundProvider: FunctionComponent = ({ children }) => {
   useHookDebug('BackgroundProvider');
 
-  const isHighContrast = useTheme() === 'highContrast';
+  const isHighContrast = $theme.value === 'highContrast';
 
   const initialDelay = !useDelay(true, 1000);
 

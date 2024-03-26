@@ -16,9 +16,11 @@
     "dist/**/*.{js,map,ts}"
   ],
   "dependencies": {
+    "@preact/signals": "latest",
     "comlink": "latest",
     "goober": "latest",
     "hls.js": "latest",
+    "idb-keyval": "latest",
     "preact": "latest",
     "proper-tags": "latest",
     "workbox-precaching": "latest",
@@ -29,8 +31,6 @@
     "@types/glob": "latest",
     "favicons-webpack-plugin": "latest",
     "glob": "latest",
-    "html-inline-css-webpack-plugin": "latest",
-    "html-inline-script-webpack-plugin": "latest",
     "source-map-loader": "latest",
     "modify-source-webpack-plugin": "latest",
     "workbox-webpack-plugin": "latest"

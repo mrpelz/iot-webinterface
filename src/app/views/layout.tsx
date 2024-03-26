@@ -9,7 +9,7 @@ import {
   useSetMenuVisible,
 } from '../state/menu.js';
 import { useGoUp } from '../state/path.js';
-import { useIsScreensaverActive } from '../state/screensaver.js';
+import { $isScreensaverActive } from '../state/screensaver.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useMediaQuery } from '../style/main.js';
@@ -25,7 +25,7 @@ export const Layout: FunctionComponent = ({ children }) => {
 
   const isAsideVisible = useIsMenuVisible();
   const setAsideVisible = useSetMenuVisible();
-  const isScreensaverActive = useIsScreensaverActive();
+  const { value: isScreensaverActive } = $isScreensaverActive;
 
   const goUp = useGoUp();
 

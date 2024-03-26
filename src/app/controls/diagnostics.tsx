@@ -1,4 +1,4 @@
-import { ComponentChildren, FunctionComponent } from 'preact';
+import { ComponentChildren, FunctionComponent, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import { Summary } from '../components/diagnostics.js';

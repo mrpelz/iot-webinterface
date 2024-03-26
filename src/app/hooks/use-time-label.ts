@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
-import { useFlag } from '../state/flags.js';
 import { useI18n, useI18nKey } from '../state/i18n.js';
+import { flags } from '../util/flags.js';
 
 const units = [
   'second',
@@ -155,7 +155,7 @@ export const useTimeLabel = (
   date: Date | null,
   nowSpan?: number,
 ): string | null => {
-  const absoluteTimes = useFlag('absoluteTimes');
+  const { value: absoluteTimes } = flags.absoluteTimes;
 
   const relativeLabel = useRelativeTimeLabel(
     absoluteTimes ? null : date,

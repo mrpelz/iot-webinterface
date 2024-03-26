@@ -9,8 +9,6 @@ import {
 import configUpstream from '@mrpelz/boilerplate-preact/webpack.config.js';
 import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
 import { glob } from 'glob';
-import { PluginForHtmlWebpackPluginV4 } from 'html-inline-css-webpack-plugin/build/core/v4.js';
-import HtmlInlineScriptPlugin from 'html-inline-script-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import {
@@ -25,10 +23,7 @@ import { InjectManifest } from 'workbox-webpack-plugin';
 const configDownstream = {
   devServer: {
     allowedHosts: 'all',
-    client: {
-      logging: 'error',
-      overlay: false,
-    },
+    client: false,
     historyApiFallback: true,
     hot: false,
     liveReload: false,
@@ -115,7 +110,7 @@ config.plugins = [
             glob
               .sync(resolve(dirSrc, 'common/images/background/*'))
               .map((path) => relative(resolve(dirSrc, 'app'), path))
-              .map((path) => `import "${path}"`)
+              .map((path) => `import "${path}";`)
               .join('\n'),
           ),
         ],
@@ -128,10 +123,6 @@ config.plugins = [
     scriptLoading: 'module',
     template: resolve(dirSrc, 'common/main.html'),
   }),
-  new HtmlInlineScriptPlugin({
-    scriptMatchPattern: [/^main.js$/],
-  }),
-  new PluginForHtmlWebpackPluginV4(),
   new FaviconsWebpackPlugin({
     logo: resolve(dirSrc, 'common/icon.svg'),
     manifest: resolve(dirSrc, 'common/manifest.json'),
