@@ -13,7 +13,6 @@ import {
 } from '../components/menu.js';
 import { useArray } from '../hooks/use-array-compare.js';
 import { roomSorting } from '../i18n/mapping.js';
-import { Translation } from '../state/i18n.js';
 import { $isMenuVisible } from '../state/menu.js';
 import {
   staticPagesBottom,
@@ -27,7 +26,7 @@ import { flipScreensaverActive } from '../state/screensaver.js';
 import { $theme } from '../state/theme.js';
 import { useChild, useChildGetter, useLevelShallow } from '../state/web-api.js';
 import { colors } from '../style.js';
-import { flags } from '../util/flags.js';
+import { $flags } from '../util/flags.js';
 import { getSignal } from '../util/signal.js';
 import {
   HierarchyElementFloor,
@@ -35,6 +34,7 @@ import {
   Levels,
   sortBy,
 } from '../web-api.js';
+import { Translation } from './translation.js';
 
 const AllLightState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
   room,
@@ -141,7 +141,7 @@ export const Floor: FunctionComponent<{
 };
 
 export const Menu: FunctionComponent = () => {
-  const isScreensaverEnabled = getSignal(flags.screensaverEnable);
+  const isScreensaverEnabled = getSignal($flags.screensaverEnable);
 
   const isMenuVisible = getSignal($isMenuVisible);
 

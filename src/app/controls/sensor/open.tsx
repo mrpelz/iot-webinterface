@@ -4,10 +4,10 @@ import { useCallback } from 'preact/hooks';
 import { Tag } from '../../components/controls.js';
 import { ForwardIcon } from '../../components/icons.js';
 import { I18nKey } from '../../i18n/main.js';
-import { Translation } from '../../state/i18n.js';
 import { $setSubPath } from '../../state/path.js';
 import { useChild, useGetter } from '../../state/web-api.js';
 import { getSignal } from '../../util/signal.js';
+import { Translation } from '../../views/translation.js';
 import {
   HierarchyElement,
   HierarchyElementArea,

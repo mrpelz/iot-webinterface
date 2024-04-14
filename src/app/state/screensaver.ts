@@ -1,13 +1,13 @@
 import { effect, signal } from '@preact/signals';
 
-import { flags } from '../util/flags.js';
+import { $flags } from '../util/flags.js';
 import { callbackUnwrapped, getSignal, readOnly } from '../util/signal.js';
 import { $isVisible } from './visibility.js';
 
-const $setIsScreensaverActive = signal(flags.screensaverEnable.value);
+const $setIsScreensaverActive = signal($flags.screensaverEnable.value);
 
 effect(() => {
-  const isScreensaverEnabled = getSignal(flags.screensaverEnable);
+  const isScreensaverEnabled = getSignal($flags.screensaverEnable);
   if (isScreensaverEnabled) return;
 
   $setIsScreensaverActive.value = false;
@@ -20,7 +20,7 @@ export const setScreensaverActive = callbackUnwrapped(
     $setIsScreensaverActive.value = active;
   },
   {
-    isEnabled: flags.screensaverEnable,
+    isEnabled: $flags.screensaverEnable,
   },
 );
 

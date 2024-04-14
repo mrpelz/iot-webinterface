@@ -12,7 +12,6 @@ import {
   useTimeSpan,
 } from '../hooks/use-time-label.js';
 import { I18nKey } from '../i18n/main.js';
-import { Translation } from '../state/i18n.js';
 import { $rootPath } from '../state/path.js';
 import {
   useChild,
@@ -21,6 +20,7 @@ import {
   useGetter,
 } from '../state/web-api.js';
 import { getSignal } from '../util/signal.js';
+import { Translation } from '../views/translation.js';
 import {
   HierarchyElement,
   isMetaPropertySensorDate,

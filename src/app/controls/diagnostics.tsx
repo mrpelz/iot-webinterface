@@ -2,7 +2,7 @@ import { ComponentChildren, FunctionComponent, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import { Summary } from '../components/diagnostics.js';
-import { $i18n } from '../state/i18n.js';
+import { $i18n } from '../state/translation.js';
 import { useGetter, useSetter } from '../state/web-api.js';
 import { getSignal } from '../util/signal.js';
 import {

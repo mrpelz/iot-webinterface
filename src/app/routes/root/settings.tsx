@@ -6,24 +6,29 @@ import { Button, Entry as EntryComponent } from '../../components/list.js';
 import { ShowHide } from '../../components/show-hide.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
-import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
 import {
   staticPages,
   useNavigationBuilding,
   useNavigationHome,
 } from '../../state/navigation.js';
 import { Theme, themes } from '../../state/theme.js';
+import { getTranslationFallback } from '../../state/translation.js';
 import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
-import { flags } from '../../util/flags.js';
+import { swProxy } from '../../sw.js';
+import { $flags } from '../../util/flags.js';
 import { getSignal } from '../../util/signal.js';
-import { swProxy } from '../../util/sw.js';
 import { Entry, List } from '../../views/list.js';
+import { Translation } from '../../views/translation.js';
 import {
   HierarchyElementBuilding,
   HierarchyElementHome,
   HierarchyElementRoom,
   Levels,
 } from '../../web-api.js';
+
+const $staticPageLabel = getTranslationFallback('staticPage');
+const $roomLabel = getTranslationFallback('room');
+const $autoLabel = getTranslationFallback('auto');
 
 export const Settings: FunctionComponent = () => {
   const hierarchy = useHierarchy();
@@ -43,17 +48,17 @@ export const Settings: FunctionComponent = () => {
 
   const startPages = useMemo(() => [...staticPages, ...roomNames], [roomNames]);
 
-  const startPage = getSignal(flags.startPage);
-  const theme = getSignal(flags.theme);
-  const language = getSignal(flags.language);
-  const absoluteTimes = getSignal(flags.absoluteTimes);
-  const inactivityTimeout = getSignal(flags.inactivityTimeout);
-  const screensaverEnable = getSignal(flags.screensaverEnable);
+  const startPage = getSignal($flags.startPage);
+  const theme = getSignal($flags.theme);
+  const language = getSignal($flags.language);
+  const absoluteTimes = getSignal($flags.absoluteTimes);
+  const inactivityTimeout = getSignal($flags.inactivityTimeout);
+  const screensaverEnable = getSignal($flags.screensaverEnable);
   const { value: screensaverRandomizePosition } =
-    flags.screensaverRandomizePosition;
-  const updateUnattended = getSignal(flags.updateUnattended);
-  const debug = getSignal(flags.debug);
-  const apiBaseUrl = getSignal(flags.apiBaseUrl);
+    $flags.screensaverRandomizePosition;
+  const updateUnattended = getSignal($flags.updateUnattended);
+  const debug = getSignal($flags.debug);
+  const apiBaseUrl = getSignal($flags.apiBaseUrl);
 
   return (
     <>
@@ -130,14 +135,14 @@ export const Settings: FunctionComponent = () => {
               ({ currentTarget: { value } }) => {
                 const selectedOverride = value;
                 if (selectedOverride === 'auto') {
-                  flags.startPage.value = null;
+                  $flags.startPage.value = null;
                 }
 
                 if (!startPages.includes(selectedOverride)) {
                   return;
                 }
 
-                flags.startPage.value = selectedOverride;
+                $flags.startPage.value = selectedOverride;
               },
               [startPages],
             )}
@@ -145,7 +150,7 @@ export const Settings: FunctionComponent = () => {
             <option value="auto" selected={startPage === null}>
               <Translation i18nKey="auto" />
             </option>
-            <optgroup label={useI18nKeyFallback('staticPage')}>
+            <optgroup label={getSignal($staticPageLabel)}>
               {staticPages.map((aStaticPage) => (
                 <option
                   value={aStaticPage}
@@ -155,7 +160,7 @@ export const Settings: FunctionComponent = () => {
                 </option>
               ))}
             </optgroup>
-            <optgroup label={useI18nKeyFallback('room')}>
+            <optgroup label={getSignal($roomLabel)}>
               {roomNames.map((aRoom) => (
                 <option value={aRoom} selected={aRoom === startPage}>
                   <Translation i18nKey={aRoom} />
@@ -177,7 +182,7 @@ export const Settings: FunctionComponent = () => {
               ({ currentTarget: { value } }) => {
                 const selectedTheme = value as Theme | 'auto';
                 if (selectedTheme === 'auto') {
-                  flags.theme.value = null;
+                  $flags.theme.value = null;
                   return;
                 }
 
@@ -188,7 +193,7 @@ export const Settings: FunctionComponent = () => {
                   return;
                 }
 
-                flags.theme.value = selectedTheme;
+                $flags.theme.value = selectedTheme;
               },
               [theme],
             )}
@@ -214,7 +219,7 @@ export const Settings: FunctionComponent = () => {
               ({ currentTarget: { value } }) => {
                 const selectedLanguage = value as I18nLanguage | 'auto';
                 if (selectedLanguage === 'auto') {
-                  flags.language.value = null;
+                  $flags.language.value = null;
                   return;
                 }
 
@@ -225,7 +230,7 @@ export const Settings: FunctionComponent = () => {
                   return;
                 }
 
-                flags.language.value = selectedLanguage;
+                $flags.language.value = selectedLanguage;
               },
               [language],
             )}
@@ -251,7 +256,7 @@ export const Settings: FunctionComponent = () => {
             type="checkbox"
             onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked: selectedAbsoluteTimes } }) => {
-                flags.absoluteTimes.value = selectedAbsoluteTimes;
+                $flags.absoluteTimes.value = selectedAbsoluteTimes;
               },
               [],
             )}
@@ -281,11 +286,11 @@ export const Settings: FunctionComponent = () => {
                   Number.isNaN(selectedInactivityTimeout) ||
                   !Number.isInteger(selectedInactivityTimeout)
                 ) {
-                  flags.inactivityTimeout.value = null;
+                  $flags.inactivityTimeout.value = null;
                   return;
                 }
 
-                flags.inactivityTimeout.value = selectedInactivityTimeout;
+                $flags.inactivityTimeout.value = selectedInactivityTimeout;
               },
               [],
             )}
@@ -302,10 +307,10 @@ export const Settings: FunctionComponent = () => {
             type="checkbox"
             onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked: selectedScreensaverEnable } }) => {
-                flags.screensaverEnable.value = selectedScreensaverEnable;
+                $flags.screensaverEnable.value = selectedScreensaverEnable;
 
                 if (!selectedScreensaverEnable) {
-                  flags.screensaverRandomizePosition.value = false;
+                  $flags.screensaverRandomizePosition.value = false;
                 }
               },
               [],
@@ -333,7 +338,7 @@ export const Settings: FunctionComponent = () => {
                     checked: selectedscreensaverRandomizePosition,
                   },
                 }) => {
-                  flags.screensaverRandomizePosition.value =
+                  $flags.screensaverRandomizePosition.value =
                     selectedscreensaverRandomizePosition;
                 },
                 [],
@@ -354,7 +359,7 @@ export const Settings: FunctionComponent = () => {
             type="checkbox"
             onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked: selectedDebug } }) => {
-                flags.debug.value = selectedDebug;
+                $flags.debug.value = selectedDebug;
               },
               [],
             )}
@@ -371,7 +376,7 @@ export const Settings: FunctionComponent = () => {
             type="checkbox"
             onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked: selectedupdateUnattended } }) => {
-                flags.updateUnattended.value = selectedupdateUnattended;
+                $flags.updateUnattended.value = selectedupdateUnattended;
               },
               [],
             )}
@@ -384,22 +389,22 @@ export const Settings: FunctionComponent = () => {
           <input
             id="apiBaseUrl"
             name="apiBaseUrl"
-            placeholder={useI18nKeyFallback('auto')}
+            placeholder={getSignal($autoLabel)}
             type="url"
             value={apiBaseUrl || ''}
             onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { value } }) => {
                 const selectedApiBaseUrl = value.trim();
                 if (selectedApiBaseUrl.length === 0) {
-                  flags.apiBaseUrl.value = null;
+                  $flags.apiBaseUrl.value = null;
                   return;
                 }
 
                 try {
                   const url = new URL(selectedApiBaseUrl);
-                  flags.apiBaseUrl.value = url.href;
+                  $flags.apiBaseUrl.value = url.href;
                 } catch {
-                  flags.apiBaseUrl.value = null;
+                  $flags.apiBaseUrl.value = null;
                 }
               },
               [],

@@ -8,9 +8,10 @@ import {
   defaultNumberFormat,
   measuredNumberFormats,
 } from '../../i18n/mapping.js';
-import { $i18n, Translation } from '../../state/i18n.js';
+import { $i18n } from '../../state/translation.js';
 import { useGetter } from '../../state/web-api.js';
 import { getSignal } from '../../util/signal.js';
+import { Translation } from '../../views/translation.js';
 import {
   HierarchyElement,
   HierarchyElementPropertySensor,

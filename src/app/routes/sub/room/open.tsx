@@ -8,17 +8,19 @@ import {
   useDateFromEpoch,
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
-import { Translation, useI18nKey } from '../../../state/i18n.js';
 import { useSetTitleOverride } from '../../../state/title.js';
+import { getTranslation } from '../../../state/translation.js';
 import { useChild, useChildGetter, useGetter } from '../../../state/web-api.js';
+import { getSignal } from '../../../util/signal.js';
 import { Entry, List } from '../../../views/list.js';
+import { Translation } from '../../../views/translation.js';
 
 export const OpenSensor: FunctionComponent<{
   element: OpenSensorElement;
 }> = ({ element }) => {
   const { property } = element;
 
-  useSetTitleOverride(useI18nKey(property));
+  useSetTitleOverride(getSignal(getTranslation(property)));
 
   const open = useChild(element, 'open');
   const openValue = useGetter<boolean>(open);

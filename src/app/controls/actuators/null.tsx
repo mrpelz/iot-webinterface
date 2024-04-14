@@ -7,8 +7,8 @@ import { TriggerBody } from '../../components/null-actuator.js';
 import { Overlay } from '../../components/overlay.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { I18nKey } from '../../i18n/main.js';
-import { Translation } from '../../state/i18n.js';
 import { useSetter } from '../../state/web-api.js';
+import { Translation } from '../../views/translation.js';
 import {
   HierarchyElement,
   HierarchyElementPropertyActuator,

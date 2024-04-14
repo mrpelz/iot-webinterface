@@ -10,7 +10,6 @@ import {
 } from '../../controls/sensor/open.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { actuated, measuredCategories } from '../../i18n/mapping.js';
-import { Translation } from '../../state/i18n.js';
 import { $subPath } from '../../state/path.js';
 import {
   useElementFilter,
@@ -21,6 +20,7 @@ import {
 import { getSignal } from '../../util/signal.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
+import { Translation } from '../../views/translation.js';
 import {
   groupBy,
   HierarchyElement,

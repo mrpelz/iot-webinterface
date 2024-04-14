@@ -2,8 +2,8 @@ import { FunctionComponent } from 'preact';
 
 import { Tag } from '../../components/controls.js';
 import { I18nKey } from '../../i18n/main.js';
-import { Translation } from '../../state/i18n.js';
 import { useGetter } from '../../state/web-api.js';
+import { Translation } from '../../views/translation.js';
 import {
   HierarchyElement,
   HierarchyElementPropertySensor,

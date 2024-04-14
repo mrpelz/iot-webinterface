@@ -5,7 +5,6 @@ import { Grid } from '../../components/grid.js';
 import { Device } from '../../controls/device.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { roomSorting as roomsSorting } from '../../i18n/mapping.js';
-import { Translation } from '../../state/i18n.js';
 import { $setSubPath, $subPath } from '../../state/path.js';
 import {
   useElementFilter,
@@ -17,6 +16,7 @@ import {
 import { getSignal } from '../../util/signal.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
+import { Translation } from '../../views/translation.js';
 import {
   HierarchyElement,
   HierarchyElementDevice,

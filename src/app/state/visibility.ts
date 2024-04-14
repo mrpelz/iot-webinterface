@@ -1,6 +1,6 @@
 import { computed, effect, signal } from '@preact/signals';
 
-import { flags } from '../util/flags.js';
+import { $flags } from '../util/flags.js';
 import { getSignal } from '../util/signal.js';
 
 const getBrowserVisibility = () => document.visibilityState === 'visible';
@@ -14,7 +14,7 @@ document.addEventListener(
 const $setIsInteracting = signal(true);
 
 effect(() => {
-  const inactivityTimeout = getSignal(flags.inactivityTimeout);
+  const inactivityTimeout = getSignal($flags.inactivityTimeout);
 
   const listenerAbort = new AbortController();
 

@@ -2,7 +2,7 @@ import { computed, Signal } from '@preact/signals';
 
 import { strings } from '../style.js';
 import { breakpoint } from '../style/breakpoint.js';
-import { flags } from '../util/flags.js';
+import { $flags } from '../util/flags.js';
 import { getSignal } from '../util/signal.js';
 
 const { prefersDarkTheme, prefersLightTheme, prefersMoreContrast } = strings;
@@ -16,7 +16,7 @@ export const themes = ['light', 'dark', 'highContrast'] as const;
 export type Theme = (typeof themes)[number];
 
 export const $theme = computed(() => {
-  const flagPreferredTheme = getSignal(flags.theme as Signal<Theme>);
+  const flagPreferredTheme = getSignal($flags.theme as Signal<Theme>);
 
   if (themes.includes(flagPreferredTheme)) return flagPreferredTheme;
 

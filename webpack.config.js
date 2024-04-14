@@ -27,6 +27,13 @@ const configDownstream = {
     historyApiFallback: true,
     hot: false,
     liveReload: false,
+    proxy: [
+      {
+        path: '/api',
+        router: () => 'http://localhost:1337',
+        target: 'http://localhost:3000',
+      },
+    ],
     static: [
       {
         directory: resolve(dirBase, 'node_modules'),

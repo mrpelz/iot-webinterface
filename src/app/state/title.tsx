@@ -9,8 +9,9 @@ import {
 } from 'preact/hooks';
 
 import { useHookDebug } from '../hooks/use-hook-debug.js';
-import { useCapitalization, useI18nKey } from './i18n.js';
+import { getSignal } from '../util/signal.js';
 import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
+import { getCapitalization, getTranslation } from './translation.js';
 
 export type TTitleContext = {
   capitalizedTitle: string | null;
@@ -26,10 +27,10 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
   useHookDebug('TitleProvider');
 
   const [staticPage] = useNavigationStaticPage();
-  const staticPageName = useI18nKey(staticPage || undefined);
+  const staticPageName = getSignal(getTranslation(staticPage || undefined));
 
   const [room] = useNavigationRoom();
-  const roomName = useI18nKey(room?.meta.name);
+  const roomName = getSignal(getTranslation(room?.meta.name));
 
   const [titleOverride, setTitleOverride] = useState<string | null>(null);
 
@@ -38,7 +39,7 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
     [roomName, staticPageName, titleOverride],
   );
 
-  const capitalizedTitle = useCapitalization(title);
+  const capitalizedTitle = getSignal(getCapitalization(title));
 
   const value = useMemo(
     () => ({ capitalizedTitle, setTitleOverride, title }) as const,

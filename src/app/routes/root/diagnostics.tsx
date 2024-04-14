@@ -5,7 +5,6 @@ import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { Details, Hierarchy, Meta } from '../../controls/diagnostics.js';
 import { useGetLocalStorage } from '../../hooks/use-local-storage.js';
 import { $isFocused } from '../../state/focus.js';
-import { $i18n } from '../../state/i18n.js';
 import { $isMenuVisible } from '../../state/menu.js';
 import {
   staticPagesBottom,
@@ -16,6 +15,7 @@ import { $isRoot, $path, $previousPath } from '../../state/path.js';
 import { $isScreensaverActive } from '../../state/screensaver.js';
 import { $theme } from '../../state/theme.js';
 import { useTitle } from '../../state/title.js';
+import { $i18n } from '../../state/translation.js';
 import { $isVisible } from '../../state/visibility.js';
 import {
   useHierarchy,
@@ -26,7 +26,7 @@ import {
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { getMediaQuery } from '../../style/main.js';
-import { flags } from '../../util/flags.js';
+import { $flags } from '../../util/flags.js';
 import { getSignal } from '../../util/signal.js';
 import { Levels } from '../../web-api.js';
 
@@ -38,7 +38,7 @@ const Fallback: FunctionComponent = () => (
 
 const Flags: FunctionComponent = () => (
   <table>
-    {Object.entries(flags).map(([key, observable]) => (
+    {Object.entries($flags).map(([key, observable]) => (
       <tr>
         <td>{key}</td>
         <td>{JSON.stringify(observable.value)}</td>

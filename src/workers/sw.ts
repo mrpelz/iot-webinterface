@@ -1,8 +1,8 @@
 import { expose } from 'comlink';
-import { entries } from 'idb-keyval';
 import { precacheAndRoute } from 'workbox-precaching';
 
-import type { API, Flags } from '../common/types.js';
+import type { SW_API } from '../common/types.js';
+import { getFlags } from './util.js';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -28,16 +28,12 @@ precacheAndRoute(manifest, {
   },
 });
 
-const getFlags = async (): Promise<Flags> => {
-  const flags = Object.fromEntries(await entries());
+const clearNotifications = async (tags?: string[]) => {
+  const { debug } = await getFlags();
 
   // eslint-disable-next-line no-console
-  console.table(flags);
+  if (debug) console.debug('remove clearNotifications', tags);
 
-  return flags;
-};
-
-const clearNotifications = async (tags?: string[]) => {
   const notifications = tags
     ? await Promise.all(
         tags.map((tag) => self.registration.getNotifications({ tag })),
@@ -50,6 +46,11 @@ const clearNotifications = async (tags?: string[]) => {
 };
 
 const reload = async () => {
+  const { debug } = await getFlags();
+
+  // eslint-disable-next-line no-console
+  if (debug) console.debug('reload');
+
   const windowClients = await self.clients.matchAll({ type: 'window' });
 
   for (const windowClient of windowClients) {
@@ -64,6 +65,11 @@ const reload = async () => {
 };
 
 const removeRegistration = async () => {
+  const { debug } = await getFlags();
+
+  // eslint-disable-next-line no-console
+  if (debug) console.debug('removeRegistration');
+
   const cacheNames = await self.caches.keys();
 
   await Promise.all(
@@ -74,17 +80,33 @@ const removeRegistration = async () => {
   await reload();
 };
 
-const api: API = {
+const api: SW_API = {
   clearNotifications,
   reload,
   removeRegistration,
-  showNotification: async (...args) =>
-    self.registration.showNotification(...args),
+  showNotification: async (...args) => {
+    const { debug } = await getFlags();
+
+    // eslint-disable-next-line no-console
+    if (debug) console.debug('showNotification', ...args);
+
+    return self.registration.showNotification(...args);
+  },
 };
 
 self.addEventListener('install', (event) =>
   event.waitUntil(
     (async () => {
+      const flags = await getFlags();
+
+      if (flags.debug) {
+        // eslint-disable-next-line no-console
+        console.debug('install event');
+
+        // eslint-disable-next-line no-console
+        console.table(flags);
+      }
+
       await clearNotifications([
         NOTIFICATION_SERVICEWORKER_INSTALL_TAG,
         NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG,
@@ -107,6 +129,11 @@ self.addEventListener('install', (event) =>
 self.addEventListener('activate', (event) =>
   event.waitUntil(
     (async () => {
+      const { debug } = await getFlags();
+
+      // eslint-disable-next-line no-console
+      if (debug) console.debug('activate event');
+
       await self.clients.claim();
 
       await clearNotifications([
@@ -132,6 +159,8 @@ self.addEventListener('activate', (event) =>
           body: 'Reload all windows to make use of new version?',
           requireInteraction: true,
           tag: NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG,
+        } as NotificationOptions & {
+          actions: { action: string; title: string }[];
         })
         .catch(() => {
           // noop
@@ -147,6 +176,11 @@ self.addEventListener('notificationclick', (event) =>
         action,
         notification: { tag },
       } = event;
+
+      const { debug } = await getFlags();
+
+      // eslint-disable-next-line no-console
+      if (debug) console.debug('notificationclick event', action, tag);
 
       if (tag !== NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG) return;
 

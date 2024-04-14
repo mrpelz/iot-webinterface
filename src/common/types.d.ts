@@ -1,3 +1,8 @@
+import { TSerialization } from '@iot/iot-monolith';
+
+export type { TSerialization };
+export type { TSystem } from '@iot/iot-monolith';
+
 export type Flags = {
   absoluteTimes: boolean;
   apiBaseUrl: string | null;
@@ -13,9 +18,13 @@ export type Flags = {
   updateUnattended: boolean;
 };
 
-export type API = {
+export type SW_API = {
   clearNotifications: (tags?: string[]) => Promise<void>;
   reload: () => Promise<void>;
   removeRegistration: () => Promise<void>;
-  showNotification: ServiceWorkerRegistration['showNotification']
+  showNotification: ServiceWorkerRegistration['showNotification'];
+};
+
+export type API_WORKER_API = {
+  getHierarchy: () => Promise<TSerialization>;
 };

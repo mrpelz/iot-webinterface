@@ -12,12 +12,12 @@ import { Video } from '../components/video.js';
 import { usePromise } from '../hooks/use-promise.js';
 import { msToNextSecond, useTimeIncrement } from '../hooks/use-time-label.js';
 import { $isFocused } from '../state/focus.js';
-import { Translation } from '../state/i18n.js';
 import { $isScreensaverActive } from '../state/screensaver.js';
 import { dimensions } from '../style.js';
 import { fetchFallback } from '../util/fetch.js';
 import { getSignal } from '../util/signal.js';
 import { Category } from './category.js';
+import { Translation } from './translation.js';
 
 const next10thSecondIncrement = (): number => msToNextSecond(10);
 const next2ndSecondIncrement = (): number => msToNextSecond(2);

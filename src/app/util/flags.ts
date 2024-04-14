@@ -21,7 +21,7 @@ const defaultFlags: Flags = {
 const hashFlags = new URLSearchParams(location.hash.slice(1));
 const queryFlags = new URLSearchParams(location.search);
 
-export const flags = Object.fromEntries(
+export const $flags = Object.fromEntries(
   Object.entries(defaultFlags).map(([key, value]) => {
     const externalValue = (() => {
       const payload = hashFlags.get(key) ?? queryFlags.get(key);
@@ -38,7 +38,7 @@ export const flags = Object.fromEntries(
   }),
 ) as { [K in keyof Flags]: Signal<Flags[K]> };
 
-export type ObservableFlags = typeof flags;
+export type ObservableFlags = typeof $flags;
 
 const isMeaningfulValue = (key: keyof Flags, input: unknown) => {
   if (input === undefined) return false;
@@ -49,7 +49,7 @@ const isMeaningfulValue = (key: keyof Flags, input: unknown) => {
   return true;
 };
 
-for (const [key_, aSignal] of Object.entries(flags)) {
+for (const [key_, aSignal] of Object.entries($flags)) {
   const key = key_ as keyof Flags;
 
   (async () => {
@@ -77,6 +77,6 @@ addEventListener('hashchange', ({ newURL }) => {
       }
     })();
 
-    flags[key].value = value;
+    $flags[key].value = value;
   }
 });

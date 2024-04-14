@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@mrpelz/boilerplate-preact": "latest",
+    "@iot/iot-monolith": "latest",
     "@types/glob": "latest",
     "favicons-webpack-plugin": "latest",
     "glob": "latest",

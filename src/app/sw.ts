@@ -1,13 +1,13 @@
 import { Remote, wrap } from 'comlink';
 import { Workbox } from 'workbox-window';
 
-import type { API } from '../../common/types.js';
+import type { SW_API } from '../common/types.js';
 
 export const isProd = !['localhost', '127.0.0.1'].includes(location.hostname);
 export const CHECK_INTERVAL = isProd ? 15_000 : 1000;
 
 export let workbox: Workbox | undefined;
-export let swProxy: Remote<API> | undefined;
+export let swProxy: Remote<SW_API> | undefined;
 
 export const registerServiceWorker = async (
   updateCheckInterval?: number,

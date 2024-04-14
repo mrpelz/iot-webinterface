@@ -1,7 +1,6 @@
 import { computed, effect, signal } from '@preact/signals';
 
-import { previous } from '../signals/previous.js';
-import { flags } from '../util/flags.js';
+import { $flags } from '../util/flags.js';
 import {
   amend,
   getPath,
@@ -13,6 +12,7 @@ import {
   callbackSignal,
   callbackUnwrapped,
   getSignal,
+  previous,
   readOnly,
 } from '../util/signal.js';
 import { $isVisible } from './visibility.js';
@@ -23,8 +23,8 @@ const ROOT_PATH_DEPTH = 1;
 const disableBackcapture =
   'standalone' in navigator && navigator['standalone' as keyof Navigator];
 
-const $setPath = signal(flags.path.value || location.pathname);
-flags.path.value = null;
+const $setPath = signal($flags.path.value || location.pathname);
+$flags.path.value = null;
 
 export const setPath = (input: string): void => {
   $setPath.value = input;

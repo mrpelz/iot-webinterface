@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
-import { $i18n, useI18nKey } from '../state/i18n.js';
-import { flags } from '../util/flags.js';
+import { $i18n, getTranslation } from '../state/translation.js';
+import { $flags } from '../util/flags.js';
 import { getSignal } from '../util/signal.js';
 
 const units = [
@@ -80,6 +80,8 @@ export const useTimeIncrement = (
   return incrementCb ? compareDate : null;
 };
 
+const $nowLabel = getTranslation('now');
+
 export const useRelativeTimeLabel = (
   date: Date | null,
   nowSpan = 4000,
@@ -95,7 +97,7 @@ export const useRelativeTimeLabel = (
     [effectiveLocale],
   );
 
-  const nowLabel = useI18nKey('now');
+  const nowLabel = getSignal($nowLabel);
 
   const compareDate = useTimeIncrement(date ? nextSecondIncrement : null);
 
@@ -156,7 +158,7 @@ export const useTimeLabel = (
   date: Date | null,
   nowSpan?: number,
 ): string | null => {
-  const absoluteTimes = getSignal(flags.absoluteTimes);
+  const absoluteTimes = getSignal($flags.absoluteTimes);
 
   const relativeLabel = useRelativeTimeLabel(
     absoluteTimes ? null : date,

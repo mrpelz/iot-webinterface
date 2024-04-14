@@ -15,7 +15,7 @@ import {
   useGetLocalStorage,
   useSetLocalStorage,
 } from '../hooks/use-local-storage.js';
-import { flags } from '../util/flags.js';
+import { $flags } from '../util/flags.js';
 import { getSignal } from '../util/signal.js';
 import {
   HierarchyElement,
@@ -195,7 +195,7 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   const { hierarchy } = useWebApi();
   const settled = useDelay(Boolean(hierarchy), 500);
 
-  const startPageFlag = getSignal(flags.startPage);
+  const startPageFlag = getSignal($flags.startPage);
 
   const rootPath = getSignal($rootPath);
   const setRootPath = getSignal($setRootPath);
