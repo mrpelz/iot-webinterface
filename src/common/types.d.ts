@@ -25,6 +25,7 @@ export type SW_API = {
   showNotification: ServiceWorkerRegistration['showNotification'];
 };
 
-export type API_WORKER_API = {
-  getHierarchy: () => Promise<TSerialization>;
+export abstract class API_WORKER_API {
+  init(): Promise<void>;
+  get hierarchy(): TSerialization | undefined;
 };

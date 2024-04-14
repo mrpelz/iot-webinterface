@@ -23,18 +23,16 @@ try {
 
   defer(async () => {
     requestNotificationPermission();
+    await registerServiceWorker(updateCheckInterval.value ?? undefined);
 
     iOSHoverStyles();
     iOSScrollToTop();
 
-    await registerServiceWorker(updateCheckInterval.value ?? undefined);
-
     await persist();
   });
 } catch (error) {
-  if (
-    // eslint-disable-next-line no-alert
-    confirm(stripIndent`
+  // eslint-disable-next-line no-alert
+  alert(stripIndent`
       Error!
 
       Confirm to clear local storage and remove ServiceWorker.
@@ -42,10 +40,7 @@ try {
       ${(error as Error).name}: "${(error as Error).message}"
 
       ${(error as Error).stack || '[no stack trace]'}
-    `)
-  ) {
-    localStorage.clear();
-  }
+    `);
 
   throw error;
 }

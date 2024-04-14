@@ -27,13 +27,13 @@
     "workbox-window": "latest"
   },
   "devDependencies": {
-    "@mrpelz/boilerplate-preact": "latest",
     "@iot/iot-monolith": "latest",
+    "@mrpelz/boilerplate-preact": "latest",
     "@types/glob": "latest",
     "favicons-webpack-plugin": "latest",
     "glob": "latest",
-    "source-map-loader": "latest",
     "modify-source-webpack-plugin": "latest",
+    "source-map-loader": "latest",
     "workbox-webpack-plugin": "latest"
   }
 }
