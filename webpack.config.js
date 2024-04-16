@@ -25,13 +25,18 @@ const configDownstream = {
     allowedHosts: 'all',
     client: false,
     historyApiFallback: true,
+    host: '::1',
     hot: false,
     liveReload: false,
     proxy: [
       {
-        path: '/api',
-        router: () => 'http://localhost:1337',
-        target: 'http://localhost:3000',
+        context: ['/api/stream'],
+        target: 'http://localhost:1337',
+        ws: true,
+      },
+      {
+        context: ['/api'],
+        target: 'http://localhost:1337',
       },
     ],
     static: [
@@ -40,6 +45,7 @@ const configDownstream = {
         publicPath: '/node_modules',
       },
     ],
+    webSocketServer: false,
   },
   output: {
     assetModuleFilename: 'assets/[name][ext]',

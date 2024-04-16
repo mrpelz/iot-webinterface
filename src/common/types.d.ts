@@ -26,6 +26,7 @@ export type SW_API = {
 };
 
 export abstract class API_WORKER_API {
-  init(): Promise<void>;
   get hierarchy(): TSerialization | undefined;
+  get values(): Record<string, unknown>;
+  init(): Promise<void>;
 };
