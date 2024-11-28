@@ -1,39 +1,44 @@
+import { JSX } from 'preact';
 import { stripIndent } from 'proper-tags';
 
-import { render } from './root.js';
+import { Api } from './api.js';
+import { registerServiceWorker } from './sw.js';
 import { defer } from './util/defer.js';
-import { getFlags } from './util/flags.js';
 import { iOSHoverStyles, iOSScrollToTop } from './util/ios-fixes.js';
 import { requestNotificationPermission } from './util/notifications.js';
-import { registerServiceWorker } from './util/service-worker.js';
 import { persist } from './util/storage.js';
-import { update } from './util/update.js';
-import { WebApi } from './web-api.js';
+
+export const api = new Api();
 
 try {
-  const flags = getFlags();
-  const { apiBaseUrl, debug, updateCheckInterval } = flags;
+  (async () => {
+    await api.isInit;
+    const { render } = await import('./root.js');
 
-  const webApi = new WebApi(apiBaseUrl, debug);
-
-  render(flags, webApi);
-  document.documentElement.removeAttribute('static');
+    render();
+    document.documentElement.removeAttribute('static');
+  })();
 
   defer(async () => {
-    registerServiceWorker();
-
-    update(updateCheckInterval, debug);
-
     requestNotificationPermission();
-    persist();
+    await registerServiceWorker();
 
     iOSHoverStyles();
     iOSScrollToTop();
+
+    await persist();
+
+    await api.isInit;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const [match] = api.match({ $: 'sunElevation' as const });
+
+    // eslint-disable-next-line no-console
+    console.log({ match, reference: match.main.state.reference });
   });
 } catch (error) {
-  if (
-    // eslint-disable-next-line no-alert
-    confirm(stripIndent`
+  // eslint-disable-next-line no-console
+  console.error(stripIndent`
       Error!
 
       Confirm to clear local storage and remove ServiceWorker.
@@ -41,10 +46,9 @@ try {
       ${(error as Error).name}: "${(error as Error).message}"
 
       ${(error as Error).stack || '[no stack trace]'}
-    `)
-  ) {
-    localStorage.clear();
-  }
+    `);
 
   throw error;
 }
+
+type Test = JSX.AllCSSProperties;

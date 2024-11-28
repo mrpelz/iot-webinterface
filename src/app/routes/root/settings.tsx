@@ -1,11 +1,12 @@
-import { FunctionComponent } from 'preact';
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
+import { clear } from 'idb-keyval';
+import { FunctionComponent, JSX } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import { Button, Entry as EntryComponent } from '../../components/list.js';
 import { ShowHide } from '../../components/show-hide.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
-import { useFlag, useSetFlag } from '../../state/flags.js';
 import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
 import {
   staticPages,
@@ -14,7 +15,8 @@ import {
 } from '../../state/navigation.js';
 import { Theme, themes } from '../../state/theme.js';
 import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
-import { triggerUpdate } from '../../util/update.js';
+import { swProxy } from '../../sw.js';
+import { $flags } from '../../util/flags.js';
 import { Entry, List } from '../../views/list.js';
 import {
   HierarchyElementBuilding,
@@ -41,34 +43,15 @@ export const Settings: FunctionComponent = () => {
 
   const startPages = useMemo(() => [...staticPages, ...roomNames], [roomNames]);
 
-  const startPage = useFlag('startPage');
-  const setStartPage = useSetFlag('startPage');
-
-  const theme = useFlag('theme');
-  const setTheme = useSetFlag('theme');
-
-  const language = useFlag('language');
-  const setLanguage = useSetFlag('language');
-
-  const absoluteTimes = useFlag('absoluteTimes');
-  const setAbsoluteTimes = useSetFlag('absoluteTimes');
-
-  const inactivityTimeout = useFlag('inactivityTimeout');
-  const setInactivityTimeout = useSetFlag('inactivityTimeout');
-
-  const screensaverEnable = useFlag('screensaverEnable');
-  const setScreensaverEnable = useSetFlag('screensaverEnable');
-
-  const screensaverRandomizePosition = useFlag('screensaverRandomizePosition');
-  const setScreensaverRandomizePosition = useSetFlag(
-    'screensaverRandomizePosition',
-  );
-
-  const debug = useFlag('debug');
-  const setDebug = useSetFlag('debug');
-
-  const apiBaseUrl = useFlag('apiBaseUrl');
-  const setApiBaseUrl = useSetFlag('apiBaseUrl');
+  const startPage = $flags.startPage.value;
+  const theme = $flags.theme.value;
+  const language = $flags.language.value;
+  const absoluteTimes = $flags.absoluteTimes.value;
+  const inactivityTimeout = $flags.inactivityTimeout.value;
+  const screensaverEnable = $flags.screensaverEnable.value;
+  const screensaverRandomizePosition = $flags.screensaverRandomizePosition;
+  const debug = $flags.debug.value;
+  const apiBaseUrl = $flags.apiBaseUrl.value;
 
   return (
     <>
@@ -81,8 +64,12 @@ export const Settings: FunctionComponent = () => {
             disabled={homes.length < 2}
             id="home"
             name="home"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
-              ({ currentTarget: { value } }) => {
+            onChange={useCallback<
+              JSX.GenericEventHandler<HTMLSelectElement> & Function
+            >(
+              ({
+                currentTarget: { value },
+              }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
                 const matchingHome = homes.find(
                   ({ meta: { name } }) => name === value,
                 );
@@ -110,8 +97,12 @@ export const Settings: FunctionComponent = () => {
             disabled={buildings.length < 2}
             id="building"
             name="building"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
-              ({ currentTarget: { value } }) => {
+            onChange={useCallback<
+              JSX.GenericEventHandler<HTMLSelectElement> & Function
+            >(
+              ({
+                currentTarget: { value },
+              }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
                 const matchingBuilding = buildings.find(
                   ({ meta: { name } }) => name === value,
                 );
@@ -141,20 +132,24 @@ export const Settings: FunctionComponent = () => {
           <select
             id="startPage"
             name="startPage"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
-              ({ currentTarget: { value } }) => {
+            onChange={useCallback<
+              JSX.GenericEventHandler<HTMLSelectElement> & Function
+            >(
+              ({
+                currentTarget: { value },
+              }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
                 const selectedOverride = value;
                 if (selectedOverride === 'auto') {
-                  setStartPage(null);
+                  $flags.startPage.value = null;
                 }
 
                 if (!startPages.includes(selectedOverride)) {
                   return;
                 }
 
-                setStartPage(selectedOverride);
+                $flags.startPage.value = selectedOverride;
               },
-              [startPages, setStartPage],
+              [startPages],
             )}
           >
             <option value="auto" selected={startPage === null}>
@@ -188,11 +183,15 @@ export const Settings: FunctionComponent = () => {
           <select
             id="theme"
             name="theme"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
-              ({ currentTarget: { value } }) => {
+            onChange={useCallback<
+              JSX.GenericEventHandler<HTMLSelectElement> & Function
+            >(
+              ({
+                currentTarget: { value },
+              }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
                 const selectedTheme = value as Theme | 'auto';
                 if (selectedTheme === 'auto') {
-                  setTheme(null);
+                  $flags.theme.value = null;
                   return;
                 }
 
@@ -203,9 +202,9 @@ export const Settings: FunctionComponent = () => {
                   return;
                 }
 
-                setTheme(selectedTheme);
+                $flags.theme.value = selectedTheme;
               },
-              [setTheme, theme],
+              [theme],
             )}
           >
             <option value="auto" selected={theme === null}>
@@ -225,11 +224,15 @@ export const Settings: FunctionComponent = () => {
           <select
             id="language"
             name="language"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
-              ({ currentTarget: { value } }) => {
+            onChange={useCallback<
+              JSX.GenericEventHandler<HTMLSelectElement> & Function
+            >(
+              ({
+                currentTarget: { value },
+              }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
                 const selectedLanguage = value as I18nLanguage | 'auto';
                 if (selectedLanguage === 'auto') {
-                  setLanguage(null);
+                  $flags.language.value = null;
                   return;
                 }
 
@@ -240,9 +243,9 @@ export const Settings: FunctionComponent = () => {
                   return;
                 }
 
-                setLanguage(selectedLanguage);
+                $flags.language.value = selectedLanguage;
               },
-              [language, setLanguage],
+              [language],
             )}
           >
             <option value="auto" selected={language === null}>
@@ -264,11 +267,15 @@ export const Settings: FunctionComponent = () => {
             id="absoluteTimes"
             name="absoluteTimes"
             type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
-              ({ currentTarget: { checked: selectedAbsoluteTimes } }) => {
-                setAbsoluteTimes(selectedAbsoluteTimes);
+            onChange={useCallback<
+              JSX.GenericEventHandler<HTMLInputElement> & Function
+            >(
+              ({
+                currentTarget: { checked: selectedAbsoluteTimes },
+              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+                $flags.absoluteTimes.value = selectedAbsoluteTimes;
               },
-              [setAbsoluteTimes],
+              [],
             )}
           />
         </Entry>
@@ -285,8 +292,12 @@ export const Settings: FunctionComponent = () => {
             pattern="[0-9]*"
             placeholder="0"
             value={inactivityTimeout || ''}
-            onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
-              ({ currentTarget: { value } }) => {
+            onBlur={useCallback<
+              JSX.GenericEventHandler<HTMLInputElement> & Function
+            >(
+              ({
+                currentTarget: { value },
+              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
                 const selectedInactivityTimeout = Number.parseInt(
                   value.trim(),
                   10,
@@ -296,13 +307,13 @@ export const Settings: FunctionComponent = () => {
                   Number.isNaN(selectedInactivityTimeout) ||
                   !Number.isInteger(selectedInactivityTimeout)
                 ) {
-                  setInactivityTimeout(null);
+                  $flags.inactivityTimeout.value = null;
                   return;
                 }
 
-                setInactivityTimeout(selectedInactivityTimeout);
+                $flags.inactivityTimeout.value = selectedInactivityTimeout;
               },
-              [setInactivityTimeout],
+              [],
             )}
           />
         </Entry>
@@ -315,15 +326,19 @@ export const Settings: FunctionComponent = () => {
             id="screensaverEnable"
             name="screensaverEnable"
             type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
-              ({ currentTarget: { checked: selectedScreensaverEnable } }) => {
-                setScreensaverEnable(selectedScreensaverEnable);
+            onChange={useCallback<
+              JSX.GenericEventHandler<HTMLInputElement> & Function
+            >(
+              ({
+                currentTarget: { checked: selectedScreensaverEnable },
+              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+                $flags.screensaverEnable.value = selectedScreensaverEnable;
 
                 if (!selectedScreensaverEnable) {
-                  setScreensaverRandomizePosition(false);
+                  $flags.screensaverRandomizePosition.value = false;
                 }
               },
-              [setScreensaverEnable, setScreensaverRandomizePosition],
+              [],
             )}
           />
         </Entry>
@@ -342,17 +357,18 @@ export const Settings: FunctionComponent = () => {
               id="screensaverRandomizePosition"
               name="screensaverRandomizePosition"
               type="checkbox"
-              onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+              onChange={useCallback<
+                JSX.GenericEventHandler<HTMLInputElement> & Function
+              >(
                 ({
                   currentTarget: {
                     checked: selectedscreensaverRandomizePosition,
                   },
-                }) => {
-                  setScreensaverRandomizePosition(
-                    selectedscreensaverRandomizePosition,
-                  );
+                }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+                  $flags.screensaverRandomizePosition.value =
+                    selectedscreensaverRandomizePosition;
                 },
-                [setScreensaverRandomizePosition],
+                [],
               )}
             />
           </Entry>
@@ -368,11 +384,15 @@ export const Settings: FunctionComponent = () => {
             id="debug"
             name="debug"
             type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
-              ({ currentTarget: { checked: selectedDebug } }) => {
-                setDebug(selectedDebug);
+            onChange={useCallback<
+              JSX.GenericEventHandler<HTMLInputElement> & Function
+            >(
+              ({
+                currentTarget: { checked: selectedDebug },
+              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+                $flags.debug.value = selectedDebug;
               },
-              [setDebug],
+              [],
             )}
           />
         </Entry>
@@ -386,38 +406,45 @@ export const Settings: FunctionComponent = () => {
             placeholder={useI18nKeyFallback('auto')}
             type="url"
             value={apiBaseUrl || ''}
-            onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
-              ({ currentTarget: { value } }) => {
+            onBlur={useCallback<
+              JSX.GenericEventHandler<HTMLInputElement> & Function
+            >(
+              ({
+                currentTarget: { value },
+              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
                 const selectedApiBaseUrl = value.trim();
                 if (selectedApiBaseUrl.length === 0) {
-                  setApiBaseUrl(null);
+                  $flags.apiBaseUrl.value = null;
                   return;
                 }
 
                 try {
                   const url = new URL(selectedApiBaseUrl);
-                  setApiBaseUrl(url.href);
+                  $flags.apiBaseUrl.value = url.href;
                 } catch {
-                  setApiBaseUrl(null);
+                  $flags.apiBaseUrl.value = null;
                 }
               },
-              [setApiBaseUrl],
+              [],
             )}
           />
         </Entry>
         <EntryComponent>
-          <Button onClick={useCallback(() => triggerUpdate?.(), [])}>
+          <Button
+            onClick={useCallback(() => swProxy?.removeRegistration(), [])}
+          >
             update
           </Button>
-          <Button onClick={useCallback(() => location.reload(), [])}>
+          <Button onClick={useCallback(() => swProxy?.reload(), [])}>
             reload
           </Button>
           <Button
             onClick={useCallback(() => {
               localStorage.clear();
+              clear();
             }, [])}
           >
-            reset persistent storage
+            reset local storage
           </Button>
         </EntryComponent>
       </List>

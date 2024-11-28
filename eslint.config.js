@@ -5,11 +5,11 @@ import {
 } from '@mrpelz/boilerplate-preact/eslint.config.js';
 import { merge } from 'ts-deepmerge';
 
-/** @type {import('eslint').Linter.FlatConfig} */
+/** @type {import('eslint').Linter.Config} */
 export const configApp = merge(configUpstream);
 configApp.files = ['src/app/**/*.{js,jsx,ts,tsx}'];
 
-/** @type {import('eslint').Linter.FlatConfig} */
+/** @type {import('eslint').Linter.Config} */
 const configDownstreamWorkers = {
   languageOptions: {
     parserOptions: {
@@ -18,9 +18,9 @@ const configDownstreamWorkers = {
   },
 };
 
-/** @type {import('eslint').Linter.FlatConfig} */
+/** @type {import('eslint').Linter.Config} */
 export const configWorkers = merge(configUpstream, configDownstreamWorkers);
 configWorkers.files = ['src/workers/**/*.{js,ts}'];
 
-/** @type {import('eslint').Linter.FlatConfig[]} */
+/** @type {import('eslint').Linter.Config[]} */
 export default [configMeta, configApp, configWorkers];

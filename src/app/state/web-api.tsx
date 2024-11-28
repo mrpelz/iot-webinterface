@@ -43,7 +43,6 @@ const WebApiContext = createContext<TWebApiContext>({
   useSetterIndex: () => null,
 });
 
-// eslint-disable-next-line comma-spacing
 const useGetterIndexFactory = <T,>(webApi: WebApi, index?: number) => {
   const [state, setState] = useState<T | null>(null);
 
@@ -59,7 +58,6 @@ const useGetterIndexFactory = <T,>(webApi: WebApi, index?: number) => {
   return state;
 };
 
-// eslint-disable-next-line comma-spacing
 const useSetterIndexFactory = <T,>(webApi: WebApi, index?: number) => {
   const setter = useRef<Setter<T> | null>(null);
 
@@ -105,10 +103,10 @@ export const WebApiProvider: FunctionComponent<{ webApi: WebApi }> = ({
       elements,
       hierarchy,
       isStreamOnline,
-      // eslint-disable-next-line comma-spacing
+
       useGetterIndex: <T,>(index?: number) =>
         useGetterIndexFactory<T>(webApi, index),
-      // eslint-disable-next-line comma-spacing
+
       useSetterIndex: <T,>(index?: number) =>
         useSetterIndexFactory<T>(webApi, index),
     }),
@@ -217,14 +215,12 @@ export const useStreamOnline = (): TWebApiContext['isStreamOnline'] => {
   return useMemo(() => isStreamOnline, [isStreamOnline]);
 };
 
-// eslint-disable-next-line comma-spacing
 export const useGetter = <T,>(element: HierarchyElement | null): T | null => {
   const { useGetterIndex } = useContext(WebApiContext);
 
   return useGetterIndex(element?.get);
 };
 
-// eslint-disable-next-line comma-spacing
 export const useChildGetter = <T,>(
   input: HierarchyElement | null,
   child: string,
@@ -238,7 +234,6 @@ export const useChildGetter = <T,>(
   return useGetterIndex(element?.get);
 };
 
-// eslint-disable-next-line comma-spacing
 export const useSetter = <T,>(
   element: HierarchyElement | null,
 ): SetterFunction<T> | null => {
@@ -247,7 +242,6 @@ export const useSetter = <T,>(
   return useSetterIndex(element?.set);
 };
 
-// eslint-disable-next-line comma-spacing
 export const useChildSetter = <T,>(
   input: HierarchyElement | null,
   child: string,

@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'preact';
 import {
+  Dispatch,
   MutableRef,
   StateUpdater,
   useCallback,
@@ -84,7 +85,7 @@ export const useSwipeBrightness = (
   brightnessRef: MutableRef<number | null>,
   loadingRef: MutableRef<boolean | null>,
   setBrightness: SetterFunction<number> | null,
-  setInteracting: StateUpdater<boolean>,
+  setInteracting: Dispatch<StateUpdater<boolean>>,
 ): ((delta: number | null) => void) => {
   const startBrightnessRef = useRef<number | null>(null);
 

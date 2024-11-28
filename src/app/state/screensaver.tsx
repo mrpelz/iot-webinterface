@@ -1,5 +1,6 @@
 import { createContext, FunctionComponent } from 'preact';
 import {
+  Dispatch,
   StateUpdater,
   useCallback,
   useContext,
@@ -9,13 +10,13 @@ import {
 } from 'preact/hooks';
 
 import { useHookDebug } from '../hooks/use-hook-debug.js';
-import { useFlag } from './flags.js';
+import { $flags } from '../util/flags.js';
 import { useVisibility } from './visibility.js';
 
 export type TScreensaverActiveContext = {
   flipScreensaverActive: () => void;
   isScreensaverActive: boolean;
-  setScreensaverActive: StateUpdater<boolean>;
+  setScreensaverActive: Dispatch<StateUpdater<boolean>>;
 };
 
 const ScreensaverActiveContext = createContext<TScreensaverActiveContext>(
@@ -25,7 +26,7 @@ const ScreensaverActiveContext = createContext<TScreensaverActiveContext>(
 export const ScreensaverActiveProvider: FunctionComponent = ({ children }) => {
   useHookDebug('ScreensaverActiveProvider');
 
-  const isScreensaverEnabled = useFlag('screensaverEnable');
+  const isScreensaverEnabled = $flags.screensaverEnable.value;
   const isVisible = useVisibility();
 
   const [isScreensaverActive, _setScreensaverActive] = useState(
@@ -37,7 +38,7 @@ export const ScreensaverActiveProvider: FunctionComponent = ({ children }) => {
     _setScreensaverActive(false);
   }, [isScreensaverEnabled]);
 
-  const setScreensaverActive = useCallback<StateUpdater<boolean>>(
+  const setScreensaverActive = useCallback<Dispatch<StateUpdater<boolean>>>(
     (...args) => {
       if (!isScreensaverEnabled) return;
       _setScreensaverActive(...args);
@@ -75,7 +76,7 @@ export const useIsScreensaverActive = (): boolean => {
   return useMemo(() => isScreensaverActive, [isScreensaverActive]);
 };
 
-export const useSetScreensaverActive = (): StateUpdater<boolean> => {
+export const useSetScreensaverActive = (): Dispatch<StateUpdater<boolean>> => {
   const { setScreensaverActive } = useContext(ScreensaverActiveContext);
   return useMemo(() => setScreensaverActive, [setScreensaverActive]);
 };

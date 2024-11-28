@@ -2,14 +2,14 @@ import { createContext, FunctionComponent } from 'preact';
 import { useContext, useEffect, useLayoutEffect, useState } from 'preact/hooks';
 
 import { useHookDebug } from '../hooks/use-hook-debug.js';
-import { useFlag } from './flags.js';
+import { $flags } from '../util/flags.js';
 
 const VisibilityContext = createContext(true);
 
 export const VisibilityProvider: FunctionComponent = ({ children }) => {
   useHookDebug('VisibilityProvider');
 
-  const inactivityTimeout = useFlag('inactivityTimeout');
+  const inactivityTimeout = $flags.inactivityTimeout.value;
 
   const [isVisible, setVisible] = useState(true);
 

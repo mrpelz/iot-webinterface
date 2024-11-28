@@ -1,6 +1,6 @@
 import { useEffect } from 'preact/hooks';
 
-import { useFlag } from '../state/flags.js';
+import { $flags } from '../util/flags.js';
 import { getCountry } from '../util/locale.js';
 
 const country = getCountry() || undefined;
@@ -9,7 +9,7 @@ const memo: unknown[] = [];
 let rerenderCount = 0;
 
 export const useHookDebug = (label: string, force = false): void => {
-  const debug = useFlag('debug');
+  const debug = $flags.debug.value;
 
   if (debug || force) {
     // eslint-disable-next-line no-console

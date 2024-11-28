@@ -13,7 +13,6 @@ import {
 } from '../components/menu.js';
 import { useArray } from '../hooks/use-array-compare.js';
 import { roomSorting } from '../i18n/mapping.js';
-import { useFlag } from '../state/flags.js';
 import { Translation } from '../state/i18n.js';
 import { useIsMenuVisible } from '../state/menu.js';
 import {
@@ -28,6 +27,7 @@ import { useFlipScreensaverActive } from '../state/screensaver.js';
 import { useTheme } from '../state/theme.js';
 import { useChild, useChildGetter, useLevelShallow } from '../state/web-api.js';
 import { colors } from '../style.js';
+import { $flags } from '../util/flags.js';
 import {
   HierarchyElementFloor,
   HierarchyElementRoom,
@@ -144,7 +144,7 @@ export const Floor: FunctionComponent<{
 export const Menu: FunctionComponent = () => {
   const goRoot = useGoRoot();
 
-  const isScreensaverEnabled = useFlag('screensaverEnable');
+  const isScreensaverEnabled = $flags.screensaverEnable.value;
   const flipScreensaverActive = useFlipScreensaverActive();
 
   const isMenuVisible = useIsMenuVisible();

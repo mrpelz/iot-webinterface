@@ -1,5 +1,6 @@
 import { createContext, FunctionComponent } from 'preact';
 import {
+  Dispatch,
   StateUpdater,
   useContext,
   useEffect,
@@ -17,7 +18,7 @@ type NoBackground = typeof noBackground;
 
 export type TBackgroundContext = readonly [
   string | null,
-  StateUpdater<string | NoBackground | null>,
+  Dispatch<StateUpdater<string | NoBackground | null>>,
 ];
 
 const BackgroundContext = createContext(null as unknown as TBackgroundContext);

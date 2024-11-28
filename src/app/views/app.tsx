@@ -2,8 +2,8 @@ import { FunctionComponent } from 'preact';
 import { useLayoutEffect } from 'preact/hooks';
 
 import { App as AppComponent } from '../components/app.js';
-import { useFlag } from '../state/flags.js';
 import { colors } from '../style.js';
+import { $flags } from '../util/flags.js';
 import { Background } from './background.js';
 import { Layout } from './layout.js';
 import { RootRoute } from './route.js';
@@ -12,7 +12,7 @@ import { Screensaver } from './screensaver.js';
 export const App: FunctionComponent = () => {
   const backgroundColor = colors.backgroundPrimary()();
 
-  const isScreensaverEnabled = useFlag('screensaverEnable');
+  const isScreensaverEnabled = $flags.screensaverEnable.value;
 
   useLayoutEffect(() => {
     const { style } = document.documentElement;

@@ -4,7 +4,7 @@ import { useContext, useMemo } from 'preact/hooks';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { strings } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
-import { useFlag } from './flags.js';
+import { $flags } from '../util/flags.js';
 
 export const themes = ['light', 'dark', 'highContrast'] as const;
 
@@ -15,7 +15,7 @@ const ThemeContext = createContext(null as unknown as Theme);
 export const ThemeProvider: FunctionComponent = ({ children }) => {
   useHookDebug('ThemeProvider');
 
-  const flagPreferredTheme = useFlag('theme');
+  const flagPreferredTheme = $flags.theme.value;
 
   const prefersHighContrastTheme = useBreakpoint(strings.prefersMoreContrast);
   const prefersDarkTheme = useBreakpoint(strings.prefersDarkTheme);

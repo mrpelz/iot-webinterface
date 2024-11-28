@@ -14,6 +14,5 @@ export const useLatestUpdate = <T>(first: T, ...inputs: T[]): T => {
     }, [input]);
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return state;
 };

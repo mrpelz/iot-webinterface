@@ -1,5 +1,5 @@
 export const requestNotificationPermission = (): void => {
-  if (!('Notification' in window)) return;
+  if (!('Notification' in globalThis)) return;
   if (Notification.permission === 'granted') return;
   if (Notification.permission === 'denied') return;
 
@@ -15,4 +15,4 @@ export const requestNotificationPermission = (): void => {
 };
 
 export const canNotify = (): boolean =>
-  'Notification' in window && Notification.permission === 'granted';
+  'Notification' in globalThis && Notification.permission === 'granted';

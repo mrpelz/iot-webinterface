@@ -1,5 +1,6 @@
 import { createContext, FunctionComponent } from 'preact';
 import {
+  Dispatch,
   StateUpdater,
   useCallback,
   useContext,
@@ -14,6 +15,7 @@ import {
   useGetLocalStorage,
   useSetLocalStorage,
 } from '../hooks/use-local-storage.js';
+import { $flags } from '../util/flags.js';
 import {
   HierarchyElement,
   HierarchyElementBuilding,
@@ -22,7 +24,6 @@ import {
   HierarchyElementRoom,
   Levels,
 } from '../web-api.js';
-import { useFlag } from './flags.js';
 import { useSegment } from './path.js';
 import { useVisibility } from './visibility.js';
 import { useLevelShallow, useWebApi } from './web-api.js';
@@ -40,7 +41,10 @@ export type StaticPage =
   | (typeof staticPagesTop)[number]
   | (typeof staticPagesBottom)[number];
 
-type NavigationElement<T> = readonly [T | null, StateUpdater<T | null>];
+type NavigationElement<T> = readonly [
+  T | null,
+  Dispatch<StateUpdater<T | null>>,
+];
 
 type TNavigationContext = {
   building: NavigationElement<HierarchyElementBuilding>;
@@ -190,7 +194,7 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   const { hierarchy } = useWebApi();
   const settled = useDelay(Boolean(hierarchy), 500);
 
-  const startPageFlag = useFlag('startPage');
+  const startPageFlag = $flags.startPage.value;
   const [startPagePath, setStartPagePath] = useSegment(0);
 
   const startPagePathInitial = useMemo(

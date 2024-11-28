@@ -4,7 +4,6 @@ import { useMemo } from 'preact/hooks';
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { Details, Hierarchy, Meta } from '../../controls/diagnostics.js';
 import { useGetLocalStorage } from '../../hooks/use-local-storage.js';
-import { useFlags } from '../../state/flags.js';
 import { useFocus } from '../../state/focus.js';
 import { useI18n } from '../../state/i18n.js';
 import { useIsMenuVisible } from '../../state/menu.js';
@@ -27,6 +26,7 @@ import {
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { useMediaQuery } from '../../style/main.js';
+import { $flags } from '../../util/flags.js';
 import { Levels } from '../../web-api.js';
 
 const Fallback: FunctionComponent = () => (
@@ -35,20 +35,16 @@ const Fallback: FunctionComponent = () => (
   </tr>
 );
 
-const Flags: FunctionComponent = () => {
-  const flags = useFlags();
-
-  return (
-    <table>
-      {Object.entries(flags).map(([key, value]) => (
-        <tr>
-          <td>{key}</td>
-          <td>{JSON.stringify(value)}</td>
-        </tr>
-      ))}
-    </table>
-  );
-};
+const Flags: FunctionComponent = () => (
+  <table>
+    {Object.entries($flags).map(([key, value]) => (
+      <tr>
+        <td>{key}</td>
+        <td>{JSON.stringify(value.value)}</td>
+      </tr>
+    ))}
+  </table>
+);
 
 const Navigation: FunctionComponent = () => {
   const hierarchy = useHierarchy();

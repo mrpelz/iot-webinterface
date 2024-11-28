@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'preact';
+import { FunctionComponent, JSX } from 'preact';
 import {
   useCallback,
   useEffect,
@@ -68,9 +68,10 @@ const WaitIconView: FunctionComponent = () => {
   );
 
   const onAnimationIteration = useCallback<
-    JSX.AnimationEventHandler<SVGSVGElement>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    JSX.AnimationEventHandler<SVGSVGElement> & Function
   >(
-    ({ animationName }) => {
+    ({ animationName }: JSX.TargetedAnimationEvent<SVGSVGElement>) => {
       if (animationName !== 'wait-circle-animation') return;
 
       handleEvent();

@@ -5,7 +5,6 @@ import { FunctionComponent, h, render as preactRender } from 'preact';
 import { useMemo } from 'preact/hooks';
 
 import { BackgroundProvider } from './state/background.js';
-import { FlagProvider } from './state/flags.js';
 import { FocusProvider } from './state/focus.js';
 import { I18nProvider } from './state/i18n.js';
 import { MenuVisibleProvider } from './state/menu.js';
@@ -19,7 +18,7 @@ import { VisibilityProvider } from './state/visibility.js';
 import { WebApiProvider } from './state/web-api.js';
 import { dimensions } from './style.js';
 import { bindComponent, combineComponents } from './util/combine-components.js';
-import { Flags } from './util/flags.js';
+import { $flags } from './util/flags.js';
 import { App } from './views/app.js';
 import { WebApi } from './web-api.js';
 
@@ -51,20 +50,19 @@ const GlobalStyles = createGlobalStyle`
     scroll-snap-type: block;
     scroll-padding: ${dimensions.headerHeight} 0 0 0;
   }
-`;
+` as unknown as FunctionComponent;
 
-export const Root: FunctionComponent<{
-  flags: Flags;
-  webApi: WebApi;
-}> = ({ flags, webApi }) => {
+export const Root: FunctionComponent = () => {
+  const { apiBaseUrl, debug } = $flags;
+
+  const webApi = useMemo(
+    () => new WebApi(apiBaseUrl.value, debug.value),
+    [apiBaseUrl.value, debug.value],
+  );
+
   const _PathProvider = bindComponent(
     PathProvider,
     useMemo(() => ({ rootPathDepth: 1 }), []),
-  );
-
-  const _FlagProvider = bindComponent(
-    FlagProvider,
-    useMemo(() => ({ flags }), [flags]),
   );
 
   const _WebApiProvider = bindComponent(
@@ -73,7 +71,6 @@ export const Root: FunctionComponent<{
   );
 
   const OuterState = combineComponents(
-    _FlagProvider,
     VisibilityProvider,
     FocusProvider,
     ScreensaverActiveProvider,
@@ -101,8 +98,8 @@ export const Root: FunctionComponent<{
   );
 };
 
-export const render = (flags: Flags, webApi: WebApi): void => {
+export const render = (): void => {
   setup(h, prefix);
 
-  preactRender(<Root flags={flags} webApi={webApi} />, document.body);
+  preactRender(<Root />, document.body);
 };

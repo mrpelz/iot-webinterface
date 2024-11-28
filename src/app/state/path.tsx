@@ -11,6 +11,7 @@ import {
 
 import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { usePrevious } from '../hooks/use-previous.js';
+import { $flags } from '../util/flags.js';
 import {
   amend,
   getPath,
@@ -18,7 +19,6 @@ import {
   goDown,
   goUp as goUpUtil,
 } from '../util/path.js';
-import { useFlag, useSetFlag } from './flags.js';
 import { useVisibility } from './visibility.js';
 
 export type TPathContext = {
@@ -51,8 +51,8 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
 
   const isVisible = useVisibility();
 
-  const pathFlag = useFlag('path');
-  const pathFlagSetter = useSetFlag('path');
+  const pathFlag = $flags.path.value;
+  const pathFlagSetter = (path: string | null) => ($flags.path.value = path);
 
   const [path, setPath] = useState(() => {
     const result = pathFlag || location.pathname;
@@ -147,8 +147,8 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
   );
 
   useEffect(() => {
-    window.addEventListener('popstate', onPopstate);
-    return () => window.removeEventListener('popstate', onPopstate);
+    globalThis.addEventListener('popstate', onPopstate);
+    return () => globalThis.removeEventListener('popstate', onPopstate);
   }, [onPopstate]);
 
   useEffect(() => {

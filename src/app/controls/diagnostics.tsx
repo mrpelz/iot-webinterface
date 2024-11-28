@@ -1,4 +1,4 @@
-import { ComponentChildren, FunctionComponent } from 'preact';
+import { ComponentChildren, FunctionComponent, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import { Summary } from '../components/diagnostics.js';
@@ -164,7 +164,7 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
 
   const onChange: JSX.EventHandler<
     JSX.TargetedEvent<HTMLInputElement, Event>
-  > = ({ currentTarget }) => {
+  > = ({ currentTarget }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
     const { value } = currentTarget;
 
     if (value.length === 0) {
@@ -194,7 +194,9 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
     }
   };
 
-  const onSubmit: JSX.GenericEventHandler<HTMLFormElement> = (event) => {
+  const onSubmit: JSX.GenericEventHandler<HTMLFormElement> = (
+    event: JSX.TargetedEvent<HTMLFormElement, Event>,
+  ) => {
     event.preventDefault();
 
     if (input === undefined) return;

@@ -430,7 +430,7 @@ export const getCountry = (): string | null => {
   return null;
 };
 
-const languageMatcher = new RegExp('^\\w+');
+const languageMatcher = new RegExp(String.raw`^\w+`);
 
 export const getLanguage = (): string =>
   languageMatcher.exec(navigator.language)?.[0] ||

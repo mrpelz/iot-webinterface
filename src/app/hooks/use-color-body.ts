@@ -4,8 +4,7 @@ import { useMemo } from 'preact/hooks';
 
 import { colors } from '../style.js';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-const colorBodies = <P extends Object = {}>(base: StyledVNode<P>) =>
+const colorBodies = <P extends object = object>(base: StyledVNode<P>) =>
   ({
     _: styled(base, forwardRef)`
       background-color: ${colors.whiteShaded(80)};
@@ -41,8 +40,7 @@ const colorBodies = <P extends Object = {}>(base: StyledVNode<P>) =>
     `,
   }) as const;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const useColorBody = <P extends Object = {}>(
+export const useColorBody = <P extends object = object>(
   base: StyledVNode<P>,
   property?: string,
   actuated?: string,

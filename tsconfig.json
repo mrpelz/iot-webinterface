@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "declaration": false,
-    "declarationMap": false,
-    "skipLibCheck": true
+    "declarationMap": false
   },
   "extends": "@mrpelz/boilerplate-preact/tsconfig.json",
   "include": ["src/app/**/*"]

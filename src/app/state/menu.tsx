@@ -1,5 +1,6 @@
 import { createContext, FunctionComponent } from 'preact';
 import {
+  Dispatch,
   StateUpdater,
   useCallback,
   useContext,
@@ -21,7 +22,7 @@ export type MenuVisible = boolean | null;
 export type TMenuVisibleContext = {
   flipMenuVisible: () => void;
   isMenuVisible: MenuVisible;
-  setMenuVisible: StateUpdater<MenuVisible>;
+  setMenuVisible: Dispatch<StateUpdater<MenuVisible>>;
 };
 
 const MenuVisibleContext = createContext<TMenuVisibleContext>(
@@ -46,7 +47,7 @@ export const MenuVisibleProvider: FunctionComponent = ({ children }) => {
     _setMenuVisible(isDesktop ? null : false);
   }, [isDesktop]);
 
-  const setMenuVisible = useCallback<StateUpdater<MenuVisible>>(
+  const setMenuVisible = useCallback<Dispatch<StateUpdater<MenuVisible>>>(
     (...args) => {
       if (isDesktop) return;
       _setMenuVisible(...args);
@@ -98,7 +99,7 @@ export const useIsMenuVisible = (): MenuVisible => {
   return useMemo(() => isMenuVisible, [isMenuVisible]);
 };
 
-export const useSetMenuVisible = (): StateUpdater<MenuVisible> => {
+export const useSetMenuVisible = (): Dispatch<StateUpdater<MenuVisible>> => {
   const { setMenuVisible } = useContext(MenuVisibleContext);
   return useMemo(() => setMenuVisible, [setMenuVisible]);
 };
