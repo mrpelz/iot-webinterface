@@ -13,18 +13,11 @@ import {
 } from '../../state/navigation.js';
 import { Theme, themes } from '../../state/theme.js';
 import { getTranslationFallback } from '../../state/translation.js';
-import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
 import { swProxy } from '../../sw.js';
 import { $flags } from '../../util/flags.js';
 import { getSignal } from '../../util/signal.js';
 import { Entry, List } from '../../views/list.js';
 import { Translation } from '../../views/translation.js';
-import {
-  HierarchyElementBuilding,
-  HierarchyElementHome,
-  HierarchyElementRoom,
-  Levels,
-} from '../../web-api.js';
 
 const $staticPageLabel = getTranslationFallback('staticPage');
 const $roomLabel = getTranslationFallback('room');
@@ -54,8 +47,9 @@ export const Settings: FunctionComponent = () => {
   const absoluteTimes = getSignal($flags.absoluteTimes);
   const inactivityTimeout = getSignal($flags.inactivityTimeout);
   const screensaverEnable = getSignal($flags.screensaverEnable);
-  const { value: screensaverRandomizePosition } =
-    $flags.screensaverRandomizePosition;
+  const screensaverRandomizePosition = getSignal(
+    $flags.screensaverRandomizePosition,
+  );
   const updateUnattended = getSignal($flags.updateUnattended);
   const debug = getSignal($flags.debug);
   const apiBaseUrl = getSignal($flags.apiBaseUrl);

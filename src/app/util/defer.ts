@@ -1,5 +1,5 @@
 export const defer = (callback: () => void): void => {
-  if ('queueMicrotask' in window) {
+  if ('queueMicrotask' in globalThis) {
     queueMicrotask(callback);
     return;
   }

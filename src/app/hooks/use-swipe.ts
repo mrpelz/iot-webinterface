@@ -3,8 +3,8 @@ import { MutableRef, useEffect } from 'preact/hooks';
 export type SwipeDirection = 'horizontal' | 'vertial';
 
 export const useSwipe = <T extends HTMLElement>(
-  ref: MutableRef<T | null>,
-  setter: (input: number | null) => void,
+  ref: MutableRef<T | undefined>,
+  setter: (input: number | undefined) => void,
   throttle: number,
   direction: SwipeDirection = 'horizontal',
 ): void => {
@@ -17,8 +17,8 @@ export const useSwipe = <T extends HTMLElement>(
 
     let update = 0;
 
-    let startMainAxis: number | null = null;
-    let startCrossAxis: number | null = null;
+    let startMainAxis: number | undefined;
+    let startCrossAxis: number | undefined;
     let lock = false;
 
     const onTouchStart: (
@@ -27,7 +27,7 @@ export const useSwipe = <T extends HTMLElement>(
     ) => void = ({ targetTouches }) => {
       const touch = targetTouches.item(0);
       if (!touch) return;
-      if (startMainAxis !== null || startCrossAxis !== null) return;
+      if (startMainAxis !== undefined || startCrossAxis !== undefined) return;
 
       const x = touch.clientX;
       const y = touch.clientY;
@@ -48,7 +48,7 @@ export const useSwipe = <T extends HTMLElement>(
 
       const touch = targetTouches.item(0);
       if (!touch) return;
-      if (startMainAxis === null || startCrossAxis === null) return;
+      if (startMainAxis === undefined || startCrossAxis === undefined) return;
 
       const x = touch.clientX;
       const y = touch.clientY;
@@ -64,8 +64,8 @@ export const useSwipe = <T extends HTMLElement>(
       }
 
       if (Math.abs(crossDelta) > Math.abs(mainDelta) && !lock) {
-        startMainAxis = null;
-        startCrossAxis = null;
+        startMainAxis = undefined;
+        startCrossAxis = undefined;
 
         return;
       }
@@ -91,12 +91,12 @@ export const useSwipe = <T extends HTMLElement>(
     ) => void = () => {
       update = 0;
 
-      startMainAxis = null;
-      startCrossAxis = null;
+      startMainAxis = undefined;
+      startCrossAxis = undefined;
 
       lock = false;
 
-      setter(null);
+      setter(undefined);
     };
 
     element.addEventListener('touchstart', onTouchStart, { passive: true });

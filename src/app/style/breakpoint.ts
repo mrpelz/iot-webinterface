@@ -1,4 +1,4 @@
-import { computed, effect, ReadonlySignal, signal } from '@preact/signals';
+import { computed, ReadonlySignal, signal } from '@preact/signals';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
 import { readOnly } from '../util/signal.js';
@@ -21,19 +21,23 @@ export const useBreakpoint = (breakpoint: string): boolean => {
   return matches;
 };
 
-export const breakpoint = (query: string): ReadonlySignal<boolean> => {
+export const $breakpoint = (
+  query: string,
+  abort?: AbortController,
+): ReadonlySignal<boolean> => {
   const mediaQuery = matchMedia(query);
 
   const matches = signal(mediaQuery.matches);
 
-  effect(() => {
-    const handleMediaQueryChange = () => (matches.value = mediaQuery.matches);
+  const handleMediaQueryChange = () => (matches.value = mediaQuery.matches);
 
-    mediaQuery.addEventListener('change', handleMediaQueryChange);
+  mediaQuery.addEventListener('change', handleMediaQueryChange);
 
-    return () =>
-      mediaQuery.removeEventListener('change', handleMediaQueryChange);
-  });
+  abort?.signal.addEventListener(
+    'abort',
+    () => mediaQuery.removeEventListener('change', handleMediaQueryChange),
+    { once: true },
+  );
 
   return readOnly(matches);
 };
@@ -52,8 +56,9 @@ export const $breakpointValue = (
   query: string,
   ifTrue: string,
   ifFalse: string,
+  abort?: AbortController,
 ): ReadonlySignal<string> =>
-  computed(() => (breakpoint(query) ? ifTrue : ifFalse));
+  computed(() => ($breakpoint(query, abort) ? ifTrue : ifFalse));
 
 export const breakpointValue =
   (query: Value, ifTrue: Value, ifFalse: Value): (() => string) =>

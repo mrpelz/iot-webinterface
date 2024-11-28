@@ -1,72 +1,72 @@
 import { FunctionComponent } from 'preact';
 import { useCallback } from 'preact/hooks';
 
+import { Match } from '../../api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { useDelay } from '../../hooks/use-delay.js';
+import {
+  useTypedCollector,
+  useTypedEmitter,
+} from '../../hooks/use-interaction.js';
 import { I18nKey } from '../../i18n/main.js';
 import { $rootPath } from '../../state/path.js';
-import {
-  useChildGetter,
-  useChildSetter,
-  useGetter,
-} from '../../state/web-api.js';
 import { getSignal } from '../../util/signal.js';
 import { Translation } from '../../views/translation.js';
-import {
-  HierarchyElement,
-  HierarchyElementPropertyActuator,
-  isMetaPropertyActuator,
-  ValueType,
-} from '../../web-api.js';
 import { Cell } from '../main.js';
 
-export type BinaryActuatorElement = HierarchyElementPropertyActuator & {
-  meta: { valueType: ValueType.BOOLEAN };
-};
-
-export const isBinaryActuatorElement = (
-  element: HierarchyElement,
-): element is BinaryActuatorElement =>
-  isMetaPropertyActuator(element.meta) &&
-  element.meta.valueType === ValueType.BOOLEAN;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type TBinaryActuator = Match<{
+  $: 'output';
+}>;
 
 export const BinaryActuator: FunctionComponent<{
-  element: BinaryActuatorElement;
+  actuator: TBinaryActuator;
   negativeKey?: I18nKey;
   onClick?: () => void;
   positiveKey?: I18nKey;
   title?: I18nKey;
-}> = ({ element, negativeKey = 'off', onClick, positiveKey = 'on', title }) => {
-  const {
-    property,
-    meta: { actuated },
-  } = element;
+}> = ({
+  actuator,
+  negativeKey = 'off',
+  onClick,
+  positiveKey = 'on',
+  title,
+}) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const value = useTypedEmitter(actuator.main).value;
+  const loading = useTypedEmitter(actuator.actuatorStaleness.loading).value;
 
-  const value = useGetter<boolean>(element);
-
-  const loading = useChildGetter<boolean>(element, 'loading');
-
-  const flip = useChildSetter<null>(element, 'flip');
+  const flip = useTypedCollector(actuator.flip);
   const handleClick = useCallback(() => flip?.(null), [flip]);
 
-  const ColorBody = useColorBody(BodyLarge, property, actuated);
+  const ColorBody = useColorBody(
+    BodyLarge,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    actuator.$ref.path.at(-1),
+    actuator.topic,
+  );
 
   const route = getSignal($rootPath);
   const allowTransition = Boolean(useDelay(route, 300, true));
 
   return (
     <Cell
-      onClick={flip && !onClick ? handleClick : onClick}
-      title={<Translation i18nKey={title || property} capitalize={true} />}
+      onClick={onClick ?? handleClick}
+      title={
+        <Translation i18nKey={title || actuator.topic} capitalize={true} />
+      }
     >
       <BlendOver
         blendOver={value ? 1 : 0}
         direction="block"
         transition={allowTransition && value !== null && !loading}
         overlay={
-          value === null ? undefined : (
+          value === undefined ? undefined : (
             <ColorBody>
               <Translation i18nKey={positiveKey} />
             </ColorBody>
@@ -74,7 +74,7 @@ export const BinaryActuator: FunctionComponent<{
         }
       >
         <BodyLarge>
-          {value === null ? (
+          {value === undefined ? (
             '?'
           ) : (
             <>

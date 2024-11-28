@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
+import { api } from '../../api.js';
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { Details, Hierarchy, Meta } from '../../controls/diagnostics.js';
 import { useGetLocalStorage } from '../../hooks/use-local-storage.js';
@@ -17,18 +18,11 @@ import { $theme } from '../../state/theme.js';
 import { useTitle } from '../../state/title.js';
 import { $i18n } from '../../state/translation.js';
 import { $isVisible } from '../../state/visibility.js';
-import {
-  useHierarchy,
-  useLevelShallow,
-  useStreamCount,
-  useStreamOnline,
-} from '../../state/web-api.js';
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { getMediaQuery } from '../../style/main.js';
 import { $flags } from '../../util/flags.js';
 import { getSignal } from '../../util/signal.js';
-import { Levels } from '../../web-api.js';
 
 const Fallback: FunctionComponent = () => (
   <tr>
@@ -258,6 +252,9 @@ const I18n: FunctionComponent = () => {
   );
 };
 
+const $isWebSocketOnline = api.$isWebSocketOnline();
+const $streamCount = api.$streamCount();
+
 export const Diagnostics: FunctionComponent = () => {
   const isVisible = getSignal($isVisible);
 
@@ -273,8 +270,8 @@ export const Diagnostics: FunctionComponent = () => {
 
   const isDesktop = useBreakpoint(getMediaQuery(dimensions.breakpointDesktop));
 
-  const isStreamOnline = useStreamOnline();
-  const streamCount = useStreamCount();
+  const isWebSocketOnline = getSignal($isWebSocketOnline);
+  const streamCount = isWebSocketOnline ? getSignal($streamCount) : 0;
 
   const hierarchy = useHierarchy();
 
@@ -363,7 +360,10 @@ export const Diagnostics: FunctionComponent = () => {
             <b>stream connected</b>
           </td>
           <td>
-            {useMemo(() => JSON.stringify(isStreamOnline), [isStreamOnline])}
+            {useMemo(
+              () => JSON.stringify(isWebSocketOnline),
+              [isWebSocketOnline],
+            )}
           </td>
         </tr>
 

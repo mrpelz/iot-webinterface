@@ -150,7 +150,6 @@ export const Layout: FunctionComponent = ({ children }) => {
       mainCurrent.removeEventListener('touchend', onTouchEnd);
       mainCurrent.removeEventListener('touchcancel', onTouchCancel);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useLayoutEffect(() => {

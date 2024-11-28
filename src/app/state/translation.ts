@@ -43,7 +43,7 @@ export const $i18n = computed(() => {
 
 export const getTranslation = callbackSignal(
   ({ i18n: { translation } }, key?: keyof I18nTranslation | string) => {
-    if (!key || !(key in translation)) return null;
+    if (!key || !(key in translation)) return undefined;
 
     return translation[key as unknown as keyof I18nTranslation];
   },
@@ -68,9 +68,9 @@ export const getTranslationFallback = (
 };
 
 export const getCapitalization = callbackSignal(
-  ({ i18n: { nonCapitalization } }, input: string | null) => {
-    const inputWords = input ? input.split(' ') : null;
-    if (!inputWords) return null;
+  ({ i18n: { nonCapitalization } }, input: string | undefined) => {
+    const inputWords = input ? input.split(' ') : undefined;
+    if (!inputWords) return undefined;
 
     return inputWords
       .map((word) =>

@@ -18,7 +18,7 @@ export const Test: FunctionComponent = () => {
   const route2 = getSignal($route2);
   const setRoute2 = getSignal($setRoute2);
 
-  useSetTitleOverride(route2 || route1 || null);
+  useSetTitleOverride(route2 || route1 || undefined);
 
   return (
     <>

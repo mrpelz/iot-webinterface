@@ -1,43 +1,28 @@
 import { FunctionComponent } from 'preact';
 import { useCallback, useRef } from 'preact/hooks';
 
+import { api, Match } from '../../api.js';
 import { Body } from '../../components/controls.js';
 import { Button } from '../../components/list.js';
 import { TriggerBody } from '../../components/null-actuator.js';
 import { Overlay } from '../../components/overlay.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { I18nKey } from '../../i18n/main.js';
-import { useSetter } from '../../state/web-api.js';
 import { Translation } from '../../views/translation.js';
-import {
-  HierarchyElement,
-  HierarchyElementPropertyActuator,
-  isMetaPropertyActuator,
-  ValueType,
-} from '../../web-api.js';
 import { Cell } from '../main.js';
 
-export type NullActuatorElement = HierarchyElementPropertyActuator & {
-  meta: { valueType: ValueType.NULL };
-};
-
-export const isNullActuatorElement = (
-  element: HierarchyElement,
-): element is NullActuatorElement =>
-  isMetaPropertyActuator(element.meta) &&
-  element.meta.valueType === ValueType.NULL;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type TNullActuator = Match<{
+  $: 'triggerElement';
+}>;
 
 export const NullActuator: FunctionComponent<{
-  element: NullActuatorElement;
+  actuator: TNullActuator;
   onClick?: () => void;
   title?: I18nKey;
-}> = ({ element, onClick, title }) => {
-  const {
-    property,
-    meta: { actuated },
-  } = element;
-
-  const setter = useSetter<null>(element);
+}> = ({ actuator, onClick, title }) => {
+  const setter = api.$typedCollector(actuator.main);
 
   const overlayRef = useRef<HTMLElement>(null);
   const baseRef = useRef<HTMLElement>(null);
@@ -68,11 +53,15 @@ export const NullActuator: FunctionComponent<{
     })();
   }, [setter]);
 
-  const ColorBody = useColorBody(TriggerBody, property, actuated);
+  const ColorBody = useColorBody(
+    TriggerBody,
+    actuator.$ref.path.at(-1),
+    actuator.topic,
+  );
 
   return (
     <Cell
-      onClick={setter && !onClick ? handleClick : onClick}
+      onClick={onClick ?? handleClick}
       title={<Translation i18nKey="scene" capitalize={true} />}
     >
       <Overlay
@@ -83,7 +72,7 @@ export const NullActuator: FunctionComponent<{
         }
       >
         <Body ref={baseRef}>
-          <Translation i18nKey={title || property} capitalize={true} />
+          <Translation i18nKey={title || actuator.topic} capitalize={true} />
         </Body>
       </Overlay>
     </Cell>
@@ -91,9 +80,9 @@ export const NullActuator: FunctionComponent<{
 };
 
 export const NullActuatorButton: FunctionComponent<{
-  element: NullActuatorElement;
-}> = ({ element, children }) => {
-  const setter = useSetter<null>(element);
+  actuator: TNullActuator;
+}> = ({ actuator, children }) => {
+  const setter = api.$typedCollector(actuator.main);
   const handleClick = useCallback(() => setter?.(null), [setter]);
 
   return <Button onClick={handleClick}>{children}</Button>;

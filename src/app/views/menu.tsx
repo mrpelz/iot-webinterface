@@ -24,16 +24,9 @@ import {
 import { goRoot } from '../state/path.js';
 import { flipScreensaverActive } from '../state/screensaver.js';
 import { $theme } from '../state/theme.js';
-import { useChild, useChildGetter, useLevelShallow } from '../state/web-api.js';
 import { colors } from '../style.js';
 import { $flags } from '../util/flags.js';
 import { getSignal } from '../util/signal.js';
-import {
-  HierarchyElementFloor,
-  HierarchyElementRoom,
-  Levels,
-  sortBy,
-} from '../web-api.js';
 import { Translation } from './translation.js';
 
 const AllLightState: FunctionComponent<{ room: HierarchyElementRoom }> = ({

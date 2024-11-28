@@ -8,6 +8,7 @@ import {
   useState,
 } from 'preact/hooks';
 
+import { Match } from '../../api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { ColorIcon } from '../../components/icons.js';
 import {
@@ -18,92 +19,56 @@ import {
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { useColorPicker } from '../../hooks/use-color-picker.js';
 import { useDelay } from '../../hooks/use-delay.js';
+import {
+  useTypedCollector,
+  useTypedEmitter,
+} from '../../hooks/use-interaction.js';
 import { useSwipe } from '../../hooks/use-swipe.js';
 import { useWheel } from '../../hooks/use-wheel.js';
 import { I18nKey } from '../../i18n/main.js';
 import { $rootPath } from '../../state/path.js';
-import {
-  useChild,
-  useChildGetter,
-  useChildSetter,
-  useGetter,
-} from '../../state/web-api.js';
 import { getSignal } from '../../util/signal.js';
 import { Translation } from '../../views/translation.js';
-import {
-  HierarchyElement,
-  HierarchyElementArea,
-  isMetaArea,
-  MetaArea,
-} from '../../web-api.js';
 import { Cell } from '../main.js';
 import {
-  BrightnessActuatorElement,
   BrightnessLabel,
-  isBrightnessActuatorElement,
+  TBrightnessActuator,
   useSwipeBrightness,
   useWheelBrightness,
 } from './brightness.js';
 
-export type RGBActuatorElement = HierarchyElementArea & {
-  children: Record<'r' | 'g' | 'b', BrightnessActuatorElement>;
-};
-
-export const isMetaAreaRGB = ({ name }: MetaArea): boolean =>
-  name.toLowerCase().includes('rgb');
-
-export const isRGBActuatorElement = (
-  element: HierarchyElement,
-): element is RGBActuatorElement =>
-  Boolean(
-    isMetaArea(element.meta) &&
-      element.children &&
-      'r' in element.children &&
-      isBrightnessActuatorElement(element.children.r) &&
-      'g' in element.children &&
-      isBrightnessActuatorElement(element.children.g) &&
-      'b' in element.children &&
-      isBrightnessActuatorElement(element.children.b),
-  );
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type TRGBActuator = Match<{
+  $: 'rgb';
+}>;
 
 const Color: FunctionComponent<{
+  actuator: TBrightnessActuator;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   base?: StyledVNode<any>;
-  element: BrightnessActuatorElement;
 }> = ({
+  actuator,
   // eslint-disable-next-line @typescript-eslint/naming-convention
   base: Base = RGBBody,
-  element,
 }) => {
-  const {
-    meta: { actuated },
-    property,
-  } = element;
+  const value = useTypedEmitter(actuator.main).value;
 
-  const value = useGetter<boolean>(element);
-
-  const brightness = useChildGetter<number>(element, 'brightness');
+  const brightness = useTypedEmitter(actuator.brightness).value;
+  const setBrightness = useTypedCollector(actuator.brightness);
   const brightnessRef = useRef(brightness);
   useEffect(() => {
     brightnessRef.current = brightness;
   }, [brightness]);
 
-  const loading = useChildGetter<boolean>(element, 'loading');
+  const loading = useTypedEmitter(actuator.actuatorStaleness.loading).value;
   const loadingRef = useRef(loading);
   useEffect(() => {
     loadingRef.current = loading;
   }, [loading]);
 
-  const flip = useChildSetter<null>(element, 'flip');
-  const handleClick = useCallback(
-    (event: MouseEvent) => {
-      event.stopPropagation();
-      flip?.(null);
-    },
-    [flip],
-  );
-
-  const setBrightness = useChildSetter<number>(element, 'brightness');
+  const flip = useTypedCollector(actuator.flip);
+  const handleClick = useCallback(() => flip?.(null), [flip]);
 
   const [isInteracting, setInteracting] = useState(false);
 
@@ -119,8 +84,8 @@ const Color: FunctionComponent<{
     setInteracting,
   );
 
-  const refA = useRef<HTMLElement | null>(null);
-  const refB = useRef<HTMLElement | null>(null);
+  const refA = useRef<HTMLElement | undefined>(undefined);
+  const refB = useRef<HTMLElement | undefined>(undefined);
 
   useWheel(refA, handleWheel, 100);
   useWheel(refB, handleWheel, 100);
@@ -128,7 +93,13 @@ const Color: FunctionComponent<{
   useSwipe(refA, handleSwipe, 50);
   useSwipe(refB, handleSwipe, 50);
 
-  const ColorBody = useColorBody(Base, property, actuated);
+  const ColorBody = useColorBody(
+    Base,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    actuator.$ref.path.at(-1),
+    actuator.topic,
+  );
 
   const route = getSignal($rootPath);
   const allowTransition = Boolean(useDelay(route, 300, true));
@@ -137,7 +108,7 @@ const Color: FunctionComponent<{
     () => (
       <>
         <ColorLabel>
-          <Translation i18nKey={property} />
+          <Translation i18nKey={actuator.topic} />
         </ColorLabel>
         <BrightnessLabel
           brightness={brightness}
@@ -146,7 +117,7 @@ const Color: FunctionComponent<{
         />
       </>
     ),
-    [brightness, loading, property, value],
+    [actuator.topic, brightness, loading, value],
   );
 
   return (
@@ -169,32 +140,24 @@ const Color: FunctionComponent<{
 };
 
 export const RGBActuator: FunctionComponent<{
-  element: RGBActuatorElement;
+  actuator: TRGBActuator;
   onClick?: () => void;
   title?: I18nKey;
-}> = ({ element, onClick, title }) => {
-  const { property } = element;
+}> = ({ actuator, onClick, title }) => {
+  const rBrightness = useTypedEmitter(actuator.r.brightness).value;
+  const rSetBrightness = useTypedCollector(actuator.r.brightness);
 
-  const r = useChild(element, 'r') as BrightnessActuatorElement | null;
-  const g = useChild(element, 'g') as BrightnessActuatorElement | null;
-  const b = useChild(element, 'b') as BrightnessActuatorElement | null;
+  const gBrightness = useTypedEmitter(actuator.g.brightness).value;
+  const gSetBrightness = useTypedCollector(actuator.g.brightness);
 
-  const rBrightness = useChildGetter<number>(r, 'brightness');
-  const rSetBrightness = useChildSetter<number>(r, 'brightness');
-
-  const gBrightness = useChildGetter<number>(g, 'brightness');
-  const gSetBrightness = useChildSetter<number>(g, 'brightness');
-
-  const bBrightness = useChildGetter<number>(b, 'brightness');
-  const bSetBrightness = useChildSetter<number>(b, 'brightness');
+  const bBrightness = useTypedEmitter(actuator.b.brightness).value;
+  const bSetBrightness = useTypedCollector(actuator.b.brightness);
 
   const [focus, colorPicker] = useColorPicker(
     useMemo(() => [rBrightness, rSetBrightness], [rBrightness, rSetBrightness]),
     useMemo(() => [gBrightness, gSetBrightness], [gBrightness, gSetBrightness]),
     useMemo(() => [bBrightness, bSetBrightness], [bBrightness, bSetBrightness]),
   );
-
-  if (!r || !g || !b) return null;
 
   return (
     <Cell
@@ -203,13 +166,13 @@ export const RGBActuator: FunctionComponent<{
       title={
         <>
           {colorPicker}
-          <Translation i18nKey={title || property} capitalize={true} />
+          <Translation i18nKey={title || 'lighting'} capitalize={true} />
         </>
       }
     >
-      <Color base={BodyDisableRoundedCorners} element={r} />
-      <Color base={BodyDisableRoundedCorners} element={g} />
-      <Color element={b} />
+      <Color base={BodyDisableRoundedCorners} actuator={actuator.r} />
+      <Color base={BodyDisableRoundedCorners} actuator={actuator.g} />
+      <Color actuator={actuator.b} />
     </Cell>
   );
 };

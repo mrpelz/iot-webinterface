@@ -7,6 +7,7 @@ import {
   useState,
 } from 'preact/hooks';
 
+import { api } from '../api.js';
 import {
   BackIcon,
   MapIcon,
@@ -29,11 +30,12 @@ import {
   goUp,
 } from '../state/path.js';
 import { useCapitalizedTitle } from '../state/title.js';
-import { useStreamOnline } from '../state/web-api.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { getMediaQuery } from '../style/main.js';
 import { getSignal } from '../util/signal.js';
+
+const $isWebSocketOnline = api.$isWebSocketOnline();
 
 export const IconContainer: FunctionComponent<{
   paddingSetter: (input: number) => void;
@@ -67,10 +69,10 @@ export const IconContainer: FunctionComponent<{
 };
 
 const WaitIconView: FunctionComponent = () => {
-  const isStreamOnline = useStreamOnline();
+  const isWebSocketOnline = getSignal($isWebSocketOnline);
 
-  const [isStreamOnlineDelayed, handleEvent] = useAwaitEvent(
-    isStreamOnline,
+  const [isWebSocketOnlineDelayed, handleEvent] = useAwaitEvent(
+    isWebSocketOnline,
     true,
   );
 
@@ -85,7 +87,7 @@ const WaitIconView: FunctionComponent = () => {
     [handleEvent],
   );
 
-  if (isStreamOnlineDelayed) return null;
+  if (isWebSocketOnlineDelayed) return null;
 
   return <WaitIcon onAnimationIteration={onAnimationIteration} />;
 };

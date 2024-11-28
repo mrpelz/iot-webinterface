@@ -60,7 +60,9 @@ for (const [key_, aSignal] of Object.entries($flags)) {
   })();
 
   set(key, aSignal.value);
-  effect(() => set(key, aSignal.value));
+  effect(() => {
+    set(key, aSignal.value);
+  });
 }
 
 addEventListener('hashchange', ({ newURL }) => {

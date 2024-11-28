@@ -1,40 +1,29 @@
 import { FunctionComponent } from 'preact';
-import { useCallback, useMemo } from 'preact/hooks';
+import { useMemo } from 'preact/hooks';
 
+import { api, Level, Match } from '../../api.js';
 import { Grid } from '../../components/grid.js';
 import { Device } from '../../controls/device.js';
-import { useArray } from '../../hooks/use-array-compare.js';
 import { roomSorting as roomsSorting } from '../../i18n/mapping.js';
 import { $setSubPath, $subPath } from '../../state/path.js';
-import {
-  useElementFilter,
-  useElements,
-  useHierarchy,
-  useLevelDeep,
-  useMetaFilter,
-} from '../../state/web-api.js';
 import { getSignal } from '../../util/signal.js';
+import { sortBy } from '../../util/sort.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
 import { Translation } from '../../views/translation.js';
-import {
-  HierarchyElement,
-  HierarchyElementDevice,
-  HierarchyElementRoom,
-  Levels,
-  sortBy,
-} from '../../web-api.js';
 import { DeviceDetails } from '../sub/devices/device.js';
 
-const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
-  const {
-    meta: { name },
-  } = room;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const rooms = api.match({ level: Level.ROOM as const });
+const roomsSorted = sortBy(rooms, '$', roomsSorting).all;
 
-  const devices = useMetaFilter(
-    useLevelDeep<HierarchyElementDevice>(Levels.DEVICE, room),
-    useCallback(({ isSubDevice }) => !isSubDevice, []),
-  );
+const Room: FunctionComponent<{ room: Match<{ level: Level.ROOM }> }> = ({
+  room,
+}) => {
+  const { $: name } = room;
+
+  const devices = api.match({ level: Level.DEVICE as const }, undefined, room);
 
   return (
     <Category
@@ -45,9 +34,9 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
           () =>
             devices.map((device) => (
               <Device
-                element={device}
+                device={device}
                 onClick={() => {
-                  getSignal($setSubPath)(device.id);
+                  getSignal($setSubPath);
                 }}
               />
             )),
@@ -59,20 +48,16 @@ const Room: FunctionComponent<{ room: HierarchyElementRoom }> = ({ room }) => {
 };
 
 export const Devices: FunctionComponent = () => {
-  const hierarchy = useHierarchy();
-  const elements = useElements();
-
   const subPath = getSignal($subPath);
+  const device = api
+    .match({
+      $ref: { id: subPath },
+      level: Level.DEVICE as const,
+    })
+    .at(0);
 
-  const rooms = useLevelDeep<HierarchyElementRoom>(Levels.ROOM, hierarchy);
-  const roomsSorted = useArray(
-    useMemo(() => sortBy(rooms, 'name', roomsSorting).all, [rooms]),
-  );
-
-  const [device] = useElementFilter<HierarchyElement, HierarchyElementDevice>(
-    subPath ? elements : null,
-    useCallback(({ id }) => id === subPath, [subPath]),
-  );
+  // eslint-disable-next-line no-console
+  console.log(subPath);
 
   return (
     <SubRoute subRoute={device ? <DeviceDetails device={device} /> : null}>

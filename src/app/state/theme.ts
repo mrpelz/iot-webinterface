@@ -1,15 +1,15 @@
 import { computed, Signal } from '@preact/signals';
 
 import { strings } from '../style.js';
-import { breakpoint } from '../style/breakpoint.js';
+import { $breakpoint } from '../style/breakpoint.js';
 import { $flags } from '../util/flags.js';
 import { getSignal } from '../util/signal.js';
 
 const { prefersDarkTheme, prefersLightTheme, prefersMoreContrast } = strings;
 
-export const $isPrefersHighContrastTheme = breakpoint(prefersMoreContrast);
-export const $isPrefersDarkTheme = breakpoint(prefersDarkTheme);
-export const $isPrefersLightTheme = breakpoint(prefersLightTheme);
+export const $isPrefersHighContrastTheme = $breakpoint(prefersMoreContrast);
+export const $isPrefersDarkTheme = $breakpoint(prefersDarkTheme);
+export const $isPrefersLightTheme = $breakpoint(prefersLightTheme);
 
 export const themes = ['light', 'dark', 'highContrast'] as const;
 

@@ -10,18 +10,10 @@ import {
 import { I18nKey } from '../i18n/main.js';
 import { $theme } from '../state/theme.js';
 import { getSignal } from '../util/signal.js';
-import {
-  HierarchyElementArea,
-  HierarchyElementProperty,
-  HierarchyElementPropertyActuator,
-  HierarchyElementPropertySensor,
-  isMetaPropertyActuator,
-  isMetaPropertySensor,
-} from '../web-api.js';
 import { Actuator } from './actuators/main.js';
-import { isRGBActuatorElement, RGBActuator } from './actuators/rgb.js';
+import { RGBActuator } from './actuators/rgb.js';
 import { Sensor } from './sensor/main.js';
-import { isOpenSensorElement, OpenSensor } from './sensor/open.js';
+import { OpenSensor } from './sensor/open.js';
 import { isTimerActuatorElement, TimerActuator } from './timer.js';
 
 export type CellProps = {

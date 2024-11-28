@@ -1,7 +1,12 @@
-import { TSerialization } from '@iot/iot-monolith';
+import { TSystem } from '@iot/iot-monolith';
+import type { ElementSerialization } from '@iot/iot-monolith/tree-serialization';
 
-export type { TSerialization };
-export type { TSystem } from '@iot/iot-monolith';
+export type { TSystem }
+export type TSerialization = ElementSerialization<TSystem>
+
+// https://stackoverflow.com/a/50375286
+export type UnionToIntersection<U> =
+(U extends any ? (x: U)=>void : never) extends ((x: infer I)=>void) ? I : never
 
 export type Flags = {
   absoluteTimes: boolean;
@@ -26,7 +31,9 @@ export type SW_API = {
 };
 
 export abstract class API_WORKER_API {
-  get hierarchy(): TSerialization | undefined;
-  get values(): Record<string, unknown>;
-  init(): Promise<void>;
+  getValue: <T>(reference: string) => Promise<T>;
+  readonly hierarchy: Promise<TSerialization>;
+  readonly isInit: Promise<void>;
+  isOnline: () => boolean;
+  triggerCollector: <T>(reference: string, value: T) => Promise<void>;
 };

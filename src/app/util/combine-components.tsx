@@ -16,7 +16,6 @@ export const combineComponents = (
     ({ children }) => <>{children}</>,
   );
 
-// eslint-disable-next-line comma-spacing
 export const bindComponent =
   <T,>(
     // eslint-disable-next-line @typescript-eslint/naming-convention

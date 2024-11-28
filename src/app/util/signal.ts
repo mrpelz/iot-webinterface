@@ -143,3 +143,27 @@ export const previous = <T>(
 
   return [readOnly($previous), readOnly(input)] as const;
 };
+
+export const delayedSignal = <T>(
+  input: Signal<T> | ReadonlySignal<T>,
+  delay: number,
+  resetOnDelayStart = false,
+): ReadonlySignal<T | null> => {
+  const $result = signal<T | null>(getSignal(input));
+
+  effect(() => {
+    const newValue = getSignal(input);
+
+    if (resetOnDelayStart) {
+      $result.value = null;
+    }
+
+    const timeout = setTimeout(() => {
+      $result.value = newValue;
+    }, delay);
+
+    return () => clearTimeout(timeout);
+  });
+
+  return computed(() => getSignal($result));
+};

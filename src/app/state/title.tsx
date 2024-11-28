@@ -10,13 +10,12 @@ import {
 
 import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { getSignal } from '../util/signal.js';
-import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
 import { getCapitalization, getTranslation } from './translation.js';
 
 export type TTitleContext = {
-  capitalizedTitle: string | null;
-  setTitleOverride: Dispatch<StateUpdater<string | null>>;
-  title: string | null;
+  capitalizedTitle: string | undefined;
+  setTitleOverride: Dispatch<StateUpdater<string | undefined>>;
+  title: string | undefined;
 };
 
 const TitleContext = createContext(null as unknown as TTitleContext);
@@ -26,13 +25,13 @@ const appName = document.title;
 export const TitleProvider: FunctionComponent = ({ children }) => {
   useHookDebug('TitleProvider');
 
-  const [staticPage] = useNavigationStaticPage();
-  const staticPageName = getSignal(getTranslation(staticPage || undefined));
+  const staticPageName = getSignal(getTranslation(''));
 
-  const [room] = useNavigationRoom();
-  const roomName = getSignal(getTranslation(room?.meta.name));
+  const roomName = getSignal(getTranslation(''));
 
-  const [titleOverride, setTitleOverride] = useState<string | null>(null);
+  const [titleOverride, setTitleOverride] = useState<string | undefined>(
+    undefined,
+  );
 
   const title = useMemo(
     () => titleOverride || staticPageName || roomName,
@@ -55,25 +54,25 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
   );
 };
 
-export const useTitle = (): string | null => {
+export const useTitle = (): string | undefined => {
   const { title } = useContext(TitleContext);
 
   return useMemo(() => title, [title]);
 };
 
-export const useCapitalizedTitle = (): string | null => {
+export const useCapitalizedTitle = (): string | undefined => {
   const { capitalizedTitle } = useContext(TitleContext);
 
   return useMemo(() => capitalizedTitle, [capitalizedTitle]);
 };
 
-export const useSetTitleOverride = (override: string | null): void => {
+export const useSetTitleOverride = (override: string | undefined): void => {
   const { setTitleOverride } = useContext(TitleContext);
 
   useEffect(() => {
     setTitleOverride(override);
 
-    return () => setTitleOverride(null);
+    return () => setTitleOverride(undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [override]);
 };

@@ -1,7 +1,7 @@
 import { effect, signal } from '@preact/signals';
 
 import { dimensions } from '../style.js';
-import { breakpoint } from '../style/breakpoint.js';
+import { $breakpoint } from '../style/breakpoint.js';
 import { getMediaQuery } from '../style/main.js';
 import { callbackUnwrapped, getSignal, readOnly } from '../util/signal.js';
 import { $path, setLeaveCallback } from './path.js';
@@ -10,7 +10,7 @@ import { $isVisible } from './visibility.js';
 
 export type MenuVisible = boolean | null;
 
-const $isDesktop = breakpoint(getMediaQuery(dimensions.breakpointDesktop));
+const $isDesktop = $breakpoint(getMediaQuery(dimensions.breakpointDesktop));
 
 const $setIsMenuVisible = signal<MenuVisible>($isDesktop.value ? null : false);
 

@@ -3,7 +3,7 @@ import { effect, signal } from '@preact/signals';
 import { getSignal, readOnly } from '../util/signal.js';
 import { $isVisible } from './visibility.js';
 
-const $isBrowserFocused = signal($isVisible.value);
+const $isBrowserFocused = signal($isVisible.peek());
 
 window.addEventListener('focus', () => ($isBrowserFocused.value = true));
 window.addEventListener('blur', () => ($isBrowserFocused.value = false));

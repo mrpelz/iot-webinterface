@@ -3,7 +3,7 @@ import { MutableRef, useCallback, useEffect, useRef } from 'preact/hooks';
 export type WheelDirection = 'both' | 'horizontal' | 'vertial';
 
 export const useWheel = <T extends HTMLElement>(
-  ref: MutableRef<T | null>,
+  ref: MutableRef<T | undefined>,
   setter: (input: number) => void,
   throttle: number,
   direction: WheelDirection = 'both',

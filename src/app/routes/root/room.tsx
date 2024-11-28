@@ -11,28 +11,10 @@ import {
 import { useArray } from '../../hooks/use-array-compare.js';
 import { actuated, measuredCategories } from '../../i18n/mapping.js';
 import { $subPath } from '../../state/path.js';
-import {
-  useElementFilter,
-  useElements,
-  useLevelShallow,
-  useMetaFilter,
-} from '../../state/web-api.js';
 import { getSignal } from '../../util/signal.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
 import { Translation } from '../../views/translation.js';
-import {
-  groupBy,
-  HierarchyElement,
-  HierarchyElementArea,
-  HierarchyElementProperty,
-  HierarchyElementPropertyActuator,
-  HierarchyElementPropertySensor,
-  isMetaPropertyActuator,
-  isMetaPropertySensor,
-  Levels,
-  sortBy,
-} from '../../web-api.js';
 import { SubPage } from '../sub/room/main.js';
 
 export const Room: FunctionComponent<{

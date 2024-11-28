@@ -1,32 +1,19 @@
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
+import { api } from '../../../api.js';
 import { Entry as EntryComponent } from '../../../components/list.js';
 import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
-import {
-  isNullActuatorElement,
-  NullActuatorButton,
-} from '../../../controls/actuators/null.js';
-import {
-  filterSubDevices,
-  OfflineIcon,
-  OnlineIcon,
-} from '../../../controls/device.js';
+import { NullActuatorButton } from '../../../controls/actuators/null.js';
+import { OfflineIcon, OnlineIcon, TDevice } from '../../../controls/device.js';
 import {
   useAbsoluteTimeLabel,
   useDateFromEpoch,
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
 import { useSetTitleOverride } from '../../../state/title.js';
-import {
-  useChild,
-  useChildGetter,
-  useGetter,
-  useLevelShallowSkipInput,
-  useMetaFilter,
-} from '../../../state/web-api.js';
+import { resolve } from '../../../util/oop.js';
 import { Entry, List } from '../../../views/list.js';
-import { HierarchyElementDevice, Levels } from '../../../web-api.js';
 
 const SHY_CHARACTER = '\u00AD';
 
@@ -47,17 +34,20 @@ const DeviceDetail: FunctionComponent<{ label: string }> = ({
   );
 };
 
-const DeviceAddress: FunctionComponent<{ device: HierarchyElementDevice }> = ({
-  device,
-}) =>
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const DeviceAddress: FunctionComponent<{ device: TDevice }> = ({ device }) =>
   useMemo(() => {
-    const { host, identifier, port, type } = device.meta;
+    const type = resolve(device, 'type').type;
+    const { host, port } = resolve(device, 'host', 'port');
+    const identifier = resolve(device, 'host').identifier;
 
     if (type === 'ESPNowDevice') {
-      const annotatedIdentifier =
-        identifier
-          ?.map((byte) => byte.toString(16).padStart(2, '0').toUpperCase())
-          .join(':') || null;
+      if (!identifier) return null;
+
+      const annotatedIdentifier = identifier
+        .map((byte) => byte.toString(16).padStart(2, '0').toUpperCase())
+        .join(':');
 
       return (
         <DeviceDetail label="WiFi MAC-address">
@@ -98,33 +88,51 @@ const DeviceAddress: FunctionComponent<{ device: HierarchyElementDevice }> = ({
     return null;
   }, [device]);
 
-const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
-  device,
-}) => {
-  const online = useChild(device, 'online');
-  const isOnlineValue = useGetter<boolean>(online);
+const DeviceOnline: FunctionComponent<{ device: TDevice }> = ({ device }) => {
+  const { isOnline, onlineLastChange } = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { online } = resolve(device, 'online');
 
-  const lastSeenDate = useDateFromEpoch(
-    useChildGetter<number>(device, 'lastSeen'),
-  );
-  const lastSeenLabelAbsolute = useAbsoluteTimeLabel(lastSeenDate);
-  const lastSeenLabelRelative = useRelativeTimeLabel(lastSeenDate);
+    return online
+      ? {
+          isOnline: api.$typedEmitter(online.main),
+          onlineLastChange: api.$typedEmitter(online.lastChange.main),
+        }
+      : {};
+  }, [device]);
 
-  const onlineChangeDate = useDateFromEpoch(
-    useChildGetter<number>(online, 'lastChange'),
+  const onlineChangeLabelAbsolute = useAbsoluteTimeLabel(
+    useDateFromEpoch(onlineLastChange?.value),
   );
-  const onlineChangeLabelAbsolute = useAbsoluteTimeLabel(onlineChangeDate);
-  const onlineChangeLabelRelative = useRelativeTimeLabel(onlineChangeDate);
+  const onlineChangeLabelRelative = useRelativeTimeLabel(
+    useDateFromEpoch(onlineLastChange?.value),
+  );
+
+  const lastSeen = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { lastSeen: lastSeen_ } = resolve(device, 'lastSeen');
+
+    return lastSeen_ ? api.$typedEmitter(lastSeen_.main) : undefined;
+  }, [device]);
+
+  const lastSeenLabelAbsolute = useAbsoluteTimeLabel(
+    useDateFromEpoch(lastSeen?.value),
+  );
+  const lastSeenLabelRelative = useRelativeTimeLabel(
+    useDateFromEpoch(lastSeen?.value),
+  );
 
   return useMemo(
     () => (
       <>
-        {online ? (
+        {isOnline ? (
           <DeviceDetail label="online">
-            {isOnlineValue ? <OnlineIcon /> : <OfflineIcon />}
+            {isOnline.value ? <OnlineIcon /> : <OfflineIcon />}
           </DeviceDetail>
         ) : null}
-        {onlineChangeDate ? (
+        {onlineLastChange ? (
           <DeviceDetail label="online change">
             <TabularNums>
               {onlineChangeLabelAbsolute || '—'} <br />(
@@ -132,7 +140,7 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
             </TabularNums>
           </DeviceDetail>
         ) : null}
-        {lastSeenDate ? (
+        {lastSeen ? (
           <DeviceDetail label="last seen">
             <TabularNums>
               {lastSeenLabelAbsolute || '—'} <br />(
@@ -143,25 +151,28 @@ const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
       </>
     ),
     [
-      isOnlineValue,
-      lastSeenDate,
+      isOnline,
+      lastSeen,
       lastSeenLabelAbsolute,
       lastSeenLabelRelative,
-      online,
-      onlineChangeDate,
       onlineChangeLabelAbsolute,
       onlineChangeLabelRelative,
+      onlineLastChange,
     ],
   );
 };
 
-const DeviceHello: FunctionComponent<{ device: HierarchyElementDevice }> = ({
-  device,
-}) => {
-  const hello = useChildGetter<string>(device, 'hello');
+const DeviceHello: FunctionComponent<{ device: TDevice }> = ({ device }) => {
+  const hello = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { hello: hello_ } = resolve(device, 'hello');
+
+    return hello_ ? api.$typedEmitter(hello_.main) : undefined;
+  }, [device]);
 
   return useMemo(() => {
-    if (!hello) return null;
+    if (!hello?.value) return null;
 
     const [
       ,
@@ -181,7 +192,7 @@ const DeviceHello: FunctionComponent<{ device: HierarchyElementDevice }> = ({
       wifiRssi,
       wifiPhyMode,
       wifiSsid,
-    ] = hello.split(',').map((element) => element || null);
+    ] = hello.value.split(',').map((element) => element || null);
 
     return (
       <>
@@ -211,13 +222,38 @@ const DeviceHello: FunctionComponent<{ device: HierarchyElementDevice }> = ({
 };
 
 export const DeviceDetailsInner: FunctionComponent<{
-  device: HierarchyElementDevice;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  device: TDevice;
 }> = ({ device }) => {
-  const { meta } = device;
-  const { isSubDevice, name, transportType, type } = meta;
+  const name = useMemo(() => device.$ref.path.at(-1) ?? '', [device]);
 
-  const identifyDevice = useChild(device, 'identifyDevice');
-  const resetDevice = useChild(device, 'resetDevice');
+  const { isSubDevice, transportType, type } = useMemo(
+    () => resolve(device, 'isSubDevice', 'transportType', 'type'),
+    [device],
+  );
+
+  const identifyDevice = useMemo(
+    () =>
+      resolve(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        device,
+        'identifyDevice',
+      ).identifyDevice?.main,
+    [device],
+  );
+
+  const resetDevice = useMemo(
+    () =>
+      resolve(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        device,
+        'resetDevice',
+      ).resetDevice?.main,
+    [device],
+  );
 
   return (
     <List>
@@ -235,13 +271,13 @@ export const DeviceDetailsInner: FunctionComponent<{
 
       {identifyDevice || resetDevice ? (
         <EntryComponent>
-          {identifyDevice && isNullActuatorElement(identifyDevice) ? (
-            <NullActuatorButton element={identifyDevice}>
+          {identifyDevice ? (
+            <NullActuatorButton trigger={identifyDevice}>
               identify device
             </NullActuatorButton>
           ) : null}
-          {resetDevice && isNullActuatorElement(resetDevice) ? (
-            <NullActuatorButton element={resetDevice}>
+          {resetDevice ? (
+            <NullActuatorButton trigger={resetDevice}>
               reset device
             </NullActuatorButton>
           ) : null}
@@ -252,27 +288,25 @@ export const DeviceDetailsInner: FunctionComponent<{
 };
 
 export const DeviceDetails: FunctionComponent<{
-  device: HierarchyElementDevice;
+  device: TDevice;
 }> = ({ device }) => {
-  const {
-    meta: { name },
-  } = device;
-
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const name = useMemo(() => device.$ref.path.at(-1) ?? '', [device]);
   useSetTitleOverride(name);
 
-  const subDevices = useMetaFilter(
-    useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
-    filterSubDevices,
+  const { espNow, wifi } = useMemo(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    () => resolve(device, 'espNow', 'wifi'),
+    [device],
   );
 
   return (
     <>
       <DeviceDetailsInner device={device} />
-      {subDevices
-        ? subDevices.map((subDevice) => (
-            <DeviceDetailsInner device={subDevice} />
-          ))
-        : null}
+      {espNow ? <DeviceDetailsInner device={espNow} /> : null}
+      {wifi ? <DeviceDetailsInner device={wifi} /> : null}
     </>
   );
 };

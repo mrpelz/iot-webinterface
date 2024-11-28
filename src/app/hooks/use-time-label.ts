@@ -83,9 +83,9 @@ export const useTimeIncrement = (
 const $nowLabel = getTranslation('now');
 
 export const useRelativeTimeLabel = (
-  date: Date | null,
+  date?: Date,
   nowSpan = 4000,
-): string | null => {
+): string | undefined => {
   const { translationLanguage, translationLocale } = getSignal($i18n);
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
@@ -102,7 +102,7 @@ export const useRelativeTimeLabel = (
   const compareDate = useTimeIncrement(date ? nextSecondIncrement : null);
 
   return useMemo(() => {
-    if (!date || !compareDate) return null;
+    if (!date || !compareDate) return undefined;
 
     const diff = date.getTime() - compareDate.getTime();
     const delta = Math.abs(diff);
@@ -127,7 +127,7 @@ export const useRelativeTimeLabel = (
   }, [compareDate, date, nowLabel, nowSpan, relativeTimeFormat]);
 };
 
-export const useAbsoluteTimeLabel = (date: Date | null): string | null => {
+export const useAbsoluteTimeLabel = (date?: Date): string | undefined => {
   const { translationLanguage, translationLocale } = getSignal($i18n);
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
@@ -137,7 +137,7 @@ export const useAbsoluteTimeLabel = (date: Date | null): string | null => {
   const nextDay = useTimeIncrement(date ? nextDayIncrement : null);
 
   return useMemo(() => {
-    if (!date || !nextDay) return null;
+    if (!date || !nextDay) return undefined;
 
     const isSameDay =
       date.getDate() === nextDay.getDate() &&
@@ -155,16 +155,16 @@ export const useAbsoluteTimeLabel = (date: Date | null): string | null => {
 };
 
 export const useTimeLabel = (
-  date: Date | null,
+  date?: Date,
   nowSpan?: number,
-): string | null => {
+): string | undefined => {
   const absoluteTimes = getSignal($flags.absoluteTimes);
 
   const relativeLabel = useRelativeTimeLabel(
-    absoluteTimes ? null : date,
+    absoluteTimes ? undefined : date,
     nowSpan,
   );
-  const absoluteLabel = useAbsoluteTimeLabel(absoluteTimes ? date : null);
+  const absoluteLabel = useAbsoluteTimeLabel(absoluteTimes ? date : undefined);
 
   return absoluteTimes ? absoluteLabel : relativeLabel;
 };
@@ -203,5 +203,5 @@ export const useTimeSpan = (
   return useMemo(() => [totalTime, fraction], [fraction, totalTime]);
 };
 
-export const useDateFromEpoch = (input: number | null): Date | null =>
-  useMemo(() => (input === null ? null : new Date(input)), [input]);
+export const useDateFromEpoch = (input?: number): Date | undefined =>
+  useMemo(() => (input === undefined ? undefined : new Date(input)), [input]);

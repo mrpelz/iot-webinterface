@@ -20,10 +20,11 @@ import { $isVisible } from './visibility.js';
 const TRIGGER_STATE = 'C0AAB99B-77E0-45C8-AB13-7EFFA083BC19';
 const ROOT_PATH_DEPTH = 1;
 
-const disableBackcapture =
-  'standalone' in navigator && navigator['standalone' as keyof Navigator];
+const disableBackcapture = Boolean(
+  'standalone' in navigator && navigator['standalone' as keyof Navigator],
+);
 
-const $setPath = signal($flags.path.value || location.pathname);
+const $setPath = signal(getSignal($flags.path) || location.pathname);
 $flags.path.value = null;
 
 export const setPath = (input: string): void => {
@@ -150,4 +151,4 @@ effect(() => {
   goRoot();
 });
 
-window.addEventListener('popstate', onPopstate);
+addEventListener('popstate', onPopstate);

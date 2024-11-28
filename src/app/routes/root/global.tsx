@@ -2,19 +2,7 @@ import { FunctionComponent } from 'preact';
 import { useCallback } from 'preact/hooks';
 
 import { useNavigationBuilding } from '../../state/navigation.js';
-import {
-  useChild,
-  useHierarchy,
-  useLevelShallow,
-  useMetaFilter,
-} from '../../state/web-api.js';
 import { HallwayStream } from '../../views/hallway-stream.js';
-import {
-  HierarchyElementArea,
-  HierarchyElementFloor,
-  HierarchyElementProperty,
-  Levels,
-} from '../../web-api.js';
 import { Room } from './room.js';
 
 export const Global: FunctionComponent = () => {

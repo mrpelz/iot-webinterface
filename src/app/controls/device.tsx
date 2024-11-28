@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
+import { api, Level, Match } from '../api.js';
 import { Tag, TagGroup } from '../components/controls.js';
 import {
   ActivityIcon,
@@ -12,15 +13,14 @@ import {
 import { TabularNums } from '../components/text.js';
 import { useTimeLabel } from '../hooks/use-time-label.js';
 import { $theme } from '../state/theme.js';
-import {
-  useChild,
-  useGetter,
-  useLevelShallowSkipInput,
-  useMetaFilter,
-} from '../state/web-api.js';
+import { resolve } from '../util/oop.js';
 import { getSignal } from '../util/signal.js';
-import { HierarchyElementDevice, Levels, MetaDevice } from '../web-api.js';
 import { CellWithBody } from './main.js';
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type TDevice = Match<{ level: Level.DEVICE }>;
+export type TSubDevice = Match<{ isSubDevice: true }, TDevice>;
 
 export const OnlineIcon: FunctionComponent = () => {
   const theme = getSignal($theme);
@@ -44,24 +44,34 @@ export const OfflineIcon: FunctionComponent = () => {
 };
 
 const DeviceOnlineState: FunctionComponent<{
-  device: HierarchyElementDevice;
+  device: TDevice;
 }> = ({ device }) => {
-  const isOnline = useChild(device, 'online');
-  const isOnlineValue = useGetter<boolean>(isOnline);
+  const { isOnline, onlineLastChange } = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { online } = resolve(device, 'online');
+    return online
+      ? {
+          isOnline: api.$typedEmitter(online.main),
+          onlineLastChange: api.$typedEmitter(online.lastChange.main),
+        }
+      : {};
+  }, [device]);
 
-  const onlineLastChange = useChild(isOnline, 'lastChange');
-  const onlineLastChangeValue = useGetter<number>(onlineLastChange);
-
-  const lastSeen = useChild(device, 'lastSeen');
-  const lastSeenValue = useGetter<number>(lastSeen);
+  const lastSeen = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { lastSeen: lastSeen_ } = resolve(device, 'lastSeen');
+    return lastSeen_ ? api.$typedEmitter(lastSeen_.main) : undefined;
+  }, [device]);
 
   const timeLabel = useTimeLabel(
     useMemo(() => {
-      const epoch = lastSeenValue || onlineLastChangeValue;
-      if (!epoch) return null;
+      const epoch = lastSeen?.value || onlineLastChange?.value;
+      if (!epoch) return undefined;
 
       return new Date(epoch);
-    }, [lastSeenValue, onlineLastChangeValue]),
+    }, [lastSeen, onlineLastChange]),
   );
 
   const time = useMemo(
@@ -79,7 +89,7 @@ const DeviceOnlineState: FunctionComponent<{
   }
 
   if (isOnline) {
-    if (isOnlineValue === null) {
+    if (isOnline === undefined) {
       return (
         <>
           <OfflineIcon />—
@@ -89,7 +99,7 @@ const DeviceOnlineState: FunctionComponent<{
 
     return (
       <>
-        {isOnlineValue ? <OnlineIcon /> : <OfflineIcon />}
+        {isOnline.value ? <OnlineIcon /> : <OfflineIcon />}
         {time}
       </>
     );
@@ -98,48 +108,39 @@ const DeviceOnlineState: FunctionComponent<{
   return null;
 };
 
-export const filterSubDevices = (
-  device: MetaDevice,
-): device is MetaDevice & { isSubDevice: true } => Boolean(device.isSubDevice);
-
 export const Device: FunctionComponent<{
-  element: HierarchyElementDevice;
+  device: TDevice;
   onClick?: () => void;
-}> = ({ element: device, onClick }) => {
-  const {
-    meta: { name },
-  } = device;
-
-  const subDevices = useMetaFilter(
-    useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
-    filterSubDevices,
+}> = ({ device, onClick }) => {
+  const { espNow, wifi } = useMemo(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    () => resolve(device, 'espNow', 'wifi'),
+    [device],
   );
 
   return (
     <CellWithBody
       icon={<ForwardIcon height="1em" />}
       onClick={onClick}
-      title={name}
+      title={useMemo(() => device.$ref.path.at(-1), [device])}
     >
-      {subDevices.length > 0 ? (
-        subDevices.map((subDevice) => {
-          const {
-            meta: { name: subDeviceName },
-          } = subDevice;
-
-          return (
-            <Tag>
-              {subDeviceName === 'espNow' ? null : (
-                <TagGroup>
-                  <WiFiIcon height="1em" />
-                </TagGroup>
-              )}
-              <TagGroup>
-                <DeviceOnlineState device={subDevice} />
-              </TagGroup>
-            </Tag>
-          );
-        })
+      {espNow && wifi ? (
+        <>
+          <Tag>
+            <TagGroup>
+              <DeviceOnlineState device={espNow} />
+            </TagGroup>
+          </Tag>
+          <Tag>
+            <TagGroup>
+              <WiFiIcon height="1em" />
+            </TagGroup>
+            <TagGroup>
+              <DeviceOnlineState device={wifi} />
+            </TagGroup>
+          </Tag>
+        </>
       ) : (
         <Tag>
           <DeviceOnlineState device={device} />
