@@ -20,10 +20,10 @@ import {
   Titlebar as TitlebarComponent,
 } from '../components/titlebar.js';
 import { useAwaitEvent } from '../hooks/use-await-event.js';
+import { useIsWebSocketOnline } from '../state/api.js';
 import { useFlipMenuVisible } from '../state/menu.js';
 import { useGoPreviousSegment, useGoUp, useSegment } from '../state/path.js';
 import { useCapitalizedTitle } from '../state/title.js';
-import { useStreamOnline } from '../state/web-api.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { useMediaQuery } from '../style/main.js';
@@ -60,10 +60,10 @@ export const IconContainer: FunctionComponent<{
 };
 
 const WaitIconView: FunctionComponent = () => {
-  const isStreamOnline = useStreamOnline();
+  const isWebSocketOnline = useIsWebSocketOnline();
 
-  const [isStreamOnlineDelayed, handleEvent] = useAwaitEvent(
-    isStreamOnline,
+  const [isWebSocketOnlineDelayed, handleEvent] = useAwaitEvent(
+    isWebSocketOnline.value,
     true,
   );
 
@@ -79,7 +79,7 @@ const WaitIconView: FunctionComponent = () => {
     [handleEvent],
   );
 
-  if (isStreamOnlineDelayed) return null;
+  if (isWebSocketOnlineDelayed) return null;
 
   return <WaitIcon onAnimationIteration={onAnimationIteration} />;
 };

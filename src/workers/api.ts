@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { expose } from 'comlink';
 
 import type { API_WORKER_API, TSerialization } from '../common/types.js';
@@ -21,7 +22,6 @@ const sleep = () =>
     setTimeout(() => resolve(undefined), WEBSOCKET_PING_INTERVAL),
   );
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 class Api implements API_WORKER_API {
   private readonly _values: Promise<Values>;
@@ -43,10 +43,12 @@ class Api implements API_WORKER_API {
     })();
   }
 
+  // @ts-ignore
   private async _getHierarchy(): Promise<TSerialization> {
     const { debug, apiBaseUrl } = await getFlags();
 
     try {
+      // @ts-ignore
       const hierarchy = await fetch(
         new URL(PATH_HIERARCHY, apiBaseUrl ?? self.location.href),
       ).then((response) => response.json() as Promise<TSerialization>);

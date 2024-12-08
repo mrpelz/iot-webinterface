@@ -209,12 +209,6 @@ export const useChild = <
     return childElement as NonNullable<T['children']>[K];
   }, [child, input]);
 
-export const useStreamOnline = (): TWebApiContext['isStreamOnline'] => {
-  const { isStreamOnline } = useContext(WebApiContext);
-
-  return useMemo(() => isStreamOnline, [isStreamOnline]);
-};
-
 export const useGetter = <T,>(element: HierarchyElement | null): T | null => {
   const { useGetterIndex } = useContext(WebApiContext);
 

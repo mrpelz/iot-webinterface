@@ -1,9 +1,11 @@
+import { computed } from '@preact/signals';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { Details, Hierarchy, Meta } from '../../controls/diagnostics.js';
 import { useGetLocalStorage } from '../../hooks/use-local-storage.js';
+import { useIsWebSocketOnline } from '../../state/api.js';
 import { useFocus } from '../../state/focus.js';
 import { useI18n } from '../../state/i18n.js';
 import { useIsMenuVisible } from '../../state/menu.js';
@@ -21,7 +23,6 @@ import {
   useHierarchy,
   useLevelShallow,
   useStreamCount,
-  useStreamOnline,
 } from '../../state/web-api.js';
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
@@ -270,7 +271,7 @@ export const Diagnostics: FunctionComponent = () => {
 
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
-  const isStreamOnline = useStreamOnline();
+  const isWebSocketOnline = useIsWebSocketOnline();
   const streamCount = useStreamCount();
 
   const hierarchy = useHierarchy();
@@ -359,9 +360,7 @@ export const Diagnostics: FunctionComponent = () => {
           <td>
             <b>stream connected</b>
           </td>
-          <td>
-            {useMemo(() => JSON.stringify(isStreamOnline), [isStreamOnline])}
-          </td>
+          <td>{computed(() => JSON.stringify(isWebSocketOnline.value))}</td>
         </tr>
 
         <tr>

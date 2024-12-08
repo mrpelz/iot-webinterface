@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
+import { Level } from '@iot/iot-monolith/tree';
 import { clear } from 'idb-keyval';
 import { FunctionComponent, JSX } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
@@ -7,6 +9,7 @@ import { Button, Entry as EntryComponent } from '../../components/list.js';
 import { ShowHide } from '../../components/show-hide.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
+import { api } from '../../main.js';
 import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
 import {
   staticPages,
@@ -28,6 +31,9 @@ import {
 export const Settings: FunctionComponent = () => {
   const hierarchy = useHierarchy();
   const homes = useLevelShallow<HierarchyElementHome>(Levels.HOME, hierarchy);
+
+  // @ts-ignore
+  const homes_ = api.match({ level: Level.HOME as const });
   const [home, setHome] = useNavigationHome();
 
   const buildings = useLevelShallow<HierarchyElementBuilding>(
@@ -52,6 +58,8 @@ export const Settings: FunctionComponent = () => {
   const screensaverRandomizePosition = $flags.screensaverRandomizePosition;
   const debug = $flags.debug.value;
   const apiBaseUrl = $flags.apiBaseUrl.value;
+  const updateUnattended = $flags.updateUnattended.value;
+  const updateCheckInterval = $flags.updateCheckInterval.value;
 
   return (
     <>
@@ -288,6 +296,7 @@ export const Settings: FunctionComponent = () => {
           <input
             id="inactivityTimeout"
             inputMode="numeric"
+            min="5000"
             name="inactivityTimeout"
             pattern="[0-9]*"
             placeholder="0"
@@ -429,6 +438,70 @@ export const Settings: FunctionComponent = () => {
             )}
           />
         </Entry>
+      </List>
+      <List>
+        <Entry
+          id="updateUnattended"
+          label={<Translation capitalize={true} i18nKey="updateUnattended" />}
+        >
+          <input
+            checked={Boolean(updateUnattended)}
+            id="updateUnattended"
+            name="updateUnattended"
+            type="checkbox"
+            onChange={useCallback<
+              JSX.GenericEventHandler<HTMLInputElement> & Function
+            >(
+              ({
+                currentTarget: { checked: selectedUpdateUnattended },
+              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+                $flags.updateUnattended.value = selectedUpdateUnattended;
+              },
+              [],
+            )}
+          />
+        </Entry>
+        <Entry
+          id="updateCheckInterval"
+          label={
+            <Translation capitalize={true} i18nKey="updateCheckInterval" />
+          }
+        >
+          <input
+            id="updateCheckInterval"
+            inputMode="numeric"
+            min="500"
+            name="updateCheckInterval"
+            pattern="[0-9]*"
+            placeholder="0"
+            value={updateCheckInterval || ''}
+            onBlur={useCallback<
+              JSX.GenericEventHandler<HTMLInputElement> & Function
+            >(
+              ({
+                currentTarget: { value },
+              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+                const selectedUpdateCheckInterval = Number.parseInt(
+                  value.trim(),
+                  10,
+                );
+                if (
+                  !selectedUpdateCheckInterval ||
+                  Number.isNaN(selectedUpdateCheckInterval) ||
+                  !Number.isInteger(selectedUpdateCheckInterval)
+                ) {
+                  $flags.updateCheckInterval.value = null;
+                  return;
+                }
+
+                $flags.updateCheckInterval.value = selectedUpdateCheckInterval;
+              },
+              [],
+            )}
+          />
+        </Entry>
+      </List>
+      <List>
         <EntryComponent>
           <Button
             onClick={useCallback(() => swProxy?.removeRegistration(), [])}

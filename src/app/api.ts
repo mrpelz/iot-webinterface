@@ -1,42 +1,22 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-
 import {
-  DeepValuesInclusive,
-  objectKeys,
-  objectValues,
-  Prev,
-} from '@iot/iot-monolith/oop';
-import { TValueType, ValueType } from '@iot/iot-monolith/tree';
+  DEFAULT_MATCH_DEPTH,
+  Match,
+  match,
+  TValueType,
+  ValueType,
+} from '@iot/iot-monolith/tree';
+import {
+  InteractionReference,
+  InteractionType,
+} from '@iot/iot-monolith/tree-serialization';
 import { computed, ReadonlySignal, Signal, signal } from '@preact/signals';
 import { Remote, wrap } from 'comlink';
 
 import { API_WORKER_API, TSerialization } from '../common/types.js';
-import { isObject } from './util/oop.js';
-
-const INTERACTION_UUID_NAMESPACE = 'cfe7d23c-1bdd-401b-bfb4-f1210694ab83';
 
 const WEB_API_UUID = 'c4218bec-e940-4d68-8807-5c43b2aee27b';
 const WEB_API_ONLINE = '562a3aa9-a10e-4347-aa3f-cec9e011a3dc';
-
-export enum InteractionType {
-  EMIT,
-  COLLECT,
-}
-
-export type InteractionReference<
-  T extends InteractionType = InteractionType,
-  R extends string = string,
-> = {
-  $: typeof INTERACTION_UUID_NAMESPACE;
-  reference: R;
-  type: T;
-};
-
-// @ts-ignore
-export type Match<M, R = TSerialization, D extends number = 50> = Extract<
-  Exclude<DeepValuesInclusive<R, D>, InteractionReference>,
-  M
->;
 
 export class Api {
   private static _getBroadcastChannel<T>(
@@ -63,29 +43,6 @@ export class Api {
     );
   }
 
-  private static _isInteractionReference(
-    input: unknown,
-  ): input is InteractionReference {
-    if (!isObject(input)) return false;
-    if (!('$' in input)) return false;
-    if (input.$ !== INTERACTION_UUID_NAMESPACE) return false;
-
-    return true;
-  }
-
-  private static _match<M extends object, R extends object>(match: M, root: R) {
-    for (const key of objectKeys(match)) {
-      const a = root[key as unknown as keyof R] as unknown;
-      const b = match[key];
-
-      if (a === b) continue;
-
-      return false;
-    }
-
-    return true;
-  }
-
   private readonly _api: Remote<API_WORKER_API>;
   private _hierarchy?: TSerialization;
 
@@ -98,11 +55,13 @@ export class Api {
           '../workers/api.js',
           import.meta.url,
         ) /* webpackChunkName: 'api' */,
+        { name: 'api' },
       ).port,
     );
 
     this.isInit = (async () => {
       await this._api.isInit;
+      // @ts-ignore
       this._hierarchy = await this._api.hierarchy;
 
       // eslint-disable-next-line no-console
@@ -155,7 +114,7 @@ export class Api {
 
   $typedCollector<
     R extends string,
-    S extends InteractionReference<InteractionType.COLLECT, R>,
+    S extends InteractionReference<R, InteractionType.COLLECT>,
     T extends ValueType,
   >({
     setState,
@@ -168,37 +127,29 @@ export class Api {
 
   $typedEmitter<
     R extends string,
-    S extends InteractionReference<InteractionType.EMIT, R>,
+    S extends InteractionReference<R, InteractionType.EMIT>,
     T extends ValueType,
-  >({
-    state,
-  }: {
-    state: S;
-    valueType: T;
-  }): ReadonlySignal<TValueType[T] | undefined> {
-    return this.$emitter(state.reference);
+  >(
+    {
+      state,
+    }: {
+      state: S;
+      valueType: T;
+    },
+    abort?: AbortController,
+  ): ReadonlySignal<TValueType[T] | undefined> {
+    return this.$emitter(state.reference, abort);
   }
 
-  match<M extends object, D extends number = 50, R = TSerialization>(
-    match: M,
-    depth = 50 as D,
-    root?: R,
-  ): Match<M, R, D>[] {
-    if (depth < 0) return [];
-
-    // @ts-ignore
-    const root_ = root ?? (this._hierarchy as R);
-    if (!root_) return [];
-    if (!isObject(root_)) return [];
-    if (Api._isInteractionReference(root_)) return [];
-
-    const localMatch = Api._match(match, root_) ? [root] : [];
-
-    const nextDepth = (depth - 1) as Prev[D];
-    const childMatch = objectValues(root_).flatMap((child) =>
-      this.match(match, nextDepth, child),
-    );
-
-    return [localMatch, childMatch].flat(1) as Match<M, R, D>[];
+  match<
+    P extends object,
+    D extends number = typeof DEFAULT_MATCH_DEPTH,
+    R extends object = TSerialization,
+  >(
+    pattern: P,
+    depth = DEFAULT_MATCH_DEPTH as D,
+    root = this.hierarchy as R,
+  ): Match<P, R, D>[] {
+    return match(pattern, root, depth);
   }
 }
