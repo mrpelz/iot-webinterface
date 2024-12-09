@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { Level } from '@iot/iot-monolith/tree';
 import { createContext, FunctionComponent } from 'preact';
 import {
   Dispatch,
@@ -9,24 +11,18 @@ import {
   useState,
 } from 'preact/hooks';
 
+import { LevelObject } from '../api.js';
 import { useDelay } from '../hooks/use-delay.js';
 import { useHookDebug } from '../hooks/use-hook-debug.js';
 import {
   useGetLocalStorage,
   useSetLocalStorage,
 } from '../hooks/use-local-storage.js';
+import { api } from '../main.js';
 import { $flags } from '../util/flags.js';
-import {
-  HierarchyElement,
-  HierarchyElementBuilding,
-  HierarchyElementFloor,
-  HierarchyElementHome,
-  HierarchyElementRoom,
-  Levels,
-} from '../web-api.js';
+import { useIsInit, useMatch } from './api.js';
 import { useSegment } from './path.js';
 import { useVisibility } from './visibility.js';
-import { useLevelShallow, useWebApi } from './web-api.js';
 
 export const staticPagesTop = ['global', 'map'] as const;
 export const staticPagesBottom = [
@@ -42,14 +38,15 @@ export type StaticPage =
   | (typeof staticPagesBottom)[number];
 
 type NavigationElement<T> = readonly [
-  T | null,
-  Dispatch<StateUpdater<T | null>>,
+  T | undefined,
+  Dispatch<StateUpdater<T | undefined>>,
 ];
 
 type TNavigationContext = {
-  building: NavigationElement<HierarchyElementBuilding>;
-  home: NavigationElement<HierarchyElementHome>;
-  room: NavigationElement<HierarchyElementRoom>;
+  // @ts-ignore
+  building: NavigationElement<LevelObject[Level.BUILDING]>;
+  home: NavigationElement<LevelObject[Level.HOME]>;
+  room: NavigationElement<LevelObject[Level.ROOM]>;
   staticPage: NavigationElement<StaticPage>;
 };
 
@@ -61,85 +58,71 @@ const NavigationContext = createContext<TNavigationContext>(
 );
 
 const useNavigationElements = <
-  T extends
-    | HierarchyElementHome
-    | HierarchyElementBuilding
-    | HierarchyElementFloor
-    | HierarchyElementRoom,
+  T extends Level.HOME | Level.BUILDING | Level.FLOOR | Level.ROOM,
 >(
-  parent: HierarchyElement | null,
-  level: T['meta']['level'],
+  parent: object | undefined,
+  level: T,
   persistenceKey: string,
   ignorePersistenceInit = false,
   override?: string | null,
 ) => {
-  const elements = useLevelShallow<T>(level, parent);
+  type CompoundMatch = LevelObject[T];
+
+  // @ts-ignore
+  const objects = useMatch({ level }, parent) as CompoundMatch[];
 
   const storedName = useGetLocalStorage(persistenceKey);
 
   const determineElement = useCallback(
-    (previousState: T | null) => {
+    (previousState: CompoundMatch | undefined) => {
       if (previousState) {
-        for (const element of elements) {
-          const { meta } = element;
-
-          if (meta.name === previousState.meta.name) {
-            return element;
+        for (const object of objects) {
+          if (object.$ === previousState.$) {
+            return object;
           }
         }
       }
 
-      if (ignorePersistenceInit) return null;
+      if (ignorePersistenceInit) return undefined;
 
       if (override) {
-        for (const element of elements) {
-          const { meta } = element;
-
-          if (meta.name === override) {
-            return element;
+        for (const object of objects) {
+          if (object.$ === override) {
+            return object;
           }
         }
       }
 
-      for (const element of elements) {
-        const { meta } = element;
-
-        if (meta.name === storedName) {
-          return element;
+      for (const object of objects) {
+        if (object.$ === storedName) {
+          return object;
         }
       }
 
-      if (elements.length === 1) {
-        return elements[0];
+      if (objects.length === 1) {
+        return objects[0];
       }
 
-      for (const element of elements) {
-        const { meta } = element;
-
-        if ('isPrimary' in meta && meta.isPrimary) {
-          return element;
-        }
-      }
-
-      return null;
+      return undefined;
     },
-    [elements, ignorePersistenceInit, override, storedName],
+    [objects, ignorePersistenceInit, override, storedName],
   );
 
-  const result = useState<T | null>(null);
+  const result = useState<CompoundMatch | undefined>(undefined);
   const [state, setState] = result;
 
   useEffect(() => {
     setState(() => determineElement(state));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [elements]);
+  }, [objects]);
 
-  useSetLocalStorage(persistenceKey, state?.meta.name || null);
+  // @ts-ignore
+  useSetLocalStorage(persistenceKey, state?.$);
 
   useEffect(() => {
     if (!override) return;
 
-    setState(() => determineElement(null));
+    setState(() => determineElement(undefined));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [override]);
 
@@ -147,20 +130,21 @@ const useNavigationElements = <
 };
 
 const useStaticPage = (
-  room: HierarchyElementRoom | null,
-  override: string | null,
+  room: LevelObject[Level.ROOM] | undefined,
+  override?: string,
   defer = false,
 ) => {
-  const fallback = useDelay(defer ? null : START_PAGE, 300);
+  const fallback = useDelay(defer ? undefined : START_PAGE, 300);
 
   const storedName = useGetLocalStorage(STATIC_PAGE_KEY);
 
   const determineStaticPage = useCallback(() => {
     if (override) return override as StaticPage;
-    if (room) return null;
+    if (room) return undefined;
     if (storedName) return storedName as StaticPage;
 
     return fallback;
+    // @ts-ignore
   }, [fallback, override, room, storedName]);
 
   const result = useState(determineStaticPage);
@@ -191,22 +175,21 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   const isVisible = useVisibility();
   const isVisibleDelayed = useDelay(isVisible, 300);
 
-  const { hierarchy } = useWebApi();
-  const settled = useDelay(Boolean(hierarchy), 500);
+  const settled = useDelay(useIsInit(), 500);
 
   const startPageFlag = $flags.startPage.value;
   const [startPagePath, setStartPagePath] = useSegment(0);
 
   const startPagePathInitial = useMemo(
-    () => startPagePath || null,
+    () => startPagePath || undefined,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
   const startPage = useMemo(
     () =>
-      (settled && isVisibleDelayed ? null : startPageFlag) ||
-      (settled ? startPagePath : null) ||
+      (settled && isVisibleDelayed ? undefined : startPageFlag) ||
+      (settled ? startPagePath : undefined) ||
       startPagePathInitial,
     [
       isVisibleDelayed,
@@ -222,23 +205,20 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
     [startPage],
   );
 
-  const home = useNavigationElements<HierarchyElementHome>(
-    hierarchy,
-    Levels.HOME,
-    'n_home',
-  );
+  // @ts-ignore
+  const home = useNavigationElements(api.hierarchy, Level.HOME, 'n_home');
   const [stateHome] = home;
 
-  const building = useNavigationElements<HierarchyElementBuilding>(
+  const building = useNavigationElements(
     stateHome,
-    Levels.BUILDING,
+    Level.BUILDING,
     'n_building',
   );
   const [stateBuilding] = building;
 
-  const room = useNavigationElements<HierarchyElementRoom>(
+  const room = useNavigationElements(
     stateBuilding,
-    Levels.ROOM,
+    Level.ROOM,
     'n_room',
     staticPageFromFlag,
     staticPageFromFlag || !startPage ? null : startPage,
@@ -247,8 +227,8 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
 
   const staticPage = useStaticPage(
     stateRoom,
-    staticPageFromFlag ? startPage : null,
-    !hierarchy,
+    staticPageFromFlag ? startPage : undefined,
+    !api.hierarchy,
   );
   const [stateStaticPage, setStaticPage] = staticPage;
 
@@ -256,15 +236,15 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
     if (!stateStaticPage) return;
 
     setStartPagePath?.(stateStaticPage);
-    setRoom(null);
+    setRoom(undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateStaticPage]);
 
   useEffect(() => {
     if (!stateRoom) return;
 
-    setStartPagePath?.(stateRoom.meta.name);
-    setStaticPage(null);
+    setStartPagePath?.(stateRoom.$);
+    setStaticPage(undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateRoom]);
 

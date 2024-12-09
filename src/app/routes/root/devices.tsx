@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
+import { sortBy } from '../../api.js';
 import { Grid } from '../../components/grid.js';
 import { Device } from '../../controls/device.js';
 import { useArray } from '../../hooks/use-array-compare.js';
@@ -21,7 +22,6 @@ import {
   HierarchyElementDevice,
   HierarchyElementRoom,
   Levels,
-  sortBy,
 } from '../../web-api.js';
 import { DeviceDetails } from '../sub/devices/device.js';
 

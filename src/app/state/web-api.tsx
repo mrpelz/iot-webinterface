@@ -248,9 +248,3 @@ export const useChildSetter = <T,>(
   ) as unknown as HierarchyElement;
   return useSetterIndex(element?.set);
 };
-
-export const useStreamCount = (): number | null => {
-  const { useGetterIndex } = useContext(WebApiContext);
-
-  return useGetterIndex(-1);
-};

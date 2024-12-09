@@ -11,12 +11,13 @@ import { useHookDebug } from './use-hook-debug.js';
  * @returns returns memoized Signal
  */
 export const useSignalFactory = <
-  Args,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Args extends any[],
   Return extends Signal,
-  Factory extends (...args: Args[]) => Return,
+  Factory extends (...args: Args) => Return,
 >(
   factory: Factory,
-  args = [] as Args[],
+  args = [] as unknown as Args,
 ): Return => {
   useHookDebug('useSignalFactory');
 

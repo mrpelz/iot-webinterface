@@ -66,10 +66,12 @@ export const BlendOver: FunctionComponent<{
   }, [direction, transitionDurationOverride]);
 
   const transitionDurationFractional = useMemo(() => {
-    if (transitionDurationOverride) return null;
+    if (transitionDurationOverride) return undefined;
 
     const delta =
-      blendOverPrevious === null ? 0 : Math.abs(blendOver - blendOverPrevious);
+      blendOverPrevious === undefined
+        ? 0
+        : Math.abs(blendOver - blendOverPrevious);
 
     return transitionDurationWithoutUserInput * delta;
   }, [

@@ -1,13 +1,14 @@
+import { Match } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
 
+import { TSerialization } from '../../common/types.js';
 import { DiagnosticsContainer } from '../components/diagnostics.js';
-import { HierarchyElement } from '../web-api.js';
 import { Hierarchy } from './diagnostics.js';
 
 export const ElementDiagnostics: FunctionComponent<{
-  element: HierarchyElement;
+  element: Match<object, TSerialization>;
 }> = ({ element }) => (
   <DiagnosticsContainer>
-    <Hierarchy element={element} />
+    <Hierarchy object={element} />
   </DiagnosticsContainer>
 );

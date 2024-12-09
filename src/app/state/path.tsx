@@ -22,24 +22,24 @@ import {
 import { useVisibility } from './visibility.js';
 
 export type TPathContext = {
-  getSegment: (segmentNumber: number) => string | null;
-  goPrevious: (() => void) | null;
-  goRoot: (() => void) | null;
-  goUp: (() => void) | null;
+  getSegment: (segmentNumber: number) => string | undefined;
+  goPrevious: (() => void) | undefined;
+  goRoot: (() => void) | undefined;
+  goUp: (() => void) | undefined;
   isRoot: boolean;
-  leaveCallbackRef: MutableRef<(() => void) | null>;
+  leaveCallbackRef: MutableRef<(() => void) | undefined>;
   path: string;
-  previousPath: string | null;
+  previousPath?: string;
   setSegment: (
     segmentNumber: number,
-  ) => ((value: string | null) => void) | null;
+  ) => ((value: string | undefined) => void) | undefined;
 };
 
 const triggerState = 'C0AAB99B-77E0-45C8-AB13-7EFFA083BC19';
 const disableBackcapture =
   'standalone' in navigator && navigator['standalone' as keyof Navigator];
 
-const PathContext = createContext(null as unknown as TPathContext);
+const PathContext = createContext(undefined as unknown as TPathContext);
 
 export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
   children,
@@ -47,16 +47,17 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
 }) => {
   useHookDebug('PathProvider');
 
-  const leaveCallbackRef = useRef<(() => void) | null>(null);
+  const leaveCallbackRef = useRef<(() => void) | undefined>(undefined);
 
   const isVisible = useVisibility();
 
-  const pathFlag = $flags.path.value;
-  const pathFlagSetter = (path: string | null) => ($flags.path.value = path);
+  const pathFlag = $flags.path.value ?? null;
+  const pathFlagSetter = (path: string | undefined) =>
+    ($flags.path.value = path ?? null);
 
   const [path, setPath] = useState(() => {
     const result = pathFlag || location.pathname;
-    pathFlagSetter(null);
+    pathFlagSetter(undefined);
 
     return result;
   });
@@ -77,29 +78,29 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
   );
 
   const getSegment = useCallback(
-    (segmentNumber: number) => getSegments(path)[segmentNumber] || null,
+    (segmentNumber: number) => getSegments(path)[segmentNumber] || undefined,
     [path],
   );
 
   const goPrevious = useMemo(() => {
     if (!previousPath || getSegments(previousPath).length < rootPathDepth) {
-      return null;
+      return undefined;
     }
 
     return () => setPath(previousPath);
   }, [previousPath, rootPathDepth]);
 
   const goUp = useMemo(() => {
-    if (isRoot) return null;
+    if (isRoot) return undefined;
     return () => setPath(goUpUtil(path));
   }, [isRoot, path]);
 
   const setSegment = useCallback(
     (segmentNumber: number) => {
       const segments = getSegments(path);
-      if (segments.length < segmentNumber) return null;
+      if (segments.length < segmentNumber) return undefined;
 
-      return (value: string | null) => {
+      return (value: string | undefined) => {
         const segment = segments[segmentNumber];
         if (segment === value) return;
 
@@ -111,12 +112,12 @@ export const PathProvider: FunctionComponent<{ rootPathDepth: number }> = ({
   );
 
   const goRoot = useMemo(() => {
-    if (isRoot) return null;
+    if (isRoot) return undefined;
 
     const setter = setSegment(rootPathDepth);
-    if (!setter) return null;
+    if (!setter) return undefined;
 
-    return () => setter(null);
+    return () => setter(undefined);
   }, [isRoot, rootPathDepth, setSegment]);
 
   const onPopstate = useCallback(
@@ -219,7 +220,7 @@ export const useGoPreviousSegment = (
   const [previousSegment] = usePrevious(segment);
 
   return useMemo(() => {
-    if (!previousSegment || !setter) return null;
+    if (!previousSegment || !setter) return undefined;
 
     return () => setter(previousSegment);
     // eslint-disable-next-line react-hooks/exhaustive-deps

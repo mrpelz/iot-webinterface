@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 
-export const usePromise = <T>(input: () => Promise<T>): T | null => {
-  const [state, setState] = useState<T | null>(null);
+export const usePromise = <T>(input: () => Promise<T>): T | undefined => {
+  const [state, setState] = useState<T | undefined>(undefined);
 
   useEffect(() => {
     (async () => {

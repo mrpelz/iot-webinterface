@@ -16,6 +16,7 @@
     "dist/**/*.{js,map,ts}"
   ],
   "dependencies": {
+    "@iot/iot-monolith": "latest",
     "@preact/signals": "latest",
     "comlink": "latest",
     "goober": "latest",
@@ -27,7 +28,6 @@
     "workbox-window": "latest"
   },
   "devDependencies": {
-    "@iot/iot-monolith": "latest",
     "@mrpelz/boilerplate-preact": "latest",
     "@types/glob": "latest",
     "favicons-webpack-plugin": "latest",

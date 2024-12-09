@@ -1,4 +1,5 @@
-import { Level } from '@iot/iot-monolith/tree';
+import { Level, levelObjectMatch } from '@iot/iot-monolith/tree';
+import {} from '@iot/iot-monolith/tree-serialization';
 import { effect } from '@preact/signals';
 import { stripIndent } from 'proper-tags';
 
@@ -39,7 +40,7 @@ try {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const rooms = api.match({ level: Level.ROOM as const });
+    const rooms = api.match(levelObjectMatch[Level.ROOM]);
     // eslint-disable-next-line no-console
     console.log({ rooms: rooms.map((room) => room.$) });
 

@@ -1,11 +1,19 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { Level, levelObjectMatch } from '@iot/iot-monolith/tree';
 import { computed } from '@preact/signals';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
-import { Details, Hierarchy, Meta } from '../../controls/diagnostics.js';
+import { Details, Hierarchy, Properties } from '../../controls/diagnostics.js';
 import { useGetLocalStorage } from '../../hooks/use-local-storage.js';
-import { useIsWebSocketOnline } from '../../state/api.js';
+import { api } from '../../main.js';
+import {
+  useIsInit,
+  useIsWebSocketOnline,
+  useMatch,
+  useWebSocketCount,
+} from '../../state/api.js';
 import { useFocus } from '../../state/focus.js';
 import { useI18n } from '../../state/i18n.js';
 import { useIsMenuVisible } from '../../state/menu.js';
@@ -19,16 +27,10 @@ import { useIsScreensaverActive } from '../../state/screensaver.js';
 import { useTheme } from '../../state/theme.js';
 import { useTitle } from '../../state/title.js';
 import { useVisibility } from '../../state/visibility.js';
-import {
-  useHierarchy,
-  useLevelShallow,
-  useStreamCount,
-} from '../../state/web-api.js';
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { useMediaQuery } from '../../style/main.js';
 import { $flags } from '../../util/flags.js';
-import { Levels } from '../../web-api.js';
 
 const Fallback: FunctionComponent = () => (
   <tr>
@@ -48,8 +50,6 @@ const Flags: FunctionComponent = () => (
 );
 
 const Navigation: FunctionComponent = () => {
-  const hierarchy = useHierarchy();
-
   const {
     building: [building],
     home: [home],
@@ -57,10 +57,13 @@ const Navigation: FunctionComponent = () => {
     staticPage: [staticPage],
   } = useNavigation();
 
-  const homes = useLevelShallow(Levels.HOME, hierarchy);
-  const buildings = useLevelShallow(Levels.BUILDING, home);
-  const floors = useLevelShallow(Levels.FLOOR, building);
-  const rooms = useLevelShallow(Levels.ROOM, building);
+  const homes = useMatch(levelObjectMatch[Level.HOME]);
+  // @ts-ignore
+  const buildings = useMatch(levelObjectMatch[Level.BUILDING], home);
+  // @ts-ignore
+  const floors = useMatch(levelObjectMatch[Level.FLOOR], building);
+  // @ts-ignore
+  const rooms = useMatch(levelObjectMatch[Level.ROOM], building);
 
   return (
     <table>
@@ -75,7 +78,7 @@ const Navigation: FunctionComponent = () => {
               <tr>
                 <td>
                   <table>
-                    <Meta element={element} />
+                    <Properties object={element} />
                   </table>
                 </td>
               </tr>
@@ -85,7 +88,7 @@ const Navigation: FunctionComponent = () => {
             <tr>
               <td colSpan={999}>state</td>
             </tr>
-            {home ? <Meta element={home} /> : <Fallback />}
+            {home ? <Properties object={home} /> : <Fallback />}
           </table>
         </td>
       </tr>
@@ -100,7 +103,7 @@ const Navigation: FunctionComponent = () => {
               <tr>
                 <td>
                   <table>
-                    <Meta element={element} />
+                    <Properties object={element} />
                   </table>
                 </td>
               </tr>
@@ -110,7 +113,7 @@ const Navigation: FunctionComponent = () => {
             <tr>
               <td colSpan={999}>state</td>
             </tr>
-            {building ? <Meta element={building} /> : <Fallback />}
+            {building ? <Properties object={building} /> : <Fallback />}
           </table>
         </td>
       </tr>
@@ -125,7 +128,7 @@ const Navigation: FunctionComponent = () => {
               <tr>
                 <td>
                   <table>
-                    <Meta element={element} />
+                    <Properties object={element} />
                   </table>
                 </td>
               </tr>
@@ -144,7 +147,7 @@ const Navigation: FunctionComponent = () => {
               <tr>
                 <td>
                   <table>
-                    <Meta element={element} />
+                    <Properties object={element} />
                   </table>
                 </td>
               </tr>
@@ -154,7 +157,7 @@ const Navigation: FunctionComponent = () => {
             <tr>
               <td colSpan={999}>state</td>
             </tr>
-            {room ? <Meta element={room} /> : <Fallback />}
+            {room ? <Properties object={room} /> : <Fallback />}
           </table>
         </td>
       </tr>
@@ -272,9 +275,10 @@ export const Diagnostics: FunctionComponent = () => {
   const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
 
   const isWebSocketOnline = useIsWebSocketOnline();
-  const streamCount = useStreamCount();
+  const webSocketCount = useWebSocketCount();
 
-  const hierarchy = useHierarchy();
+  // @ts-ignore
+  const hierarchy = useIsInit() ? api.hierarchy : undefined;
 
   const isMenuVisible = useIsMenuVisible();
 
@@ -367,7 +371,7 @@ export const Diagnostics: FunctionComponent = () => {
           <td>
             <b>stream client count</b>
           </td>
-          <td>{streamCount === null ? null : streamCount}</td>
+          <td>{webSocketCount.value}</td>
         </tr>
 
         <tr>
@@ -410,7 +414,7 @@ export const Diagnostics: FunctionComponent = () => {
         </tr>
       </table>
 
-      {hierarchy ? <Hierarchy element={hierarchy} /> : null}
+      {hierarchy ? <Hierarchy object={hierarchy} /> : null}
     </DiagnosticsContainer>
   );
 };

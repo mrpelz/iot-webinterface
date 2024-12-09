@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
-import { Level } from '@iot/iot-monolith/tree';
+import { Level, levelObjectMatch } from '@iot/iot-monolith/tree';
 import { clear } from 'idb-keyval';
 import { FunctionComponent, JSX } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
@@ -9,7 +9,7 @@ import { Button, Entry as EntryComponent } from '../../components/list.js';
 import { ShowHide } from '../../components/show-hide.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
-import { api } from '../../main.js';
+import { useMatch } from '../../state/api.js';
 import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
 import {
   staticPages,
@@ -17,34 +17,21 @@ import {
   useNavigationHome,
 } from '../../state/navigation.js';
 import { Theme, themes } from '../../state/theme.js';
-import { useHierarchy, useLevelShallow } from '../../state/web-api.js';
 import { swProxy } from '../../sw.js';
 import { $flags } from '../../util/flags.js';
 import { Entry, List } from '../../views/list.js';
-import {
-  HierarchyElementBuilding,
-  HierarchyElementHome,
-  HierarchyElementRoom,
-  Levels,
-} from '../../web-api.js';
 
 export const Settings: FunctionComponent = () => {
-  const hierarchy = useHierarchy();
-  const homes = useLevelShallow<HierarchyElementHome>(Levels.HOME, hierarchy);
-
   // @ts-ignore
-  const homes_ = api.match({ level: Level.HOME as const });
+  const homes = useMatch(levelObjectMatch[Level.HOME]);
   const [home, setHome] = useNavigationHome();
 
-  const buildings = useLevelShallow<HierarchyElementBuilding>(
-    Levels.BUILDING,
-    home,
-  );
+  const buildings = useMatch(levelObjectMatch[Level.BUILDING]);
   const [building, setBuilding] = useNavigationBuilding();
 
-  const rooms = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, hierarchy);
+  const rooms = useMatch(levelObjectMatch[Level.ROOM]);
   const roomNames = useArray(
-    useMemo(() => rooms.map(({ meta: { name } }) => name), [rooms]),
+    useMemo(() => rooms.map((room) => room.$), [rooms]),
   );
 
   const startPages = useMemo(() => [...staticPages, ...roomNames], [roomNames]);
@@ -78,9 +65,7 @@ export const Settings: FunctionComponent = () => {
               ({
                 currentTarget: { value },
               }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
-                const matchingHome = homes.find(
-                  ({ meta: { name } }) => name === value,
-                );
+                const matchingHome = homes.find((aHome) => aHome.$ === value);
                 if (!matchingHome || matchingHome === home) {
                   return;
                 }
@@ -91,8 +76,8 @@ export const Settings: FunctionComponent = () => {
             )}
           >
             {homes.map((aHome) => (
-              <option value={aHome.meta.name} selected={aHome === home}>
-                <Translation i18nKey={aHome.meta.name} />
+              <option value={aHome.$} selected={aHome === home}>
+                <Translation i18nKey={aHome.$} />
               </option>
             ))}
           </select>
@@ -112,7 +97,7 @@ export const Settings: FunctionComponent = () => {
                 currentTarget: { value },
               }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
                 const matchingBuilding = buildings.find(
-                  ({ meta: { name } }) => name === value,
+                  (aBuilding) => aBuilding.$ === value,
                 );
                 if (!matchingBuilding || matchingBuilding === building) {
                   return;
@@ -124,11 +109,8 @@ export const Settings: FunctionComponent = () => {
             )}
           >
             {buildings.map((aBuilding) => (
-              <option
-                value={aBuilding.meta.name}
-                selected={aBuilding === building}
-              >
-                <Translation i18nKey={aBuilding.meta.name} />
+              <option value={aBuilding.$} selected={aBuilding === building}>
+                <Translation i18nKey={aBuilding.$} />
               </option>
             ))}
           </select>
@@ -151,7 +133,11 @@ export const Settings: FunctionComponent = () => {
                   $flags.startPage.value = null;
                 }
 
-                if (!startPages.includes(selectedOverride)) {
+                if (
+                  !startPages.includes(
+                    selectedOverride as (typeof startPages)[number],
+                  )
+                ) {
                   return;
                 }
 

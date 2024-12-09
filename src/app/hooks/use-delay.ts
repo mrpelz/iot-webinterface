@@ -4,14 +4,16 @@ export const useDelay = <T>(
   value: T,
   delay: number,
   resetOnDelayStart = false,
-): T | null => {
-  const [state, setState] = useState<T | null>(null);
+): T | undefined => {
+  const [state, setState] = useState<T | undefined>(undefined);
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     if (resetOnDelayStart) {
-      setState(null);
+      setState(undefined);
     }
 
     timeoutRef.current = setTimeout(() => setState(value), delay);

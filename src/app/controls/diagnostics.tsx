@@ -1,22 +1,16 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { Level, Match, ValueType } from '@iot/iot-monolith/tree';
+import {
+  levelDescription,
+  valueTypeDescription,
+} from '@iot/iot-monolith/tree-serialization';
+import { computed } from '@preact/signals';
 import { ComponentChildren, FunctionComponent, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
+import { TSerialization } from '../../common/types.js';
 import { Summary } from '../components/diagnostics.js';
-import { useI18n } from '../state/i18n.js';
-import { useGetter, useSetter } from '../state/web-api.js';
-import {
-  HierarchyElement,
-  isElementWithMeta,
-  isMetaPropertyActuator,
-  isMetaPropertySensorDate,
-  Levels,
-  levelToString,
-  ParentRelation,
-  parentRelationToString,
-  typeToValueType,
-  ValueType,
-  valueTypeToType,
-} from '../web-api.js';
+import { useCollector, useEmitter, useMatch } from '../state/api.js';
 
 export const Details: FunctionComponent<{
   open?: boolean;
@@ -45,30 +39,23 @@ export const Details: FunctionComponent<{
   );
 };
 
-export const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
-  element,
-}) => {
-  const { country } = useI18n();
+export const Properties: FunctionComponent<{
+  object: Match<object, TSerialization>;
+}> = ({ object }) => {
+  const $ = useMemo(
+    () => JSON.stringify('$' in object ? object.$ : undefined),
+    [object],
+  );
 
-  if (!isElementWithMeta(element)) return null;
-
-  const { id, meta, property } = element;
-
-  if (Object.keys(meta).length === 0) return null;
+  if (Object.keys(object).length === 0) return null;
 
   return (
     <>
       <tr>
         <td>
-          <b>ID</b>
+          <b>$</b>
         </td>
-        <td>{id}</td>
-      </tr>
-      <tr>
-        <td>
-          <b>Property</b>
-        </td>
-        <td>{property}</td>
+        <td>{$}</td>
       </tr>
       <tr>
         <td>
@@ -76,37 +63,21 @@ export const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
         </td>
         <td>
           <table>
-            {Object.entries(meta).map(([key, value]) => {
-              const idDate =
-                key === 'id' && meta.level === Levels.SYSTEM && country
-                  ? new Date(Number(value)).toLocaleString(country)
-                  : null;
-
+            {Object.entries(object).map(([key, value]) => {
               const level =
                 key === 'level'
-                  ? levelToString(value as unknown as Levels)
-                  : null;
-
-              const parentRelation =
-                key === 'parentRelation'
-                  ? parentRelationToString(value as unknown as ParentRelation)
-                  : null;
+                  ? levelDescription[value as unknown as Level]
+                  : undefined;
 
               const valueType =
                 key === 'valueType'
-                  ? valueTypeToType(value as unknown as ValueType)
-                  : null;
+                  ? valueTypeDescription[value as unknown as ValueType]
+                  : undefined;
 
               return (
                 <tr>
                   <td>{key}</td>
-                  <td>
-                    {level ||
-                      parentRelation ||
-                      valueType ||
-                      JSON.stringify(value)}{' '}
-                    {idDate ? <>({idDate})</> : null}
-                  </td>
+                  <td>{level || valueType || JSON.stringify(value)} </td>
                 </tr>
               );
             })}
@@ -117,50 +88,43 @@ export const Meta: FunctionComponent<{ element: HierarchyElement }> = ({
   );
 };
 
-const Getter: FunctionComponent<{ element: HierarchyElement }> = ({
-  element,
-}) => {
-  const { get, meta } = element;
-  const isDate = isMetaPropertySensorDate(meta);
+const Emitter: FunctionComponent<{
+  object: Match<object, TSerialization>;
+}> = ({ object }) => {
+  // @ts-ignore
+  const object_ = useMatch({ $: 'getter' as const }, object, 0).at(0);
 
-  const { country } = useI18n();
+  // @ts-ignore
+  const state = useEmitter(object_.state);
 
-  const rawState = useGetter<unknown>(element);
-  const state = useMemo(
-    () =>
-      isDate && country && rawState
-        ? new Date(rawState as number).toLocaleString(country)
-        : JSON.stringify(rawState, undefined, 2),
-    [isDate, country, rawState],
-  );
-
-  if (get === undefined) return null;
+  if (!object_ || !state) return null;
 
   return (
     <tr>
       <td>
-        <b>Getter</b> <i>{get}</i>
+        <b>Getter</b> <i>{object_.state.reference}</i>
       </td>
       <td>
-        <pre>{state}</pre>
+        <pre>{computed(() => JSON.stringify(state.value))}</pre>
       </td>
     </tr>
   );
 };
 
-const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
-  element,
-}) => {
-  const { meta, set } = element;
+const Collector: FunctionComponent<{
+  object: Match<object, TSerialization>;
+}> = ({ object }) => {
+  // @ts-ignore
+  const object_ = useMatch({ $: 'setter' as const }, object, 0).at(0);
 
-  const setter = useSetter<unknown>(element);
+  const valueTypeNamed = object_
+    ? valueTypeDescription[object_.valueType]
+    : undefined;
+
+  const collector = useCollector(object_?.setState);
   const [input, setInput] = useState<unknown>(undefined);
 
-  if (set === undefined || !isMetaPropertyActuator(meta)) return null;
-
-  const { valueType } = meta;
-  const isNull = valueType === ValueType.NULL;
-  const namedValueType = valueTypeToType(valueType);
+  if (!object_) return null;
 
   const onChange: JSX.EventHandler<
     JSX.TargetedEvent<HTMLInputElement, Event>
@@ -176,12 +140,11 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
 
     try {
       const parsedValue = JSON.parse(value);
-      const inputType = typeToValueType(parsedValue);
-      const namedInputType = valueTypeToType(inputType);
+      const inputTypeNamed = typeof parsedValue;
 
-      if (inputType !== valueType) {
+      if (inputTypeNamed !== valueTypeNamed) {
         currentTarget.setCustomValidity(
-          `parsed type does not match the required type! Needed: ${namedValueType}, parsed: ${namedInputType}`,
+          `parsed type does not match the required type! Needed: ${valueTypeNamed}, parsed: ${inputTypeNamed}`,
         );
 
         return;
@@ -201,82 +164,78 @@ const Setter: FunctionComponent<{ element: HierarchyElement }> = ({
 
     if (input === undefined) return;
 
-    setter?.(input);
+    collector(input);
   };
-
-  if (set === undefined) return null;
 
   return (
     <tr>
       <td>
-        <b>Setter</b> <i>{set}</i>
+        <b>Setter</b> <i>{object_.setState.reference}</i>
       </td>
       <td>
-        {isNull ? (
-          <button onClick={() => setter?.(null)}>null</button>
-        ) : (
-          <form action="#" onSubmit={onSubmit}>
-            <input placeholder={namedValueType} onChange={onChange} />
-          </form>
-        )}
+        {
+          // @ts-ignore
+          object.valueType === ValueType.NULL ? (
+            <button onClick={() => collector(null)}>null</button>
+          ) : (
+            <form action="#" onSubmit={onSubmit}>
+              <input placeholder={valueTypeNamed} onChange={onChange} />
+            </form>
+          )
+        }
       </td>
     </tr>
   );
 };
 
 const Child: FunctionComponent<{
-  element: HierarchyElement;
   name: string;
+  object: Match<object, TSerialization>;
   open: boolean;
-}> = ({ name, element, open }) => {
-  const { get, children, set } = element;
-  if (get === undefined && !children && set === undefined) return null;
+}> = ({ name, object, open }) => (
+  <tr>
+    <td colSpan={999}>
+      <Details
+        open={open}
+        summary={
+          <>
+            <b>Child:</b> {name}
+          </>
+        }
+      >
+        {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
+        <Hierarchy object={object} />
+      </Details>
+    </td>
+  </tr>
+);
 
-  return (
-    <tr>
-      <td colSpan={999}>
-        <Details
-          open={open}
-          summary={
-            <>
-              <b>Child:</b> {name}
-            </>
-          }
-        >
-          {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
-          <Hierarchy element={element} />
-        </Details>
-      </td>
-    </tr>
-  );
-};
-
-export const Hierarchy: FunctionComponent<{ element: HierarchyElement }> = ({
-  element,
-}) => {
-  const { children: hierarchyChildren } = element;
-
+export const Hierarchy: FunctionComponent<{
+  object: Match<object, TSerialization>;
+}> = ({ object }) => {
   const openChildList = useMemo(() => {
-    const { meta: { level = undefined } = {} } = element ?? {};
-    if (level === undefined) return false;
+    if (!('level' in object)) return false;
 
-    return (
-      level === Levels.SYSTEM ||
-      level === Levels.HOME ||
-      level === Levels.BUILDING
-    );
-  }, [element]);
+    switch (object.level) {
+      case Level.SYSTEM:
+      case Level.HOME:
+      case Level.FLOOR: {
+        return true;
+      }
+      default: {
+        return false;
+      }
+    }
+  }, [object]);
 
   return (
     <table>
-      <Meta element={element} />
-      <Getter element={element} />
-      <Setter element={element} />
-      {hierarchyChildren
-        ? Object.entries(hierarchyChildren).map(([name, child]) => (
-            <Child name={name} element={child} open={openChildList} />
-          ))
-        : null}
+      <Properties object={object} />
+      <Emitter object={object} />
+      <Collector object={object} />
+      {Object.entries(object).map(([name, child]) => (
+        <Child name={name} object={child} open={openChildList} />
+      ))}
     </table>
   );
 };

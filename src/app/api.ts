@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   DEFAULT_MATCH_DEPTH,
+  Level,
   Match,
   match,
   TValueType,
@@ -17,6 +18,19 @@ import { API_WORKER_API, TSerialization } from '../common/types.js';
 
 const WEB_API_UUID = 'c4218bec-e940-4d68-8807-5c43b2aee27b';
 const WEB_API_ONLINE = '562a3aa9-a10e-4347-aa3f-cec9e011a3dc';
+
+export type LevelObject = {
+  [Level.AREA]: Match<{ level: Level.AREA }, TSerialization>;
+  [Level.BUILDING]: Match<{ level: Level.BUILDING }, TSerialization>;
+  [Level.DEVICE]: Match<{ level: Level.DEVICE }, TSerialization>;
+  [Level.ELEMENT]: Match<{ level: Level.ELEMENT }, TSerialization>;
+  [Level.FLOOR]: Match<{ level: Level.FLOOR }, TSerialization>;
+  [Level.HOME]: Match<{ level: Level.HOME }, TSerialization>;
+  [Level.NONE]: Match<{ level: Level.NONE }, TSerialization>;
+  [Level.PROPERTY]: Match<{ level: Level.PROPERTY }, TSerialization>;
+  [Level.ROOM]: Match<{ level: Level.ROOM }, TSerialization>;
+  [Level.SYSTEM]: Match<{ level: Level.SYSTEM }, TSerialization>;
+};
 
 export class Api {
   private static _getBroadcastChannel<T>(
@@ -73,24 +87,28 @@ export class Api {
     return this._hierarchy;
   }
 
-  $collector<T>(reference: string): (value: T) => void {
+  $collector<T>(reference?: string): (value: T) => void {
     return (value) => {
+      if (!reference) return;
+
       this._api.triggerCollector(reference, value);
     };
   }
 
   $emitter<T>(
-    reference: string,
+    reference?: string,
     abort?: AbortController,
   ): ReadonlySignal<T | undefined> {
     const $signal = signal<T | undefined>(undefined);
 
-    this._api
-      .getValue(reference)
-      .catch(() => undefined)
-      .then((value) => ($signal.value = value as T | undefined));
+    if (reference) {
+      this._api
+        .getValue(reference)
+        .catch(() => undefined)
+        .then((value) => ($signal.value = value as T | undefined));
 
-    Api._getBroadcastChannel($signal, reference, abort);
+      Api._getBroadcastChannel($signal, reference, abort);
+    }
 
     return computed(() => $signal.value);
   }
@@ -108,21 +126,14 @@ export class Api {
     return computed(() => $signal.value ?? false);
   }
 
-  $streamCount(abort?: AbortController): ReadonlySignal<number | undefined> {
-    return this.$emitter(WEB_API_UUID, abort);
-  }
-
   $typedCollector<
     R extends string,
     S extends InteractionReference<R, InteractionType.COLLECT>,
     T extends ValueType,
-  >({
-    setState,
-  }: {
-    setState: S;
-    valueType: T;
-  }): (value: TValueType[T]) => void {
-    return this.$collector(setState.reference);
+  >(
+    object?: { setState: S; valueType: T } | undefined,
+  ): (value: TValueType[T]) => void {
+    return this.$collector(object?.setState.reference);
   }
 
   $typedEmitter<
@@ -130,26 +141,98 @@ export class Api {
     S extends InteractionReference<R, InteractionType.EMIT>,
     T extends ValueType,
   >(
-    {
-      state,
-    }: {
-      state: S;
-      valueType: T;
-    },
+    object?:
+      | {
+          state: S;
+          valueType: T;
+        }
+      | undefined,
     abort?: AbortController,
   ): ReadonlySignal<TValueType[T] | undefined> {
-    return this.$emitter(state.reference, abort);
+    return this.$emitter(object?.state.reference, abort);
+  }
+
+  $webSocketCount(abort?: AbortController): ReadonlySignal<number | undefined> {
+    return this.$emitter(WEB_API_UUID, abort);
   }
 
   match<
     P extends object,
-    D extends number = typeof DEFAULT_MATCH_DEPTH,
     R extends object = TSerialization,
+    D extends number = typeof DEFAULT_MATCH_DEPTH,
   >(
     pattern: P,
-    depth = DEFAULT_MATCH_DEPTH as D,
     root = this.hierarchy as R,
+    depth = DEFAULT_MATCH_DEPTH as D,
   ): Match<P, R, D>[] {
     return match(pattern, root, depth);
   }
 }
+
+type GroupByResult<T extends object, K extends keyof Required<T>> = {
+  elements: T[];
+  group: T[K];
+}[];
+
+export const groupBy = <T extends object, K extends keyof Required<T>>(
+  input: readonly T[],
+  property: K,
+): GroupByResult<T, K> => {
+  const keys = new Set<T[K]>();
+
+  for (const object of input) {
+    keys.add(object[property]);
+  }
+
+  const result: GroupByResult<T, K> = [];
+
+  for (const key of keys) {
+    result.push({
+      elements: input.filter(
+        (object) => property in object && object[property] === key,
+      ),
+      group: key,
+    });
+  }
+
+  return result;
+};
+
+export const sortBy = <T extends object, K extends keyof Required<T>>(
+  input: readonly T[],
+  property: K,
+  list: readonly T[K][],
+): Record<'all' | 'listedResults' | 'unlistedResults', T[]> => {
+  const listedResultsCollection: T[][] = [];
+
+  for (const listItem of list) {
+    const matchingObject = input.filter(
+      (object) => property in object && object[property] === listItem,
+    );
+    if (match.length === 0) continue;
+
+    listedResultsCollection.push(matchingObject);
+  }
+
+  const listedResults = listedResultsCollection.flat(1);
+
+  const unlistedResults: T[] = [];
+
+  for (const object of input) {
+    if (!(property in object)) continue;
+
+    const value = object[property];
+    if (!value) continue;
+    if (list.includes(value)) continue;
+
+    unlistedResults.push(object);
+  }
+
+  return {
+    get all() {
+      return [listedResults, unlistedResults].flat(1);
+    },
+    listedResults,
+    unlistedResults,
+  };
+};

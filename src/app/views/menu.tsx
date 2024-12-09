@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { Level, levelObjectMatch } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
 import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 
+import { LevelObject, sortBy } from '../api.js';
 import {
   Menu as MenuComponent,
   MenuContent,
@@ -13,6 +16,7 @@ import {
 } from '../components/menu.js';
 import { useArray } from '../hooks/use-array-compare.js';
 import { roomSorting } from '../i18n/mapping.js';
+import { useMatch, useTypedEmitter } from '../state/api.js';
 import { Translation } from '../state/i18n.js';
 import { useIsMenuVisible } from '../state/menu.js';
 import {
@@ -25,40 +29,40 @@ import {
 import { useGoRoot } from '../state/path.js';
 import { useFlipScreensaverActive } from '../state/screensaver.js';
 import { useTheme } from '../state/theme.js';
-import { useChild, useChildGetter, useLevelShallow } from '../state/web-api.js';
 import { colors } from '../style.js';
 import { $flags } from '../util/flags.js';
-import {
-  HierarchyElementFloor,
-  HierarchyElementRoom,
-  Levels,
-  sortBy,
-} from '../web-api.js';
 
-const AllLightState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
+// @ts-ignore
+const AllLightState: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
   room,
 }) => {
-  const allLights = useChildGetter<boolean>(room, 'allLights');
+  const allLights = 'allLights' in room ? room.allLights.main : undefined;
+  const on = useTypedEmitter(allLights);
 
-  return allLights ? <MenuIndicatorItem color="hsl(40deg 100% 50%)" /> : null;
+  return (on.value ?? false) ? (
+    <MenuIndicatorItem color="hsl(40deg 100% 50%)" />
+  ) : null;
 };
 
-const AllWindowsState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
+const AllWindowsState: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
   room,
 }) => {
-  const allWindows = useChildGetter<boolean>(room, 'allWindows');
+  const allWindows = 'allWindows' in room ? room.allWindows.main : undefined;
+  const open = useTypedEmitter(allWindows);
 
-  return allWindows ? <MenuIndicatorItem color="hsl(0deg 100% 50%)" /> : null;
+  return (open.value ?? false) ? (
+    <MenuIndicatorItem color="hsl(0deg 100% 50%)" />
+  ) : null;
 };
 
-const DoorState: FunctionComponent<{ room: HierarchyElementRoom }> = ({
+const DoorState: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
   room,
 }) => {
   const fontColor = colors.fontPrimary()();
-  const door = useChild(room, 'door');
-  const open = useChildGetter<boolean>(door, 'open');
+  const door = 'door' in room ? room.door.open.main : undefined;
+  const open = useTypedEmitter(door);
 
-  return open ? <MenuIndicatorItem color={fontColor} /> : null;
+  return (open.value ?? false) ? <MenuIndicatorItem color={fontColor} /> : null;
 };
 
 const MenuListItem: FunctionComponent<{
@@ -101,13 +105,15 @@ const MenuListItem: FunctionComponent<{
 };
 
 export const Floor: FunctionComponent<{
-  floor: HierarchyElementFloor;
+  // @ts-ignore
+  floor: LevelObject[Level.FLOOR];
 }> = ({ floor }) => {
   const goRoot = useGoRoot();
 
-  const elements = useLevelShallow<HierarchyElementRoom>(Levels.ROOM, floor);
+  // @ts-ignore
+  const elements = useMatch(levelObjectMatch[Level.ROOM], floor);
   const sortedElements = useArray(
-    useMemo(() => sortBy(elements, 'name', roomSorting).all, [elements]),
+    useMemo(() => sortBy(elements, '$', roomSorting).all, [elements]),
   );
 
   const [selectedRoom, selectRoom] = useNavigationRoom();
@@ -115,7 +121,7 @@ export const Floor: FunctionComponent<{
   return (
     <>
       <MenuSubdivisionHeader>
-        <Translation i18nKey={floor.meta.name} />
+        <Translation i18nKey={floor.$} />
       </MenuSubdivisionHeader>
       <MenuList>
         {sortedElements.map((room, key) => {
@@ -127,7 +133,7 @@ export const Floor: FunctionComponent<{
               isActive={isActive}
               onClick={() => (isActive ? goRoot?.() : selectRoom(room))}
             >
-              <Translation capitalize={true} i18nKey={room.meta.name} />
+              <Translation capitalize={true} i18nKey={room.$} />
               <MenuIndicatorSection>
                 <AllWindowsState room={room} />
                 <DoorState room={room} />
@@ -152,7 +158,7 @@ export const Menu: FunctionComponent = () => {
   const [selectedStaticPage, selectStaticPage] = useNavigationStaticPage();
   const [building] = useNavigationBuilding();
 
-  const floors = useLevelShallow<HierarchyElementFloor>(Levels.FLOOR, building);
+  const floors = useMatch(levelObjectMatch[Level.FLOOR], building);
 
   const isVisible = useMemo(
     () => (isMenuVisible === null ? true : isMenuVisible),

@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
+import { groupBy, sortBy } from '../../api.js';
 import { Grid } from '../../components/grid.js';
 import { isMetaAreaRGB } from '../../controls/actuators/rgb.js';
 import { Control } from '../../controls/main.js';
@@ -21,7 +22,6 @@ import {
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
 import {
-  groupBy,
   HierarchyElement,
   HierarchyElementArea,
   HierarchyElementProperty,
@@ -30,7 +30,6 @@ import {
   isMetaPropertyActuator,
   isMetaPropertySensor,
   Levels,
-  sortBy,
 } from '../../web-api.js';
 import { SubPage } from '../sub/room/main.js';
 
