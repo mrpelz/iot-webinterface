@@ -17,11 +17,13 @@ export const noBackground = Symbol('noBackground');
 type NoBackground = typeof noBackground;
 
 export type TBackgroundContext = readonly [
-  string | null,
-  Dispatch<StateUpdater<string | NoBackground | null>>,
+  string | undefined,
+  Dispatch<StateUpdater<string | NoBackground | undefined>>,
 ];
 
-const BackgroundContext = createContext(null as unknown as TBackgroundContext);
+const BackgroundContext = createContext(
+  undefined as unknown as TBackgroundContext,
+);
 
 const BACKGROUND_PATH = '/assets/';
 const BACKGROUND_EXTENSION = '.png';
@@ -39,17 +41,16 @@ export const BackgroundProvider: FunctionComponent = ({ children }) => {
   const [room] = useNavigationRoom();
 
   const [backgroundOverride, setBackgroundOverride] = useState<
-    string | NoBackground | null
-  >(null);
+    string | NoBackground | undefined
+  >(undefined);
 
   const background = useMemo(() => {
     if (isHighContrast || initialDelay || backgroundOverride === noBackground) {
-      return null;
+      return undefined;
     }
 
-    const identifier =
-      backgroundOverride || staticPage || room?.meta.name || null;
-    if (!identifier) return null;
+    const identifier = backgroundOverride || staticPage || room?.$ || undefined;
+    if (!identifier) return undefined;
 
     const baseName = encodeURIComponent(
       identifier.replaceAll(camelCase, (letter) => `-${letter.toLowerCase()}`),
@@ -70,21 +71,21 @@ export const BackgroundProvider: FunctionComponent = ({ children }) => {
   );
 };
 
-export const useBackground = (): string | null => {
+export const useBackground = (): string | undefined => {
   const [background] = useContext(BackgroundContext);
 
   return useMemo(() => background, [background]);
 };
 
 export const useSetBackgroundOverride = (
-  override: string | NoBackground | null,
+  override: string | NoBackground | undefined,
 ): void => {
   const [, setBackgroundOverride] = useContext(BackgroundContext);
 
   useEffect(() => {
     setBackgroundOverride(override);
 
-    return () => setBackgroundOverride(null);
+    return () => setBackgroundOverride(undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [override]);
 };

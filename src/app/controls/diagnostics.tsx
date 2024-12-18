@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { isObject, isPlainObject } from '@iot/iot-monolith/oop';
 import { Level, Match, ValueType } from '@iot/iot-monolith/tree';
 import {
   levelDescription,
@@ -40,6 +41,7 @@ export const Details: FunctionComponent<{
 };
 
 export const Properties: FunctionComponent<{
+  // @ts-ignore
   object: Match<object, TSerialization>;
 }> = ({ object }) => {
   const $ = useMemo(
@@ -50,52 +52,43 @@ export const Properties: FunctionComponent<{
   if (Object.keys(object).length === 0) return null;
 
   return (
-    <>
-      <tr>
-        <td>
-          <b>$</b>
-        </td>
-        <td>{$}</td>
-      </tr>
-      <tr>
-        <td>
-          <b>Meta</b>
-        </td>
-        <td>
-          <table>
-            {Object.entries(object).map(([key, value]) => {
-              const level =
-                key === 'level'
-                  ? levelDescription[value as unknown as Level]
-                  : undefined;
+    <tr>
+      <td>
+        <b>Meta</b>
+      </td>
+      <td>
+        <table>
+          {Object.entries(object).map(([key, value]) => {
+            if (isObject(value)) return null;
+            const level =
+              key === 'level'
+                ? levelDescription[value as unknown as Level]
+                : undefined;
 
-              const valueType =
-                key === 'valueType'
-                  ? valueTypeDescription[value as unknown as ValueType]
-                  : undefined;
+            const valueType =
+              key === 'valueType'
+                ? valueTypeDescription[value as unknown as ValueType]
+                : undefined;
 
-              return (
-                <tr>
-                  <td>{key}</td>
-                  <td>{level || valueType || JSON.stringify(value)} </td>
-                </tr>
-              );
-            })}
-          </table>
-        </td>
-      </tr>
-    </>
+            return (
+              <tr>
+                <td>{key}</td>
+                <td>{level || valueType || JSON.stringify(value)}</td>
+              </tr>
+            );
+          })}
+        </table>
+      </td>
+    </tr>
   );
 };
 
 const Emitter: FunctionComponent<{
   object: Match<object, TSerialization>;
 }> = ({ object }) => {
-  // @ts-ignore
-  const object_ = useMatch({ $: 'getter' as const }, object, 0).at(0);
+  const [object_] = useMatch({ $: 'getter' as const }, object, 0);
 
-  // @ts-ignore
-  const state = useEmitter(object_.state);
+  const state = useEmitter(object_?.state);
 
   if (!object_ || !state) return null;
 
@@ -192,23 +185,24 @@ const Child: FunctionComponent<{
   name: string;
   object: Match<object, TSerialization>;
   open: boolean;
-}> = ({ name, object, open }) => (
-  <tr>
-    <td colSpan={999}>
-      <Details
-        open={open}
-        summary={
-          <>
-            <b>Child:</b> {name}
-          </>
-        }
-      >
-        {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
-        <Hierarchy object={object} />
-      </Details>
-    </td>
-  </tr>
-);
+}> = ({ name, object, open }) =>
+  isPlainObject(object) ? (
+    <tr>
+      <td colSpan={999}>
+        <Details
+          open={open}
+          summary={
+            <>
+              <b>Child:</b> {name}
+            </>
+          }
+        >
+          {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
+          <Hierarchy object={object} />
+        </Details>
+      </td>
+    </tr>
+  ) : null;
 
 export const Hierarchy: FunctionComponent<{
   object: Match<object, TSerialization>;

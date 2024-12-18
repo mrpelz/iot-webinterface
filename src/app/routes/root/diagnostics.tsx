@@ -5,7 +5,25 @@ import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
-import { Details, Hierarchy, Properties } from '../../controls/diagnostics.js';
+import {
+  arrayRenderer,
+  objectRenderer,
+  primitiveRenderer,
+} from '../../components/json-viewer/basic-renderers.js';
+import {
+  collectInteractionReferenceRenderer,
+  emitInteractionReferenceRenderer,
+  getterRenderer,
+  idRenderer,
+  interactionTypeRenderer,
+  levelRenderer,
+  setterRenderer,
+  speciesRenderer,
+  triggerRenderer,
+  valueTypeRenderer,
+} from '../../components/json-viewer/hierarchy-renderers.js';
+import { JSONViewer } from '../../components/json-viewer/main.js';
+import { Details, Properties } from '../../controls/diagnostics.js';
 import { useGetLocalStorage } from '../../hooks/use-local-storage.js';
 import { api } from '../../main.js';
 import {
@@ -51,6 +69,7 @@ const Flags: FunctionComponent = () => (
 
 const Navigation: FunctionComponent = () => {
   const {
+    // @ts-ignore
     building: [building],
     home: [home],
     room: [room],
@@ -286,6 +305,29 @@ export const Diagnostics: FunctionComponent = () => {
 
   const updateId = useGetLocalStorage('updateId');
 
+  const jsonViewerRenderers = useMemo(
+    () =>
+      new Set([
+        collectInteractionReferenceRenderer,
+        emitInteractionReferenceRenderer,
+        // @ts-ignore
+        getterRenderer,
+        idRenderer,
+        interactionTypeRenderer,
+        levelRenderer,
+        // @ts-ignore
+        setterRenderer,
+        speciesRenderer,
+        // @ts-ignore
+        triggerRenderer,
+        valueTypeRenderer,
+        arrayRenderer,
+        objectRenderer,
+        primitiveRenderer,
+      ]),
+    [],
+  );
+
   return (
     <DiagnosticsContainer>
       <table>
@@ -414,7 +456,13 @@ export const Diagnostics: FunctionComponent = () => {
         </tr>
       </table>
 
-      {hierarchy ? <Hierarchy object={hierarchy} /> : null}
+      {hierarchy ? (
+        <JSONViewer
+          rootLabel="Hierarchy"
+          value={hierarchy}
+          renderers={jsonViewerRenderers}
+        />
+      ) : null}
     </DiagnosticsContainer>
   );
 };

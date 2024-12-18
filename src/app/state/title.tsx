@@ -13,12 +13,12 @@ import { useCapitalization, useI18nKey } from './i18n.js';
 import { useNavigationRoom, useNavigationStaticPage } from './navigation.js';
 
 export type TTitleContext = {
-  capitalizedTitle: string | null;
-  setTitleOverride: Dispatch<StateUpdater<string | null>>;
-  title: string | null;
+  capitalizedTitle: string | undefined;
+  setTitleOverride: Dispatch<StateUpdater<string | undefined>>;
+  title: string | undefined;
 };
 
-const TitleContext = createContext(null as unknown as TTitleContext);
+const TitleContext = createContext(undefined as unknown as TTitleContext);
 
 const appName = document.title;
 
@@ -29,9 +29,11 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
   const staticPageName = useI18nKey(staticPage || undefined);
 
   const [room] = useNavigationRoom();
-  const roomName = useI18nKey(room?.meta.name);
+  const roomName = useI18nKey(room?.$);
 
-  const [titleOverride, setTitleOverride] = useState<string | null>(null);
+  const [titleOverride, setTitleOverride] = useState<string | undefined>(
+    undefined,
+  );
 
   const title = useMemo(
     () => titleOverride || staticPageName || roomName,
@@ -54,25 +56,25 @@ export const TitleProvider: FunctionComponent = ({ children }) => {
   );
 };
 
-export const useTitle = (): string | null => {
+export const useTitle = (): string | undefined => {
   const { title } = useContext(TitleContext);
 
   return useMemo(() => title, [title]);
 };
 
-export const useCapitalizedTitle = (): string | null => {
+export const useCapitalizedTitle = (): string | undefined => {
   const { capitalizedTitle } = useContext(TitleContext);
 
   return useMemo(() => capitalizedTitle, [capitalizedTitle]);
 };
 
-export const useSetTitleOverride = (override: string | null): void => {
+export const useSetTitleOverride = (override: string | undefined): void => {
   const { setTitleOverride } = useContext(TitleContext);
 
   useEffect(() => {
     setTitleOverride(override);
 
-    return () => setTitleOverride(null);
+    return () => setTitleOverride(undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [override]);
 };

@@ -32,7 +32,7 @@ export const Screensaver: FunctionComponent = () => {
   const flipScreensaverActive = useFlipScreensaverActive();
 
   const nextMinute = useTimeIncrement(
-    isScreensaverActive ? nextMinutePlusDelayIncrement : null,
+    isScreensaverActive ? nextMinutePlusDelayIncrement : undefined,
   );
 
   const [date = null, time = null, x = 0, y = 0] = useMemo(() => {

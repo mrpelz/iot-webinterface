@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { isPlainObject, objectKeys } from '@iot/iot-monolith/oop';
 import {
   DEFAULT_MATCH_DEPTH,
   Level,
@@ -20,6 +21,7 @@ const WEB_API_UUID = 'c4218bec-e940-4d68-8807-5c43b2aee27b';
 const WEB_API_ONLINE = '562a3aa9-a10e-4347-aa3f-cec9e011a3dc';
 
 export type LevelObject = {
+  // @ts-ignore
   [Level.AREA]: Match<{ level: Level.AREA }, TSerialization>;
   [Level.BUILDING]: Match<{ level: Level.BUILDING }, TSerialization>;
   [Level.DEVICE]: Match<{ level: Level.DEVICE }, TSerialization>;
@@ -31,6 +33,27 @@ export type LevelObject = {
   [Level.ROOM]: Match<{ level: Level.ROOM }, TSerialization>;
   [Level.SYSTEM]: Match<{ level: Level.SYSTEM }, TSerialization>;
 };
+
+class Keys {
+  private readonly _keys = new WeakMap<object, string>();
+  constructor(object: object) {
+    this._addChildren(object);
+  }
+
+  private _addChildren(object: object) {
+    for (const key of objectKeys(object)) {
+      const child = object[key];
+
+      if (!isPlainObject(child)) continue;
+      this._keys.set(object, key);
+      this._addChildren(child);
+    }
+  }
+
+  getKey(object: object): string | undefined {
+    return this._keys.get(object);
+  }
+}
 
 export class Api {
   private static _getBroadcastChannel<T>(
@@ -59,6 +82,7 @@ export class Api {
 
   private readonly _api: Remote<API_WORKER_API>;
   private _hierarchy?: TSerialization;
+  private _keys?: Keys;
 
   readonly isInit: Promise<void>;
 
@@ -77,6 +101,7 @@ export class Api {
       await this._api.isInit;
       // @ts-ignore
       this._hierarchy = await this._api.hierarchy;
+      this._keys = new Keys(this._hierarchy);
 
       // eslint-disable-next-line no-console
       console.log(this._hierarchy);
@@ -85,6 +110,10 @@ export class Api {
 
   get hierarchy(): TSerialization | undefined {
     return this._hierarchy;
+  }
+
+  get keys(): Keys | undefined {
+    return this._keys;
   }
 
   $collector<T>(reference?: string): (value: T) => void {

@@ -91,11 +91,11 @@ export const useI18n = (): TI18nContext => useContext(I18nContext);
 export const useI18nKey = <F extends boolean>(
   key?: keyof I18nTranslation | string,
   fallback?: F,
-): F extends true ? string : string | null => {
+): F extends true ? string : string | undefined => {
   const { translation } = useContext(I18nContext);
 
   const result = useMemo(() => {
-    if (!key || !(key in translation)) return null;
+    if (!key || !(key in translation)) return undefined;
 
     return translation[key as unknown as keyof I18nTranslation];
   }, [key, translation]);
@@ -108,8 +108,8 @@ export const useI18nKey = <F extends boolean>(
       return '<[empty]>';
     }
 
-    return null;
-  }, [fallback, key, result]) as F extends true ? string : string | null;
+    return undefined;
+  }, [fallback, key, result]) as F extends true ? string : string | undefined;
 };
 
 export const useI18nNonCapitalization = (): string[] => {
@@ -125,13 +125,15 @@ export const useI18nKeyFallback = (
   key?: keyof I18nTranslation | string,
 ): string => useI18nKey(key, true);
 
-export const useCapitalization = (text: string | null): string | null => {
+export const useCapitalization = (
+  text: string | undefined,
+): string | undefined => {
   const nonCapitalization = useI18nNonCapitalization();
 
-  const textWords = useMemo(() => (text ? text.split(' ') : null), [text]);
+  const textWords = useMemo(() => (text ? text.split(' ') : undefined), [text]);
 
   return useMemo(() => {
-    if (!textWords) return null;
+    if (!textWords) return undefined;
 
     return textWords
       .map((word) =>
@@ -160,5 +162,5 @@ export const Translation: FunctionComponent<{
     return translation;
   }, [capitalize, translation]);
 
-  return <>{result}</>;
+  return <>{result ?? null}</>;
 };

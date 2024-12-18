@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Level, levelObjectMatch } from '@iot/iot-monolith/tree';
 import {} from '@iot/iot-monolith/tree-serialization';
 import { effect } from '@preact/signals';
@@ -31,29 +32,26 @@ try {
     await persist();
 
     await api.isInit;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const [match] = api.match({ $: 'sunElevation' as const });
 
     // eslint-disable-next-line no-console
-    console.log({ match, reference: match.main.state.reference });
+    console.log({ match, reference: match?.main.state.reference });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const rooms = api.match(levelObjectMatch[Level.ROOM]);
     // eslint-disable-next-line no-console
     console.log({ rooms: rooms.map((room) => room.$) });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const [diningRoom] = api.match({ $: 'diningRoom' as const });
 
     // eslint-disable-next-line no-console
-    console.log(diningRoom.devices.ceilingLight.button);
+    console.log(diningRoom?.devices.ceilingLight.button);
 
-    const $emitter = api.$typedEmitter(match.main);
+    const $emitter = api.$typedEmitter(match?.main);
     // eslint-disable-next-line no-console
-    effect(() => console.log(match.$, $emitter.value));
+    effect(() => console.log(match?.$, $emitter.value));
   });
 } catch (error) {
   // eslint-disable-next-line no-console

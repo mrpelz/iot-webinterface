@@ -6,7 +6,7 @@ import { useScrollRestore } from '../hooks/use-scroll-restore.js';
 import { Devices } from '../routes/root/devices.js';
 import { Diagnostics } from '../routes/root/diagnostics.js';
 import { Global } from '../routes/root/global.js';
-import { Room } from '../routes/root/room.js';
+// import { Room } from '../routes/root/room.js';
 import { Settings } from '../routes/root/settings.js';
 import { Test } from '../routes/root/test-route.js';
 import { noBackground, useSetBackgroundOverride } from '../state/background.js';
@@ -31,7 +31,8 @@ export const RootRoute: FunctionComponent = () => {
     }
 
     if (room) {
-      return <Room elements={[room]} />;
+      // return <Room room={room} />;
+      return null;
     }
 
     return null;
@@ -42,7 +43,7 @@ export const SubRoute: FunctionComponent<{
   blackOut?: boolean;
   subRoute: ComponentChildren;
 }> = ({ blackOut = true, children, subRoute }) => {
-  useSetBackgroundOverride(subRoute && blackOut ? noBackground : null);
+  useSetBackgroundOverride(subRoute && blackOut ? noBackground : undefined);
   useScrollRestore(!subRoute);
 
   return (

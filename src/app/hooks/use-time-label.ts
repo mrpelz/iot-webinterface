@@ -62,13 +62,13 @@ export const nextMinuteIncrement = (): number => msToNextMinute(1);
 export const nextDayIncrement = (): number => msToNextDay(1);
 
 export const useTimeIncrement = (
-  incrementCb: (() => number) | null = null,
-): Date | null => {
+  incrementCb?: () => number,
+): Date | undefined => {
   const [compareDate, setCompareDate] = useState(() => new Date());
   useEffect(() => {
     const timeout = incrementCb
       ? setTimeout(() => setCompareDate(new Date()), incrementCb())
-      : null;
+      : undefined;
 
     return () => {
       if (!timeout) return;
@@ -76,13 +76,13 @@ export const useTimeIncrement = (
     };
   }, [compareDate, incrementCb]);
 
-  return incrementCb ? compareDate : null;
+  return incrementCb ? compareDate : undefined;
 };
 
 export const useRelativeTimeLabel = (
-  date: Date | null,
+  date?: Date,
   nowSpan = 4000,
-): string | null => {
+): string | undefined => {
   const { translationLanguage, translationLocale } = useI18n();
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
@@ -96,10 +96,10 @@ export const useRelativeTimeLabel = (
 
   const nowLabel = useI18nKey('now');
 
-  const compareDate = useTimeIncrement(date ? nextSecondIncrement : null);
+  const compareDate = useTimeIncrement(date ? nextSecondIncrement : undefined);
 
   return useMemo(() => {
-    if (!date || !compareDate) return null;
+    if (!date || !compareDate) return undefined;
 
     const diff = date.getTime() - compareDate.getTime();
     const delta = Math.abs(diff);
@@ -124,17 +124,17 @@ export const useRelativeTimeLabel = (
   }, [compareDate, date, nowLabel, nowSpan, relativeTimeFormat]);
 };
 
-export const useAbsoluteTimeLabel = (date: Date | null): string | null => {
+export const useAbsoluteTimeLabel = (date?: Date): string | undefined => {
   const { translationLanguage, translationLocale } = useI18n();
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
     [translationLanguage, translationLocale],
   );
 
-  const nextDay = useTimeIncrement(date ? nextDayIncrement : null);
+  const nextDay = useTimeIncrement(date ? nextDayIncrement : undefined);
 
   return useMemo(() => {
-    if (!date || !nextDay) return null;
+    if (!date || !nextDay) return undefined;
 
     const isSameDay =
       date.getDate() === nextDay.getDate() &&
@@ -152,28 +152,28 @@ export const useAbsoluteTimeLabel = (date: Date | null): string | null => {
 };
 
 export const useTimeLabel = (
-  date: Date | null,
+  date?: Date,
   nowSpan?: number,
-): string | null => {
+): string | undefined => {
   const absoluteTimes = $flags.absoluteTimes.value;
 
   const relativeLabel = useRelativeTimeLabel(
-    absoluteTimes ? null : date,
+    absoluteTimes ? undefined : date,
     nowSpan,
   );
-  const absoluteLabel = useAbsoluteTimeLabel(absoluteTimes ? date : null);
+  const absoluteLabel = useAbsoluteTimeLabel(absoluteTimes ? date : undefined);
 
   return absoluteTimes ? absoluteLabel : relativeLabel;
 };
 
 export const useTimeSpan = (
-  a: Date | null,
-  b: Date | null,
-): [number | null, number | null] => {
-  const compare = useTimeIncrement(a && b ? nextSecondIncrement : null);
+  a?: Date,
+  b?: Date,
+): [number | undefined, number | undefined] => {
+  const compare = useTimeIncrement(a && b ? nextSecondIncrement : undefined);
 
   const [start, end] = useMemo(() => {
-    if (!a || !b) return [null, null];
+    if (!a || !b) return [undefined, undefined];
 
     const aTime = a.getTime();
     const bTime = b.getTime();
@@ -183,22 +183,22 @@ export const useTimeSpan = (
   }, [a, b]);
 
   const totalTime = useMemo(
-    () => (end && start ? end.getTime() - start.getTime() : null),
+    () => (end && start ? end.getTime() - start.getTime() : undefined),
     [end, start],
   );
 
   const elapsedTime = useMemo(
-    () => (compare && start ? compare.getTime() - start.getTime() : null),
+    () => (compare && start ? compare.getTime() - start.getTime() : undefined),
     [compare, start],
   );
 
   const fraction = useMemo(
-    () => (elapsedTime && totalTime ? elapsedTime / totalTime : null),
+    () => (elapsedTime && totalTime ? elapsedTime / totalTime : undefined),
     [elapsedTime, totalTime],
   );
 
   return useMemo(() => [totalTime, fraction], [fraction, totalTime]);
 };
 
-export const useDateFromEpoch = (input: number | null): Date | null =>
-  useMemo(() => (input === null ? null : new Date(input)), [input]);
+export const useDateFromEpoch = (input?: number): Date | undefined =>
+  useMemo(() => (input === undefined ? undefined : new Date(input)), [input]);

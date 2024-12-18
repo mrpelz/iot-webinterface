@@ -35,7 +35,7 @@ export const getCommonSegments = (
 
     if (segmentA !== segmentB) break;
 
-    commonSegments.push(segmentA);
+    if (segmentA) commonSegments.push(segmentA);
   }
 
   return commonSegments;

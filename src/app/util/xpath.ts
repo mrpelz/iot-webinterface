@@ -106,5 +106,8 @@ export function queryXPath<Expect extends Node>(
     return singleNodeValue;
   }
 
-  return result[primitiveResultKeys[type]];
+  const key = primitiveResultKeys[type];
+  if (!key) return null;
+
+  return result[key];
 }

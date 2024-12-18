@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   DEFAULT_MATCH_DEPTH,
   Match,
@@ -35,9 +36,22 @@ export const useEmitter = <
     typeof api.$emitter
   >(
     useCallback((...args) => api.$emitter(...args), []),
-    [object?.reference as Exclude<T['reference'], undefined>],
+    [object?.reference as T['reference']],
   );
 
+export const useIsInit = (): boolean =>
+  usePromise(() => api.isInit.then(() => true)) ?? false;
+
+export const useKey = (object: object): string | undefined => {
+  const isInit = useIsInit();
+
+  return useMemo(
+    () => (isInit ? api.keys?.getKey(object) : undefined),
+    [isInit, object],
+  );
+};
+
+// @ts-ignore
 export const useMatch = <
   P extends object,
   R extends object = TSerialization,
@@ -46,13 +60,16 @@ export const useMatch = <
   pattern: P,
   root?: R,
   depth = DEFAULT_MATCH_DEPTH as D,
-): Match<P, R, D>[] =>
-  useArray(
-    useMemo(() => api.match(pattern, root, depth), [depth, pattern, root]),
-  );
+): Match<P, R, D>[] => {
+  const isInit = useIsInit();
 
-export const useIsInit = (): boolean =>
-  usePromise(() => api.isInit.then(() => true)) ?? false;
+  return useArray(
+    useMemo(
+      () => (isInit ? api.match(pattern, root, depth) : []),
+      [depth, isInit, pattern, root],
+    ),
+  );
+};
 
 export const useIsWebSocketOnline = (): ReadonlySignal<boolean> =>
   useAbortableSignalFactory(
@@ -83,16 +100,17 @@ export const useTypedEmitter = <
 ): ReadonlySignal<TValueType[T] | undefined> =>
   useAbortableSignalFactory<
     [
-      {
-        state: S;
-        valueType: T;
-      },
+      | {
+          state: S;
+          valueType: T;
+        }
+      | undefined,
     ],
     ReadonlySignal<TValueType[T] | undefined>,
     typeof api.$typedEmitter
   >(
     useCallback((...args) => api.$typedEmitter(...args), []),
-    [object as Exclude<typeof object, undefined>],
+    [object],
   );
 
 export const useWebSocketCount = (): ReadonlySignal<number | undefined> =>

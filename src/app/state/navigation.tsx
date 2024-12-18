@@ -18,7 +18,6 @@ import {
   useGetLocalStorage,
   useSetLocalStorage,
 } from '../hooks/use-local-storage.js';
-import { api } from '../main.js';
 import { $flags } from '../util/flags.js';
 import { useIsInit, useMatch } from './api.js';
 import { useSegment } from './path.js';
@@ -129,6 +128,7 @@ const useNavigationElements = <
   return result;
 };
 
+// @ts-ignore
 const useStaticPage = (
   room: LevelObject[Level.ROOM] | undefined,
   override?: string,
@@ -206,7 +206,7 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   );
 
   // @ts-ignore
-  const home = useNavigationElements(api.hierarchy, Level.HOME, 'n_home');
+  const home = useNavigationElements(undefined, Level.HOME, 'n_home');
   const [stateHome] = home;
 
   const building = useNavigationElements(
@@ -228,7 +228,7 @@ export const NavigationProvider: FunctionComponent = ({ children }) => {
   const staticPage = useStaticPage(
     stateRoom,
     staticPageFromFlag ? startPage : undefined,
-    !api.hierarchy,
+    !useIsInit(),
   );
   const [stateStaticPage, setStaticPage] = staticPage;
 
@@ -280,6 +280,7 @@ export const useNavigationHome = (): TNavigationContext['home'] => {
   return useMemo(() => home, [home]);
 };
 
+// @ts-ignore
 export const useNavigationRoom = (): TNavigationContext['room'] => {
   const { room } = useContext(NavigationContext);
 

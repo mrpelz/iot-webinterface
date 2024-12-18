@@ -142,7 +142,9 @@ export const HLSStream: FunctionComponent<{
     [effectiveSrc],
   );
 
-  const nextPosterRefresh = useTimeIncrement(poster ? refreshHandler : null);
+  const nextPosterRefresh = useTimeIncrement(
+    poster ? refreshHandler : undefined,
+  );
 
   useEffect(() => {
     if (!poster || !nextPosterRefresh) return undefined;

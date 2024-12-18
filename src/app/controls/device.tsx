@@ -1,149 +1,166 @@
-import { FunctionComponent } from 'preact';
-import { useMemo } from 'preact/hooks';
+// /* eslint-disable @typescript-eslint/ban-ts-comment */
+// import { Level, Match } from '@iot/iot-monolith/tree';
+// import { computed } from '@preact/signals';
+// import { FunctionComponent } from 'preact';
+// import { useMemo } from 'preact/hooks';
 
-import { Tag, TagGroup } from '../components/controls.js';
-import {
-  ActivityIcon,
-  CheckIcon,
-  ForwardIcon,
-  WiFiIcon,
-  XIcon,
-} from '../components/icons.js';
-import { TabularNums } from '../components/text.js';
-import { useTimeLabel } from '../hooks/use-time-label.js';
-import { useTheme } from '../state/theme.js';
-import {
-  useChild,
-  useGetter,
-  useLevelShallowSkipInput,
-  useMetaFilter,
-} from '../state/web-api.js';
-import { HierarchyElementDevice, Levels, MetaDevice } from '../web-api.js';
-import { CellWithBody } from './main.js';
+// import { TSerialization } from '../../common/types.js';
+// import { Tag, TagGroup } from '../components/controls.js';
+// import {
+//   ActivityIcon,
+//   CheckIcon,
+//   ForwardIcon,
+//   WiFiIcon,
+//   XIcon,
+// } from '../components/icons.js';
+// import { TabularNums } from '../components/text.js';
+// import { useTimeLabel } from '../hooks/use-time-label.js';
+// import { useKey, useMatch, useTypedEmitter } from '../state/api.js';
+// import { useTheme } from '../state/theme.js';
+// import { ensureKeys } from '../util/oop.js';
+// import { CellWithBody } from './main.js';
 
-export const OnlineIcon: FunctionComponent = () => {
-  const theme = useTheme();
-  const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
+// export const OnlineIcon: FunctionComponent = () => {
+//   const theme = useTheme();
+//   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
-  return (
-    <CheckIcon
-      color={isHighContrast ? undefined : 'rgb(4, 195, 6)'}
-      height="1em"
-    />
-  );
-};
+//   return (
+//     <CheckIcon
+//       color={isHighContrast ? undefined : 'rgb(4, 195, 6)'}
+//       height="1em"
+//     />
+//   );
+// };
 
-export const OfflineIcon: FunctionComponent = () => {
-  const theme = useTheme();
-  const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
+// export const OfflineIcon: FunctionComponent = () => {
+//   const theme = useTheme();
+//   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
-  return (
-    <XIcon color={isHighContrast ? undefined : 'rgb(205, 3, 4)'} height="1em" />
-  );
-};
+//   return (
+//     <XIcon color={isHighContrast ? undefined : 'rgb(205, 3, 4)'} height="1em" />
+//   );
+// };
 
-const DeviceOnlineState: FunctionComponent<{
-  device: HierarchyElementDevice;
-}> = ({ device }) => {
-  const isOnline = useChild(device, 'online');
-  const isOnlineValue = useGetter<boolean>(isOnline);
+// const DeviceOnlineState: FunctionComponent<{
+//   device: // @ts-ignore
+//   | Match<{ isSubDevice: false; level: Level.DEVICE }, TSerialization>
+//     | Match<{ isSubDevice: true; level: Level.DEVICE }, TSerialization, 7>;
+// }> = ({ device }) => {
+//   const {
+//     online: {
+//       lastChange: { main: lastChange },
+//       main: online,
+//     },
+//     // @ts-ignore
+//   } = ensureKeys(device, 'online');
+//   const isOnline = useTypedEmitter(online);
+//   const onlineChanged = useTypedEmitter(lastChange);
 
-  const onlineLastChange = useChild(isOnline, 'lastChange');
-  const onlineLastChangeValue = useGetter<number>(onlineLastChange);
+//   const {
+//     lastSeen: { main: lastSeen },
+//     // @ts-ignore
+//   } = ensureKeys(device, 'lastSeen');
+//   const wasLastSeen = useTypedEmitter(lastSeen);
 
-  const lastSeen = useChild(device, 'lastSeen');
-  const lastSeenValue = useGetter<number>(lastSeen);
+//   const date = computed(() => {
+//     const epoch = onlineChanged.value || wasLastSeen.value;
+//     if (!epoch) return undefined;
 
-  const timeLabel = useTimeLabel(
-    useMemo(() => {
-      const epoch = lastSeenValue || onlineLastChangeValue;
-      if (!epoch) return null;
+//     return new Date(epoch);
+//   });
 
-      return new Date(epoch);
-    }, [lastSeenValue, onlineLastChangeValue]),
-  );
+//   const timeLabel = useTimeLabel(date.value);
 
-  const time = useMemo(
-    () => <TabularNums>{timeLabel || '—'}</TabularNums>,
-    [timeLabel],
-  );
+//   const time = useMemo(
+//     () => <TabularNums>{timeLabel || '—'}</TabularNums>,
+//     [timeLabel],
+//   );
 
-  if (lastSeen) {
-    return (
-      <>
-        <ActivityIcon height="1em" />
-        {time}
-      </>
-    );
-  }
+//   if (lastSeen) {
+//     return (
+//       <>
+//         <ActivityIcon height="1em" />
+//         {time}
+//       </>
+//     );
+//   }
 
-  if (isOnline) {
-    if (isOnlineValue === null) {
-      return (
-        <>
-          <OfflineIcon />—
-        </>
-      );
-    }
+//   if (online) {
+//     if (isOnline.value === undefined) {
+//       return (
+//         <>
+//           <OfflineIcon />—
+//         </>
+//       );
+//     }
 
-    return (
-      <>
-        {isOnlineValue ? <OnlineIcon /> : <OfflineIcon />}
-        {time}
-      </>
-    );
-  }
+//     return (
+//       <>
+//         {isOnline.value ? <OnlineIcon /> : <OfflineIcon />}
+//         {time}
+//       </>
+//     );
+//   }
 
-  return null;
-};
+//   return null;
+// };
 
-export const filterSubDevices = (
-  device: MetaDevice,
-): device is MetaDevice & { isSubDevice: true } => Boolean(device.isSubDevice);
+// export const SubDevice: FunctionComponent<{
+//   // @ts-ignore
+//   subDevice: Match<
+//     { isSubDevice: true; level: Level.DEVICE },
+//     TSerialization,
+//     7
+//   >;
+// }> = ({ subDevice }) => {
+//   const subDeviceName = useKey(subDevice);
 
-export const Device: FunctionComponent<{
-  element: HierarchyElementDevice;
-  onClick?: () => void;
-}> = ({ element: device, onClick }) => {
-  const {
-    meta: { name },
-  } = device;
+//   return (
+//     <Tag>
+//       {subDeviceName === 'espNow' ? null : (
+//         <TagGroup>
+//           <WiFiIcon height="1em" />
+//         </TagGroup>
+//       )}
+//       <TagGroup>
+//         <DeviceOnlineState device={subDevice} />
+//       </TagGroup>
+//     </Tag>
+//   );
+// };
 
-  const subDevices = useMetaFilter(
-    useLevelShallowSkipInput<HierarchyElementDevice>(Levels.DEVICE, device),
-    filterSubDevices,
-  );
+// export const Device: FunctionComponent<{
+//   // @ts-ignore
+//   device: Match<{ isSubDevice: false; level: Level.DEVICE }, TSerialization>;
+//   onClick?: () => void;
+// }> = ({ device, onClick }) => {
+//   // @ts-ignore
+//   const name = useKey(device);
 
-  return (
-    <CellWithBody
-      icon={<ForwardIcon height="1em" />}
-      onClick={onClick}
-      title={name}
-    >
-      {subDevices.length > 0 ? (
-        subDevices.map((subDevice) => {
-          const {
-            meta: { name: subDeviceName },
-          } = subDevice;
+//   const subDevices = useMatch(
+//     { isSubDevice: true as const, level: Level.DEVICE as const },
+//     device,
+//     1,
+//   );
 
-          return (
-            <Tag>
-              {subDeviceName === 'espNow' ? null : (
-                <TagGroup>
-                  <WiFiIcon height="1em" />
-                </TagGroup>
-              )}
-              <TagGroup>
-                <DeviceOnlineState device={subDevice} />
-              </TagGroup>
-            </Tag>
-          );
-        })
-      ) : (
-        <Tag>
-          <DeviceOnlineState device={device} />
-        </Tag>
-      )}
-    </CellWithBody>
-  );
-};
+//   return (
+//     <CellWithBody
+//       icon={<ForwardIcon height="1em" />}
+//       onClick={onClick}
+//       title={name}
+//     >
+//       {subDevices.length > 0 ? (
+//         subDevices.map((subDevice) => <SubDevice subDevice={subDevice} />)
+//       ) : (
+//         <Tag>
+//           <DeviceOnlineState
+//             device={
+//               // @ts-ignore
+//               device
+//             }
+//           />
+//         </Tag>
+//       )}
+//     </CellWithBody>
+//   );
+// };
