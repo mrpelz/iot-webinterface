@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { isPlainObject, objectKeys } from '@iot/iot-monolith/oop';
+import { isPlainObject, objectKeys, objectValues } from '@iot/iot-monolith/oop';
 import {
   DEFAULT_MATCH_DEPTH,
   Level,
@@ -45,7 +45,7 @@ class Keys {
       const child = object[key];
 
       if (!isPlainObject(child)) continue;
-      this._keys.set(object, key);
+      this._keys.set(child, key);
       this._addChildren(child);
     }
   }
@@ -55,10 +55,36 @@ class Keys {
   }
 }
 
+export class Parents {
+  private readonly _parents = new WeakMap<object, Set<object>>();
+  constructor(object: object) {
+    this._addChildren(object, undefined);
+  }
+
+  private _addChildren(object: object, parent?: object) {
+    let parents = this._parents.get(object);
+    if (parents) {
+      if (parent) parents.add(parent);
+    } else {
+      parents = new Set<object>(parent ? [parent] : undefined);
+      this._parents.set(object, parents);
+    }
+
+    for (const child of objectValues(object)) {
+      if (!isPlainObject(child)) continue;
+      this._addChildren(child, object);
+    }
+  }
+
+  getParents(object: object): Set<object> | undefined {
+    return this._parents.get(object);
+  }
+}
+
 export class Api {
-  private static _getBroadcastChannel<T>(
+  private static async _getBroadcastChannel<T>(
     $signal: Signal<T>,
-    reference: string,
+    reference: string | Promise<string>,
     abort?: AbortController,
   ) {
     const handleMessage = ({ data }: MessageEvent): void => {
@@ -66,7 +92,7 @@ export class Api {
       $signal.value = data;
     };
 
-    const channel = new BroadcastChannel(reference);
+    const channel = new BroadcastChannel(await reference);
 
     channel.addEventListener('message', handleMessage);
 
@@ -83,6 +109,7 @@ export class Api {
   private readonly _api: Remote<API_WORKER_API>;
   private _hierarchy?: TSerialization;
   private _keys?: Keys;
+  private _parents?: Parents;
 
   readonly isInit: Promise<void>;
 
@@ -102,6 +129,7 @@ export class Api {
       // @ts-ignore
       this._hierarchy = await this._api.hierarchy;
       this._keys = new Keys(this._hierarchy);
+      this._parents = new Parents(this._hierarchy);
 
       // eslint-disable-next-line no-console
       console.log(this._hierarchy);
@@ -116,6 +144,10 @@ export class Api {
     return this._keys;
   }
 
+  get parents(): Parents | undefined {
+    return this._parents;
+  }
+
   $collector<T>(reference?: string): (value: T) => void {
     return (value) => {
       if (!reference) return;
@@ -125,18 +157,21 @@ export class Api {
   }
 
   $emitter<T>(
-    reference?: string,
+    reference?: string | Promise<string>,
     abort?: AbortController,
   ): ReadonlySignal<T | undefined> {
+    const reference_ = reference ? Promise.resolve(reference) : undefined;
     const $signal = signal<T | undefined>(undefined);
 
-    if (reference) {
-      this._api
-        .getValue(reference)
-        .catch(() => undefined)
-        .then((value) => ($signal.value = value as T | undefined));
+    if (reference_) {
+      reference_.then((resolved) => {
+        this._api
+          .getValue(resolved)
+          .catch(() => undefined)
+          .then((value) => ($signal.value = value as T | undefined));
+      });
 
-      Api._getBroadcastChannel($signal, reference, abort);
+      Api._getBroadcastChannel($signal, reference_, abort);
     }
 
     return computed(() => $signal.value);
@@ -169,16 +204,20 @@ export class Api {
     R extends string,
     S extends InteractionReference<R, InteractionType.EMIT>,
     T extends ValueType,
+    O extends {
+      state: S;
+      valueType: T;
+    },
   >(
-    object?:
-      | {
-          state: S;
-          valueType: T;
-        }
-      | undefined,
+    object?: O | Promise<O> | undefined,
     abort?: AbortController,
   ): ReadonlySignal<TValueType[T] | undefined> {
-    return this.$emitter(object?.state.reference, abort);
+    return this.$emitter(
+      (object ? Promise.resolve(object) : undefined)?.then(
+        (resolved) => resolved.state.reference,
+      ),
+      abort,
+    );
   }
 
   $webSocketCount(abort?: AbortController): ReadonlySignal<number | undefined> {

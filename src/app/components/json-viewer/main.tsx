@@ -173,6 +173,7 @@ export const makeExpandingRenderer = <T,>(
       <Details
         open={isOpen}
         collapsible={!isOpen}
+        showCollapseExpandAllIcon={path_.length > 0}
         showExpandIcon={false}
         summary={
           <>

@@ -151,7 +151,7 @@ export const getterRenderer: Renderer<Match<{ $: 'getter' }, TSerialization>> =
 
       const { autoExpandLevel } = useContext(JSONViewerContext);
       // @ts-ignore
-      const isOpen = path_.length <= autoExpandLevel;
+      const isOpen = path_.length < autoExpandLevel;
       const isParentOpen = useFirstTruthy(useIsOpen() ?? isOpen);
 
       // @ts-ignore
@@ -258,7 +258,7 @@ export const setterRenderer: Renderer<Match<{ $: 'setter' }, TSerialization>> =
 
       const { autoExpandLevel } = useContext(JSONViewerContext);
       // @ts-ignore
-      const isOpen = path_.length <= autoExpandLevel;
+      const isOpen = path_.length < autoExpandLevel;
       const isParentOpen = useFirstTruthy(useIsOpen() ?? isOpen);
 
       // @ts-ignore
@@ -404,7 +404,7 @@ export const triggerRenderer: Renderer<
 
     const { autoExpandLevel } = useContext(JSONViewerContext);
     // @ts-ignore
-    const isOpen = path_.length <= autoExpandLevel;
+    const isOpen = path_.length < autoExpandLevel;
     const isParentOpen = useFirstTruthy(useIsOpen() ?? isOpen);
 
     // @ts-ignore

@@ -14,7 +14,7 @@ import { useCallback, useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../common/types.js';
 import { useArray } from '../hooks/use-array-compare.js';
-import { usePromise } from '../hooks/use-promise.js';
+import { usePromise, usePromisify } from '../hooks/use-promise.js';
 import { useAbortableSignalFactory } from '../hooks/use-signal.js';
 import { api } from '../main.js';
 
@@ -31,12 +31,12 @@ export const useEmitter = <
   object?: T | undefined,
 ): ReadonlySignal<unknown> =>
   useAbortableSignalFactory<
-    [string],
+    [Promise<T['reference']>],
     ReadonlySignal<unknown>,
     typeof api.$emitter
   >(
     useCallback((...args) => api.$emitter(...args), []),
-    [object?.reference as T['reference']],
+    [usePromisify(object?.reference)],
   );
 
 export const useIsInit = (): boolean =>
@@ -100,17 +100,15 @@ export const useTypedEmitter = <
 ): ReadonlySignal<TValueType[T] | undefined> =>
   useAbortableSignalFactory<
     [
-      | {
-          state: S;
-          valueType: T;
-        }
-      | undefined,
+      object extends undefined
+        ? undefined
+        : Promise<Exclude<typeof object, undefined>>,
     ],
     ReadonlySignal<TValueType[T] | undefined>,
     typeof api.$typedEmitter
   >(
     useCallback((...args) => api.$typedEmitter(...args), []),
-    [object],
+    [usePromisify(object)],
   );
 
 export const useWebSocketCount = (): ReadonlySignal<number | undefined> =>

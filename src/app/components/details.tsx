@@ -1,19 +1,19 @@
 import { styled } from 'goober';
 import { ComponentChild, createContext, FunctionComponent, JSX } from 'preact';
-import type { TargetedEvent } from 'preact/compat';
+import { forwardRef, type TargetedEvent } from 'preact/compat';
 import {
   useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'preact/hooks';
 
 import { useRerender } from '../hooks/use-rerender.js';
-import { useSymbol } from '../hooks/use-symbol.js';
 import { dimensions } from '../style.js';
 
-const DetailsComponent = styled('details')`
+const DetailsComponent = styled('details', forwardRef)`
   display: flex;
   flex-direction: column;
   font-family: monospace;
@@ -33,31 +33,39 @@ const SummaryComponent = styled<{ collapsible: boolean, showExpandIcon: boolean 
   }
 
   &::after {
-    content: '+';
+    aspect-ratio: 1;
+    border: solid ${dimensions.hairline} currentColor;
+    content: '+' / 'expand';
     display: ${({ collapsible, showExpandIcon }) =>
       collapsible && showExpandIcon ? 'block' : 'none'};
+    block-size: 1lh;
+    font-size: ${dimensions.fontSizeSmall};
     inset-block: 0;
     position: absolute;
-    translate: calc(-100% - 0.5ch);
+    text-align: center;
+    translate: -100%;
   }
 
   details[open] > &::after {
-    content: '-';
+    content: '-' / 'collapse';
   }
 `;
 
 const CollapseAll = styled('div')`
+  aspect-ratio: 1;
+  block-size: 1lh;
+  border: solid ${dimensions.hairline} currentColor;
   cursor: pointer;
   font-size: ${dimensions.fontSizeSmall};
   inset-block-start: 0;
   inset-inline-start: 0;
-  padding-inline: 0.5ch;
   position: absolute;
-  translate: calc(-100%) 1lh;
+  text-align: center;
+  translate: -100% calc(1lh + ${dimensions.hairline});
   visibility: hidden;
 
   &::before {
-    content: '-';
+    content: '--' / 'collapse all';
   }
 
   details[open] > & {
@@ -65,12 +73,14 @@ const CollapseAll = styled('div')`
   }
 `;
 
-const ExpandAll = styled(CollapseAll)`
-  translate: calc(-100%) 2lh;
-
+const ExpandAllSingle = styled(CollapseAll)`
   &::before {
-    content: '+';
+    content: '++' / 'expand all';
   }
+`;
+
+const ExpandAll = styled(ExpandAllSingle)`
+  translate: -100% 2lh;
 `;
 
 const HideWhenCollapsed = styled('span')`
@@ -93,6 +103,7 @@ const HideWhenExpanded = styled('span')`
 
 type TDetailsContext =
   | {
+      childCollapseExpandTrigger: () => void;
       collapseAll?: symbol;
       expandAll?: symbol;
       isOpen?: boolean;
@@ -112,6 +123,7 @@ export const Details: FunctionComponent<{
   collapsible?: boolean;
   handleToggle?: (open: boolean) => void;
   open?: boolean;
+  showCollapseExpandAllIcon?: boolean;
   showExpandIcon?: boolean;
   summary?: ComponentChild;
   summaryExpanded?: ComponentChild;
@@ -120,11 +132,18 @@ export const Details: FunctionComponent<{
   collapsible = true,
   handleToggle,
   open: initiallyOpen = false,
+  showCollapseExpandAllIcon = true,
   showExpandIcon = true,
   summary,
   summaryExpanded = null,
 }) => {
   const parentContext = useContext(DetailsContext);
+
+  const parentChildCollapseExpandTrigger =
+    parentContext?.childCollapseExpandTrigger;
+  const [childCollapseExpand, childCollapseExpandTrigger] = useRerender(
+    'childCollapseExpandTrigger',
+  );
 
   const parentCollapseAll = parentContext?.collapseAll;
   const [collapseAll, triggerCollapseAll] = useRerender('collapseAll');
@@ -136,6 +155,9 @@ export const Details: FunctionComponent<{
   const [isOpen, setOpen] = useState<boolean | undefined>(
     collapsible ? initiallyOpen && parentOpen : true,
   );
+
+  const [isCollapsible, setCollapsible] = useState(false);
+  const [isExpandable, setExpandable] = useState(false);
 
   const onToggle = useCallback<
     JSX.EventHandler<TargetedEvent<HTMLDetailsElement, ToggleEvent>>
@@ -179,29 +201,61 @@ export const Details: FunctionComponent<{
   }, [parentOpen]);
 
   useEffect(() => {
-    if (parentExpandAll) setOpen(true);
+    if (!parentExpandAll) return;
+    setOpen(true);
   }, [parentExpandAll]);
 
   useEffect(() => {
-    if (parentCollapseAll) setOpen(false);
+    if (!parentCollapseAll) return;
+    setOpen(false);
   }, [parentCollapseAll]);
 
   useEffect(() => {
+    parentChildCollapseExpandTrigger?.();
     handleToggle?.(Boolean(isOpen));
-  }, [handleToggle, isOpen]);
+  }, [handleToggle, isOpen, parentChildCollapseExpandTrigger]);
+
+  const ref = useRef<HTMLDetailsElement>(null);
+
+  useEffect(() => {
+    const { current: element } = ref;
+    if (!element) return;
+
+    const directChildren = Array.from(
+      element.querySelectorAll('details'),
+    ).filter((child) =>
+      child.parentElement?.closest('details')?.isSameNode(element),
+    );
+
+    const directChildrenOpen = directChildren.filter((child) =>
+      child.matches('[open]'),
+    );
+
+    setCollapsible(directChildren.length > 1 && directChildrenOpen.length > 0);
+    setExpandable(
+      directChildren.length > 1 &&
+        directChildren.length > directChildrenOpen.length,
+    );
+  }, [childCollapseExpand, isOpen]);
 
   return (
     <DetailsContext.Provider
       value={useMemo(
         () => ({
+          childCollapseExpandTrigger,
           collapseAll,
           expandAll,
           isOpen,
         }),
-        [collapseAll, expandAll, isOpen],
+        [childCollapseExpandTrigger, collapseAll, expandAll, isOpen],
       )}
     >
-      <DetailsComponent open={isOpen} onToggle={onToggle}>
+      <DetailsComponent
+        onToggle={onToggle}
+        open={isOpen}
+        ref={ref}
+        title={isOpen ? undefined : 'expand'}
+      >
         <SummaryComponent
           collapsible={collapsible}
           showExpandIcon={showExpandIcon}
@@ -215,9 +269,27 @@ export const Details: FunctionComponent<{
             summary
           )}
         </SummaryComponent>
+        {showCollapseExpandAllIcon ? (
+          <>
+            {isCollapsible ? (
+              <CollapseAll onClick={onCollapseAllClick} title="collapse all" />
+            ) : null}
+            {
+              // eslint-disable-next-line no-nested-ternary
+              isExpandable ? (
+                isCollapsible ? (
+                  <ExpandAll onClick={onExpandAllClick} title="expand all" />
+                ) : (
+                  <ExpandAllSingle
+                    onClick={onExpandAllClick}
+                    title="expand all"
+                  />
+                )
+              ) : null
+            }
+          </>
+        ) : null}
         {children}
-        <CollapseAll onClick={onCollapseAllClick} />
-        <ExpandAll onClick={onExpandAllClick} />
       </DetailsComponent>
     </DetailsContext.Provider>
   );
