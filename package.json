@@ -16,7 +16,7 @@
     "dist/**/*.{js,map,ts}"
   ],
   "dependencies": {
-    "@iot/iot-monolith": "^1.0.1-jsx-without-jsx-f4b33f0b.0",
+    "@iot/iot-monolith": "^1.0.1-jsx-without-jsx.1",
     "@preact/signals": "latest",
     "comlink": "latest",
     "goober": "latest",
