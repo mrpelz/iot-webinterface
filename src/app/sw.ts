@@ -14,10 +14,15 @@ export let swProxy: Remote<SW_API> | undefined;
 export const registerServiceWorker = async (): Promise<void> => {
   if (!('serviceWorker' in navigator)) return;
 
-  workbox = new Workbox('/sw.js');
-  await workbox.register();
+  try {
+    workbox = new Workbox('/sw.js');
+    await workbox.register();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('error registering ServiceWorker', error);
+  }
 
-  swProxy = wrap(await workbox.getSW());
+  swProxy = workbox ? wrap(await workbox.getSW()) : undefined;
 
   effect(() => {
     const interval = setInterval(
