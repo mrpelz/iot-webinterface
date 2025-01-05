@@ -44,10 +44,10 @@ export const Properties: FunctionComponent<{
   // @ts-ignore
   object: Match<object, TSerialization>;
 }> = ({ object }) => {
-  const $ = useMemo(
-    () => JSON.stringify('$' in object ? object.$ : undefined),
-    [object],
-  );
+  // const $ = useMemo(
+  //   () => JSON.stringify('$' in object ? object.$ : undefined),
+  //   [object],
+  // );
 
   if (Object.keys(object).length === 0) return null;
 

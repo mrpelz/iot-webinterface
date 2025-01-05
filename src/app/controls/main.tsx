@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-empty-file */
 // import { ComponentChild, FunctionComponent } from 'preact';
 // import { useMemo } from 'preact/hooks';
 

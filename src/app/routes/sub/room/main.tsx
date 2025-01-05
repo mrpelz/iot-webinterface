@@ -5,7 +5,7 @@ import { FunctionComponent } from 'preact';
 
 export const SubPage: FunctionComponent<{
   element: object;
-}> = ({ element }) =>
+}> = () =>
   // if (isOpenSensorElement(element)) {
   //   return <OpenSensor element={element}>open sensor element</OpenSensor>;
   // }

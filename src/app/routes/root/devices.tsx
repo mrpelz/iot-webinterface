@@ -10,7 +10,7 @@ import { useArray } from '../../hooks/use-array-compare.js';
 import { roomSorting as roomsSorting } from '../../i18n/mapping.js';
 import { useMatch } from '../../state/api.js';
 import { Translation } from '../../state/i18n.js';
-import { useSegment } from '../../state/path.js';
+// import { useSegment } from '../../state/path.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
 // import { DeviceDetails } from '../sub/devices/device.js';
@@ -19,7 +19,7 @@ import { SubRoute } from '../../views/route.js';
 const Room: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
   room,
 }) => {
-  const [, setDeviceId] = useSegment(1);
+  // const [, setDeviceId] = useSegment(1);
 
   const { $ } = room;
 
@@ -36,14 +36,14 @@ const Room: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
         {useMemo(
           () =>
             devices.map(
-              (device) =>
+              () =>
                 // <Device
                 //   device={device}
                 //   onClick={() => setDeviceId?.(device.$id)}
                 // />
                 null,
             ),
-          [devices, setDeviceId],
+          [devices],
         )}
       </Grid>
     </Category>
@@ -51,7 +51,7 @@ const Room: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
 };
 
 export const Devices: FunctionComponent = () => {
-  const [deviceId] = useSegment(1);
+  // const [deviceId] = useSegment(1);
 
   // @ts-ignore
   const rooms = useMatch(levelObjectMatch[Level.ROOM]);
@@ -59,7 +59,7 @@ export const Devices: FunctionComponent = () => {
     useMemo(() => sortBy(rooms, '$', roomsSorting).all, [rooms]),
   );
 
-  const [device] = useMatch({ $id: deviceId, level: Level.DEVICE as const });
+  // const [device] = useMatch({ $id: deviceId, level: Level.DEVICE as const });
 
   return (
     <SubRoute

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-empty-file */
 // /* eslint-disable @typescript-eslint/ban-ts-comment */
 // import { Level, Match } from '@iot/iot-monolith/tree';
 // import { computed } from '@preact/signals';

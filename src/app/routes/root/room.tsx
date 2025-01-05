@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-empty-file */
 // /* eslint-disable @typescript-eslint/ban-ts-comment */
 // import { any, Level } from '@iot/iot-monolith/tree';
 // import { FunctionComponent } from 'preact';

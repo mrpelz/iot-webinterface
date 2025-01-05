@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-empty-file */
 // import { StyledVNode } from 'goober';
 // import { FunctionComponent } from 'preact';
 // import {

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-empty-file */
 // import { FunctionComponent } from 'preact';
 
 // import { I18nKey } from '../../i18n/main.js';

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-empty-file */
 // import { Match } from '@iot/iot-monolith/tree';
 // import { FunctionComponent } from 'preact';
 

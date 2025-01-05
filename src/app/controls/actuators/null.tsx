@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-empty-file */
 // import { FunctionComponent } from 'preact';
 // import { useCallback, useRef } from 'preact/hooks';
 
