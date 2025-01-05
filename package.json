@@ -1,6 +1,6 @@
 {
   "name": "@iot/iot-webinterface",
-  "version": "1.0.0",
+  "version": "1.0.1-save-signals-for-later.0",
   "description": "web interface for \"iot-monolith\" using web-components written with the goal of having absolutely no build-process.",
   "repository": {
     "type": "git",
