@@ -21,7 +21,7 @@ spec:
           imagePullPolicy: IfNotPresent
           name: iot-webinterface
           ports:
-            - containerPort: 80
+            - containerPort: 1337
               name: http
               protocol: TCP
       imagePullSecrets:
