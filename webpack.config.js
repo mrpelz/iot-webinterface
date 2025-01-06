@@ -39,12 +39,6 @@ const configDownstream = {
         target: 'http://localhost:1337',
       },
     ],
-    static: [
-      {
-        directory: path.resolve(dirBase, 'node_modules'),
-        publicPath: '/node_modules',
-      },
-    ],
     webSocketServer: false,
   },
   output: {
@@ -52,7 +46,6 @@ const configDownstream = {
     chunkFormat: false,
     publicPath: '/',
   },
-  performance: false,
 };
 
 // @ts-ignore
