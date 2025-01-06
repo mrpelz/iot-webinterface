@@ -1,7 +1,7 @@
 {
   "name": "@iot/iot-webinterface",
   "version": "1.0.0",
-  "description": "web interface for \"iot-monolith\" using web-components written with the goal of having absolutely no build-process.",
+  "description": "web interface for \"iot-monolith\".",
   "repository": {
     "type": "git",
     "url": "https://git.i.wurstsalat.cloud/iot/iot-webinterface.git"
@@ -14,10 +14,11 @@
   "types": "dist/main.d.ts",
   "files": [
     "dist/**/*",
-    "Dockerfile"
+    "Dockerfile",
+    "nginx_template.conf"
   ],
   "dependencies": {
-    "@iot/iot-monolith": "jsx-without-jsx",
+    "@iot/iot-monolith": "pre-jsx-without-jsx",
     "@preact/signals": "latest",
     "comlink": "latest",
     "goober": "latest",
