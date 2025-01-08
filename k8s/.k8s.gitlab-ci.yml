@@ -58,4 +58,4 @@ comment deploy info:
     - npm ci --audit=false --fund=false
     - |
       export IOT_MONOLITH_VERSION="$(npm --silent pkg get "dependencies.@iot/iot-monolith" | sed -nr 's/^"(.+)"$/\1/p')"
-      k8s/comment-deploy-info.js
+      k8s/post-deploy-info.js

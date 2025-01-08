@@ -47,15 +47,15 @@ import {
     const [body, headline] = getProcessedBody(`
       ## Prerelease Deployed on k8s
 
-      Release based on [tag "${version}"](${projectUrl}/-/tags/${version}) has been [deployed to k8s namespace "${namespace}"](https://rancher.lan.wurstsalat.cloud/dashboard/c/local/explorer/apps.deployment/${namespace}/iot-webinterface).
+      Release based on [tag "${version}"](${projectUrl}/-/tags/${version}) has been deployed to [namespace "${namespace}"](https://rancher.lan.wurstsalat.cloud/dashboard/c/local/explorer/apps.deployment/${namespace}/iot-webinterface).
 
       [visit live deployment](https://${namespace}.rancher.lan.wurstsalat.cloud)
 
       ### API-Info
 
-      This prerelease is set up to proxy \`/api\` to \`iot-monolith@${iotMonolithVersion}\` deployment in k8s namespace "${iotMonolithNamespace}"](https://rancher.lan.wurstsalat.cloud/dashboard/c/local/explorer/apps.deployment/${iotMonolithNamespace}/iot-monolith).
+      This prerelease is set up to proxy \`/api\` to \`iot-monolith@${iotMonolithVersion}\` deployment in k8s [namespace "${iotMonolithNamespace}"](https://rancher.lan.wurstsalat.cloud/dashboard/c/local/explorer/apps.deployment/${iotMonolithNamespace}/iot-monolith).
 
-      [visit \`/api\`](http://${iotMonolithNamespace}.rancher.lan.wurstsalat.cloud/api)
+      [visit \`/api\`](https://${iotMonolithNamespace}.rancher.lan.wurstsalat.cloud/api)
     `);
 
     const [projectMergeRequests, pipelineUsername] = await Promise.all([
