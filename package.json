@@ -30,6 +30,7 @@
     "workbox-window": "latest"
   },
   "devDependencies": {
+    "@mrpelz/boilerplate-common": "latest",
     "@mrpelz/boilerplate-preact": "latest",
     "@types/glob": "latest",
     "favicons-webpack-plugin": "latest",
