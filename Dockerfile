@@ -13,7 +13,7 @@ export PACKAGE_BUNDLE="$(npm pack --silent "${PACKAGE_SPEC}")" && \
 \
 tar --strip-components=1 -xf "${PACKAGE_BUNDLE}" "package/" && \
 export IOT_MONOLITH_VERSION="$(npm --silent pkg get "dependencies.@iot/iot-monolith" | sed -nr 's/^"(.+)"$/\1/p')" && \
-sed -e "s#{IOT_MONOLITH_HOSTNAME}#iot-monolith.iot-iot-monolith-${IOT_MONOLITH_VERSION}.svc.cluster.local#g" "nginx_template.conf" >"nginx.conf" && \
+sed -e "s#{IOT_MONOLITH_HOSTNAME}#iot-monolith-http.iot-iot-monolith-${IOT_MONOLITH_VERSION}.svc.cluster.local#g" "nginx_template.conf" >"nginx.conf" && \
 rm "${PACKAGE_BUNDLE}"
 
 FROM nginx:stable
