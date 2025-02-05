@@ -1,4 +1,5 @@
 import { styled } from 'goober';
+import { JSX } from 'preact/jsx-runtime';
 
 import { dimensions } from '../../style.js';
 
@@ -42,7 +43,11 @@ export const Property = styled('div')`
   }
 `;
 
-export const Key = styled<{ isIndex?: boolean }>('span')`
+export const Key = styled<{
+  isIndex?: boolean;
+  onCopy?: JSX.ClipboardEventHandler<HTMLSpanElement>;
+  title?: string;
+}>('span')`
   color: var(
     ${({ isIndex = false }) =>
       isIndex ? '--foreground-index' : '--foreground-key'}

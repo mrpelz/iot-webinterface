@@ -44,10 +44,10 @@ try {
     console.log({ rooms: rooms.map((room) => room.$) });
 
     // @ts-ignore
-    const [diningRoom] = api.match({ $: 'diningRoom' as const });
+    const [office] = api.match({ $: 'office' as const });
 
     // eslint-disable-next-line no-console
-    console.log(diningRoom?.devices.ceilingLight.button);
+    console.log(office?.devices.ceilingLight.button);
 
     const $emitter = api.$typedEmitter(match?.main);
     // eslint-disable-next-line no-console

@@ -7,7 +7,6 @@ import { useMemo } from 'preact/hooks';
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import {
   arrayRenderer,
-  objectRenderer,
   primitiveRenderer,
 } from '../../components/json-viewer/basic-renderers.js';
 import {
@@ -17,6 +16,7 @@ import {
   idRenderer,
   interactionTypeRenderer,
   levelRenderer,
+  objectRenderer,
   setterRenderer,
   speciesRenderer,
   triggerRenderer,

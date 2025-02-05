@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { isPlainObject } from '@iot/iot-monolith/oop';
+import { ensureKeys, isPlainObject, objectKeys } from '@iot/iot-monolith/oop';
 import { Level, Match, ValueType } from '@iot/iot-monolith/tree';
 import {
   InteractionReference,
@@ -10,13 +10,13 @@ import {
   valueTypeDescription,
 } from '@iot/iot-monolith/tree-serialization';
 import { computed } from '@preact/signals';
+import { ComponentChild } from 'preact';
 import { useContext, useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../../common/types.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { useFirstTruthy } from '../../hooks/use-first-truthy.js';
 import { useTypedCollector, useTypedEmitter } from '../../state/api.js';
-import { ensureKeys } from '../../util/oop.js';
 import { Details, Inset, useIsOpen } from '../details.js';
 import {
   useGetObjectChildren,
@@ -31,11 +31,32 @@ import {
 } from './components.js';
 import {
   JSONViewerContext,
+  JSONViewerInner,
   Key,
   makeExpandingRenderer,
   makeRenderer,
   Renderer,
 } from './main.js';
+
+export const objectRenderer = makeExpandingRenderer<object>(
+  (_path, input) => isPlainObject(input),
+  'element',
+  (path: PropertyKey[], value?: object): ComponentChild[] =>
+    useMemo(
+      () =>
+        value
+          ? objectKeys(value).map((childKey) => (
+              <JSONViewerInner
+                path={[path, childKey].flat()}
+                value={value[childKey]}
+              />
+            ))
+          : [],
+      [path, value],
+    ),
+  '{',
+  '}',
+);
 
 export const idRenderer = makeRenderer<string>(
   (path, input): input is string =>
@@ -191,7 +212,7 @@ export const getterRenderer: Renderer<Match<{ $: 'getter' }, TSerialization>> =
       const annotation = useMemo(
         () => (
           <Annotation
-            content={`${children.length} item${children.length > 1 ? 's' : ''}`}
+            content={`${children.length} item${children.length === 1 ? '' : 's'}`}
           />
         ),
         [children.length],
@@ -333,7 +354,7 @@ export const setterRenderer: Renderer<Match<{ $: 'setter' }, TSerialization>> =
       const annotation = useMemo(
         () => (
           <Annotation
-            content={`${children.length} item${children.length > 1 ? 's' : ''}`}
+            content={`${children.length} item${children.length === 1 ? '' : 's'}`}
           />
         ),
         [children.length],

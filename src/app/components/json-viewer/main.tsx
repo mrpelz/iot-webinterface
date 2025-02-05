@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { isObject } from '@iot/iot-monolith/oop';
-import { ComponentChild, createContext, FunctionComponent } from 'preact';
-import { useContext, useMemo } from 'preact/hooks';
+import { ComponentChild, createContext, FunctionComponent, JSX } from 'preact';
+import { useCallback, useContext, useEffect, useMemo } from 'preact/hooks';
 
 import { useArray } from '../../hooks/use-array-compare.js';
-import { useFirstTruthy } from '../../hooks/use-first-truthy.js';
 import { Details, Inset, useIsOpen } from '../details.js';
 import {
   arrayRenderer,
@@ -58,10 +57,24 @@ export const Key: FunctionComponent<{
   const isOpen = useIsOpen();
 
   const key = path.at(-1);
+  const path_ = useMemo(() => path.join('.'), [path]);
+
+  const onCopy = useCallback<JSX.ClipboardEventHandler<HTMLSpanElement>>(
+    (event) => {
+      event.clipboardData?.setData('text/plain', path_);
+      event.preventDefault();
+    },
+    [path_],
+  );
+
   if (key === undefined) return <KeyComponent>{rootLabel}</KeyComponent>;
 
   const keyNode = (
-    <KeyComponent isIndex={typeof key === 'number'}>
+    <KeyComponent
+      isIndex={typeof key === 'number'}
+      onCopy={onCopy}
+      title={path_}
+    >
       {key.toString()}:
     </KeyComponent>
   );
@@ -80,10 +93,21 @@ export const JSONViewerInner: FunctionComponent<JSONViewerInnerProps> = ({
 }) => {
   const { circularCache, renderers } = useContext(JSONViewerContext);
 
-  if (isObject(value)) {
-    if (circularCache.has(value)) return null;
+  useEffect(() => {
+    if (!isObject(value) || circularCache.has(value)) {
+      return () => {
+        /* noop */
+      };
+    }
+
     circularCache.add(value);
-  }
+
+    return () => {
+      circularCache.delete(value);
+    };
+  }, [circularCache, value]);
+
+  if (isObject(value) && circularCache.has(value)) return null;
 
   for (const renderer of renderers) {
     if (!renderer.is(path, value)) continue;
@@ -139,12 +163,14 @@ export const makeExpandingRenderer = <T,>(
   suffix: string,
 ): Renderer<T> => ({
   RenderValue: ({ path, value }) => {
-    const path_ = useArray(path);
-
     const { autoExpandLevel } = useContext(JSONViewerContext);
+
+    const path_ = useArray(path);
 
     const isOpen = path_.length <= autoExpandLevel;
     const isParentOpen = useIsOpen() ?? isOpen;
+
+    const value_ = isParentOpen ? value : undefined;
 
     const key = useMemo(
       () => (
@@ -155,15 +181,12 @@ export const makeExpandingRenderer = <T,>(
       [path_],
     );
 
-    const children = useGetChildren(
-      path_,
-      useFirstTruthy(isParentOpen) ? value : undefined,
-    );
+    const children = useGetChildren(path_, value_);
 
     const annotation = useMemo(
       () => (
         <Annotation
-          content={`${children.length} item${children.length > 1 ? 's' : ''}`}
+          content={`${children.length} item${children.length === 1 ? '' : 's'}`}
         />
       ),
       [children.length],

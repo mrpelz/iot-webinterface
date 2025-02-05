@@ -35,23 +35,27 @@ export type LevelObject = {
 };
 
 class Keys {
-  private readonly _keys = new WeakMap<object, string>();
-  constructor(object: object) {
+  private readonly _keys = new WeakMap<Record<string, unknown>, string[]>();
+  constructor(object: Record<string, unknown>) {
     this._addChildren(object);
   }
 
-  private _addChildren(object: object) {
+  private _addChildren(object: Record<string, unknown>) {
     for (const key of objectKeys(object)) {
-      const child = object[key];
+      const child = object[key] as Record<string, unknown>;
 
       if (!isPlainObject(child)) continue;
-      this._keys.set(child, key);
+
+      const existingKeys = this.getKey(child);
+      existingKeys.push(key);
+
+      this._keys.set(child, existingKeys);
       this._addChildren(child);
     }
   }
 
-  getKey(object: object): string | undefined {
-    return this._keys.get(object);
+  getKey(object: Record<string, unknown>): string[] {
+    return this._keys.get(object) ?? [];
   }
 }
 

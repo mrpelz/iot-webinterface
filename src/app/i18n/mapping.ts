@@ -1,6 +1,6 @@
 export const roomSorting = [
   'livingRoom',
-  'diningRoom',
+  'office',
   'kitchen',
   'mrpelzBedroom',
   'mrpelzBathroom',
@@ -8,6 +8,7 @@ export const roomSorting = [
   'tsiaBathroom',
   'storageRoom',
   'hallway',
+  'testRoom',
 ] as const;
 
 export const actuated = ['lighting'] as const;

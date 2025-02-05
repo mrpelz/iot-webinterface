@@ -40,13 +40,16 @@ export const useEmitter = <
   );
 
 export const useIsInit = (): boolean =>
-  usePromise(() => api.isInit.then(() => true)) ?? false;
+  usePromise(
+    api.isInit.then(() => true),
+    false,
+  );
 
-export const useKey = (object: object): string | undefined => {
+export const useKey = (object: Record<string, unknown>): string[] => {
   const isInit = useIsInit();
 
   return useMemo(
-    () => (isInit ? api.keys?.getKey(object) : undefined),
+    () => (isInit ? (api.keys?.getKey(object) ?? ['no key']) : ['not init']),
     [isInit, object],
   );
 };

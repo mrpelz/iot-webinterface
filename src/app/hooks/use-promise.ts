@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
-export const usePromise = <T>(input: () => Promise<T>): T | undefined => {
-  const [state, setState] = useState<T | undefined>(undefined);
+export const usePromise = <T, F = undefined>(
+  input: Promise<T> | T,
+  fallback = undefined as F,
+): T | F => {
+  const [state, setState] = useState<T | F>(() => fallback);
 
   useEffect(() => {
     (async () => {
-      setState(await input());
+      setState(await input);
     })();
-  }, [input]);
+  }, [input, setState]);
 
   return state;
 };
