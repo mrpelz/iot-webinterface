@@ -21,13 +21,17 @@ import {
       CI_COMMIT_TAG_MESSAGE: tagMessage,
       CI_COMMIT_TAG: version,
       CI_PROJECT_URL: projectUrl,
+      DOMAIN: domain,
       IOT_MONOLITH_VERSION: iotMonolithVersion,
       NAMESPACE: namespace,
+      RANCHER_CLUSTER: rancherCluster,
     } = process.env;
     if (
+      !domain ||
       !namespace ||
       !iotMonolithVersion ||
       !projectUrl ||
+      !rancherCluster ||
       !tagMessage ||
       !version
     ) {
@@ -38,24 +42,26 @@ import {
       CI_COMMIT_TAG: version,
       CI_COMMIT_TAG_MESSAGE: tagMessage,
       CI_PROJECT_URL: projectUrl,
+      DOMAIN: domain,
       IOT_MONOLITH_VERSION: iotMonolithVersion,
       NAMESPACE: namespace,
+      RANCHER_CLUSTER: rancherCluster,
     });
 
     const iotMonolithNamespace = `iot-iot-monolith-${iotMonolithVersion}`;
 
     const [body, headline] = getProcessedBody(`
-      ## Prerelease Deployed on k8s
+      ## Prerelease Deployed on k8s / \`${rancherCluster}\`
 
-      Release based on [tag "${version}"](${projectUrl}/-/tags/${version}) has been deployed to [namespace "${namespace}"](https://rancher.lan.wurstsalat.cloud/dashboard/c/local/explorer/apps.deployment/${namespace}/iot-webinterface).
+      Release based on [tag "${version}"](${projectUrl}/-/tags/${version}) has been deployed to [namespace "${namespace}" on cluster \`${rancherCluster}\`](https://rancher.lan.wurstsalat.cloud/dashboard/c/${rancherCluster}/explorer/apps.deployment/${namespace}/iot-webinterface).
 
-      [visit live deployment](https://${namespace}.rancher.lan.wurstsalat.cloud)
+      [visit live deployment](https://${namespace}.${domain})
 
       ### API-Info
 
-      This prerelease is set up to proxy \`/api\` to \`iot-monolith@${iotMonolithVersion}\` deployment in k8s [namespace "${iotMonolithNamespace}"](https://rancher.lan.wurstsalat.cloud/dashboard/c/local/explorer/apps.deployment/${iotMonolithNamespace}/iot-monolith).
+      This prerelease is set up to proxy \`/api\` to \`iot-monolith@${iotMonolithVersion}\` deployment in k8s [namespace "${iotMonolithNamespace}" on cluster \`${rancherCluster}\`](https://rancher.lan.wurstsalat.cloud/dashboard/c/${rancherCluster}/explorer/apps.deployment/${iotMonolithNamespace}/iot-monolith).
 
-      [visit \`/api\`](https://${iotMonolithNamespace}.rancher.lan.wurstsalat.cloud/api)
+      [visit \`/api\`](https://${iotMonolithNamespace}.${domain}/api)
     `);
 
     const [projectMergeRequests, pipelineUsername] = await Promise.all([
