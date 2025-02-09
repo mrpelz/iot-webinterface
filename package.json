@@ -18,7 +18,7 @@
     "nginx_template.conf"
   ],
   "dependencies": {
-    "@iot/iot-monolith": "pre-jsx-without-jsx",
+    "@iot/iot-monolith": "latest",
     "@preact/signals": "latest",
     "comlink": "latest",
     "goober": "latest",
