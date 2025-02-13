@@ -18,9 +18,9 @@ import {
 import { merge } from 'ts-deepmerge';
 import { InjectManifest } from 'workbox-webpack-plugin';
 
-const API_PROXY = 'http://localhost:1337';
-// const API_PROXY =
-//   'https://iot-iot-monolith-latest.rancher-iot.lan.wurstsalat.cloud';
+// const API_PROXY = 'http://localhost:1337';
+const API_PROXY =
+  'https://iot-iot-monolith-latest.rancher-iot.lan.wurstsalat.cloud';
 
 // @ts-ignore
 /** @type {import('@mrpelz/boilerplate-dom/webpack.config.js').ConfigurationExtended} */
@@ -34,11 +34,13 @@ const configDownstream = {
     liveReload: false,
     proxy: [
       {
+        changeOrigin: true,
         context: ['/api/stream'],
         target: API_PROXY,
         ws: true,
       },
       {
+        changeOrigin: true,
         context: ['/api'],
         target: API_PROXY,
       },
