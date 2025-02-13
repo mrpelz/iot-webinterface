@@ -15,7 +15,8 @@
   "files": [
     "dist/**/*",
     "Dockerfile",
-    "nginx_template.conf"
+    "nginx_template.conf",
+    "dist/**/*.{js,map,ts}"
   ],
   "dependencies": {
     "@iot/iot-monolith": "latest",
