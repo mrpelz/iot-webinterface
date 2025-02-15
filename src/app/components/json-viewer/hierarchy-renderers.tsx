@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { ensureKeys, isPlainObject, objectKeys } from '@iot/iot-monolith/oop';
-import { Level, Match, ValueType } from '@iot/iot-monolith/tree';
+import { ensureKeys, isPlainObject } from '@iot/iot-monolith/oop';
+import { Level, Match, TExclude, ValueType } from '@iot/iot-monolith/tree';
 import {
   InteractionReference,
   InteractionType,
@@ -10,7 +10,6 @@ import {
   valueTypeDescription,
 } from '@iot/iot-monolith/tree-serialization';
 import { computed } from '@preact/signals';
-import { ComponentChild } from 'preact';
 import { useContext, useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../../common/types.js';
@@ -31,32 +30,11 @@ import {
 } from './components.js';
 import {
   JSONViewerContext,
-  JSONViewerInner,
   Key,
   makeExpandingRenderer,
   makeRenderer,
   Renderer,
 } from './main.js';
-
-export const objectRenderer = makeExpandingRenderer<object>(
-  (_path, input) => isPlainObject(input),
-  'element',
-  (path: PropertyKey[], value?: object): ComponentChild[] =>
-    useMemo(
-      () =>
-        value
-          ? objectKeys(value).map((childKey) => (
-              <JSONViewerInner
-                path={[path, childKey].flat()}
-                value={value[childKey]}
-              />
-            ))
-          : [],
-      [path, value],
-    ),
-  '{',
-  '}',
-);
 
 export const idRenderer = makeRenderer<string>(
   (path, input): input is string =>
@@ -163,261 +141,269 @@ export const emitInteractionReferenceRenderer = makeExpandingRenderer<
   '}',
 );
 
-// @ts-ignore
-export const getterRenderer: Renderer<Match<{ $: 'getter' }, TSerialization>> =
-  {
-    RenderValue: ({ path, value }) => {
-      // @ts-ignore
-      const path_ = useArray(path);
-
-      const { autoExpandLevel } = useContext(JSONViewerContext);
-      // @ts-ignore
-      const isOpen = path_.length < autoExpandLevel;
-      const isParentOpen = useFirstTruthy(useIsOpen() ?? isOpen);
-
-      // @ts-ignore
-      const { unit, valueType } = value;
-      const isDate = unit === 'date';
-
-      const emitter = useTypedEmitter(isParentOpen ? value : undefined);
-      const liveValue = computed(() => {
-        if (isDate && typeof emitter.value === 'number') {
-          return new Date(emitter.value).toUTCString();
-        }
-
-        return JSON.stringify(emitter.value);
-      });
-
-      const type = useMemo(() => valueTypeDescription[valueType], [valueType]);
-
-      const key = useMemo(
-        () => (
-          <>
-            <Key path={path_} />{' '}
-            <TypeAnnotation content={`getter (${isDate ? 'date' : type})`} />
-            <PrimitiveValue type={type}>{liveValue}</PrimitiveValue>
-            <br />
-            <TypeAnnotation content="object" />
-          </>
-        ),
-        [isDate, liveValue, path_, type],
-      );
-
-      // @ts-ignore
-      const children = useGetObjectChildren(
-        path_,
-        isParentOpen ? value : undefined,
-      );
-
-      const annotation = useMemo(
-        () => (
-          <Annotation
-            content={`${children.length} item${children.length === 1 ? '' : 's'}`}
-          />
-        ),
-        [children.length],
-      );
-
-      return (
-        <Details
-          open={isOpen}
-          collapsible={!isOpen}
-          showExpandIcon={false}
-          summary={
-            <>
-              {key}
-              {'{'}
-              {annotation}
-              {'},'}
-            </>
-          }
-          summaryExpanded={
-            <>
-              {key}
-              {'{'}
-              {annotation}
-            </>
-          }
-        >
-          <Inset inset={INSET_CH}>{children}</Inset>
-          {'},'}
-        </Details>
-      );
-    },
+export const getterRenderer: Renderer<
+  // @ts-ignore
+  Match<{ $: 'getter' }, TExclude, TSerialization>
+> = {
+  RenderValue: ({ path, value }) => {
     // @ts-ignore
-    is: (_path, input): input is Match<{ $: 'getter' }, TSerialization> => {
-      if (!isPlainObject(input)) return false;
-      const { $, state, level, valueType } = ensureKeys(
-        // @ts-ignore
-        input as Record<PropertyKey, unknown>,
-        '$',
-        'state',
-        'level',
-        'valueType',
-      );
+    const path_ = useArray(path);
 
-      if (
-        $ !== 'getter' ||
-        !state ||
-        level !== Level.ELEMENT ||
-        valueType === undefined
-      ) {
-        return false;
+    const { autoExpandLevel } = useContext(JSONViewerContext);
+    // @ts-ignore
+    const isOpen = path_.length < autoExpandLevel;
+    const isParentOpen = useFirstTruthy(useIsOpen() ?? isOpen);
+
+    // @ts-ignore
+    const { unit, valueType } = value;
+    const isDate = unit === 'date';
+
+    const emitter = useTypedEmitter(isParentOpen ? value : undefined);
+    const liveValue = computed(() => {
+      if (isDate && typeof emitter.value === 'number') {
+        return new Date(emitter.value).toUTCString();
       }
 
-      return isInteractionReference(state, InteractionType.EMIT);
-    },
-  };
+      return JSON.stringify(emitter.value);
+    });
+
+    const type = useMemo(() => valueTypeDescription[valueType], [valueType]);
+
+    const key = useMemo(
+      () => (
+        <>
+          <Key path={path_} />{' '}
+          <TypeAnnotation content={`getter (${isDate ? 'date' : type})`} />
+          <PrimitiveValue type={type}>{liveValue}</PrimitiveValue>
+          <br />
+          <TypeAnnotation content="object" />
+        </>
+      ),
+      [isDate, liveValue, path_, type],
+    );
+
+    // @ts-ignore
+    const children = useGetObjectChildren(
+      path_,
+      isParentOpen ? value : undefined,
+    );
+
+    const annotation = useMemo(
+      () => (
+        <Annotation
+          content={`${children.length} item${children.length === 1 ? '' : 's'}`}
+        />
+      ),
+      [children.length],
+    );
+
+    return (
+      <Details
+        open={isOpen}
+        collapsible={!isOpen}
+        showExpandIcon={false}
+        summary={
+          <>
+            {key}
+            {'{'}
+            {annotation}
+            {'},'}
+          </>
+        }
+        summaryExpanded={
+          <>
+            {key}
+            {'{'}
+            {annotation}
+          </>
+        }
+      >
+        <Inset inset={INSET_CH}>{children}</Inset>
+        {'},'}
+      </Details>
+    );
+  },
+  // @ts-ignore
+  is: (
+    _path,
+    input,
+  ): input is Match<{ $: 'getter' }, TExclude, TSerialization> => {
+    if (!isPlainObject(input)) return false;
+    const { $, state, level, valueType } = ensureKeys(
+      // @ts-ignore
+      input as Record<PropertyKey, unknown>,
+      '$',
+      'state',
+      'level',
+      'valueType',
+    );
+
+    if (
+      $ !== 'getter' ||
+      !state ||
+      level !== Level.ELEMENT ||
+      valueType === undefined
+    ) {
+      return false;
+    }
+
+    return isInteractionReference(state, InteractionType.EMIT);
+  },
+};
 
 // @ts-ignore
-export const setterRenderer: Renderer<Match<{ $: 'setter' }, TSerialization>> =
-  {
+export const setterRenderer: Renderer<
+  Match<{ $: 'setter' }, TExclude, TSerialization>
+> = {
+  // @ts-ignore
+  RenderValue: ({ path, value }) => {
     // @ts-ignore
-    RenderValue: ({ path, value }) => {
-      // @ts-ignore
-      const path_ = useArray(path);
+    const path_ = useArray(path);
 
-      const { autoExpandLevel } = useContext(JSONViewerContext);
-      // @ts-ignore
-      const isOpen = path_.length < autoExpandLevel;
-      const isParentOpen = useFirstTruthy(useIsOpen() ?? isOpen);
+    const { autoExpandLevel } = useContext(JSONViewerContext);
+    // @ts-ignore
+    const isOpen = path_.length < autoExpandLevel;
+    const isParentOpen = useFirstTruthy(useIsOpen() ?? isOpen);
 
-      // @ts-ignore
-      const { valueType } = value;
-      const type = useMemo(() => valueTypeDescription[valueType], [valueType]);
+    // @ts-ignore
+    const { valueType } = value;
+    const type = useMemo(() => valueTypeDescription[valueType], [valueType]);
 
-      const emitter = useTypedEmitter(isParentOpen ? value : undefined);
-      const liveValue = computed(() => JSON.stringify(emitter.value));
+    const emitter = useTypedEmitter(isParentOpen ? value : undefined);
+    const liveValue = computed(() => JSON.stringify(emitter.value));
 
-      // @ts-ignore
-      const collector = useTypedCollector(value);
+    // @ts-ignore
+    const collector = useTypedCollector(value);
 
-      const input = useMemo(() => {
-        if (valueType === ValueType.BOOLEAN) {
-          return (
-            <input
-              type="checkbox"
-              indeterminate={computed(() => emitter.value === null)}
-              checked={computed(
-                () => (emitter.value as boolean | undefined) ?? false,
-              )}
-              onChange={(event) => {
-                event.preventDefault();
-                collector(event.currentTarget.checked);
-              }}
-            />
-          );
-        }
-
-        if (valueType === ValueType.NUMBER) {
-          return (
-            <input
-              type="text"
-              inputMode="decimal"
-              value={computed(() => emitter.value as number | undefined)}
-              onKeyDown={(event) => {
-                if (!['Enter', 'NumpadEnter'].includes(event.code)) return;
-
-                event.preventDefault();
-                if (event.currentTarget.value.length === 0) return;
-
-                collector(Number.parseFloat(event.currentTarget.value) ?? 0);
-              }}
-            />
-          );
-        }
-
-        return null;
-      }, [collector, emitter.value, valueType]);
-
-      const key = useMemo(
-        () => (
-          <>
-            <Key path={path_} /> <TypeAnnotation content={`setter (${type})`} />
-            <Annotation content="set:" />
-            {input}
-            <Annotation content="actual:" />
-            <PrimitiveValue type={type}>{liveValue}</PrimitiveValue>
-            <br />
-            <TypeAnnotation content="object" />
-          </>
-        ),
-        [input, liveValue, path_, type],
-      );
-
-      // @ts-ignore
-      const children = useGetObjectChildren(
-        path_,
-        isParentOpen ? value : undefined,
-      );
-
-      const annotation = useMemo(
-        () => (
-          <Annotation
-            content={`${children.length} item${children.length === 1 ? '' : 's'}`}
+    const input = useMemo(() => {
+      if (valueType === ValueType.BOOLEAN) {
+        return (
+          <input
+            type="checkbox"
+            indeterminate={computed(() => emitter.value === null)}
+            checked={computed(
+              () => (emitter.value as boolean | undefined) ?? false,
+            )}
+            onChange={(event) => {
+              event.preventDefault();
+              collector(event.currentTarget.checked);
+            }}
           />
-        ),
-        [children.length],
-      );
-
-      return (
-        <Details
-          open={isOpen}
-          collapsible={!isOpen}
-          showExpandIcon={false}
-          summary={
-            <>
-              {key}
-              {'{'}
-              {annotation}
-              {'},'}
-            </>
-          }
-          summaryExpanded={
-            <>
-              {key}
-              {'{'}
-              {annotation}
-            </>
-          }
-        >
-          <Inset inset={INSET_CH}>{children}</Inset>
-          {'},'}
-        </Details>
-      );
-    },
-    // @ts-ignore
-    is: (_path, input): input is Match<{ $: 'setter' }, TSerialization> => {
-      if (!isPlainObject(input)) return false;
-      const { $, setState, state, level, valueType } = ensureKeys(
-        input as Record<PropertyKey, unknown>,
-        '$',
-        'level',
-        'setState',
-        'state',
-        'valueType',
-      );
-
-      if (
-        $ !== 'setter' ||
-        !setState ||
-        !state ||
-        level !== Level.ELEMENT ||
-        valueType === undefined
-      ) {
-        return false;
+        );
       }
 
-      return (
-        isInteractionReference(state, InteractionType.EMIT) &&
-        isInteractionReference(setState, InteractionType.COLLECT)
-      );
-    },
-  };
+      if (valueType === ValueType.NUMBER) {
+        return (
+          <input
+            type="text"
+            inputMode="decimal"
+            value={computed(() => emitter.value as number | undefined)}
+            onKeyDown={(event) => {
+              if (!['Enter', 'NumpadEnter'].includes(event.code)) return;
+
+              event.preventDefault();
+              if (event.currentTarget.value.length === 0) return;
+
+              collector(Number.parseFloat(event.currentTarget.value) ?? 0);
+            }}
+          />
+        );
+      }
+
+      return null;
+    }, [collector, emitter.value, valueType]);
+
+    const key = useMemo(
+      () => (
+        <>
+          <Key path={path_} /> <TypeAnnotation content={`setter (${type})`} />
+          <Annotation content="set:" />
+          {input}
+          <Annotation content="actual:" />
+          <PrimitiveValue type={type}>{liveValue}</PrimitiveValue>
+          <br />
+          <TypeAnnotation content="object" />
+        </>
+      ),
+      [input, liveValue, path_, type],
+    );
+
+    // @ts-ignore
+    const children = useGetObjectChildren(
+      path_,
+      isParentOpen ? value : undefined,
+    );
+
+    const annotation = useMemo(
+      () => (
+        <Annotation
+          content={`${children.length} item${children.length === 1 ? '' : 's'}`}
+        />
+      ),
+      [children.length],
+    );
+
+    return (
+      <Details
+        open={isOpen}
+        collapsible={!isOpen}
+        showExpandIcon={false}
+        summary={
+          <>
+            {key}
+            {'{'}
+            {annotation}
+            {'},'}
+          </>
+        }
+        summaryExpanded={
+          <>
+            {key}
+            {'{'}
+            {annotation}
+          </>
+        }
+      >
+        <Inset inset={INSET_CH}>{children}</Inset>
+        {'},'}
+      </Details>
+    );
+  },
+  // @ts-ignore
+  is: (
+    _path,
+    input,
+  ): input is Match<{ $: 'setter' }, TExclude, TSerialization> => {
+    if (!isPlainObject(input)) return false;
+    const { $, setState, state, level, valueType } = ensureKeys(
+      input as Record<PropertyKey, unknown>,
+      '$',
+      'level',
+      'setState',
+      'state',
+      'valueType',
+    );
+
+    if (
+      $ !== 'setter' ||
+      !setState ||
+      !state ||
+      level !== Level.ELEMENT ||
+      valueType === undefined
+    ) {
+      return false;
+    }
+
+    return (
+      isInteractionReference(state, InteractionType.EMIT) &&
+      isInteractionReference(setState, InteractionType.COLLECT)
+    );
+  },
+};
 
 export const triggerRenderer: Renderer<
   // @ts-ignore
-  Match<{ $: 'trigger' }, TSerialization>
+  Match<{ $: 'trigger' }, TExclude, TSerialization>
 > = {
   RenderValue: ({ path, value }) => {
     // @ts-ignore
@@ -501,7 +487,10 @@ export const triggerRenderer: Renderer<
     );
   },
   // @ts-ignore
-  is: (_path, input): input is Match<{ $: 'trigger' }, TSerialization> => {
+  is: (
+    _path,
+    input,
+  ): input is Match<{ $: 'trigger' }, TExclude, TSerialization> => {
     if (!isPlainObject(input)) return false;
     const { $, setState, level, valueType } = ensureKeys(
       input as Record<PropertyKey, unknown>,

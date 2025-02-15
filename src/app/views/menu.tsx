@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Level, levelObjectMatch } from '@iot/iot-monolith/tree';
+import {
+  excludePattern,
+  Level,
+  levelObjectMatch,
+} from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
 import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 
@@ -59,6 +63,7 @@ const DoorState: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
   room,
 }) => {
   const fontColor = colors.fontPrimary()();
+  // @ts-ignore
   const door = 'door' in room ? room.door.open.main : undefined;
   const open = useTypedEmitter(door);
 
@@ -111,7 +116,11 @@ export const Floor: FunctionComponent<{
   const goRoot = useGoRoot();
 
   // @ts-ignore
-  const elements = useMatch(levelObjectMatch[Level.ROOM], floor);
+  const elements = useMatch(
+    levelObjectMatch[Level.ROOM],
+    excludePattern,
+    floor,
+  );
   const sortedElements = useArray(
     useMemo(() => sortBy(elements, '$', roomSorting).all, [elements]),
   );

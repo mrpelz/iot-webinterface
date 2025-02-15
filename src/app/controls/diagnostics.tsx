@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { isObject, isPlainObject } from '@iot/iot-monolith/oop';
-import { Level, Match, ValueType } from '@iot/iot-monolith/tree';
+import {
+  excludePattern,
+  Level,
+  Match,
+  TExclude,
+  ValueType,
+} from '@iot/iot-monolith/tree';
 import {
   levelDescription,
   valueTypeDescription,
@@ -42,7 +48,7 @@ export const Details: FunctionComponent<{
 
 export const Properties: FunctionComponent<{
   // @ts-ignore
-  object: Match<object, TSerialization>;
+  object: Match<object, TExclude, TSerialization>;
 }> = ({ object }) => {
   // const $ = useMemo(
   //   () => JSON.stringify('$' in object ? object.$ : undefined),
@@ -84,9 +90,14 @@ export const Properties: FunctionComponent<{
 };
 
 const Emitter: FunctionComponent<{
-  object: Match<object, TSerialization>;
+  object: Match<object, TExclude, TSerialization>;
 }> = ({ object }) => {
-  const [object_] = useMatch({ $: 'getter' as const }, object, 0);
+  const [object_] = useMatch(
+    { $: 'getter' as const },
+    excludePattern,
+    object,
+    0,
+  );
 
   const state = useEmitter(object_?.state);
 
@@ -105,10 +116,15 @@ const Emitter: FunctionComponent<{
 };
 
 const Collector: FunctionComponent<{
-  object: Match<object, TSerialization>;
+  object: Match<object, TExclude, TSerialization>;
 }> = ({ object }) => {
   // @ts-ignore
-  const object_ = useMatch({ $: 'setter' as const }, object, 0).at(0);
+  const object_ = useMatch(
+    { $: 'setter' as const },
+    excludePattern,
+    object,
+    0,
+  ).at(0);
 
   const valueTypeNamed = object_
     ? valueTypeDescription[object_.valueType]
@@ -183,7 +199,7 @@ const Collector: FunctionComponent<{
 
 const Child: FunctionComponent<{
   name: string;
-  object: Match<object, TSerialization>;
+  object: Match<object, TExclude, TSerialization>;
   open: boolean;
 }> = ({ name, object, open }) =>
   isPlainObject(object) ? (
@@ -205,7 +221,7 @@ const Child: FunctionComponent<{
   ) : null;
 
 export const Hierarchy: FunctionComponent<{
-  object: Match<object, TSerialization>;
+  object: Match<object, TExclude, TSerialization>;
 }> = ({ object }) => {
   const openChildList = useMemo(() => {
     if (!('level' in object)) return false;

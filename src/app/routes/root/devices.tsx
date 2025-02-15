@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Level, levelObjectMatch } from '@iot/iot-monolith/tree';
+import {
+  excludePattern,
+  Level,
+  levelObjectMatch,
+} from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
@@ -54,7 +58,7 @@ export const Devices: FunctionComponent = () => {
   // const [deviceId] = useSegment(1);
 
   // @ts-ignore
-  const rooms = useMatch(levelObjectMatch[Level.ROOM]);
+  const rooms = useMatch(levelObjectMatch[Level.ROOM], excludePattern);
   const roomsSorted = useArray(
     useMemo(() => sortBy(rooms, '$', roomsSorting).all, [rooms]),
   );

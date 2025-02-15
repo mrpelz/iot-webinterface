@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { isPlainObject, objectKeys, objectValues } from '@iot/iot-monolith/oop';
 import {
   DEFAULT_MATCH_DEPTH,
   Level,
   Match,
   match,
+  TExclude,
   TValueType,
   ValueType,
 } from '@iot/iot-monolith/tree';
@@ -22,68 +22,17 @@ const WEB_API_ONLINE = '562a3aa9-a10e-4347-aa3f-cec9e011a3dc';
 
 export type LevelObject = {
   // @ts-ignore
-  [Level.AREA]: Match<{ level: Level.AREA }, TSerialization>;
-  [Level.BUILDING]: Match<{ level: Level.BUILDING }, TSerialization>;
-  [Level.DEVICE]: Match<{ level: Level.DEVICE }, TSerialization>;
-  [Level.ELEMENT]: Match<{ level: Level.ELEMENT }, TSerialization>;
-  [Level.FLOOR]: Match<{ level: Level.FLOOR }, TSerialization>;
-  [Level.HOME]: Match<{ level: Level.HOME }, TSerialization>;
-  [Level.NONE]: Match<{ level: Level.NONE }, TSerialization>;
-  [Level.PROPERTY]: Match<{ level: Level.PROPERTY }, TSerialization>;
-  [Level.ROOM]: Match<{ level: Level.ROOM }, TSerialization>;
-  [Level.SYSTEM]: Match<{ level: Level.SYSTEM }, TSerialization>;
+  [Level.AREA]: Match<{ level: Level.AREA }, TExclude, TSerialization>;
+  [Level.BUILDING]: Match<{ level: Level.BUILDING }, TExclude, TSerialization>;
+  [Level.DEVICE]: Match<{ level: Level.DEVICE }, TExclude, TSerialization>;
+  [Level.ELEMENT]: Match<{ level: Level.ELEMENT }, TExclude, TSerialization>;
+  [Level.FLOOR]: Match<{ level: Level.FLOOR }, TExclude, TSerialization>;
+  [Level.HOME]: Match<{ level: Level.HOME }, TExclude, TSerialization>;
+  [Level.NONE]: Match<{ level: Level.NONE }, TExclude, TSerialization>;
+  [Level.PROPERTY]: Match<{ level: Level.PROPERTY }, TExclude, TSerialization>;
+  [Level.ROOM]: Match<{ level: Level.ROOM }, TExclude, TSerialization>;
+  [Level.SYSTEM]: Match<{ level: Level.SYSTEM }, TExclude, TSerialization>;
 };
-
-class Keys {
-  private readonly _keys = new WeakMap<Record<string, unknown>, string[]>();
-  constructor(object: Record<string, unknown>) {
-    this._addChildren(object);
-  }
-
-  private _addChildren(object: Record<string, unknown>) {
-    for (const key of objectKeys(object)) {
-      const child = object[key] as Record<string, unknown>;
-
-      if (!isPlainObject(child)) continue;
-
-      const existingKeys = this.getKey(child);
-      existingKeys.push(key);
-
-      this._keys.set(child, existingKeys);
-      this._addChildren(child);
-    }
-  }
-
-  getKey(object: Record<string, unknown>): string[] {
-    return this._keys.get(object) ?? [];
-  }
-}
-
-export class Parents {
-  private readonly _parents = new WeakMap<object, Set<object>>();
-  constructor(object: object) {
-    this._addChildren(object, undefined);
-  }
-
-  private _addChildren(object: object, parent?: object) {
-    let parents = this._parents.get(object);
-    if (parents) {
-      if (parent) parents.add(parent);
-    } else {
-      parents = new Set<object>(parent ? [parent] : undefined);
-      this._parents.set(object, parents);
-    }
-
-    for (const child of objectValues(object)) {
-      if (!isPlainObject(child)) continue;
-      this._addChildren(child, object);
-    }
-  }
-
-  getParents(object: object): Set<object> | undefined {
-    return this._parents.get(object);
-  }
-}
 
 export class Api {
   private static async _getBroadcastChannel<T>(
@@ -112,8 +61,6 @@ export class Api {
 
   private readonly _api: Remote<API_WORKER_API>;
   private _hierarchy?: TSerialization;
-  private _keys?: Keys;
-  private _parents?: Parents;
 
   readonly isInit: Promise<void>;
 
@@ -132,8 +79,7 @@ export class Api {
       await this._api.isInit;
       // @ts-ignore
       this._hierarchy = await this._api.hierarchy;
-      this._keys = new Keys(this._hierarchy);
-      this._parents = new Parents(this._hierarchy);
+      Object.freeze(this._hierarchy);
 
       // eslint-disable-next-line no-console
       console.log(this._hierarchy);
@@ -142,14 +88,6 @@ export class Api {
 
   get hierarchy(): TSerialization | undefined {
     return this._hierarchy;
-  }
-
-  get keys(): Keys | undefined {
-    return this._keys;
-  }
-
-  get parents(): Parents | undefined {
-    return this._parents;
   }
 
   $collector<T>(reference?: string): (value: T) => void {
@@ -230,14 +168,16 @@ export class Api {
 
   match<
     P extends object,
+    E,
     R extends object = TSerialization,
     D extends number = typeof DEFAULT_MATCH_DEPTH,
   >(
     pattern: P,
+    exclude: E,
     root = this.hierarchy as R,
     depth = DEFAULT_MATCH_DEPTH as D,
-  ): Match<P, R, D>[] {
-    return match(pattern, root, depth);
+  ): Match<P, E, R, D>[] {
+    return match(pattern, exclude, root, depth);
   }
 }
 
