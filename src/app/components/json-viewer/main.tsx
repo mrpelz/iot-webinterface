@@ -122,6 +122,23 @@ export const JSONViewerInner: FunctionComponent<JSONViewerInnerProps> = ({
   return null;
 };
 
+export const JSONViewerIndependentSubtree: FunctionComponent<
+  JSONViewerInnerProps
+> = (props) => {
+  const context = useContext(JSONViewerContext);
+
+  return (
+    <JSONViewerContext.Provider
+      value={{
+        ...context,
+        circularCache: new WeakSet(),
+      }}
+    >
+      <JSONViewerInner {...props} />
+    </JSONViewerContext.Provider>
+  );
+};
+
 export const makeRenderer = <T,>(
   is: Renderer<T>['is'],
   useTransformValue: (

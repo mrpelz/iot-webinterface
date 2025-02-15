@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
-import { Level, levelObjectMatch } from '@iot/iot-monolith/tree';
+import {
+  excludePattern,
+  Level,
+  levelObjectMatch,
+} from '@iot/iot-monolith/tree';
 import { clear } from 'idb-keyval';
 import { FunctionComponent, JSX } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
@@ -23,13 +27,13 @@ import { Entry, List } from '../../views/list.js';
 
 export const Settings: FunctionComponent = () => {
   // @ts-ignore
-  const homes = useMatch(levelObjectMatch[Level.HOME]);
+  const homes = useMatch(levelObjectMatch[Level.HOME], excludePattern);
   const [home, setHome] = useNavigationHome();
 
-  const buildings = useMatch(levelObjectMatch[Level.BUILDING]);
+  const buildings = useMatch(levelObjectMatch[Level.BUILDING], excludePattern);
   const [building, setBuilding] = useNavigationBuilding();
 
-  const rooms = useMatch(levelObjectMatch[Level.ROOM]);
+  const rooms = useMatch(levelObjectMatch[Level.ROOM], excludePattern);
   const roomNames = useArray(
     useMemo(() => rooms.map((room) => room.$), [rooms]),
   );

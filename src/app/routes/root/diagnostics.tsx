@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Level, levelObjectMatch } from '@iot/iot-monolith/tree';
+import {
+  excludePattern,
+  Level,
+  levelObjectMatch,
+} from '@iot/iot-monolith/tree';
 import { computed } from '@preact/signals';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
@@ -7,6 +11,7 @@ import { useMemo } from 'preact/hooks';
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import {
   arrayRenderer,
+  objectRenderer,
   primitiveRenderer,
 } from '../../components/json-viewer/basic-renderers.js';
 import {
@@ -16,7 +21,6 @@ import {
   idRenderer,
   interactionTypeRenderer,
   levelRenderer,
-  objectRenderer,
   setterRenderer,
   speciesRenderer,
   triggerRenderer,
@@ -76,13 +80,25 @@ const Navigation: FunctionComponent = () => {
     staticPage: [staticPage],
   } = useNavigation();
 
-  const homes = useMatch(levelObjectMatch[Level.HOME]);
+  const homes = useMatch(levelObjectMatch[Level.HOME], excludePattern);
   // @ts-ignore
-  const buildings = useMatch(levelObjectMatch[Level.BUILDING], home);
+  const buildings = useMatch(
+    levelObjectMatch[Level.BUILDING],
+    excludePattern,
+    home,
+  );
   // @ts-ignore
-  const floors = useMatch(levelObjectMatch[Level.FLOOR], building);
+  const floors = useMatch(
+    levelObjectMatch[Level.FLOOR],
+    excludePattern,
+    building,
+  );
   // @ts-ignore
-  const rooms = useMatch(levelObjectMatch[Level.ROOM], building);
+  const rooms = useMatch(
+    levelObjectMatch[Level.ROOM],
+    excludePattern,
+    building,
+  );
 
   return (
     <table>

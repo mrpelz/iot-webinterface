@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Level, levelObjectMatch } from '@iot/iot-monolith/tree';
+import {
+  excludePattern,
+  Level,
+  levelObjectMatch,
+} from '@iot/iot-monolith/tree';
 import {} from '@iot/iot-monolith/tree-serialization';
 import { effect } from '@preact/signals';
 import { stripIndent } from 'proper-tags';
@@ -33,18 +37,18 @@ try {
 
     await api.isInit;
     // @ts-ignore
-    const [match] = api.match({ $: 'sunElevation' as const });
+    const [match] = api.match({ $: 'sunElevation' as const }, excludePattern);
 
     // eslint-disable-next-line no-console
     console.log({ match, reference: match?.main.state.reference });
 
     // @ts-ignore
-    const rooms = api.match(levelObjectMatch[Level.ROOM]);
+    const rooms = api.match(levelObjectMatch[Level.ROOM], excludePattern);
     // eslint-disable-next-line no-console
     console.log({ rooms: rooms.map((room) => room.$) });
 
     // @ts-ignore
-    const [office] = api.match({ $: 'office' as const });
+    const [office] = api.match({ $: 'office' as const }, excludePattern);
 
     // eslint-disable-next-line no-console
     console.log(office?.devices.ceilingLight.button);

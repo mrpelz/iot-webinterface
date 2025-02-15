@@ -45,31 +45,24 @@ export const useIsInit = (): boolean =>
     false,
   );
 
-export const useKey = (object: Record<string, unknown>): string[] => {
-  const isInit = useIsInit();
-
-  return useMemo(
-    () => (isInit ? (api.keys?.getKey(object) ?? ['no key']) : ['not init']),
-    [isInit, object],
-  );
-};
-
 // @ts-ignore
 export const useMatch = <
   P extends object,
+  E,
   R extends object = TSerialization,
   D extends number = typeof DEFAULT_MATCH_DEPTH,
 >(
   pattern: P,
+  exclude: E,
   root?: R,
   depth = DEFAULT_MATCH_DEPTH as D,
-): Match<P, R, D>[] => {
+): Match<P, E, R, D>[] => {
   const isInit = useIsInit();
 
   return useArray(
     useMemo(
-      () => (isInit ? api.match(pattern, root, depth) : []),
-      [depth, isInit, pattern, root],
+      () => (isInit ? api.match(pattern, exclude, root, depth) : []),
+      [depth, exclude, isInit, pattern, root],
     ),
   );
 };
