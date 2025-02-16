@@ -52,6 +52,7 @@ import { useVisibility } from '../../state/visibility.js';
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { useMediaQuery } from '../../style/main.js';
+import { isProd } from '../../sw.js';
 import { $flags } from '../../util/flags.js';
 
 const Fallback: FunctionComponent = () => (
@@ -379,6 +380,13 @@ export const Diagnostics: FunctionComponent = () => {
               [isScreensaverActive],
             )}
           </td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>isProd</b>
+          </td>
+          <td>{useMemo(() => JSON.stringify(isProd), [])}</td>
         </tr>
 
         <tr>

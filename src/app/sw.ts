@@ -5,7 +5,8 @@ import { Workbox } from 'workbox-window';
 import type { SW_API } from '../common/types.js';
 import { $flags } from './util/flags.js';
 
-export const isProd = !['localhost', '127.0.0.1'].includes(location.hostname);
+export const isProd = location.hostname.endsWith('wurstsalat.cloud');
+
 export const CHECK_INTERVAL = isProd ? 15_000 : 500;
 
 export let workbox: Workbox | undefined;
