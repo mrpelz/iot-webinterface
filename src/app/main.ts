@@ -5,7 +5,7 @@ import {
   levelObjectMatch,
 } from '@iot/iot-monolith/tree';
 import {} from '@iot/iot-monolith/tree-serialization';
-import { effect } from '@preact/signals';
+// import { effect } from '@preact/signals';
 import { stripIndent } from 'proper-tags';
 
 import { Api } from './api.js';
@@ -53,9 +53,9 @@ try {
     // eslint-disable-next-line no-console
     console.log(office?.devices.ceilingLight.button);
 
-    const $emitter = api.$typedEmitter(match?.main);
-    // eslint-disable-next-line no-console
-    effect(() => console.log(match?.$, $emitter.value));
+    // const $emitter = api.$typedEmitter(match?.main);
+    // // eslint-disable-next-line no-console
+    // effect(() => console.log(match?.$, $emitter.value));
   });
 } catch (error) {
   // eslint-disable-next-line no-console

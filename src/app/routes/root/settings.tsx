@@ -1,10 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unsafe-function-type */
-import {
-  excludePattern,
-  Level,
-  levelObjectMatch,
-} from '@iot/iot-monolith/tree';
 import { clear } from 'idb-keyval';
 import { FunctionComponent, JSX } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
@@ -13,44 +6,34 @@ import { Button, Entry as EntryComponent } from '../../components/list.js';
 import { ShowHide } from '../../components/show-hide.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
-import { useMatch } from '../../state/api.js';
-import { Translation, useI18nKeyFallback } from '../../state/i18n.js';
 import {
+  $building,
+  $buildings,
+  $home,
+  $homes,
+  $rooms,
+  setBuildingName,
+  setHomeName,
   staticPages,
-  useNavigationBuilding,
-  useNavigationHome,
 } from '../../state/navigation.js';
-import { Theme, themes } from '../../state/theme.js';
+import { $theme, Theme, themes } from '../../state/theme.js';
+import { getTranslationFallback } from '../../state/translation.js';
 import { swProxy } from '../../sw.js';
 import { $flags } from '../../util/flags.js';
 import { Entry, List } from '../../views/list.js';
+import { Translation } from '../../views/translation.js';
+
+const $staticPageLabel = getTranslationFallback('staticPage');
+const $roomLabel = getTranslationFallback('room');
+const $autoLabel = getTranslationFallback('auto');
 
 export const Settings: FunctionComponent = () => {
-  // @ts-ignore
-  const homes = useMatch(levelObjectMatch[Level.HOME], excludePattern);
-  const [home, setHome] = useNavigationHome();
-
-  const buildings = useMatch(levelObjectMatch[Level.BUILDING], excludePattern);
-  const [building, setBuilding] = useNavigationBuilding();
-
-  const rooms = useMatch(levelObjectMatch[Level.ROOM], excludePattern);
+  const rooms = $rooms.value;
   const roomNames = useArray(
-    useMemo(() => rooms.map((room) => room.$), [rooms]),
+    useMemo(() => (rooms ? rooms.map((room) => room.$) : []), [rooms]),
   );
 
   const startPages = useMemo(() => [...staticPages, ...roomNames], [roomNames]);
-
-  const startPage = $flags.startPage.value;
-  const theme = $flags.theme.value;
-  const language = $flags.language.value;
-  const absoluteTimes = $flags.absoluteTimes.value;
-  const inactivityTimeout = $flags.inactivityTimeout.value;
-  const screensaverEnable = $flags.screensaverEnable.value;
-  const screensaverRandomizePosition = $flags.screensaverRandomizePosition;
-  const debug = $flags.debug.value;
-  const apiBaseUrl = $flags.apiBaseUrl.value;
-  const updateUnattended = $flags.updateUnattended.value;
-  const updateCheckInterval = $flags.updateCheckInterval.value;
 
   return (
     <>
@@ -60,30 +43,31 @@ export const Settings: FunctionComponent = () => {
           label={<Translation capitalize={true} i18nKey="home" />}
         >
           <select
-            disabled={homes.length < 2}
+            disabled={!$homes.value || $homes.value.length <= 1}
             id="home"
             name="home"
-            onChange={useCallback<
-              JSX.GenericEventHandler<HTMLSelectElement> & Function
-            >(
+            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
               ({
                 currentTarget: { value },
               }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
-                const matchingHome = homes.find((aHome) => aHome.$ === value);
-                if (!matchingHome || matchingHome === home) {
+                const matchingHome = $homes.value?.find(
+                  (home) => home.$ === value,
+                );
+
+                if (!matchingHome || matchingHome === $home.value) {
                   return;
                 }
 
-                setHome(matchingHome);
+                setHomeName?.(matchingHome.$);
               },
-              [homes, setHome, home],
+              [],
             )}
           >
-            {homes.map((aHome) => (
-              <option value={aHome.$} selected={aHome === home}>
-                <Translation i18nKey={aHome.$} />
+            {$homes.value?.map((home) => (
+              <option value={home.$} selected={home === $home.value}>
+                <Translation i18nKey={home.$} />
               </option>
-            ))}
+            )) ?? null}
           </select>
         </Entry>
         <Entry
@@ -91,32 +75,33 @@ export const Settings: FunctionComponent = () => {
           label={<Translation capitalize={true} i18nKey="building" />}
         >
           <select
-            disabled={buildings.length < 2}
+            disabled={!$buildings.value || $buildings.value.length <= 1}
             id="building"
             name="building"
-            onChange={useCallback<
-              JSX.GenericEventHandler<HTMLSelectElement> & Function
-            >(
+            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
               ({
                 currentTarget: { value },
               }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
-                const matchingBuilding = buildings.find(
-                  (aBuilding) => aBuilding.$ === value,
+                const matchingBuilding = $buildings.value?.find(
+                  (building) => building.$ === value,
                 );
-                if (!matchingBuilding || matchingBuilding === building) {
+                if (!matchingBuilding || matchingBuilding === $building.value) {
                   return;
                 }
 
-                setBuilding(matchingBuilding);
+                setBuildingName?.(matchingBuilding.$);
               },
-              [buildings, setBuilding, building],
+              [],
             )}
           >
-            {buildings.map((aBuilding) => (
-              <option value={aBuilding.$} selected={aBuilding === building}>
-                <Translation i18nKey={aBuilding.$} />
+            {$buildings.value?.map((building) => (
+              <option
+                value={building.$}
+                selected={building === $building.value}
+              >
+                <Translation i18nKey={building.$} />
               </option>
-            ))}
+            )) ?? null}
           </select>
         </Entry>
         <Entry
@@ -126,9 +111,7 @@ export const Settings: FunctionComponent = () => {
           <select
             id="startPage"
             name="startPage"
-            onChange={useCallback<
-              JSX.GenericEventHandler<HTMLSelectElement> & Function
-            >(
+            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
               ({
                 currentTarget: { value },
               }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
@@ -150,23 +133,23 @@ export const Settings: FunctionComponent = () => {
               [startPages],
             )}
           >
-            <option value="auto" selected={startPage === null}>
+            <option value="auto" selected={$flags.startPage.value === null}>
               <Translation i18nKey="auto" />
             </option>
-            <optgroup label={useI18nKeyFallback('staticPage')}>
-              {staticPages.map((aStaticPage) => (
+            <optgroup label={$staticPageLabel}>
+              {staticPages.map((staticPage) => (
                 <option
-                  value={aStaticPage}
-                  selected={aStaticPage === startPage}
+                  value={staticPage}
+                  selected={staticPage === $flags.startPage.value}
                 >
-                  <Translation i18nKey={aStaticPage} />
+                  <Translation i18nKey={staticPage} />
                 </option>
               ))}
             </optgroup>
-            <optgroup label={useI18nKeyFallback('room')}>
-              {roomNames.map((aRoom) => (
-                <option value={aRoom} selected={aRoom === startPage}>
-                  <Translation i18nKey={aRoom} />
+            <optgroup label={$roomLabel}>
+              {roomNames.map((room) => (
+                <option value={room} selected={room === $flags.startPage.value}>
+                  <Translation i18nKey={room} />
                 </option>
               ))}
             </optgroup>
@@ -181,36 +164,31 @@ export const Settings: FunctionComponent = () => {
           <select
             id="theme"
             name="theme"
-            onChange={useCallback<
-              JSX.GenericEventHandler<HTMLSelectElement> & Function
-            >(
+            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
               ({
                 currentTarget: { value },
               }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
-                const selectedTheme = value as Theme | 'auto';
-                if (selectedTheme === 'auto') {
+                const theme = value as Theme | 'auto';
+                if (theme === 'auto') {
                   $flags.theme.value = null;
                   return;
                 }
 
-                if (
-                  !themes.includes(selectedTheme) ||
-                  selectedTheme === theme
-                ) {
+                if (!themes.includes(theme) || theme === $theme.value) {
                   return;
                 }
 
-                $flags.theme.value = selectedTheme;
+                $flags.theme.value = theme;
               },
-              [theme],
+              [],
             )}
           >
-            <option value="auto" selected={theme === null}>
+            <option value="auto" selected={$flags.theme.value === null}>
               <Translation i18nKey="auto" />
             </option>
-            {themes.map((aTheme) => (
-              <option value={aTheme} selected={aTheme === theme}>
-                <Translation i18nKey={aTheme} />
+            {themes.map((theme) => (
+              <option value={theme} selected={theme === $flags.theme.value}>
+                <Translation i18nKey={theme} />
               </option>
             ))}
           </select>
@@ -222,36 +200,37 @@ export const Settings: FunctionComponent = () => {
           <select
             id="language"
             name="language"
-            onChange={useCallback<
-              JSX.GenericEventHandler<HTMLSelectElement> & Function
-            >(
+            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
               ({
                 currentTarget: { value },
               }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
-                const selectedLanguage = value as I18nLanguage | 'auto';
-                if (selectedLanguage === 'auto') {
+                const language = value as I18nLanguage | 'auto';
+                if (language === 'auto') {
                   $flags.language.value = null;
                   return;
                 }
 
                 if (
-                  !i18nLanguages.includes(selectedLanguage) ||
-                  selectedLanguage === language
+                  !i18nLanguages.includes(language) ||
+                  language === $flags.language.value
                 ) {
                   return;
                 }
 
-                $flags.language.value = selectedLanguage;
+                $flags.language.value = language;
               },
-              [language],
+              [],
             )}
           >
-            <option value="auto" selected={language === null}>
+            <option value="auto" selected={$flags.language.value === null}>
               <Translation i18nKey="auto" />
             </option>
-            {i18nLanguages.map((aLanguage) => (
-              <option value={aLanguage} selected={aLanguage === language}>
-                <Translation i18nKey={aLanguage} />
+            {i18nLanguages.map((language) => (
+              <option
+                value={language}
+                selected={language === $flags.language.value}
+              >
+                <Translation i18nKey={language} />
               </option>
             ))}
           </select>
@@ -261,17 +240,13 @@ export const Settings: FunctionComponent = () => {
           label={<Translation capitalize={true} i18nKey="absoluteTimes" />}
         >
           <input
-            checked={Boolean(absoluteTimes)}
+            checked={Boolean($flags.absoluteTimes.value)}
             id="absoluteTimes"
             name="absoluteTimes"
             type="checkbox"
-            onChange={useCallback<
-              JSX.GenericEventHandler<HTMLInputElement> & Function
-            >(
-              ({
-                currentTarget: { checked: selectedAbsoluteTimes },
-              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
-                $flags.absoluteTimes.value = selectedAbsoluteTimes;
+            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+              ({ currentTarget: { checked } }) => {
+                $flags.absoluteTimes.value = checked;
               },
               [],
             )}
@@ -290,27 +265,22 @@ export const Settings: FunctionComponent = () => {
             name="inactivityTimeout"
             pattern="[0-9]*"
             placeholder="0"
-            value={inactivityTimeout || ''}
-            onBlur={useCallback<
-              JSX.GenericEventHandler<HTMLInputElement> & Function
-            >(
+            value={$flags.inactivityTimeout.value || ''}
+            onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({
                 currentTarget: { value },
               }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
-                const selectedInactivityTimeout = Number.parseInt(
-                  value.trim(),
-                  10,
-                );
+                const inactivityTimeout = Number.parseInt(value.trim(), 10);
                 if (
-                  !selectedInactivityTimeout ||
-                  Number.isNaN(selectedInactivityTimeout) ||
-                  !Number.isInteger(selectedInactivityTimeout)
+                  !inactivityTimeout ||
+                  Number.isNaN(inactivityTimeout) ||
+                  !Number.isInteger(inactivityTimeout)
                 ) {
                   $flags.inactivityTimeout.value = null;
                   return;
                 }
 
-                $flags.inactivityTimeout.value = selectedInactivityTimeout;
+                $flags.inactivityTimeout.value = inactivityTimeout;
               },
               [],
             )}
@@ -321,19 +291,15 @@ export const Settings: FunctionComponent = () => {
           label={<Translation capitalize={true} i18nKey="enableScreensaver" />}
         >
           <input
-            checked={Boolean(screensaverEnable)}
+            checked={Boolean($flags.screensaverEnable.value)}
             id="screensaverEnable"
             name="screensaverEnable"
             type="checkbox"
-            onChange={useCallback<
-              JSX.GenericEventHandler<HTMLInputElement> & Function
-            >(
-              ({
-                currentTarget: { checked: selectedScreensaverEnable },
-              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
-                $flags.screensaverEnable.value = selectedScreensaverEnable;
+            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+              ({ currentTarget: { checked } }) => {
+                $flags.screensaverEnable.value = checked;
 
-                if (!selectedScreensaverEnable) {
+                if (!checked) {
                   $flags.screensaverRandomizePosition.value = false;
                 }
               },
@@ -341,7 +307,7 @@ export const Settings: FunctionComponent = () => {
             )}
           />
         </Entry>
-        <ShowHide show={Boolean(screensaverEnable)}>
+        <ShowHide show={Boolean($flags.screensaverEnable.value)}>
           <Entry
             id="screensaverRandomizePosition"
             label={
@@ -352,20 +318,13 @@ export const Settings: FunctionComponent = () => {
             }
           >
             <input
-              checked={Boolean(screensaverRandomizePosition)}
+              checked={Boolean($flags.screensaverRandomizePosition.value)}
               id="screensaverRandomizePosition"
               name="screensaverRandomizePosition"
               type="checkbox"
-              onChange={useCallback<
-                JSX.GenericEventHandler<HTMLInputElement> & Function
-              >(
-                ({
-                  currentTarget: {
-                    checked: selectedscreensaverRandomizePosition,
-                  },
-                }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
-                  $flags.screensaverRandomizePosition.value =
-                    selectedscreensaverRandomizePosition;
+              onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+                ({ currentTarget: { checked } }) => {
+                  $flags.screensaverRandomizePosition.value = checked;
                 },
                 [],
               )}
@@ -379,17 +338,13 @@ export const Settings: FunctionComponent = () => {
           label={<Translation capitalize={true} i18nKey="debug" />}
         >
           <input
-            checked={Boolean(debug)}
+            checked={Boolean($flags.debug.value)}
             id="debug"
             name="debug"
             type="checkbox"
-            onChange={useCallback<
-              JSX.GenericEventHandler<HTMLInputElement> & Function
-            >(
-              ({
-                currentTarget: { checked: selectedDebug },
-              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
-                $flags.debug.value = selectedDebug;
+            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+              ({ currentTarget: { checked } }) => {
+                $flags.debug.value = checked;
               },
               [],
             )}
@@ -402,23 +357,21 @@ export const Settings: FunctionComponent = () => {
           <input
             id="apiBaseUrl"
             name="apiBaseUrl"
-            placeholder={useI18nKeyFallback('auto')}
+            placeholder={$autoLabel}
             type="url"
-            value={apiBaseUrl || ''}
-            onBlur={useCallback<
-              JSX.GenericEventHandler<HTMLInputElement> & Function
-            >(
+            value={$flags.apiBaseUrl.value || ''}
+            onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({
                 currentTarget: { value },
               }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
-                const selectedApiBaseUrl = value.trim();
-                if (selectedApiBaseUrl.length === 0) {
+                const apiBaseUrl = value.trim();
+                if (apiBaseUrl.length === 0) {
                   $flags.apiBaseUrl.value = null;
                   return;
                 }
 
                 try {
-                  const url = new URL(selectedApiBaseUrl);
+                  const url = new URL(apiBaseUrl);
                   $flags.apiBaseUrl.value = url.href;
                 } catch {
                   $flags.apiBaseUrl.value = null;
@@ -435,17 +388,15 @@ export const Settings: FunctionComponent = () => {
           label={<Translation capitalize={true} i18nKey="updateUnattended" />}
         >
           <input
-            checked={Boolean(updateUnattended)}
+            checked={Boolean($flags.updateUnattended.value)}
             id="updateUnattended"
             name="updateUnattended"
             type="checkbox"
-            onChange={useCallback<
-              JSX.GenericEventHandler<HTMLInputElement> & Function
-            >(
+            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({
-                currentTarget: { checked: selectedUpdateUnattended },
+                currentTarget: { checked },
               }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
-                $flags.updateUnattended.value = selectedUpdateUnattended;
+                $flags.updateUnattended.value = checked;
               },
               [],
             )}
@@ -464,27 +415,22 @@ export const Settings: FunctionComponent = () => {
             name="updateCheckInterval"
             pattern="[0-9]*"
             placeholder="0"
-            value={updateCheckInterval || ''}
-            onBlur={useCallback<
-              JSX.GenericEventHandler<HTMLInputElement> & Function
-            >(
+            value={$flags.updateCheckInterval.value || ''}
+            onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
               ({
                 currentTarget: { value },
               }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
-                const selectedUpdateCheckInterval = Number.parseInt(
-                  value.trim(),
-                  10,
-                );
+                const updateCheckInterval = Number.parseInt(value.trim(), 10);
                 if (
-                  !selectedUpdateCheckInterval ||
-                  Number.isNaN(selectedUpdateCheckInterval) ||
-                  !Number.isInteger(selectedUpdateCheckInterval)
+                  !updateCheckInterval ||
+                  Number.isNaN(updateCheckInterval) ||
+                  !Number.isInteger(updateCheckInterval)
                 ) {
                   $flags.updateCheckInterval.value = null;
                   return;
                 }
 
-                $flags.updateCheckInterval.value = selectedUpdateCheckInterval;
+                $flags.updateCheckInterval.value = updateCheckInterval;
               },
               [],
             )}
@@ -508,6 +454,22 @@ export const Settings: FunctionComponent = () => {
             }, [])}
           >
             reset local storage
+          </Button>
+        </EntryComponent>
+        <EntryComponent>
+          <Button
+            onClick={useCallback(() => {
+              swProxy?.showNotification('test', { requireInteraction: true });
+            }, [])}
+          >
+            test notification
+          </Button>
+          <Button
+            onClick={useCallback(() => {
+              swProxy?.clearNotifications();
+            }, [])}
+          >
+            remove notifications
           </Button>
         </EntryComponent>
       </List>

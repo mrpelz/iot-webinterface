@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   DEFAULT_MATCH_DEPTH,
   Level,
@@ -16,23 +15,42 @@ import { computed, ReadonlySignal, Signal, signal } from '@preact/signals';
 import { Remote, wrap } from 'comlink';
 
 import { API_WORKER_API, TSerialization } from '../common/types.js';
+import { readOnly } from './util/signal.js';
 
 const WEB_API_UUID = 'c4218bec-e940-4d68-8807-5c43b2aee27b';
 const WEB_API_ONLINE = '562a3aa9-a10e-4347-aa3f-cec9e011a3dc';
 
 export type LevelObject = {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  [Level.AREA]: Match<{ level: Level.AREA }, TExclude, TSerialization>;
-  [Level.BUILDING]: Match<{ level: Level.BUILDING }, TExclude, TSerialization>;
-  [Level.DEVICE]: Match<{ level: Level.DEVICE }, TExclude, TSerialization>;
-  [Level.ELEMENT]: Match<{ level: Level.ELEMENT }, TExclude, TSerialization>;
-  [Level.FLOOR]: Match<{ level: Level.FLOOR }, TExclude, TSerialization>;
-  [Level.HOME]: Match<{ level: Level.HOME }, TExclude, TSerialization>;
-  [Level.NONE]: Match<{ level: Level.NONE }, TExclude, TSerialization>;
-  [Level.PROPERTY]: Match<{ level: Level.PROPERTY }, TExclude, TSerialization>;
-  [Level.ROOM]: Match<{ level: Level.ROOM }, TExclude, TSerialization>;
-  [Level.SYSTEM]: Match<{ level: Level.SYSTEM }, TExclude, TSerialization>;
+  [Level.AREA]: Match<{ level: Level.AREA }, TExclude, TSerialization, 15>;
+  [Level.BUILDING]: Match<
+    { level: Level.BUILDING },
+    TExclude,
+    TSerialization,
+    15
+  >;
+  [Level.DEVICE]: Match<{ level: Level.DEVICE }, TExclude, TSerialization, 15>;
+  [Level.ELEMENT]: Match<
+    { level: Level.ELEMENT },
+    TExclude,
+    TSerialization,
+    15
+  >;
+  [Level.FLOOR]: Match<{ level: Level.FLOOR }, TExclude, TSerialization, 15>;
+  [Level.HOME]: Match<{ level: Level.HOME }, TExclude, TSerialization, 15>;
+  [Level.NONE]: Match<{ level: Level.NONE }, TExclude, TSerialization, 15>;
+  [Level.PROPERTY]: Match<
+    { level: Level.PROPERTY },
+    TExclude,
+    TSerialization,
+    15
+  >;
+  [Level.ROOM]: Match<{ level: Level.ROOM }, TExclude, TSerialization, 15>;
+  [Level.SYSTEM]: Match<{ level: Level.SYSTEM }, TExclude, TSerialization, 15>;
 };
+
+export type AnyObject = Match<object, TExclude, TSerialization, 15>;
 
 export class Api {
   private static async _getBroadcastChannel<T>(
@@ -45,7 +63,9 @@ export class Api {
       $signal.value = data;
     };
 
-    const channel = new BroadcastChannel(await reference);
+    const reference_ = await reference;
+
+    const channel = new BroadcastChannel(reference_);
 
     channel.addEventListener('message', handleMessage);
 
@@ -62,6 +82,7 @@ export class Api {
   private readonly _api: Remote<API_WORKER_API>;
   private _hierarchy?: TSerialization;
 
+  readonly $isInit: ReadonlySignal<boolean>;
   readonly isInit: Promise<void>;
 
   constructor() {
@@ -75,15 +96,18 @@ export class Api {
       ).port,
     );
 
+    const $isInit = signal(false);
+
     this.isInit = (async () => {
       await this._api.isInit;
-      // @ts-ignore
       this._hierarchy = await this._api.hierarchy;
       Object.freeze(this._hierarchy);
 
       // eslint-disable-next-line no-console
       console.log(this._hierarchy);
     })();
+
+    this.$isInit = readOnly($isInit);
   }
 
   get hierarchy(): TSerialization | undefined {
@@ -103,6 +127,7 @@ export class Api {
     abort?: AbortController,
   ): ReadonlySignal<T | undefined> {
     const reference_ = reference ? Promise.resolve(reference) : undefined;
+
     const $signal = signal<T | undefined>(undefined);
 
     if (reference_) {
@@ -133,27 +158,23 @@ export class Api {
   }
 
   $typedCollector<
-    R extends string,
-    S extends InteractionReference<R, InteractionType.COLLECT>,
-    T extends ValueType,
-  >(
-    object?: { setState: S; valueType: T } | undefined,
-  ): (value: TValueType[T]) => void {
+    T extends {
+      setState: InteractionReference<string, InteractionType.COLLECT>;
+      valueType: ValueType;
+    },
+  >(object?: T | undefined): (value: TValueType[T['valueType']]) => void {
     return this.$collector(object?.setState.reference);
   }
 
   $typedEmitter<
-    R extends string,
-    S extends InteractionReference<R, InteractionType.EMIT>,
-    T extends ValueType,
-    O extends {
-      state: S;
-      valueType: T;
+    T extends {
+      state: InteractionReference<string, InteractionType.EMIT>;
+      valueType: ValueType;
     },
   >(
-    object?: O | Promise<O> | undefined,
+    object?: T | Promise<T> | undefined,
     abort?: AbortController,
-  ): ReadonlySignal<TValueType[T] | undefined> {
+  ): ReadonlySignal<TValueType[T['valueType']] | undefined> {
     return this.$emitter(
       (object ? Promise.resolve(object) : undefined)?.then(
         (resolved) => resolved.state.reference,

@@ -22,9 +22,31 @@ const sleep = () =>
     setTimeout(() => resolve(undefined), WEBSOCKET_PING_INTERVAL),
   );
 
-// @ts-ignore
 class Api implements API_WORKER_API {
-  private readonly _values: Promise<Values>;
+  private static async _retry<T>(
+    handler: () => Promise<T>,
+    tries = 10,
+  ): Promise<T> {
+    if (tries <= 0) {
+      const error = new Error('_retry giving up');
+      // eslint-disable-next-line no-console
+      console.warn(error);
+
+      throw error;
+    }
+
+    try {
+      return handler();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(new Error('_retry error', { cause: error }));
+
+      await sleep();
+      return Api._retry(handler, tries - 1);
+    }
+  }
+
+  private _values?: Values;
   private _webSocket?: WebSocket;
   private _webSocketOfflineTimeout?: ReturnType<typeof setTimeout>;
   private _webSocketOnline = new BroadcastChannel(WEB_API_ONLINE);
@@ -33,21 +55,20 @@ class Api implements API_WORKER_API {
   readonly isInit: Promise<void>;
 
   constructor() {
-    this.hierarchy = this._getHierarchy();
-    this._values = this._getValues();
-
     this._initWebSocket();
 
-    this.isInit = (async () => {
-      await Promise.all([this.hierarchy, this._values]);
-    })();
+    this.hierarchy = this._getHierarchy();
+
+    this.isInit = this.hierarchy.then(() => {
+      // noop
+    });
   }
 
   // @ts-ignore
   private async _getHierarchy(): Promise<TSerialization> {
     const { debug, apiBaseUrl } = await getFlags();
 
-    try {
+    return Api._retry(async () => {
       // @ts-ignore
       const hierarchy = await fetch(
         new URL(PATH_HIERARCHY, apiBaseUrl ?? self.location.href),
@@ -57,19 +78,13 @@ class Api implements API_WORKER_API {
       if (debug) console.debug(hierarchy);
 
       return hierarchy;
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(new Error('getHierarchy error', { cause: error }));
-
-      await sleep();
-      return this._getHierarchy();
-    }
+    });
   }
 
-  private async _getValues(): Promise<Values> {
+  private async _getValues(): Promise<void> {
     const { debug, apiBaseUrl } = await getFlags();
 
-    try {
+    return Api._retry(async () => {
       const values = await fetch(
         new URL(PATH_VALUES, apiBaseUrl ?? self.location.href),
       ).then((response) => response.json() as Promise<Record<string, unknown>>);
@@ -86,17 +101,11 @@ class Api implements API_WORKER_API {
         result.set(key, { channel, value });
       }
 
-      return result;
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(new Error('getValues error', { cause: error }));
-
-      await sleep();
-      return this._getValues();
-    }
+      this._values = result;
+    });
   }
 
-  private _handleWebSocketOnline(online?: boolean) {
+  private async _handleWebSocketOnline(online?: boolean) {
     clearTimeout(this._webSocketOfflineTimeout);
 
     if (online === false) {
@@ -108,7 +117,10 @@ class Api implements API_WORKER_API {
       return;
     }
 
-    if (online === true) this._webSocketOnline.postMessage(true);
+    if (online === true) {
+      await this._getValues();
+      this._webSocketOnline.postMessage(true);
+    }
 
     clearInterval(this._webSocketPingInterval);
     this._webSocketPingInterval = setInterval(() => {
@@ -173,7 +185,7 @@ class Api implements API_WORKER_API {
         const [key, value] = JSON.parse(data) ?? [];
 
         const values = await this._values;
-        values.get(key)?.channel.postMessage(value);
+        values?.get(key)?.channel.postMessage(value);
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('WebSocket incoming message error', error);
@@ -184,8 +196,10 @@ class Api implements API_WORKER_API {
   async getValue<T>(reference: string) {
     const { debug } = await getFlags();
 
-    const values_ = await this._values;
-    const result = values_.get(reference)?.value as T;
+    const values = await this._values;
+    const result = (values?.get(reference)?.value ?? undefined) as
+      | T
+      | undefined;
 
     // eslint-disable-next-line no-console
     if (debug) console.debug('getValue', { reference, result });

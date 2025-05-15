@@ -1,96 +1,90 @@
-/* eslint-disable unicorn/no-empty-file */
-// import { FunctionComponent } from 'preact';
-// import { useMemo } from 'preact/hooks';
+import { Match, TExclude } from '@iot/iot-monolith/tree';
+import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
 
-// import { Tag, TagGroup } from '../../components/controls.js';
-// import { NonBreaking, TabularNums } from '../../components/text.js';
-// import { I18nKey } from '../../i18n/main.js';
-// import {
-//   defaultNumberFormat,
-//   measuredNumberFormats,
-// } from '../../i18n/mapping.js';
-// import { Translation, useI18n } from '../../state/i18n.js';
-// import { useGetter } from '../../state/web-api.js';
-// import {
-//   HierarchyElement,
-//   HierarchyElementPropertySensor,
-//   isMetaPropertySensor,
-//   ValueType,
-// } from '../../web-api.js';
-// import { CellWithBody } from '../main.js';
+import { TSerialization } from '../../../common/types.js';
+import { Tag, TagGroup } from '../../components/controls.js';
+import { NonBreaking, TabularNums } from '../../components/text.js';
+import { I18nKey } from '../../i18n/main.js';
+import {
+  defaultNumberFormat,
+  measuredNumberFormats,
+} from '../../i18n/mapping.js';
+import { useTypedEmitter } from '../../state/api.js';
+import { $i18n } from '../../state/translation.js';
+import { Translation } from '../../views/translation.js';
+import { CellWithBody } from '../main.js';
 
-// export type NumericSensorElement = HierarchyElementPropertySensor & {
-//   meta: {
-//     measured: Exclude<
-//       HierarchyElementPropertySensor['meta']['measured'],
-//       undefined
-//     >;
-//     valueType: ValueType.NUMBER;
-//   };
-// };
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type TNumericSensor = Match<
+  {
+    $:
+      | 'brightness'
+      | 'humidity'
+      | 'pressure'
+      | 'temperature'
+      | 'tvoc'
+      | 'co2'
+      | 'pm025'
+      | 'pm10'
+      | 'uvIndex';
+  },
+  TExclude,
+  TSerialization
+>;
 
-// export const isNumericSensorElement = (
-//   element: HierarchyElement,
-// ): element is NumericSensorElement =>
-//   Boolean(
-//     isMetaPropertySensor(element.meta) &&
-//       element.meta.valueType === ValueType.NUMBER &&
-//       element.meta.measured,
-//   );
+export const NumericSensor: FunctionComponent<{
+  onClick?: () => void;
+  sensor: TNumericSensor;
+  title?: I18nKey;
+}> = ({ onClick, sensor, title }) => {
+  const {
+    value: { translationLanguage, translationLocale },
+  } = $i18n;
+  const effectiveLocale = useMemo(
+    () => translationLocale || translationLanguage,
+    [translationLanguage, translationLocale],
+  );
 
-// export const NumericSensor: FunctionComponent<{
-//   element: NumericSensorElement;
-//   onClick?: () => void;
-//   title?: I18nKey;
-// }> = ({ element, onClick, title }) => {
-//   const {
-//     meta: { measured, unit },
-//   } = element;
+  const numberFormat = useMemo(
+    () =>
+      new Intl.NumberFormat(
+        effectiveLocale,
+        sensor.$ in measuredNumberFormats
+          ? measuredNumberFormats[sensor.$]
+          : defaultNumberFormat,
+      ),
+    [effectiveLocale, sensor.$],
+  );
 
-//   const { translationLanguage, translationLocale } = useI18n();
-//   const effectiveLocale = useMemo(
-//     () => translationLocale || translationLanguage,
-//     [translationLanguage, translationLocale],
-//   );
+  const value = useTypedEmitter(sensor.main).value;
+  const formattedValue = useMemo(
+    () => (value === undefined ? undefined : numberFormat.format(value)),
+    [numberFormat, value],
+  );
 
-//   const numberFormat = useMemo(
-//     () =>
-//       new Intl.NumberFormat(
-//         effectiveLocale,
-//         measured && measured in measuredNumberFormats
-//           ? measuredNumberFormats[measured]
-//           : defaultNumberFormat,
-//       ),
-//     [effectiveLocale, measured],
-//   );
-
-//   const value = useGetter<number>(element);
-//   const formattedValue = useMemo(
-//     () => (value === null ? null : numberFormat.format(value)),
-//     [numberFormat, value],
-//   );
-
-//   return (
-//     <CellWithBody
-//       onClick={onClick}
-//       title={<Translation i18nKey={title || measured} capitalize={true} />}
-//     >
-//       <Tag>
-//         {value === null ? (
-//           '?'
-//         ) : (
-//           <NonBreaking>
-//             <TagGroup>
-//               <TabularNums>{formattedValue}</TabularNums>
-//             </TagGroup>
-//             {unit ? (
-//               <TagGroup>
-//                 <Translation i18nKey={unit} />
-//               </TagGroup>
-//             ) : null}
-//           </NonBreaking>
-//         )}
-//       </Tag>
-//     </CellWithBody>
-//   );
-// };
+  return (
+    <CellWithBody
+      onClick={onClick}
+      title={<Translation i18nKey={title || sensor.$} capitalize={true} />}
+    >
+      <Tag>
+        {value === undefined ? (
+          '?'
+        ) : (
+          <NonBreaking>
+            <TagGroup>
+              <TabularNums>{formattedValue}</TabularNums>
+            </TagGroup>
+            {sensor.main.unit ? (
+              <TagGroup>
+                <Translation i18nKey={sensor.main.unit} />
+              </TagGroup>
+            ) : null}
+          </NonBreaking>
+        )}
+      </Tag>
+    </CellWithBody>
+  );
+};

@@ -14,7 +14,7 @@ export const useDependentValue =
   (props) =>
     props[dependency] ? ifTrue : ifFalse;
 
-export const useMediaQuery = (value: string, negate?: boolean): string =>
+export const getMediaQuery = (value: string, negate?: boolean): string =>
   `${negate ? 'not ' : ''}screen and (min-width: ${value})`;
 
 export const dependentValue =
@@ -33,7 +33,7 @@ export const dependentValue =
 export const mediaQuery =
   (value: Value, negate?: boolean): (() => string) =>
   () =>
-    useMediaQuery(useUnwrapValue(value), negate);
+    getMediaQuery(useUnwrapValue(value), negate);
 
 export const cssEnv = (variable: string, fallback?: string): string =>
   `env(${variable}${fallback ? `, ${fallback}` : ''})`;

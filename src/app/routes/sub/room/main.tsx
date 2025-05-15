@@ -1,13 +1,25 @@
 import { FunctionComponent } from 'preact';
 
-// import { isOpenSensorElement } from '../../../controls/sensor/open.js';
-// import { OpenSensor } from './open.js';
+import { AnyObject } from '../../../api.js';
+import { OpenSensor } from './open.js';
 
 export const SubPage: FunctionComponent<{
-  element: object;
-}> = () =>
-  // if (isOpenSensorElement(element)) {
-  //   return <OpenSensor element={element}>open sensor element</OpenSensor>;
-  // }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  object: AnyObject;
+}> = ({ object }) => {
+  if (!('$' in object)) return null;
 
-  null;
+  switch (object.$) {
+    case 'door':
+    case 'window': {
+      return <OpenSensor sensor={object}>open sensor element</OpenSensor>;
+    }
+
+    default: {
+      break;
+    }
+  }
+
+  return null;
+};

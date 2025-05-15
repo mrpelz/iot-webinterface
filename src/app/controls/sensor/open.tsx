@@ -1,81 +1,60 @@
-/* eslint-disable unicorn/no-empty-file */
-// import { FunctionComponent } from 'preact';
-// import { useCallback } from 'preact/hooks';
+import { Match, TExclude } from '@iot/iot-monolith/tree';
+import { FunctionComponent } from 'preact';
+import { useCallback } from 'preact/hooks';
 
-// import { Tag } from '../../components/controls.js';
-// import { ForwardIcon } from '../../components/icons.js';
-// import { I18nKey } from '../../i18n/main.js';
-// import { Translation } from '../../state/i18n.js';
-// import { useSegment } from '../../state/path.js';
-// import { useChild, useGetter } from '../../state/web-api.js';
-// import {
-//   HierarchyElement,
-//   HierarchyElementArea,
-//   isMetaArea,
-//   MetaArea,
-// } from '../../web-api.js';
-// import { CellWithBody } from '../main.js';
-// import { BinarySensorElement, isBinarySensorElement } from './binary.js';
+import { TSerialization } from '../../../common/types.js';
+import { Tag } from '../../components/controls.js';
+import { ForwardIcon } from '../../components/icons.js';
+import { I18nKey } from '../../i18n/main.js';
+import { useTypedEmitter } from '../../state/api.js';
+import { setSubPath } from '../../state/path.js';
+import { Translation } from '../../views/translation.js';
+import { CellWithBody } from '../main.js';
 
-// export type OpenSensorElement = HierarchyElementArea & {
-//   children: {
-//     open: BinarySensorElement;
-//   };
-// };
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type TWindowSensor = Match<{ $: 'window' }, TExclude, TSerialization>;
 
-// export const isMetaAreaDoor = ({ name }: MetaArea): boolean =>
-//   ['door', 'entryDoor'].includes(name);
-// export const isMetaAreaWindow = ({ name }: MetaArea): boolean =>
-//   name === 'window';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type TDoorSensor = Match<{ $: 'door' }, TExclude, TSerialization>;
 
-// export const isOpenSensorElement = (
-//   element: HierarchyElement,
-// ): element is OpenSensorElement =>
-//   Boolean(
-//     isMetaArea(element.meta) &&
-//       element.children &&
-//       'open' in element.children &&
-//       isBinarySensorElement(element.children.open),
-//   );
+export type TOpenSensor = TWindowSensor | TDoorSensor;
 
-// export const OpenSensor: FunctionComponent<{
-//   element: OpenSensorElement;
-//   negativeKey?: I18nKey;
-//   onClick?: () => void;
-//   positiveKey?: I18nKey;
-//   title?: I18nKey;
-// }> = ({
-//   element,
-//   negativeKey = 'closed',
-//   onClick,
-//   positiveKey = 'open',
-//   title,
-// }) => {
-//   const { id, property } = element;
+export const OpenSensor: FunctionComponent<{
+  negativeKey?: I18nKey;
+  onClick?: () => void;
+  positiveKey?: I18nKey;
+  sensor: TOpenSensor;
+  title?: I18nKey;
+}> = ({
+  negativeKey = 'closed',
+  onClick,
+  positiveKey = 'open',
+  sensor,
+  title,
+}) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const { $id } = sensor;
 
-//   const [, setSubRouteId] = useSegment(1);
+  const handleClick = useCallback(() => setSubPath($id), [$id]);
 
-//   const handleClick = useCallback(
-//     () => setSubRouteId?.(id),
-//     [id, setSubRouteId],
-//   );
+  const value = useTypedEmitter(sensor.open.main).value;
 
-//   const open = useChild(element, 'open') as BinarySensorElement;
-//   const value = useGetter<boolean>(open);
-
-//   return (
-//     <CellWithBody
-//       icon={<ForwardIcon height="1em" />}
-//       onClick={onClick ?? handleClick}
-//       title={<Translation i18nKey={title || property} capitalize={true} />}
-//     >
-//       <Tag>
-//         {value === null ? (
-//           '?'
-//         ) : (
-//           <Translation i18nKey={value ? positiveKey : negativeKey} />
-//         )}
-//       </Tag>
-//     </CellWithBody>
-//   );
-// };
+  return (
+    <CellWithBody
+      icon={<ForwardIcon height="1em" />}
+      onClick={onClick ?? handleClick}
+      title={<Translation i18nKey={title || sensor.$} capitalize={true} />}
+    >
+      <Tag>
+        {value === undefined ? (
+          '?'
+        ) : (
+          <Translation i18nKey={value ? positiveKey : negativeKey} />
+        )}
+      </Tag>
+    </CellWithBody>
+  );
+};

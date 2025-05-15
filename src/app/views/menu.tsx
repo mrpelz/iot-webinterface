@@ -20,30 +20,31 @@ import {
 } from '../components/menu.js';
 import { useArray } from '../hooks/use-array-compare.js';
 import { roomSorting } from '../i18n/mapping.js';
-import { useMatch, useTypedEmitter } from '../state/api.js';
-import { Translation } from '../state/i18n.js';
-import { useIsMenuVisible } from '../state/menu.js';
+import { api } from '../main.js';
+import { useTypedEmitter } from '../state/api.js';
+import { $isMenuVisible } from '../state/menu.js';
 import {
+  $floors,
+  $room,
+  $staticPage,
   staticPagesBottom,
   staticPagesTop,
-  useNavigationBuilding,
-  useNavigationRoom,
-  useNavigationStaticPage,
 } from '../state/navigation.js';
-import { useGoRoot } from '../state/path.js';
-import { useFlipScreensaverActive } from '../state/screensaver.js';
-import { useTheme } from '../state/theme.js';
+import { goRoot, setRootPath } from '../state/path.js';
+import { flipScreensaverActive } from '../state/screensaver.js';
+import { $theme } from '../state/theme.js';
 import { colors } from '../style.js';
 import { $flags } from '../util/flags.js';
+import { Translation } from './translation.js';
 
 // @ts-ignore
 const AllLightState: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
   room,
 }) => {
-  const allLights = 'allLights' in room ? room.allLights.main : undefined;
-  const on = useTypedEmitter(allLights);
+  const { main: allLights } = 'allLights' in room ? room.allLights : {};
+  const { value: on } = useTypedEmitter(allLights);
 
-  return (on.value ?? false) ? (
+  return (on ?? false) ? (
     <MenuIndicatorItem color="hsl(40deg 100% 50%)" />
   ) : null;
 };
@@ -74,8 +75,8 @@ const MenuListItem: FunctionComponent<{
   isActive: boolean;
   onClick: () => void;
 }> = ({ isActive: active, onClick, children }) => {
-  const isMenuVisible = useIsMenuVisible();
-  const isHighContrast = useTheme() === 'highContrast';
+  const isMenuVisible = $isMenuVisible.value;
+  const isHighContrast = $theme.value === 'highContrast';
 
   const [isHovered, setHovered] = useState(false);
 
@@ -113,10 +114,7 @@ export const Floor: FunctionComponent<{
   // @ts-ignore
   floor: LevelObject[Level.FLOOR];
 }> = ({ floor }) => {
-  const goRoot = useGoRoot();
-
-  // @ts-ignore
-  const elements = useMatch(
+  const elements = api.match(
     levelObjectMatch[Level.ROOM],
     excludePattern,
     floor,
@@ -125,7 +123,7 @@ export const Floor: FunctionComponent<{
     useMemo(() => sortBy(elements, '$', roomSorting).all, [elements]),
   );
 
-  const [selectedRoom, selectRoom] = useNavigationRoom();
+  const room = $room.value;
 
   return (
     <>
@@ -133,20 +131,20 @@ export const Floor: FunctionComponent<{
         <Translation i18nKey={floor.$} />
       </MenuSubdivisionHeader>
       <MenuList>
-        {sortedElements.map((room, key) => {
-          const isActive = room === selectedRoom;
+        {sortedElements.map((room_, key) => {
+          const isActive = room_ === room;
 
           return (
             <MenuListItem
               key={key}
               isActive={isActive}
-              onClick={() => (isActive ? goRoot?.() : selectRoom(room))}
+              onClick={() => (isActive ? goRoot() : setRootPath(room_.$))}
             >
-              <Translation capitalize={true} i18nKey={room.$} />
+              <Translation capitalize={true} i18nKey={room_.$} />
               <MenuIndicatorSection>
-                <AllWindowsState room={room} />
-                <DoorState room={room} />
-                <AllLightState room={room} />
+                <AllWindowsState room={room_} />
+                <DoorState room={room_} />
+                <AllLightState room={room_} />
               </MenuIndicatorSection>
             </MenuListItem>
           );
@@ -157,17 +155,12 @@ export const Floor: FunctionComponent<{
 };
 
 export const Menu: FunctionComponent = () => {
-  const goRoot = useGoRoot();
-
   const isScreensaverEnabled = $flags.screensaverEnable.value;
-  const flipScreensaverActive = useFlipScreensaverActive();
 
-  const isMenuVisible = useIsMenuVisible();
+  const isMenuVisible = $isMenuVisible.value;
 
-  const [selectedStaticPage, selectStaticPage] = useNavigationStaticPage();
-  const [building] = useNavigationBuilding();
-
-  const floors = useMatch(levelObjectMatch[Level.FLOOR], building);
+  const floors = $floors.value;
+  const staticPage = $staticPage.value;
 
   const isVisible = useMemo(
     () => (isMenuVisible === null ? true : isMenuVisible),
@@ -179,18 +172,18 @@ export const Menu: FunctionComponent = () => {
       <MenuContent>
         <MenuSubdivision>
           <MenuList>
-            {staticPagesTop.map((staticPage, key) => {
-              const isActive = staticPage === selectedStaticPage;
+            {staticPagesTop.map((staticPage_, key) => {
+              const isActive = staticPage_ === staticPage;
 
               return (
                 <MenuListItem
                   key={key}
                   isActive={isActive}
                   onClick={() =>
-                    isActive ? goRoot?.() : selectStaticPage(staticPage)
+                    isActive ? goRoot() : setRootPath(staticPage_)
                   }
                 >
-                  <Translation capitalize={true} i18nKey={staticPage} />
+                  <Translation capitalize={true} i18nKey={staticPage_} />
                 </MenuListItem>
               );
             })}
@@ -198,25 +191,23 @@ export const Menu: FunctionComponent = () => {
         </MenuSubdivision>
 
         <MenuSubdivision>
-          {floors.map((floor, key) => (
-            <Floor key={key} floor={floor} />
-          ))}
+          {floors?.map((floor, key) => <Floor key={key} floor={floor} />)}
         </MenuSubdivision>
 
         <MenuSubdivision>
           <MenuList>
-            {staticPagesBottom.map((staticPage, key) => {
-              const isActive = staticPage === selectedStaticPage;
+            {staticPagesBottom.map((staticPage_, key) => {
+              const isActive = staticPage_ === staticPage;
 
               return (
                 <MenuListItem
                   key={key}
                   isActive={isActive}
                   onClick={() =>
-                    isActive ? goRoot?.() : selectStaticPage(staticPage)
+                    isActive ? goRoot() : setRootPath(staticPage_)
                   }
                 >
-                  <Translation capitalize={true} i18nKey={staticPage} />
+                  <Translation capitalize={true} i18nKey={staticPage_} />
                 </MenuListItem>
               );
             })}

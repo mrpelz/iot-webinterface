@@ -14,6 +14,7 @@ import { useCallback, useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../common/types.js';
 import { useArray } from '../hooks/use-array-compare.js';
+import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { usePromise, usePromisify } from '../hooks/use-promise.js';
 import { useAbortableSignalFactory } from '../hooks/use-signal.js';
 import { api } from '../main.js';
@@ -93,8 +94,10 @@ export const useTypedEmitter = <
         valueType: T;
       }
     | undefined,
-): ReadonlySignal<TValueType[T] | undefined> =>
-  useAbortableSignalFactory<
+): ReadonlySignal<TValueType[T] | undefined> => {
+  useHookDebug('useTypedEmitter');
+
+  return useAbortableSignalFactory<
     [
       object extends undefined
         ? undefined
@@ -106,6 +109,7 @@ export const useTypedEmitter = <
     useCallback((...args) => api.$typedEmitter(...args), []),
     [usePromisify(object)],
   );
+};
 
 export const useWebSocketCount = (): ReadonlySignal<number | undefined> =>
   useAbortableSignalFactory(

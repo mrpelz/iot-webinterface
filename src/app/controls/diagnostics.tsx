@@ -1,12 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { isObject, isPlainObject } from '@iot/iot-monolith/oop';
-import {
-  excludePattern,
-  Level,
-  Match,
-  TExclude,
-  ValueType,
-} from '@iot/iot-monolith/tree';
+import { excludePattern, Level, ValueType } from '@iot/iot-monolith/tree';
 import {
   levelDescription,
   valueTypeDescription,
@@ -15,7 +9,7 @@ import { computed } from '@preact/signals';
 import { ComponentChildren, FunctionComponent, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
-import { TSerialization } from '../../common/types.js';
+import { AnyObject } from '../api.js';
 import { Summary } from '../components/diagnostics.js';
 import { useCollector, useEmitter, useMatch } from '../state/api.js';
 
@@ -48,13 +42,8 @@ export const Details: FunctionComponent<{
 
 export const Properties: FunctionComponent<{
   // @ts-ignore
-  object: Match<object, TExclude, TSerialization>;
+  object: AnyObject;
 }> = ({ object }) => {
-  // const $ = useMemo(
-  //   () => JSON.stringify('$' in object ? object.$ : undefined),
-  //   [object],
-  // );
-
   if (Object.keys(object).length === 0) return null;
 
   return (
@@ -90,7 +79,7 @@ export const Properties: FunctionComponent<{
 };
 
 const Emitter: FunctionComponent<{
-  object: Match<object, TExclude, TSerialization>;
+  object: AnyObject;
 }> = ({ object }) => {
   const [object_] = useMatch(
     { $: 'getter' as const },
@@ -116,7 +105,7 @@ const Emitter: FunctionComponent<{
 };
 
 const Collector: FunctionComponent<{
-  object: Match<object, TExclude, TSerialization>;
+  object: AnyObject;
 }> = ({ object }) => {
   // @ts-ignore
   const object_ = useMatch(
@@ -140,12 +129,12 @@ const Collector: FunctionComponent<{
   > = ({ currentTarget }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
     const { value } = currentTarget;
 
-    if (value.length === 0) {
-      currentTarget.setCustomValidity('');
-      setInput(undefined);
+    //     if (value.length === 0) {
+    //       currentTarget.setCustomValidity('');
+    //       setInput(undefined);
 
-      return;
-    }
+    //       return;
+    //     }
 
     try {
       const parsedValue = JSON.parse(value);
@@ -199,7 +188,7 @@ const Collector: FunctionComponent<{
 
 const Child: FunctionComponent<{
   name: string;
-  object: Match<object, TExclude, TSerialization>;
+  object: AnyObject;
   open: boolean;
 }> = ({ name, object, open }) =>
   isPlainObject(object) ? (
@@ -221,7 +210,7 @@ const Child: FunctionComponent<{
   ) : null;
 
 export const Hierarchy: FunctionComponent<{
-  object: Match<object, TExclude, TSerialization>;
+  object: AnyObject;
 }> = ({ object }) => {
   const openChildList = useMemo(() => {
     if (!('level' in object)) return false;

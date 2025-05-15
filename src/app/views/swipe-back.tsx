@@ -6,10 +6,10 @@ import {
   SwipeBack as SwipeBackComponent,
   SwipeBackWrapper,
 } from '../components/swipe-back.js';
-import { useTheme } from '../state/theme.js';
+import { $theme } from '../state/theme.js';
 
 export const SwipeBack: FunctionComponent = () => {
-  const theme = useTheme();
+  const theme = $theme.value;
   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
 
   return (

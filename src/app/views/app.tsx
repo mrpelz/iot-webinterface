@@ -12,8 +12,6 @@ import { Screensaver } from './screensaver.js';
 export const App: FunctionComponent = () => {
   const backgroundColor = colors.backgroundPrimary()();
 
-  const isScreensaverEnabled = $flags.screensaverEnable.value;
-
   useLayoutEffect(() => {
     const { style } = document.documentElement;
 
@@ -26,7 +24,7 @@ export const App: FunctionComponent = () => {
 
   return (
     <AppComponent>
-      {isScreensaverEnabled ? <Screensaver /> : null}
+      {$flags.screensaverEnable.value ? <Screensaver /> : null}
       <Layout>
         <RootRoute />
         <Background />

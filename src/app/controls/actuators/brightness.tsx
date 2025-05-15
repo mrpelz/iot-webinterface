@@ -1,224 +1,211 @@
-/* eslint-disable unicorn/no-empty-file */
-// import { FunctionComponent } from 'preact';
-// import {
-//   Dispatch,
-//   MutableRef,
-//   StateUpdater,
-//   useCallback,
-//   useEffect,
-//   useMemo,
-//   useRef,
-//   useState,
-// } from 'preact/hooks';
+import { Match, TExclude } from '@iot/iot-monolith/tree';
+import { FunctionComponent } from 'preact';
+import {
+  Dispatch,
+  MutableRef,
+  StateUpdater,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 
-// import { BlendOver } from '../../components/blend-over.js';
-// import { BodyLarge } from '../../components/controls.js';
-// import { NonBreaking, TabularNums } from '../../components/text.js';
-// import { useColorBody } from '../../hooks/use-color-body.js';
-// import { useDelay } from '../../hooks/use-delay.js';
-// import { useSwipe } from '../../hooks/use-swipe.js';
-// import { useWheel } from '../../hooks/use-wheel.js';
-// import { I18nKey } from '../../i18n/main.js';
-// import { Translation } from '../../state/i18n.js';
-// import { useSegment } from '../../state/path.js';
-// import {
-//   SetterFunction,
-//   useChildGetter,
-//   useChildSetter,
-//   useGetter,
-// } from '../../state/web-api.js';
-// import {
-//   HierarchyElement,
-//   HierarchyElementPropertyActuator,
-//   isMetaPropertyActuator,
-//   ValueType,
-// } from '../../web-api.js';
-// import { Cell } from '../main.js';
-// import { BinaryActuatorElement, isBinaryActuatorElement } from './binary.js';
+import { TSerialization } from '../../../common/types.js';
+import { BlendOver } from '../../components/blend-over.js';
+import { BodyLarge } from '../../components/controls.js';
+import { NonBreaking, TabularNums } from '../../components/text.js';
+import { useColorBody } from '../../hooks/use-color-body.js';
+import { useDelay } from '../../hooks/use-delay.js';
+import { useSwipe } from '../../hooks/use-swipe.js';
+import { useWheel } from '../../hooks/use-wheel.js';
+import { I18nKey } from '../../i18n/main.js';
+import { useTypedCollector, useTypedEmitter } from '../../state/api.js';
+import { $rootPath } from '../../state/path.js';
+import { Translation } from '../../views/translation.js';
+import { Cell } from '../main.js';
 
-// export type BrightnessActuatorElement = BinaryActuatorElement & {
-//   children: {
-//     brightness: HierarchyElementPropertyActuator & {
-//       meta: { valueType: ValueType.NUMBER };
-//     };
-//   };
-// };
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type TBrightnessActuator = Match<
+  {
+    $: 'led' | 'ledGrouping';
+  },
+  TExclude,
+  TSerialization
+>;
 
-// export const isBrightnessActuatorElement = (
-//   element: HierarchyElement,
-// ): element is BrightnessActuatorElement =>
-//   Boolean(
-//     isBinaryActuatorElement(element) &&
-//       element.children &&
-//       'brightness' in element.children &&
-//       isMetaPropertyActuator(element.children.brightness.meta) &&
-//       element.children.brightness.meta.valueType === ValueType.NUMBER,
-//   );
+export const useWheelBrightness = (
+  brightnessRef: MutableRef<number | undefined>,
+  loadingRef: MutableRef<boolean | undefined>,
+  setBrightness: (brightness: number) => void | undefined,
+): ((delta: number) => void) =>
+  useCallback(
+    (delta) => {
+      const { current: currentBrightness } = brightnessRef;
+      const { current: currentLoading } = loadingRef;
 
-// export const useWheelBrightness = (
-//   brightnessRef: MutableRef<number | null>,
-//   loadingRef: MutableRef<boolean | null>,
-//   setBrightness: SetterFunction<number> | null,
-// ): ((delta: number) => void) =>
-//   useCallback(
-//     (delta) => {
-//       const { current: currentBrightness } = brightnessRef;
-//       const { current: currentLoading } = loadingRef;
+      if (!setBrightness) return;
+      if (currentLoading) return;
 
-//       if (!setBrightness) return;
-//       if (currentLoading) return;
+      const newValue =
+        Math.round(
+          Math.min(Math.max((currentBrightness || 0) + delta * 0.005, 0), 1) *
+            100,
+        ) / 100;
 
-//       const newValue =
-//         Math.round(
-//           Math.min(Math.max((currentBrightness || 0) + delta * 0.005, 0), 1) *
-//             100,
-//         ) / 100;
+      if (newValue === currentBrightness) return;
 
-//       if (newValue === currentBrightness) return;
+      setBrightness(newValue);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setBrightness],
+  );
 
-//       setBrightness(newValue);
-//     },
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//     [setBrightness],
-//   );
+export const useSwipeBrightness = (
+  brightnessRef: MutableRef<number | undefined>,
+  loadingRef: MutableRef<boolean | undefined>,
+  setBrightness: (brightness: number) => void | undefined,
+  setInteracting: Dispatch<StateUpdater<boolean>>,
+): ((delta: number | undefined) => void) => {
+  const startBrightnessRef = useRef<number | undefined>(undefined);
 
-// export const useSwipeBrightness = (
-//   brightnessRef: MutableRef<number | null>,
-//   loadingRef: MutableRef<boolean | null>,
-//   setBrightness: SetterFunction<number> | null,
-//   setInteracting: Dispatch<StateUpdater<boolean>>,
-// ): ((delta: number | null) => void) => {
-//   const startBrightnessRef = useRef<number | null>(null);
+  return useCallback(
+    (delta) => {
+      const { current: currentBrightness } = brightnessRef;
+      const { current: currentLoading } = loadingRef;
 
-//   return useCallback(
-//     (delta) => {
-//       const { current: currentBrightness } = brightnessRef;
-//       const { current: currentLoading } = loadingRef;
+      if (currentBrightness === undefined) return;
+      if (currentLoading) return;
+      if (!setBrightness) return;
 
-//       if (currentBrightness === null) return;
-//       if (currentLoading) return;
-//       if (!setBrightness) return;
+      if (delta === 0) {
+        setInteracting(true);
+        return;
+      }
 
-//       if (delta === 0) {
-//         setInteracting(true);
-//         return;
-//       }
+      if (delta === undefined) {
+        startBrightnessRef.current = undefined;
+        setInteracting(false);
+        return;
+      }
 
-//       if (delta === null) {
-//         startBrightnessRef.current = null;
-//         setInteracting(false);
-//         return;
-//       }
+      const { current: startBrightness } = startBrightnessRef;
 
-//       const { current: startBrightness } = startBrightnessRef;
+      const brightness =
+        startBrightness === undefined ? currentBrightness : startBrightness;
 
-//       const brightness =
-//         startBrightness === null ? currentBrightness : startBrightness;
+      const newValue =
+        Math.round(Math.min(Math.max(brightness + delta, 0), 1) * 100) / 100;
 
-//       const newValue =
-//         Math.round(Math.min(Math.max(brightness + delta, 0), 1) * 100) / 100;
+      if (newValue === currentBrightness) return;
 
-//       if (newValue === currentBrightness) return;
+      setBrightness(newValue);
 
-//       setBrightness(newValue);
+      startBrightnessRef.current = brightness;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setBrightness],
+  );
+};
 
-//       startBrightnessRef.current = brightness;
-//     },
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//     [setBrightness],
-//   );
-// };
+export const BrightnessLabel: FunctionComponent<{
+  brightness: number | undefined;
+  loading: boolean | undefined;
+  value: boolean | undefined;
+}> = ({ brightness, loading, value }) => (
+  <NonBreaking>
+    {useMemo(() => {
+      if (value === undefined || brightness === undefined) return '?';
+      if (loading) return '…';
 
-// export const BrightnessLabel: FunctionComponent<{
-//   brightness: number | null;
-//   loading: boolean | null;
-//   value: boolean | null;
-// }> = ({ brightness, loading, value }) => (
-//   <NonBreaking>
-//     {useMemo(() => {
-//       if (value === null || brightness === null) return '?';
-//       if (loading) return '…';
+      return <TabularNums>{Math.round(brightness * 100)}%</TabularNums>;
+    }, [brightness, loading, value])}
+  </NonBreaking>
+);
 
-//       return <TabularNums>{Math.round(brightness * 100)}%</TabularNums>;
-//     }, [brightness, loading, value])}
-//   </NonBreaking>
-// );
+export const BrightnessActuator: FunctionComponent<{
+  actuator: TBrightnessActuator;
+  onClick?: () => void;
+  title?: I18nKey;
+}> = ({ actuator, onClick, title }) => {
+  const value = useTypedEmitter(actuator.main).value;
 
-// export const BrightnessActuator: FunctionComponent<{
-//   element: BrightnessActuatorElement;
-//   onClick?: () => void;
-//   title?: I18nKey;
-// }> = ({ element, onClick, title }) => {
-//   const {
-//     property,
-//     meta: { actuated },
-//   } = element;
+  const brightness = useTypedEmitter(actuator.brightness).value;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const setBrightness = useTypedCollector(actuator.brightness);
+  const brightnessRef = useRef(brightness);
+  useEffect(() => {
+    brightnessRef.current = brightness;
+  }, [brightness]);
 
-//   const value = useGetter<boolean>(element);
+  const loading = useTypedEmitter(
+    'actuatorStaleness' in actuator
+      ? actuator.actuatorStaleness.loading
+      : undefined,
+  ).value;
+  const loadingRef = useRef(loading);
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
 
-//   const brightness = useChildGetter<number>(element, 'brightness');
-//   const brightnessRef = useRef(brightness);
-//   useEffect(() => {
-//     brightnessRef.current = brightness;
-//   }, [brightness]);
+  const flip = useTypedCollector(actuator.flip);
+  const handleClick = useCallback(() => flip?.(null), [flip]);
 
-//   const loading = useChildGetter<boolean>(element, 'loading');
-//   const loadingRef = useRef(loading);
-//   useEffect(() => {
-//     loadingRef.current = loading;
-//   }, [loading]);
+  const [isInteracting, setInteracting] = useState(false);
 
-//   const flip = useChildSetter<null>(element, 'flip');
-//   const handleClick = useCallback(() => flip?.(null), [flip]);
+  const handleWheel = useWheelBrightness(
+    brightnessRef,
+    loadingRef,
+    setBrightness,
+  );
+  const handleSwipe = useSwipeBrightness(
+    brightnessRef,
+    loadingRef,
+    setBrightness,
+    setInteracting,
+  );
 
-//   const setBrightness = useChildSetter<number>(element, 'brightness');
+  const refA = useRef<HTMLElement | null>(null);
+  const refB = useRef<HTMLElement | null>(null);
 
-//   const [isInteracting, setInteracting] = useState(false);
+  useWheel(refA, handleWheel, 100);
+  useWheel(refB, handleWheel, 100);
 
-//   const handleWheel = useWheelBrightness(
-//     brightnessRef,
-//     loadingRef,
-//     setBrightness,
-//   );
-//   const handleSwipe = useSwipeBrightness(
-//     brightnessRef,
-//     loadingRef,
-//     setBrightness,
-//     setInteracting,
-//   );
+  useSwipe(refA, handleSwipe, 50);
+  useSwipe(refB, handleSwipe, 50);
 
-//   const refA = useRef<HTMLElement | null>(null);
-//   const refB = useRef<HTMLElement | null>(null);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const name = String(title ?? actuator.$path?.at(-1) ?? actuator.topic);
 
-//   useWheel(refA, handleWheel, 100);
-//   useWheel(refB, handleWheel, 100);
+  const ColorBody = useColorBody(
+    BodyLarge,
+    String(actuator.$path?.at(-1) ?? ''),
+    actuator.topic,
+  );
 
-//   useSwipe(refA, handleSwipe, 50);
-//   useSwipe(refB, handleSwipe, 50);
+  const allowTransition = Boolean(useDelay($rootPath.value, 300, true));
 
-//   const ColorBody = useColorBody(BodyLarge, property, actuated);
+  const label = (
+    <BrightnessLabel brightness={brightness} loading={loading} value={value} />
+  );
 
-//   const [route] = useSegment(0);
-//   const allowTransition = Boolean(useDelay(route, 300, true));
-
-//   const label = (
-//     <BrightnessLabel brightness={brightness} loading={loading} value={value} />
-//   );
-
-//   return (
-//     <Cell
-//       onClick={flip && !onClick ? handleClick : onClick}
-//       title={<Translation i18nKey={title || property} capitalize={true} />}
-//     >
-//       <BlendOver
-//         blendOver={brightness === null ? 0 : brightness}
-//         overlay={<ColorBody ref={refA}>{label}</ColorBody>}
-//         transition={
-//           allowTransition && brightness !== null && !loading && !isInteracting
-//         }
-//       >
-//         <BodyLarge ref={refB}>{label}</BodyLarge>
-//       </BlendOver>
-//     </Cell>
-//   );
-// };
+  return (
+    <Cell
+      onClick={onClick ?? handleClick}
+      title={<Translation i18nKey={name} capitalize={true} />}
+    >
+      <BlendOver
+        blendOver={brightness === null ? 0 : brightness}
+        overlay={<ColorBody ref={refA}>{label}</ColorBody>}
+        transition={
+          allowTransition && brightness !== null && !loading && !isInteracting
+        }
+      >
+        <BodyLarge ref={refB}>{label}</BodyLarge>
+      </BlendOver>
+    </Cell>
+  );
+};

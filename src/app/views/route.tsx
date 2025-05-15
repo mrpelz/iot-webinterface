@@ -6,18 +6,15 @@ import { useScrollRestore } from '../hooks/use-scroll-restore.js';
 import { Devices } from '../routes/root/devices.js';
 import { Diagnostics } from '../routes/root/diagnostics.js';
 import { Global } from '../routes/root/global.js';
-// import { Room } from '../routes/root/room.js';
+import { Room } from '../routes/root/room.js';
 import { Settings } from '../routes/root/settings.js';
 import { Test } from '../routes/root/test-route.js';
-import { noBackground, useSetBackgroundOverride } from '../state/background.js';
-import {
-  useNavigationRoom,
-  useNavigationStaticPage,
-} from '../state/navigation.js';
+import { noBackground, setBackgroundOverride } from '../state/background.js';
+import { $room, $staticPage } from '../state/navigation.js';
 
 export const RootRoute: FunctionComponent = () => {
-  const [staticPage] = useNavigationStaticPage();
-  const [room] = useNavigationRoom();
+  const { value: staticPage } = $staticPage;
+  const { value: room } = $room;
 
   return useMemo(() => {
     if (staticPage) {
@@ -31,8 +28,7 @@ export const RootRoute: FunctionComponent = () => {
     }
 
     if (room) {
-      // return <Room room={room} />;
-      return null;
+      return <Room object={room} />;
     }
 
     return null;
@@ -43,7 +39,7 @@ export const SubRoute: FunctionComponent<{
   blackOut?: boolean;
   subRoute: ComponentChildren;
 }> = ({ blackOut = true, children, subRoute }) => {
-  useSetBackgroundOverride(subRoute && blackOut ? noBackground : undefined);
+  setBackgroundOverride(subRoute && blackOut ? noBackground : undefined);
   useScrollRestore(!subRoute);
 
   return (

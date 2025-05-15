@@ -2,12 +2,14 @@ import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
 import { StatusBar as StatusBarComponent } from '../components/status-bar.js';
-import { useIsWebSocketOnline } from '../state/api.js';
-import { useTheme } from '../state/theme.js';
+import { api } from '../main.js';
+import { $theme } from '../state/theme.js';
+
+const $isWebSocketOnline = api.$isWebSocketOnline();
 
 export const StatusBar: FunctionComponent = () => {
-  const isWebSocketOnline = useIsWebSocketOnline();
-  const theme = useTheme();
+  const isWebSocketOnline = $isWebSocketOnline.value;
+  const theme = $theme.value;
 
   const isLight = useMemo(
     () => theme === 'light' || theme === 'highContrast',
@@ -15,9 +17,6 @@ export const StatusBar: FunctionComponent = () => {
   );
 
   return (
-    <StatusBarComponent
-      isConnected={isWebSocketOnline.value}
-      isLight={isLight}
-    />
+    <StatusBarComponent isConnected={isWebSocketOnline} isLight={isLight} />
   );
 };

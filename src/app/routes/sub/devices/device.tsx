@@ -1,277 +1,300 @@
-/* eslint-disable unicorn/no-empty-file */
-// /* eslint-disable @typescript-eslint/ban-ts-comment */
-// import { Level, Match } from '@iot/iot-monolith/tree';
-// import { FunctionComponent } from 'preact';
-// import { useMemo } from 'preact/hooks';
+import { ensureKeys } from '@iot/iot-monolith/oop';
+import { excludePattern } from '@iot/iot-monolith/tree';
+import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
 
-// import { LevelObject } from '../../../api.js';
-// import { Entry as EntryComponent } from '../../../components/list.js';
-// import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
-// import {
-//   isNullActuatorElement,
-//   NullActuatorButton,
-// } from '../../../controls/actuators/null.js';
-// import { OfflineIcon, OnlineIcon } from '../../../controls/device.js';
-// import {
-//   useAbsoluteTimeLabel,
-//   useDateFromEpoch,
-//   useRelativeTimeLabel,
-// } from '../../../hooks/use-time-label.js';
-// import { useKey, useMatch } from '../../../state/api.js';
-// import { useSetTitleOverride } from '../../../state/title.js';
-// import { useChild, useChildGetter, useGetter } from '../../../state/web-api.js';
-// import { ensureKeys } from '../../../util/oop.js';
-// import { Entry, List } from '../../../views/list.js';
-// import { HierarchyElementDevice } from '../../../web-api.js';
+import { Entry as EntryComponent } from '../../../components/list.js';
+import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
+import { NullActuatorButton } from '../../../controls/actuators/null.js';
+import { OfflineIcon, OnlineIcon, TDevice } from '../../../controls/device.js';
+import {
+  useAbsoluteTimeLabel,
+  useDateFromEpoch,
+  useRelativeTimeLabel,
+} from '../../../hooks/use-time-label.js';
+import { useMatch, useTypedEmitter } from '../../../state/api.js';
+import { setTitleOverride } from '../../../state/title.js';
+import { Entry, List } from '../../../views/list.js';
 
-// const SHY_CHARACTER = '\u00AD';
+const SHY_CHARACTER = '\u00AD';
 
-// const DeviceDetail: FunctionComponent<{ label: string }> = ({
-//   label,
-//   children,
-// }) => {
-//   if (!children || (Array.isArray(children) && children.length === 0)) {
-//     return null;
-//   }
+const DeviceDetail: FunctionComponent<{ label: string }> = ({
+  label,
+  children,
+}) => {
+  if (!children || (Array.isArray(children) && children.length === 0)) {
+    return null;
+  }
 
-//   return (
-//     <Entry id={label} label={label}>
-//       <BreakAll>
-//         <AlignRight>{children}</AlignRight>
-//       </BreakAll>
-//     </Entry>
-//   );
-// };
+  return (
+    <Entry id={label} label={label}>
+      <BreakAll>
+        <AlignRight>{children}</AlignRight>
+      </BreakAll>
+    </Entry>
+  );
+};
 
-// const DeviceAddress: FunctionComponent<{ device: HierarchyElementDevice }> = ({
-//   device,
-// }) =>
-//   useMemo(() => {
-//     const { host, identifier, port, type } = device.meta;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const DeviceAddress: FunctionComponent<{ device: TDevice }> = ({ device }) =>
+  useMemo(() => {
+    const { type } = ensureKeys(device, 'type');
+    const { host, port } = ensureKeys(device, 'host', 'port');
+    const { identifier } = ensureKeys(device, 'host');
 
-//     if (type === 'ESPNowDevice') {
-//       const annotatedIdentifier =
-//         identifier
-//           ?.map((byte) => byte.toString(16).padStart(2, '0').toUpperCase())
-//           .join(':') || null;
+    if (type === 'ESPNowDevice') {
+      if (!identifier) return null;
 
-//       return (
-//         <DeviceDetail label="WiFi MAC-address">
-//           {annotatedIdentifier}
-//         </DeviceDetail>
-//       );
-//     }
+      const annotatedIdentifier = identifier
+        .map((byte) => byte.toString(16).padStart(2, '0').toUpperCase())
+        .join(':');
 
-//     if (type === 'Ev1527Device') {
-//       if (!identifier) return null;
+      return (
+        <DeviceDetail label="WiFi MAC-address">
+          {annotatedIdentifier}
+        </DeviceDetail>
+      );
+    }
 
-//       const array = new Uint8ClampedArray(4);
-//       array.set(identifier, 1);
+    if (type === 'Ev1527Device') {
+      if (!identifier) return null;
 
-//       const annotatedIdentifier = new DataView(array.buffer)
-//         .getUint32(0)
-//         .toString();
+      const array = new Uint8ClampedArray(4);
+      array.set(identifier, 1);
 
-//       return (
-//         <DeviceDetail label="identifier">{annotatedIdentifier}</DeviceDetail>
-//       );
-//     }
+      const annotatedIdentifier = new DataView(array.buffer)
+        .getUint32(0)
+        .toString();
 
-//     if (type === 'TCPDevice' || type === 'UDPDevice') {
-//       if (!host || !port) return null;
+      return (
+        <DeviceDetail label="identifier">{annotatedIdentifier}</DeviceDetail>
+      );
+    }
 
-//       const annotatedHost = `${host.split('.').join(`${SHY_CHARACTER}.`)}`;
-//       const annotatedPort = `${type === 'TCPDevice' ? 'tcp' : 'udp'}/${port}`;
+    if (type === 'TCPDevice' || type === 'UDPDevice') {
+      if (!host || !port) return null;
 
-//       return (
-//         <>
-//           <DeviceDetail label="host">{annotatedHost}</DeviceDetail>
-//           <DeviceDetail label="port">{annotatedPort}</DeviceDetail>
-//         </>
-//       );
-//     }
+      const annotatedHost = `${host.split('.').join(`${SHY_CHARACTER}.`)}`;
+      const annotatedPort = `${type === 'TCPDevice' ? 'tcp' : 'udp'}/${port}`;
 
-//     return null;
-//   }, [device]);
+      return (
+        <>
+          <DeviceDetail label="host">{annotatedHost}</DeviceDetail>
+          <DeviceDetail label="port">{annotatedPort}</DeviceDetail>
+        </>
+      );
+    }
 
-// const DeviceOnline: FunctionComponent<{ device: HierarchyElementDevice }> = ({
-//   device,
-// }) => {
-//   const online = useChild(device, 'online');
-//   const isOnlineValue = useGetter<boolean>(online);
+    return null;
+  }, [device]);
 
-//   const lastSeenDate = useDateFromEpoch(
-//     useChildGetter<number>(device, 'lastSeen'),
-//   );
-//   const lastSeenLabelAbsolute = useAbsoluteTimeLabel(lastSeenDate);
-//   const lastSeenLabelRelative = useRelativeTimeLabel(lastSeenDate);
+const DeviceOnline: FunctionComponent<{ device: TDevice }> = ({ device }) => {
+  const {
+    online: { lastChange: { main: lastChange } = {}, main: online } = {},
+  } = useMemo(() => ensureKeys(device, 'online'), [device]);
 
-//   const onlineChangeDate = useDateFromEpoch(
-//     useChildGetter<number>(online, 'lastChange'),
-//   );
-//   const onlineChangeLabelAbsolute = useAbsoluteTimeLabel(onlineChangeDate);
-//   const onlineChangeLabelRelative = useRelativeTimeLabel(onlineChangeDate);
+  const { value: isOnline } = useTypedEmitter(online);
 
-//   return useMemo(
-//     () => (
-//       <>
-//         {online ? (
-//           <DeviceDetail label="online">
-//             {isOnlineValue ? <OnlineIcon /> : <OfflineIcon />}
-//           </DeviceDetail>
-//         ) : null}
-//         {onlineChangeDate ? (
-//           <DeviceDetail label="online change">
-//             <TabularNums>
-//               {onlineChangeLabelAbsolute || '—'} <br />(
-//               {onlineChangeLabelRelative || '—'})
-//             </TabularNums>
-//           </DeviceDetail>
-//         ) : null}
-//         {lastSeenDate ? (
-//           <DeviceDetail label="last seen">
-//             <TabularNums>
-//               {lastSeenLabelAbsolute || '—'} <br />(
-//               {lastSeenLabelRelative || '—'})
-//             </TabularNums>
-//           </DeviceDetail>
-//         ) : null}
-//       </>
-//     ),
-//     [
-//       isOnlineValue,
-//       lastSeenDate,
-//       lastSeenLabelAbsolute,
-//       lastSeenLabelRelative,
-//       online,
-//       onlineChangeDate,
-//       onlineChangeLabelAbsolute,
-//       onlineChangeLabelRelative,
-//     ],
-//   );
-// };
+  const onlineLastChangeDate = useDateFromEpoch(
+    useTypedEmitter(lastChange).value,
+  );
 
-// const DeviceHello: FunctionComponent<{ device: HierarchyElementDevice }> = ({
-//   device,
-// }) => {
-//   const hello = useChildGetter<string>(device, 'hello');
+  const onlineChangeLabelAbsolute = useAbsoluteTimeLabel(onlineLastChangeDate);
+  const onlineChangeLabelRelative = useRelativeTimeLabel(onlineLastChangeDate);
 
-//   return useMemo(() => {
-//     if (!hello) return null;
+  const lastSeen = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { lastSeen: { main: lastSeen_ } = {} } = ensureKeys(
+      device,
+      'lastSeen',
+    );
 
-//     const [
-//       ,
-//       nodeName,
-//       boardName,
-//       hardwareName,
-//       gitRevision,
-//       pioEnvironment,
-//       pioPlatform,
-//       pioFramework,
-//       chipId,
-//       flashId,
-//       ethMacAddress,
-//       wifiMacAddress,
-//       wifiBssid,
-//       wifiChannel,
-//       wifiRssi,
-//       wifiPhyMode,
-//       wifiSsid,
-//     ] = hello.split(',').map((element) => element || null);
+    return lastSeen_;
+  }, [device]);
 
-//     return (
-//       <>
-//         <DeviceDetail label="node name">{nodeName}</DeviceDetail>
-//         <DeviceDetail label="board name">{boardName}</DeviceDetail>
-//         <DeviceDetail label="hardware name">{hardwareName}</DeviceDetail>
-//         <DeviceDetail label="chip ID">{chipId}</DeviceDetail>
-//         <DeviceDetail label="flash ID">{flashId}</DeviceDetail>
-//         <DeviceDetail label="Ethernet MAC-address">
-//           {ethMacAddress}
-//         </DeviceDetail>
-//         <DeviceDetail label="WiFi MAC-address">{wifiMacAddress}</DeviceDetail>
-//         <DeviceDetail label="WiFi SSID">{wifiSsid}</DeviceDetail>
-//         <DeviceDetail label="WiFi channel">{wifiChannel}</DeviceDetail>
-//         <DeviceDetail label="WiFi BSSID">{wifiBssid}</DeviceDetail>
-//         {wifiRssi ? (
-//           <DeviceDetail label="WiFi RSSI">{wifiRssi} dBm</DeviceDetail>
-//         ) : null}
-//         <DeviceDetail label="WiFi Phy-mode">{wifiPhyMode}</DeviceDetail>
-//         <DeviceDetail label="pio environment">{pioEnvironment}</DeviceDetail>
-//         <DeviceDetail label="pio framework">{pioFramework}</DeviceDetail>
-//         <DeviceDetail label="pio platform">{pioPlatform}</DeviceDetail>
-//         <DeviceDetail label="git revision">{gitRevision}</DeviceDetail>
-//       </>
-//     );
-//   }, [hello]);
-// };
+  const lastSeenDate = useDateFromEpoch(useTypedEmitter(lastSeen).value);
 
-// export const DeviceDetailsInner: FunctionComponent<{
-//   device: // @ts-ignore
-//   | LevelObject[Level.DEVICE]
-//     | Match<
-//         { isSubDevice: true; level: Level.DEVICE },
-//         LevelObject[Level.DEVICE],
-//         1
-//       >;
-// }> = ({ device }) => {
-//   const { $, isSubDevice, transportType, type } = ensureKeys(device, '');
+  const lastSeenLabelAbsolute = useAbsoluteTimeLabel(lastSeenDate);
+  const lastSeenLabelRelative = useRelativeTimeLabel(lastSeenDate);
 
-//   const identifyDevice = useChild(device, 'identifyDevice');
-//   const resetDevice = useChild(device, 'resetDevice');
+  return useMemo(
+    () => (
+      <>
+        {isOnline ? (
+          <DeviceDetail label="online">
+            {isOnline ? <OnlineIcon /> : <OfflineIcon />}
+          </DeviceDetail>
+        ) : null}
+        {lastChange ? (
+          <DeviceDetail label="online change">
+            <TabularNums>
+              {onlineChangeLabelAbsolute || '—'} <br />(
+              {onlineChangeLabelRelative || '—'})
+            </TabularNums>
+          </DeviceDetail>
+        ) : null}
+        {lastSeen ? (
+          <DeviceDetail label="last seen">
+            <TabularNums>
+              {lastSeenLabelAbsolute || '—'} <br />(
+              {lastSeenLabelRelative || '—'})
+            </TabularNums>
+          </DeviceDetail>
+        ) : null}
+      </>
+    ),
+    [
+      isOnline,
+      lastChange,
+      lastSeen,
+      lastSeenLabelAbsolute,
+      lastSeenLabelRelative,
+      onlineChangeLabelAbsolute,
+      onlineChangeLabelRelative,
+    ],
+  );
+};
 
-//   return (
-//     <List>
-//       <DeviceDetail label={isSubDevice ? 'sub name' : 'name'}>
-//         {name}
-//       </DeviceDetail>
-//       <DeviceDetail label="type">{type}</DeviceDetail>
-//       <DeviceDetail label="transport type">{transportType}</DeviceDetail>
+const DeviceHello: FunctionComponent<{ device: TDevice }> = ({ device }) => {
+  const { hello: { main: hello } = {} } = useMemo(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    () => ensureKeys(device, 'hello'),
+    [device],
+  );
 
-//       <DeviceAddress device={device} />
+  const { value: helloValue } = useTypedEmitter(hello);
 
-//       <DeviceOnline device={device} />
+  return useMemo(() => {
+    if (!helloValue) return null;
 
-//       <DeviceHello device={device} />
+    const [
+      ,
+      nodeName,
+      boardName,
+      hardwareName,
+      gitRevision,
+      pioEnvironment,
+      pioPlatform,
+      pioFramework,
+      chipId,
+      flashId,
+      ethMacAddress,
+      wifiMacAddress,
+      wifiBssid,
+      wifiChannel,
+      wifiRssi,
+      wifiPhyMode,
+      wifiSsid,
+    ] = helloValue.split(',').map((element) => element || null);
 
-//       {identifyDevice || resetDevice ? (
-//         <EntryComponent>
-//           {identifyDevice && isNullActuatorElement(identifyDevice) ? (
-//             <NullActuatorButton element={identifyDevice}>
-//               identify device
-//             </NullActuatorButton>
-//           ) : null}
-//           {resetDevice && isNullActuatorElement(resetDevice) ? (
-//             <NullActuatorButton element={resetDevice}>
-//               reset device
-//             </NullActuatorButton>
-//           ) : null}
-//         </EntryComponent>
-//       ) : null}
-//     </List>
-//   );
-// };
+    return (
+      <>
+        <DeviceDetail label="node name">{nodeName}</DeviceDetail>
+        <DeviceDetail label="board name">{boardName}</DeviceDetail>
+        <DeviceDetail label="hardware name">{hardwareName}</DeviceDetail>
+        <DeviceDetail label="chip ID">{chipId}</DeviceDetail>
+        <DeviceDetail label="flash ID">{flashId}</DeviceDetail>
+        <DeviceDetail label="Ethernet MAC-address">
+          {ethMacAddress}
+        </DeviceDetail>
+        <DeviceDetail label="WiFi MAC-address">{wifiMacAddress}</DeviceDetail>
+        <DeviceDetail label="WiFi SSID">{wifiSsid}</DeviceDetail>
+        <DeviceDetail label="WiFi channel">{wifiChannel}</DeviceDetail>
+        <DeviceDetail label="WiFi BSSID">{wifiBssid}</DeviceDetail>
+        {wifiRssi ? (
+          <DeviceDetail label="WiFi RSSI">{wifiRssi} dBm</DeviceDetail>
+        ) : null}
+        <DeviceDetail label="WiFi Phy-mode">{wifiPhyMode}</DeviceDetail>
+        <DeviceDetail label="pio environment">{pioEnvironment}</DeviceDetail>
+        <DeviceDetail label="pio framework">{pioFramework}</DeviceDetail>
+        <DeviceDetail label="pio platform">{pioPlatform}</DeviceDetail>
+        <DeviceDetail label="git revision">{gitRevision}</DeviceDetail>
+      </>
+    );
+  }, [helloValue]);
+};
 
-// export const DeviceDetails: FunctionComponent<{
-//   // @ts-ignore
-//   device: LevelObject[Level.DEVICE];
-// }> = ({ device }) => {
-//   useSetTitleOverride(useKey(device));
+export const DeviceDetailsInner: FunctionComponent<{
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  device: TDevice;
+}> = ({ device }) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const name = useMemo(() => String(device.$path?.at(-1) ?? ''), [device]);
 
-//   const subDevices = useMatch(
-//     { isSubDevice: true as const, level: Level.DEVICE as const },
-//     device,
-//     1,
-//   );
+  const { isSubDevice, transportType, type } = useMemo(
+    () => ensureKeys(device, 'isSubDevice', 'transportType', 'type'),
+    [device],
+  );
 
-//   return (
-//     <>
-//       <DeviceDetailsInner device={device} />
-//       {subDevices
-//         ? subDevices.map((subDevice) => (
-//             <DeviceDetailsInner device={subDevice} />
-//           ))
-//         : null}
-//     </>
-//   );
-// };
+  const [identifyDevice] = useMatch(
+    { $: 'identifyDevice' as const },
+    excludePattern,
+    device,
+  );
+
+  const [resetDevice] = useMatch(
+    { $: 'resetDevice' as const },
+    excludePattern,
+    device,
+  );
+
+  return (
+    <List>
+      <DeviceDetail label={isSubDevice ? 'sub name' : 'name'}>
+        {name}
+      </DeviceDetail>
+      <DeviceDetail label="type">{type}</DeviceDetail>
+      <DeviceDetail label="transport type">{transportType}</DeviceDetail>
+
+      <DeviceAddress device={device} />
+
+      <DeviceOnline device={device} />
+
+      <DeviceHello device={device} />
+
+      {identifyDevice || resetDevice ? (
+        <EntryComponent>
+          {identifyDevice ? (
+            <NullActuatorButton actuator={identifyDevice}>
+              identify device
+            </NullActuatorButton>
+          ) : null}
+          {resetDevice ? (
+            <NullActuatorButton actuator={resetDevice}>
+              reset device
+            </NullActuatorButton>
+          ) : null}
+        </EntryComponent>
+      ) : null}
+    </List>
+  );
+};
+
+export const DeviceDetails: FunctionComponent<{
+  device: TDevice;
+}> = ({ device }) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const name = useMemo(() => String(device.$path.at(-1) ?? ''), [device]);
+  setTitleOverride(name);
+
+  const { espNow, wifi } = useMemo(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    () => ensureKeys(device, 'espNow', 'wifi'),
+    [device],
+  );
+
+  return (
+    <>
+      <DeviceDetailsInner device={device} />
+      {espNow ? <DeviceDetailsInner device={espNow} /> : null}
+      {wifi ? <DeviceDetailsInner device={wifi} /> : null}
+    </>
+  );
+};

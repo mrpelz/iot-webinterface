@@ -1,215 +1,183 @@
-/* eslint-disable unicorn/no-empty-file */
-// import { StyledVNode } from 'goober';
-// import { FunctionComponent } from 'preact';
-// import {
-//   useCallback,
-//   useEffect,
-//   useMemo,
-//   useRef,
-//   useState,
-// } from 'preact/hooks';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+import { Match, TExclude } from '@iot/iot-monolith/tree';
+import { StyledVNode } from 'goober';
+import { FunctionComponent } from 'preact';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 
-// import { BlendOver } from '../../components/blend-over.js';
-// import { ColorIcon } from '../../components/icons.js';
-// import {
-//   BodyDisableRoundedCorners,
-//   ColorLabel,
-//   RGBBody,
-// } from '../../components/rgb-actuator.js';
-// import { useColorBody } from '../../hooks/use-color-body.js';
-// import { useColorPicker } from '../../hooks/use-color-picker.js';
-// import { useDelay } from '../../hooks/use-delay.js';
-// import { useSwipe } from '../../hooks/use-swipe.js';
-// import { useWheel } from '../../hooks/use-wheel.js';
-// import { I18nKey } from '../../i18n/main.js';
-// import { Translation } from '../../state/i18n.js';
-// import { useSegment } from '../../state/path.js';
-// import {
-//   useChild,
-//   useChildGetter,
-//   useChildSetter,
-//   useGetter,
-// } from '../../state/web-api.js';
-// import {
-//   HierarchyElement,
-//   HierarchyElementArea,
-//   isMetaArea,
-//   MetaArea,
-// } from '../../web-api.js';
-// import { Cell } from '../main.js';
-// import {
-//   BrightnessActuatorElement,
-//   BrightnessLabel,
-//   isBrightnessActuatorElement,
-//   useSwipeBrightness,
-//   useWheelBrightness,
-// } from './brightness.js';
+import { TSerialization } from '../../../common/types.js';
+import { BlendOver } from '../../components/blend-over.js';
+import { ColorIcon } from '../../components/icons.js';
+import {
+  BodyDisableRoundedCorners,
+  ColorLabel,
+  RGBBody,
+} from '../../components/rgb-actuator.js';
+import { useColorBody } from '../../hooks/use-color-body.js';
+import { useColorPicker } from '../../hooks/use-color-picker.js';
+import { useDelay } from '../../hooks/use-delay.js';
+import { useSwipe } from '../../hooks/use-swipe.js';
+import { useWheel } from '../../hooks/use-wheel.js';
+import { I18nKey } from '../../i18n/main.js';
+import { useTypedCollector, useTypedEmitter } from '../../state/api.js';
+import { $rootPath } from '../../state/path.js';
+import { Translation } from '../../views/translation.js';
+import { Cell } from '../main.js';
+import {
+  BrightnessLabel,
+  TBrightnessActuator,
+  useSwipeBrightness,
+  useWheelBrightness,
+} from './brightness.js';
 
-// export type RGBActuatorElement = HierarchyElementArea & {
-//   children: Record<'r' | 'g' | 'b', BrightnessActuatorElement>;
-// };
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type TRGBActuator = Match<
+  {
+    $: 'rgb';
+  },
+  TExclude,
+  TSerialization
+>;
 
-// export const isMetaAreaRGB = ({ name }: MetaArea): boolean =>
-//   name.toLowerCase().includes('rgb');
+const Color: FunctionComponent<{
+  actuator: TBrightnessActuator;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  base?: StyledVNode<any>;
+}> = ({
+  actuator,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  base: Base = RGBBody,
+}) => {
+  const value = useTypedEmitter(actuator.main).value;
 
-// export const isRGBActuatorElement = (
-//   element: HierarchyElement,
-// ): element is RGBActuatorElement =>
-//   Boolean(
-//     isMetaArea(element.meta) &&
-//       element.children &&
-//       'r' in element.children &&
-//       isBrightnessActuatorElement(element.children.r) &&
-//       'g' in element.children &&
-//       isBrightnessActuatorElement(element.children.g) &&
-//       'b' in element.children &&
-//       isBrightnessActuatorElement(element.children.b),
-//   );
+  const brightness = useTypedEmitter(actuator.brightness).value;
+  const setBrightness = useTypedCollector(actuator.brightness);
+  const brightnessRef = useRef(brightness);
+  useEffect(() => {
+    brightnessRef.current = brightness;
+  }, [brightness]);
 
-// const Color: FunctionComponent<{
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   base?: StyledVNode<any>;
-//   element: BrightnessActuatorElement;
-// }> = ({
-//   // eslint-disable-next-line @typescript-eslint/naming-convention
-//   base: Base = RGBBody,
-//   element,
-// }) => {
-//   const {
-//     meta: { actuated },
-//     property,
-//   } = element;
+  const loading = useTypedEmitter(actuator.actuatorStaleness.loading).value;
+  const loadingRef = useRef(loading);
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
 
-//   const value = useGetter<boolean>(element);
+  const flip = useTypedCollector(actuator.flip);
+  const handleClick = useCallback(() => flip?.(null), [flip]);
 
-//   const brightness = useChildGetter<number>(element, 'brightness');
-//   const brightnessRef = useRef(brightness);
-//   useEffect(() => {
-//     brightnessRef.current = brightness;
-//   }, [brightness]);
+  const [isInteracting, setInteracting] = useState(false);
 
-//   const loading = useChildGetter<boolean>(element, 'loading');
-//   const loadingRef = useRef(loading);
-//   useEffect(() => {
-//     loadingRef.current = loading;
-//   }, [loading]);
+  const handleWheel = useWheelBrightness(
+    brightnessRef,
+    loadingRef,
+    setBrightness,
+  );
+  const handleSwipe = useSwipeBrightness(
+    brightnessRef,
+    loadingRef,
+    setBrightness,
+    setInteracting,
+  );
 
-//   const flip = useChildSetter<null>(element, 'flip');
-//   const handleClick = useCallback(
-//     (event: MouseEvent) => {
-//       event.stopPropagation();
-//       flip?.(null);
-//     },
-//     [flip],
-//   );
+  const refA = useRef<HTMLElement | null>(null);
+  const refB = useRef<HTMLElement | null>(null);
 
-//   const setBrightness = useChildSetter<number>(element, 'brightness');
+  useWheel(refA, handleWheel, 100);
+  useWheel(refB, handleWheel, 100);
 
-//   const [isInteracting, setInteracting] = useState(false);
+  useSwipe(refA, handleSwipe, 50);
+  useSwipe(refB, handleSwipe, 50);
 
-//   const handleWheel = useWheelBrightness(
-//     brightnessRef,
-//     loadingRef,
-//     setBrightness,
-//   );
-//   const handleSwipe = useSwipeBrightness(
-//     brightnessRef,
-//     loadingRef,
-//     setBrightness,
-//     setInteracting,
-//   );
+  const ColorBody = useColorBody(
+    Base,
+    String(actuator.$path.at(-1) ?? ''),
+    actuator.topic,
+  );
 
-//   const refA = useRef<HTMLElement | null>(null);
-//   const refB = useRef<HTMLElement | null>(null);
+  const allowTransition = Boolean(useDelay($rootPath.value, 300, true));
 
-//   useWheel(refA, handleWheel, 100);
-//   useWheel(refB, handleWheel, 100);
+  const label = useMemo(
+    () => (
+      <>
+        <ColorLabel>
+          <Translation i18nKey={actuator.topic} />
+        </ColorLabel>
+        <BrightnessLabel
+          brightness={brightness}
+          loading={loading}
+          value={value}
+        />
+      </>
+    ),
+    [actuator.topic, brightness, loading, value],
+  );
 
-//   useSwipe(refA, handleSwipe, 50);
-//   useSwipe(refB, handleSwipe, 50);
+  return (
+    <BlendOver
+      blendOver={brightness === undefined ? 0 : brightness}
+      transition={
+        allowTransition &&
+        brightness !== undefined &&
+        !loading &&
+        !isInteracting
+      }
+      overlay={
+        <ColorBody onClick={handleClick} ref={refA}>
+          {label}
+        </ColorBody>
+      }
+    >
+      <Base onClick={handleClick} ref={refB}>
+        {label}
+      </Base>
+    </BlendOver>
+  );
+};
 
-//   const ColorBody = useColorBody(Base, property, actuated);
+export const RGBActuator: FunctionComponent<{
+  actuator: TRGBActuator;
+  onClick?: () => void;
+  title?: I18nKey;
+}> = ({ actuator, onClick, title }) => {
+  return null;
 
-//   const [route] = useSegment(0);
-//   const allowTransition = Boolean(useDelay(route, 300, true));
+  const rBrightness = useTypedEmitter(actuator.r.brightness).value;
+  const rSetBrightness = useTypedCollector(actuator.r.brightness);
 
-//   const label = useMemo(
-//     () => (
-//       <>
-//         <ColorLabel>
-//           <Translation i18nKey={property} />
-//         </ColorLabel>
-//         <BrightnessLabel
-//           brightness={brightness}
-//           loading={loading}
-//           value={value}
-//         />
-//       </>
-//     ),
-//     [brightness, loading, property, value],
-//   );
+  const gBrightness = useTypedEmitter(actuator.g.brightness).value;
+  const gSetBrightness = useTypedCollector(actuator.g.brightness);
 
-//   return (
-//     <BlendOver
-//       blendOver={brightness === null ? 0 : brightness}
-//       transition={
-//         allowTransition && brightness !== null && !loading && !isInteracting
-//       }
-//       overlay={
-//         <ColorBody onClick={handleClick} ref={refA}>
-//           {label}
-//         </ColorBody>
-//       }
-//     >
-//       <Base onClick={handleClick} ref={refB}>
-//         {label}
-//       </Base>
-//     </BlendOver>
-//   );
-// };
+  const bBrightness = useTypedEmitter(actuator.b.brightness).value;
+  const bSetBrightness = useTypedCollector(actuator.b.brightness);
 
-// export const RGBActuator: FunctionComponent<{
-//   element: RGBActuatorElement;
-//   onClick?: () => void;
-//   title?: I18nKey;
-// }> = ({ element, onClick, title }) => {
-//   const { property } = element;
+  const [focus, colorPicker] = useColorPicker(
+    useMemo(() => [rBrightness, rSetBrightness], [rBrightness, rSetBrightness]),
+    useMemo(() => [gBrightness, gSetBrightness], [gBrightness, gSetBrightness]),
+    useMemo(() => [bBrightness, bSetBrightness], [bBrightness, bSetBrightness]),
+  );
 
-//   const r = useChild(element, 'r') as BrightnessActuatorElement | null;
-//   const g = useChild(element, 'g') as BrightnessActuatorElement | null;
-//   const b = useChild(element, 'b') as BrightnessActuatorElement | null;
-
-//   const rBrightness = useChildGetter<number>(r, 'brightness');
-//   const rSetBrightness = useChildSetter<number>(r, 'brightness');
-
-//   const gBrightness = useChildGetter<number>(g, 'brightness');
-//   const gSetBrightness = useChildSetter<number>(g, 'brightness');
-
-//   const bBrightness = useChildGetter<number>(b, 'brightness');
-//   const bSetBrightness = useChildSetter<number>(b, 'brightness');
-
-//   const [focus, colorPicker] = useColorPicker(
-//     useMemo(() => [rBrightness, rSetBrightness], [rBrightness, rSetBrightness]),
-//     useMemo(() => [gBrightness, gSetBrightness], [gBrightness, gSetBrightness]),
-//     useMemo(() => [bBrightness, bSetBrightness], [bBrightness, bSetBrightness]),
-//   );
-
-//   if (!r || !g || !b) return null;
-
-//   return (
-//     <Cell
-//       icon={<ColorIcon height="1em" />}
-//       onClick={onClick || focus}
-//       title={
-//         <>
-//           {colorPicker}
-//           <Translation i18nKey={title || property} capitalize={true} />
-//         </>
-//       }
-//     >
-//       <Color base={BodyDisableRoundedCorners} element={r} />
-//       <Color base={BodyDisableRoundedCorners} element={g} />
-//       <Color element={b} />
-//     </Cell>
-//   );
-// };
+  return (
+    <Cell
+      icon={<ColorIcon height="1em" />}
+      onClick={onClick || focus}
+      title={
+        <>
+          {colorPicker}
+          <Translation i18nKey={title || 'lighting'} capitalize={true} />
+        </>
+      }
+    >
+      <Color base={BodyDisableRoundedCorners} actuator={actuator.r} />
+      <Color base={BodyDisableRoundedCorners} actuator={actuator.g} />
+      <Color actuator={actuator.b} />
+    </Cell>
+  );
+};

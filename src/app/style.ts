@@ -2,27 +2,18 @@
 
 import { stripIndents } from 'proper-tags';
 
-import { Theme, useTheme } from './state/theme.js';
+import { $theme, Theme } from './state/theme.js';
 import { useBreakpointValue } from './style/breakpoint.js';
 import { color, useThemedValue } from './style/colors.js';
 import { add, dimension, half, subtract } from './style/dimensions.js';
-import { cssEnv, cssVar, useMediaQuery } from './style/main.js';
+import { getMediaQuery } from './style/main.js';
+import { staticStrings } from './style/strings.js';
 
 export const strings = {
   get colorScheme() {
-    return () => useTheme();
+    return () => $theme.value;
   },
-  font: '-apple-system, SF UI Text, Helvetica Neue, Helvetica, Arial, sans-serif',
-  isRetina: '(-webkit-min-device-pixel-ratio: 2)',
-  prefersDarkTheme: '(prefers-color-scheme: dark)',
-  prefersLightTheme: '(prefers-color-scheme: light)',
-  prefersMoreContrast: '(prefers-contrast: more)',
-  safeAreaInsetTop: cssVar(
-    'safe-area-inset-top',
-    cssEnv('safe-area-inset-top'),
-  ),
-  translucent: cssVar('translucent', '20px'),
-  viewportHeight: '100vh',
+  ...staticStrings,
 };
 
 const staticDimensions = {
@@ -54,7 +45,7 @@ const dynamicDimensions = {
   get appWidth() {
     return () =>
       useBreakpointValue(
-        useMediaQuery(staticDimensions.breakpointDesktop),
+        getMediaQuery(staticDimensions.breakpointDesktop),
         subtract('100%', staticDimensions.menuWidth),
         '100%',
       );
@@ -65,7 +56,7 @@ const dynamicDimensions = {
   get fontSizeLargeAdaptive() {
     return () =>
       useBreakpointValue(
-        useMediaQuery(staticDimensions.breakpointDesktop),
+        getMediaQuery(staticDimensions.breakpointDesktop),
         staticDimensions.fontSizeLarge,
         staticDimensions.fontSize,
       );

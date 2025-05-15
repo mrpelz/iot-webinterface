@@ -1,167 +1,132 @@
-/* eslint-disable unicorn/no-empty-file */
 // /* eslint-disable @typescript-eslint/ban-ts-comment */
-// import { Level, Match } from '@iot/iot-monolith/tree';
-// import { computed } from '@preact/signals';
-// import { FunctionComponent } from 'preact';
-// import { useMemo } from 'preact/hooks';
+import { ensureKeys } from '@iot/iot-monolith/oop';
+import { Level, Match, TExclude } from '@iot/iot-monolith/tree';
+import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
 
-// import { TSerialization } from '../../common/types.js';
-// import { Tag, TagGroup } from '../components/controls.js';
-// import {
-//   ActivityIcon,
-//   CheckIcon,
-//   ForwardIcon,
-//   WiFiIcon,
-//   XIcon,
-// } from '../components/icons.js';
-// import { TabularNums } from '../components/text.js';
-// import { useTimeLabel } from '../hooks/use-time-label.js';
-// import { useKey, useMatch, useTypedEmitter } from '../state/api.js';
-// import { useTheme } from '../state/theme.js';
-// import { ensureKeys } from '../util/oop.js';
-// import { CellWithBody } from './main.js';
+import { LevelObject } from '../api.js';
+import { Tag, TagGroup } from '../components/controls.js';
+import {
+  ActivityIcon,
+  CheckIcon,
+  ForwardIcon,
+  WiFiIcon,
+  XIcon,
+} from '../components/icons.js';
+import { TabularNums } from '../components/text.js';
+import { useTimeLabel } from '../hooks/use-time-label.js';
+import { useTypedEmitter } from '../state/api.js';
+import { $theme } from '../state/theme.js';
+import { CellWithBody } from './main.js';
 
-// export const OnlineIcon: FunctionComponent = () => {
-//   const theme = useTheme();
-//   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type TDevice = LevelObject[Level.DEVICE];
+export type TSubDevice = Match<{ isSubDevice: true }, TExclude, TDevice>;
 
-//   return (
-//     <CheckIcon
-//       color={isHighContrast ? undefined : 'rgb(4, 195, 6)'}
-//       height="1em"
-//     />
-//   );
-// };
+export const OnlineIcon: FunctionComponent = () => (
+  <CheckIcon
+    color={$theme.value === 'highContrast' ? undefined : 'rgb(4, 195, 6)'}
+    height="1em"
+  />
+);
 
-// export const OfflineIcon: FunctionComponent = () => {
-//   const theme = useTheme();
-//   const isHighContrast = useMemo(() => theme === 'highContrast', [theme]);
+export const OfflineIcon: FunctionComponent = () => (
+  <XIcon
+    color={$theme.value === 'highContrast' ? undefined : 'rgb(205, 3, 4)'}
+    height="1em"
+  />
+);
 
-//   return (
-//     <XIcon color={isHighContrast ? undefined : 'rgb(205, 3, 4)'} height="1em" />
-//   );
-// };
+const DeviceOnlineState: FunctionComponent<{
+  device: TDevice | TSubDevice;
+}> = ({ device }) => {
+  const {
+    online: { lastChange: { main: lastChange } = {}, main: online } = {},
+  } = ensureKeys(device, 'online');
 
-// const DeviceOnlineState: FunctionComponent<{
-//   device: // @ts-ignore
-//   | Match<{ isSubDevice: false; level: Level.DEVICE }, TSerialization>
-//     | Match<{ isSubDevice: true; level: Level.DEVICE }, TSerialization, 7>;
-// }> = ({ device }) => {
-//   const {
-//     online: {
-//       lastChange: { main: lastChange },
-//       main: online,
-//     },
-//     // @ts-ignore
-//   } = ensureKeys(device, 'online');
-//   const isOnline = useTypedEmitter(online);
-//   const onlineChanged = useTypedEmitter(lastChange);
+  const { value: isOnline } = useTypedEmitter(online);
+  const { value: lastChangeValue } = useTypedEmitter(lastChange);
 
-//   const {
-//     lastSeen: { main: lastSeen },
-//     // @ts-ignore
-//   } = ensureKeys(device, 'lastSeen');
-//   const wasLastSeen = useTypedEmitter(lastSeen);
+  const { lastSeen: { main: lastSeen } = {} } = ensureKeys(device, 'lastSeen');
 
-//   const date = computed(() => {
-//     const epoch = onlineChanged.value || wasLastSeen.value;
-//     if (!epoch) return undefined;
+  const { value: lastSeenValue } = useTypedEmitter(lastSeen);
 
-//     return new Date(epoch);
-//   });
+  const timeLabel = useTimeLabel(
+    useMemo(() => {
+      const epoch = lastSeenValue ?? lastChangeValue;
+      if (!epoch) return undefined;
 
-//   const timeLabel = useTimeLabel(date.value);
+      return new Date(epoch);
+    }, [lastChangeValue, lastSeenValue]),
+  );
 
-//   const time = useMemo(
-//     () => <TabularNums>{timeLabel || '—'}</TabularNums>,
-//     [timeLabel],
-//   );
+  const time = useMemo(
+    () => <TabularNums>{timeLabel || '—'}</TabularNums>,
+    [timeLabel],
+  );
 
-//   if (lastSeen) {
-//     return (
-//       <>
-//         <ActivityIcon height="1em" />
-//         {time}
-//       </>
-//     );
-//   }
+  if (lastSeen) {
+    return (
+      <>
+        <ActivityIcon height="1em" />
+        {time}
+      </>
+    );
+  }
 
-//   if (online) {
-//     if (isOnline.value === undefined) {
-//       return (
-//         <>
-//           <OfflineIcon />—
-//         </>
-//       );
-//     }
+  if (isOnline === undefined) {
+    return (
+      <>
+        <OfflineIcon />—
+      </>
+    );
+  }
 
-//     return (
-//       <>
-//         {isOnline.value ? <OnlineIcon /> : <OfflineIcon />}
-//         {time}
-//       </>
-//     );
-//   }
+  return (
+    <>
+      {isOnline ? <OnlineIcon /> : <OfflineIcon />}
+      {time}
+    </>
+  );
+};
 
-//   return null;
-// };
+export const Device: FunctionComponent<{
+  device: TDevice;
+  onClick?: () => void;
+}> = ({ device, onClick }) => {
+  const { espNow, wifi } = useMemo(
+    () => ensureKeys(device, 'espNow', 'wifi'),
+    [device],
+  );
 
-// export const SubDevice: FunctionComponent<{
-//   // @ts-ignore
-//   subDevice: Match<
-//     { isSubDevice: true; level: Level.DEVICE },
-//     TSerialization,
-//     7
-//   >;
-// }> = ({ subDevice }) => {
-//   const subDeviceName = useKey(subDevice);
-
-//   return (
-//     <Tag>
-//       {subDeviceName === 'espNow' ? null : (
-//         <TagGroup>
-//           <WiFiIcon height="1em" />
-//         </TagGroup>
-//       )}
-//       <TagGroup>
-//         <DeviceOnlineState device={subDevice} />
-//       </TagGroup>
-//     </Tag>
-//   );
-// };
-
-// export const Device: FunctionComponent<{
-//   // @ts-ignore
-//   device: Match<{ isSubDevice: false; level: Level.DEVICE }, TSerialization>;
-//   onClick?: () => void;
-// }> = ({ device, onClick }) => {
-//   // @ts-ignore
-//   const name = useKey(device);
-
-//   const subDevices = useMatch(
-//     { isSubDevice: true as const, level: Level.DEVICE as const },
-//     device,
-//     1,
-//   );
-
-//   return (
-//     <CellWithBody
-//       icon={<ForwardIcon height="1em" />}
-//       onClick={onClick}
-//       title={name}
-//     >
-//       {subDevices.length > 0 ? (
-//         subDevices.map((subDevice) => <SubDevice subDevice={subDevice} />)
-//       ) : (
-//         <Tag>
-//           <DeviceOnlineState
-//             device={
-//               // @ts-ignore
-//               device
-//             }
-//           />
-//         </Tag>
-//       )}
-//     </CellWithBody>
-//   );
-// };
+  return (
+    <CellWithBody
+      icon={<ForwardIcon height="1em" />}
+      onClick={onClick}
+      title={useMemo(() => device.$path?.at(-1), [device])}
+    >
+      {espNow && wifi ? (
+        <>
+          <Tag>
+            <TagGroup>
+              <DeviceOnlineState device={espNow} />
+            </TagGroup>
+          </Tag>
+          <Tag>
+            <TagGroup>
+              <WiFiIcon height="1em" />
+            </TagGroup>
+            <TagGroup>
+              <DeviceOnlineState device={wifi} />
+            </TagGroup>
+          </Tag>
+        </>
+      ) : (
+        <Tag>
+          <DeviceOnlineState device={device} />
+        </Tag>
+      )}
+    </CellWithBody>
+  );
+};

@@ -31,7 +31,7 @@ export type SW_API = {
 };
 
 export abstract class API_WORKER_API {
-  getValue: <T>(reference: string) => Promise<T>;
+  getValue: <T>(reference: string) => Promise<T | undefined>;
   readonly hierarchy: Promise<TSerialization>;
   readonly isInit: Promise<void>;
   isOnline: () => boolean;

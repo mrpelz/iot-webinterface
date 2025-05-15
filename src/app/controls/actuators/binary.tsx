@@ -1,89 +1,93 @@
-/* eslint-disable unicorn/no-empty-file */
-// import { FunctionComponent } from 'preact';
-// import { useCallback } from 'preact/hooks';
+import { Match, TExclude } from '@iot/iot-monolith/tree';
+import { FunctionComponent } from 'preact';
+import { useCallback } from 'preact/hooks';
 
-// import { BlendOver } from '../../components/blend-over.js';
-// import { BodyLarge } from '../../components/controls.js';
-// import { useColorBody } from '../../hooks/use-color-body.js';
-// import { useDelay } from '../../hooks/use-delay.js';
-// import { I18nKey } from '../../i18n/main.js';
-// import { Translation } from '../../state/i18n.js';
-// import { useSegment } from '../../state/path.js';
-// import {
-//   useChildGetter,
-//   useChildSetter,
-//   useGetter,
-// } from '../../state/web-api.js';
-// import {
-//   HierarchyElement,
-//   HierarchyElementPropertyActuator,
-//   isMetaPropertyActuator,
-//   ValueType,
-// } from '../../web-api.js';
-// import { Cell } from '../main.js';
+import { TSerialization } from '../../../common/types.js';
+import { BlendOver } from '../../components/blend-over.js';
+import { BodyLarge } from '../../components/controls.js';
+import { useColorBody } from '../../hooks/use-color-body.js';
+import { useDelay } from '../../hooks/use-delay.js';
+import { I18nKey } from '../../i18n/main.js';
+import { useTypedCollector, useTypedEmitter } from '../../state/api.js';
+import { $rootPath } from '../../state/path.js';
+import { Translation } from '../../views/translation.js';
+import { Cell } from '../main.js';
 
-// export type BinaryActuatorElement = HierarchyElementPropertyActuator & {
-//   meta: { valueType: ValueType.BOOLEAN };
-// };
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export type TBinaryActuator = Match<
+  {
+    $: 'output' | 'outputGrouping';
+  },
+  TExclude,
+  TSerialization
+>;
 
-// export const isBinaryActuatorElement = (
-//   element: HierarchyElement,
-// ): element is BinaryActuatorElement =>
-//   isMetaPropertyActuator(element.meta) &&
-//   element.meta.valueType === ValueType.BOOLEAN;
+export const BinaryActuator: FunctionComponent<{
+  actuator: TBinaryActuator;
+  negativeKey?: I18nKey;
+  onClick?: () => void;
+  positiveKey?: I18nKey;
+  title?: I18nKey;
+}> = ({
+  actuator,
+  negativeKey = 'off',
+  onClick,
+  positiveKey = 'on',
+  title,
+}) => {
+  const value = useTypedEmitter(actuator.main);
+  const loading = useTypedEmitter(
+    'actuatorStaleness' in actuator
+      ? actuator.actuatorStaleness.loading
+      : undefined,
+  ).value;
 
-// export const BinaryActuator: FunctionComponent<{
-//   element: BinaryActuatorElement;
-//   negativeKey?: I18nKey;
-//   onClick?: () => void;
-//   positiveKey?: I18nKey;
-//   title?: I18nKey;
-// }> = ({ element, negativeKey = 'off', onClick, positiveKey = 'on', title }) => {
-//   const {
-//     property,
-//     meta: { actuated },
-//   } = element;
+  const flip = useTypedCollector(actuator.flip);
+  const handleClick = useCallback(() => flip?.(null), [flip]);
 
-//   const value = useGetter<boolean>(element);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const name = String(title ?? actuator.$path?.at(-1) ?? actuator.topic);
 
-//   const loading = useChildGetter<boolean>(element, 'loading');
+  const ColorBody = useColorBody(
+    BodyLarge,
+    String(actuator.$path?.at(-1)),
+    actuator.topic,
+  );
 
-//   const flip = useChildSetter<null>(element, 'flip');
-//   const handleClick = useCallback(() => flip?.(null), [flip]);
+  const allowTransition = Boolean(useDelay($rootPath.value, 300, true));
 
-//   const ColorBody = useColorBody(BodyLarge, property, actuated);
+  const { value: value_ } = value;
 
-//   const [route] = useSegment(0);
-//   const allowTransition = Boolean(useDelay(route, 300, true));
-
-//   return (
-//     <Cell
-//       onClick={flip && !onClick ? handleClick : onClick}
-//       title={<Translation i18nKey={title || property} capitalize={true} />}
-//     >
-//       <BlendOver
-//         blendOver={value ? 1 : 0}
-//         direction="block"
-//         transition={allowTransition && value !== null && !loading}
-//         overlay={
-//           value === null ? undefined : (
-//             <ColorBody>
-//               <Translation i18nKey={positiveKey} />
-//             </ColorBody>
-//           )
-//         }
-//       >
-//         <BodyLarge>
-//           {value === null ? (
-//             '?'
-//           ) : (
-//             <>
-//               <Translation i18nKey={negativeKey} />
-//               {loading ? '…' : null}
-//             </>
-//           )}
-//         </BodyLarge>
-//       </BlendOver>
-//     </Cell>
-//   );
-// };
+  return (
+    <Cell
+      onClick={onClick ?? handleClick}
+      title={<Translation i18nKey={name} capitalize={true} />}
+    >
+      <BlendOver
+        blendOver={value_ ? 1 : 0}
+        direction="block"
+        transition={allowTransition && value_ !== null && !loading}
+        overlay={
+          value_ === undefined ? undefined : (
+            <ColorBody>
+              <Translation i18nKey={positiveKey} />
+            </ColorBody>
+          )
+        }
+      >
+        <BodyLarge>
+          {value_ === undefined ? (
+            '?'
+          ) : (
+            <>
+              <Translation i18nKey={negativeKey} />
+              {loading ? '…' : null}
+            </>
+          )}
+        </BodyLarge>
+      </BlendOver>
+    </Cell>
+  );
+};

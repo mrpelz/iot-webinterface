@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useEffect, useState } from 'preact/hooks';
 
 const mountDefine = <T>(callback: (result: T) => void) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  globalThis.define = (() => {
+  define = (() => {
     // eslint-disable-next-line func-style
     const define = function define(_: unknown, factory: T) {
       callback(factory);
@@ -17,8 +17,9 @@ const mountDefine = <T>(callback: (result: T) => void) => {
 
 const unmountDefine = () => {
   if (!('define' in globalThis)) return;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  globalThis.define = undefined;
+  define = undefined;
 };
 
 export const useUMDModule = <T>(src: string): T | null => {

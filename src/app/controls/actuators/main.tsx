@@ -1,33 +1,50 @@
-/* eslint-disable unicorn/no-empty-file */
-// import { FunctionComponent } from 'preact';
+import { FunctionComponent } from 'preact';
 
-// import { I18nKey } from '../../i18n/main.js';
-// import { HierarchyElementPropertyActuator } from '../../web-api.js';
-// import { BinaryActuator, isBinaryActuatorElement } from './binary.js';
-// import {
-//   BrightnessActuator,
-//   isBrightnessActuatorElement,
-// } from './brightness.js';
-// import { isNullActuatorElement, NullActuator } from './null.js';
+import { AnyObject } from '../../api.js';
+import { I18nKey } from '../../i18n/main.js';
+import { BinaryActuator, TBinaryActuator } from './binary.js';
+import { BrightnessActuator, TBrightnessActuator } from './brightness.js';
+import { NullActuator, TNullActuator } from './null.js';
+import { RGBActuator, TRGBActuator } from './rgb.js';
 
-// export const Actuator: FunctionComponent<{
-//   element: HierarchyElementPropertyActuator;
-//   onClick?: () => void;
-//   title?: I18nKey;
-// }> = ({ element, onClick, title }) => {
-//   if (isBrightnessActuatorElement(element)) {
-//     return (
-//       <BrightnessActuator element={element} onClick={onClick} title={title} />
-//     );
-//   }
+export const Actuator: FunctionComponent<{
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  object: AnyObject;
+  onClick?: () => void;
+  title?: I18nKey;
+}> = ({ object, onClick, title }) => {
+  if (!('$' in object)) return null;
 
-//   if (isBinaryActuatorElement(element)) {
-//     return <BinaryActuator element={element} onClick={onClick} title={title} />;
-//   }
-
-//   if (isNullActuatorElement(element)) {
-//     return <NullActuator element={element} onClick={onClick} title={title} />;
-//   }
-
-//   return null;
-// };
+  switch (object.$) {
+    case 'output':
+    case 'outputGrouping': {
+      return (
+        <BinaryActuator actuator={object} onClick={onClick} title={title} />
+      );
+    }
+    case 'led':
+    case 'ledGrouping': {
+      return (
+        <BrightnessActuator actuator={object} onClick={onClick} title={title} />
+      );
+    }
+    case 'triggerElement': {
+      return <NullActuator actuator={object} onClick={onClick} title={title} />;
+    }
+    // fake correct species as long as there’s no RGB lights present
+    case 'rgb' as typeof object.$: {
+      return (
+        <RGBActuator
+          // fake correct object shape as long as there’s no RGB lights present
+          actuator={object as TRGBActuator}
+          onClick={onClick}
+          title={title}
+        />
+      );
+    }
+    default: {
+      return null;
+    }
+  }
+};

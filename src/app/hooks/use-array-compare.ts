@@ -11,6 +11,11 @@ export const useArray = <E, T extends E[] | null>(value: T): T => {
       return;
     }
 
+    if (value.length !== state.length) {
+      setState(value);
+      return;
+    }
+
     for (let index = 0; index < value.length; index += 1) {
       const oldElement = state[index];
       const newElement = value[index];

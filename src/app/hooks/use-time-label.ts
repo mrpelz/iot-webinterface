@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
-import { useI18n, useI18nKey } from '../state/i18n.js';
+import { $i18n, getTranslation } from '../state/translation.js';
 import { $flags } from '../util/flags.js';
 
 const units = [
@@ -79,11 +79,15 @@ export const useTimeIncrement = (
   return incrementCb ? compareDate : undefined;
 };
 
+const $nowLabel = getTranslation('now');
+
 export const useRelativeTimeLabel = (
   date?: Date,
   nowSpan = 4000,
 ): string | undefined => {
-  const { translationLanguage, translationLocale } = useI18n();
+  const {
+    value: { translationLanguage, translationLocale },
+  } = $i18n;
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
     [translationLanguage, translationLocale],
@@ -94,7 +98,7 @@ export const useRelativeTimeLabel = (
     [effectiveLocale],
   );
 
-  const nowLabel = useI18nKey('now');
+  const nowLabel = $nowLabel.value;
 
   const compareDate = useTimeIncrement(date ? nextSecondIncrement : undefined);
 
@@ -102,6 +106,8 @@ export const useRelativeTimeLabel = (
     if (!date || !compareDate) return undefined;
 
     const diff = date.getTime() - compareDate.getTime();
+    if (Number.isNaN(diff)) return undefined;
+
     const delta = Math.abs(diff);
 
     if (delta <= nowSpan) return nowLabel;
@@ -125,7 +131,9 @@ export const useRelativeTimeLabel = (
 };
 
 export const useAbsoluteTimeLabel = (date?: Date): string | undefined => {
-  const { translationLanguage, translationLocale } = useI18n();
+  const {
+    value: { translationLanguage, translationLocale },
+  } = $i18n;
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
     [translationLanguage, translationLocale],

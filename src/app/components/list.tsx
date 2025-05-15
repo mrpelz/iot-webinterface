@@ -54,6 +54,7 @@ export const Entry = styled('li')`
 
 export const Button = styled('button')`
   -webkit-appearance: none;
+  appearance: none;
   background: none;
   border-radius: ${half(dimensions.controlBase)};
   border: ${dimensions.hairline} solid ${colors.fontPrimary()};

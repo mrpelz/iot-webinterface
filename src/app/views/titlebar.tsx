@@ -21,12 +21,18 @@ import {
 } from '../components/titlebar.js';
 import { useAwaitEvent } from '../hooks/use-await-event.js';
 import { useIsWebSocketOnline } from '../state/api.js';
-import { useFlipMenuVisible } from '../state/menu.js';
-import { useGoPreviousSegment, useGoUp, useSegment } from '../state/path.js';
-import { useCapitalizedTitle } from '../state/title.js';
+import { flipMenuVisible } from '../state/menu.js';
+import {
+  $isRoot,
+  $rootPath,
+  goPrevious,
+  goUp,
+  setRootPath,
+} from '../state/path.js';
+import { $capitalizedTitle } from '../state/title.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
-import { useMediaQuery } from '../style/main.js';
+import { getMediaQuery } from '../style/main.js';
 
 export const IconContainer: FunctionComponent<{
   paddingSetter: (input: number) => void;
@@ -60,10 +66,10 @@ export const IconContainer: FunctionComponent<{
 };
 
 const WaitIconView: FunctionComponent = () => {
-  const isWebSocketOnline = useIsWebSocketOnline();
+  const { value: isWebSocketOnline } = useIsWebSocketOnline();
 
   const [isWebSocketOnlineDelayed, handleEvent] = useAwaitEvent(
-    isWebSocketOnline.value,
+    isWebSocketOnline,
     true,
   );
 
@@ -93,41 +99,36 @@ export const Titlebar: FunctionComponent = () => {
     [paddingLeft, paddingRight],
   );
 
-  const title = useCapitalizedTitle();
+  const { value: title } = $capitalizedTitle;
 
-  const isDesktop = useBreakpoint(useMediaQuery(dimensions.breakpointDesktop));
+  const isDesktop = useBreakpoint(getMediaQuery(dimensions.breakpointDesktop));
 
-  const flipMenuVisible = useFlipMenuVisible();
+  const rootPath = $rootPath.value;
 
-  const goUp = useGoUp();
-
-  const [page, setPage] = useSegment(0);
-  const isMap = useMemo(() => page === 'map', [page]);
-
-  const goPrevious = useGoPreviousSegment(0);
+  const isMap = useMemo(() => rootPath === 'map', [rootPath]);
+  const isRoot = $isRoot.value;
 
   const leftIcon = useMemo(() => {
-    if (goUp) {
+    if (!isRoot) {
       return <BackIcon onClick={goUp} />;
     }
 
     if (isDesktop) return null;
 
     return <MenuIcon onClick={flipMenuVisible} />;
-  }, [flipMenuVisible, goUp, isDesktop]);
+  }, [isDesktop, isRoot]);
 
   const rightIcon = useMemo(() => {
-    if (goUp) {
+    if (!isRoot) {
       return <MenuIcon onClick={flipMenuVisible} />;
     }
 
     if (isMap) {
-      return goPrevious ? <ReturnIcon onClick={() => goPrevious()} /> : null;
+      return <ReturnIcon onClick={() => goPrevious()} />;
     }
 
-    return setPage ? <MapIcon onClick={() => setPage('map')} /> : null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [goPrevious, goUp, isMap, setPage]);
+    return <MapIcon onClick={() => setRootPath('map')} />;
+  }, [isMap, isRoot]);
 
   return (
     <TitlebarComponent padding={padding}>

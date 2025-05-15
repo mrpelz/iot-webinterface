@@ -3,32 +3,35 @@ import {
   excludePattern,
   Level,
   levelObjectMatch,
+  TExclude,
 } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
-import { LevelObject, sortBy } from '../../api.js';
+import { LevelObject } from '../../api.js';
 import { Grid } from '../../components/grid.js';
-// import { Device } from '../../controls/device.js';
-import { useArray } from '../../hooks/use-array-compare.js';
+import { Device } from '../../controls/device.js';
 import { roomSorting as roomsSorting } from '../../i18n/mapping.js';
-import { useMatch } from '../../state/api.js';
-import { Translation } from '../../state/i18n.js';
-// import { useSegment } from '../../state/path.js';
+import { api } from '../../main.js';
+import { $subPath, setSubPath } from '../../state/path.js';
+import { sortBy } from '../../util/sort.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
-// import { DeviceDetails } from '../sub/devices/device.js';
+import { Translation } from '../../views/translation.js';
+import { DeviceDetails } from '../sub/devices/device.js';
 
 // @ts-ignore
-const Room: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
-  room,
-}) => {
-  // const [, setDeviceId] = useSegment(1);
+const rooms = api.match(levelObjectMatch[Level.ROOM], excludePattern);
+const roomsSorted = sortBy(rooms, '$', roomsSorting).all;
 
+const Room: FunctionComponent<{
+  room: LevelObject[Level.ROOM];
+}> = ({ room }) => {
   const { $ } = room;
 
-  const devices = useMatch(
-    { isSubDevice: false as const, level: Level.DEVICE as const },
+  const devices = api.match(
+    levelObjectMatch[Level.DEVICE],
+    excludePattern,
     room,
   );
 
@@ -39,14 +42,9 @@ const Room: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
       <Grid>
         {useMemo(
           () =>
-            devices.map(
-              () =>
-                // <Device
-                //   device={device}
-                //   onClick={() => setDeviceId?.(device.$id)}
-                // />
-                null,
-            ),
+            devices.map((device) => (
+              <Device device={device} onClick={() => setSubPath(device.$id)} />
+            )),
           [devices],
         )}
       </Grid>
@@ -55,23 +53,18 @@ const Room: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
 };
 
 export const Devices: FunctionComponent = () => {
-  // const [deviceId] = useSegment(1);
-
-  // @ts-ignore
-  const rooms = useMatch(levelObjectMatch[Level.ROOM], excludePattern);
-  const roomsSorted = useArray(
-    useMemo(() => sortBy(rooms, '$', roomsSorting).all, [rooms]),
-  );
-
-  // const [device] = useMatch({ $id: deviceId, level: Level.DEVICE as const });
+  const device = api
+    .match(
+      {
+        $id: $subPath.value,
+        level: Level.DEVICE as const,
+      },
+      excludePattern,
+    )
+    .at(0);
 
   return (
-    <SubRoute
-      subRoute={
-        // device ? <DeviceDetails device={device} /> :
-        null
-      }
-    >
+    <SubRoute subRoute={device ? <DeviceDetails device={device} /> : null}>
       {roomsSorted.map((aRoom) => (
         <Room room={aRoom} />
       ))}

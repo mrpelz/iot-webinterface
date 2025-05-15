@@ -2,10 +2,10 @@ import { FunctionComponent } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
 import { Background as BackgroundComponent } from '../components/background.js';
-import { useBackground } from '../state/background.js';
+import { $background } from '../state/background.js';
 
 export const Background: FunctionComponent = () => {
-  const background = useBackground();
+  const background = $background.value;
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const previousRef = useRef<HTMLElement | null>(null);

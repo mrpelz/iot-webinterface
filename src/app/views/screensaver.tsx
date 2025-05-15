@@ -9,27 +9,29 @@ import {
   nextMinuteIncrement,
   useTimeIncrement,
 } from '../hooks/use-time-label.js';
-import { useI18n } from '../state/i18n.js';
 import {
-  useFlipScreensaverActive,
-  useIsScreensaverActive,
+  $isScreensaverActive,
+  flipScreensaverActive,
 } from '../state/screensaver.js';
+import { $i18n } from '../state/translation.js';
 import { $flags } from '../util/flags.js';
 
 const nextMinutePlusDelayIncrement = () => nextMinuteIncrement() + 50;
 
 export const Screensaver: FunctionComponent = () => {
-  const { country, translationLocale } = useI18n();
+  const {
+    value: { country, translationLocale },
+  } = $i18n;
+
   const effectiveLocale = useMemo(
     () => translationLocale || country,
     [country, translationLocale],
   );
 
-  const isScreensaverPositionRandomized =
-    $flags.screensaverRandomizePosition.value;
+  const { value: isScreensaverPositionRandomized } =
+    $flags.screensaverRandomizePosition;
 
-  const isScreensaverActive = useIsScreensaverActive();
-  const flipScreensaverActive = useFlipScreensaverActive();
+  const isScreensaverActive = $isScreensaverActive.value;
 
   const nextMinute = useTimeIncrement(
     isScreensaverActive ? nextMinutePlusDelayIncrement : undefined,

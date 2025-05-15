@@ -3,7 +3,10 @@ import { useCallback, useMemo, useRef } from 'preact/hooks';
 
 import { VisuallyHidden } from '../components/visually-hidden.js';
 
-export type Channel = [number | null, ((value: number) => void) | null];
+export type Channel = [
+  number | undefined,
+  ((value: number) => void) | undefined,
+];
 
 const byteToDecimal = (input: number) =>
   Math.round((input / 255) * 1000) / 1000;
