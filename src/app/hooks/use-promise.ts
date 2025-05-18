@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
+import { useRerender as useSingleton } from './use-rerender.js';
+
 export const usePromise = <T, F = undefined>(
   input: Promise<T> | T,
   fallback = undefined as F,
@@ -21,6 +23,19 @@ export const usePromise = <T, F = undefined>(
  * @returns Promise resolving as soon as `input` _excludes_ `undefined`
  */
 export const usePromisify = <T>(input: T | undefined): Promise<T> => {
+  // create stable singleton reference to explicitly mutate
+  const [symbol, trigger] = useSingleton('usePromisify');
+
+  // mutate singleton when `input` changes its value but only if not `undefined`
+  useEffect(() => {
+    if (input === undefined) return;
+
+    trigger();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [input]);
+
+  // produce new `PromiseWithResolvers` to resolve once again only on singleton mutation,
+  // otherwise keep using still unresolved Promise
   const { promise, resolve } = useMemo(
     () => Promise.withResolvers<T>(),
     /**
@@ -30,9 +45,10 @@ export const usePromisify = <T>(input: T | undefined): Promise<T> => {
      * This is how the change got “lost”.
      */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [input],
+    [symbol],
   );
 
+  // resolve Promise with value once no longer `undefined`
   useEffect(() => {
     if (input === undefined) return;
 
