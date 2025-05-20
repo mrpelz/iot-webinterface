@@ -13,7 +13,7 @@ import {
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
 import { useMatch, useTypedEmitter } from '../../../state/api.js';
-import { setTitleOverride } from '../../../state/title.js';
+import { useTitleOverride } from '../../../state/title.js';
 import { Entry, List } from '../../../views/list.js';
 
 const SHY_CHARACTER = '\u00AD';
@@ -281,7 +281,7 @@ export const DeviceDetails: FunctionComponent<{
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const name = useMemo(() => String(device.$path.at(-1) ?? ''), [device]);
-  setTitleOverride(name);
+  useTitleOverride(name);
 
   const { espNow, wifi } = useMemo(
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

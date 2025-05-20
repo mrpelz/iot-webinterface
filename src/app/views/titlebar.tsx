@@ -119,7 +119,7 @@ export const Titlebar: FunctionComponent = () => {
   }, [isDesktop, isRoot]);
 
   const rightIcon = useMemo(() => {
-    if (!isRoot) {
+    if (!isDesktop && !isRoot) {
       return <MenuIcon onClick={flipMenuVisible} />;
     }
 
@@ -128,7 +128,7 @@ export const Titlebar: FunctionComponent = () => {
     }
 
     return <MapIcon onClick={() => setRootPath('map')} />;
-  }, [isMap, isRoot]);
+  }, [isDesktop, isMap, isRoot]);
 
   return (
     <TitlebarComponent padding={padding}>

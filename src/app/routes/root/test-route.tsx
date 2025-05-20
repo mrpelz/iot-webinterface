@@ -3,7 +3,7 @@ import { FunctionComponent } from 'preact';
 
 import { JSONViewer } from '../../components/json-viewer/main.js';
 import { $isRoot, getSegment, goRoot, setSegment } from '../../state/path.js';
-import { setTitleOverride } from '../../state/title.js';
+import { useTitleOverride } from '../../state/title.js';
 
 const $route1 = getSegment(1);
 const setRoute1 = setSegment(1);
@@ -21,7 +21,7 @@ export const Test: FunctionComponent = () => {
 
   const route2 = $route2.value;
 
-  setTitleOverride(route2 || route1 || undefined);
+  useTitleOverride(route2 || route1 || undefined);
 
   return (
     <>

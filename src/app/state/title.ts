@@ -1,8 +1,8 @@
 import { computed, effect, signal } from '@preact/signals';
+import { useEffect } from 'preact/hooks';
 
-import { capitalize } from '../util/string.js';
 import { $room, $staticPage } from './navigation.js';
-import { getTranslation } from './translation.js';
+import { getCapitalization, getTranslation } from './translation.js';
 
 const appName = document.title;
 
@@ -11,22 +11,16 @@ type NoTitle = typeof noTitle;
 
 const $titleOverride = signal<string | NoTitle | undefined>(undefined);
 
-const $staticPageName = getTranslation($staticPage.value);
-const $roomName = getTranslation($room.value?.$);
+const $staticPageName = getTranslation($staticPage);
+const $roomName = getTranslation(computed(() => $room.value?.$));
 
 export const $title = computed(() =>
   $titleOverride.value === noTitle
     ? undefined
-    : ($titleOverride.value ??
-      $staticPageName.value ??
-      $staticPage.value ??
-      $roomName.value ??
-      $room.value?.$),
+    : ($titleOverride.value ?? $staticPageName.value ?? $roomName.value),
 );
 
-export const $capitalizedTitle = computed(() =>
-  $title.value ? capitalize($title.value) : undefined,
-);
+export const $capitalizedTitle = getCapitalization($title);
 
 effect(() => {
   document.title = [$capitalizedTitle.value, appName]
@@ -36,4 +30,12 @@ effect(() => {
 
 export const setTitleOverride = (title?: string | NoTitle): void => {
   $titleOverride.value = title;
+};
+
+export const useTitleOverride: typeof setTitleOverride = (title) => {
+  useEffect(() => {
+    setTitleOverride(title);
+  }, [title]);
+
+  useEffect(() => () => setTitleOverride(), []);
 };

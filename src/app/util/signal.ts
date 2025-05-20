@@ -30,6 +30,15 @@ export type SignalValueMap<T extends Record<string, AnySignal<unknown>>> = {
   [K in keyof T]: T[K]['value'];
 };
 
+export const isSignal = <T>(input: T | AnySignal<T>): input is AnySignal<T> => {
+  if (!input) return false;
+  if (typeof input !== 'object') return false;
+  if (!('brand' in input)) return false;
+  if (input.brand !== Symbol.for('preact-signals')) return false;
+
+  return true;
+};
+
 export const readOnly = <T>(input: Signal<T>): ReadonlySignal<T> =>
   computed(() => input.value);
 

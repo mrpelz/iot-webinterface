@@ -1,4 +1,4 @@
-import { computed, ReadonlySignal } from '@preact/signals';
+import { computed, ReadonlySignal, Signal, signal } from '@preact/signals';
 
 import {
   I18nTranslation,
@@ -9,7 +9,7 @@ import {
 import { universal } from '../i18n/universal.js';
 import { $flags } from '../util/flags.js';
 import { getCountry, getLanguage } from '../util/locale.js';
-import { callbackSignal } from '../util/signal.js';
+import { AnySignal, callbackSignal, isSignal } from '../util/signal.js';
 import { capitalize as capitalizeUtil } from '../util/string.js';
 
 const country = getCountry();
@@ -41,46 +41,63 @@ export const $i18n = computed(() => {
   };
 });
 
-export const getTranslation = callbackSignal(
-  ({ i18n: { translation } }, key?: keyof I18nTranslation | string) => {
-    if (!key || !(key in translation)) return undefined;
+export const getTranslation = (
+  $key:
+    | undefined
+    | keyof I18nTranslation
+    | string
+    | AnySignal<keyof I18nTranslation | string | undefined>,
+): ReadonlySignal<string | undefined> =>
+  callbackSignal(
+    ({ i18n: { translation }, key }) => {
+      if (!key || !(key in translation)) return undefined;
 
-    return translation[key as unknown as keyof I18nTranslation];
-  },
-  {
-    i18n: $i18n,
-  },
-);
+      return translation[key as unknown as keyof I18nTranslation];
+    },
+    {
+      i18n: $i18n,
+      key: isSignal($key) ? $key : signal($key),
+    },
+  )();
 
 export const getTranslationFallback = (
-  key?: keyof I18nTranslation | string,
+  $key:
+    | undefined
+    | keyof I18nTranslation
+    | string
+    | AnySignal<keyof I18nTranslation | string | undefined>,
 ): ReadonlySignal<string> => {
-  const $result = getTranslation(key);
+  const $key_ = $key instanceof Signal ? $key : signal($key);
+  const $result = getTranslation($key);
 
   return computed(() => {
     const { value } = $result;
 
     if (value) return value;
-    if (key) return `<${key}>`;
+    if ($key_.value) return `<${$key_.value}>`;
 
     return '<[empty]>';
   });
 };
 
-export const getCapitalization = callbackSignal(
-  ({ i18n: { nonCapitalization } }, input: string | undefined) => {
-    const inputWords = input ? input.split(' ') : undefined;
-    if (!inputWords) return undefined;
+export const getCapitalization = (
+  $input: string | undefined | AnySignal<string | undefined>,
+): ReadonlySignal<string | undefined> =>
+  callbackSignal(
+    ({ i18n: { nonCapitalization }, input }) => {
+      const inputWords = input ? input.split(' ') : undefined;
+      if (!inputWords) return undefined;
 
-    return inputWords
-      .map((word) =>
-        (nonCapitalization as unknown as string[]).includes(word)
-          ? word
-          : capitalizeUtil(word),
-      )
-      .join(' ');
-  },
-  {
-    i18n: $i18n,
-  },
-);
+      return inputWords
+        .map((word) =>
+          (nonCapitalization as unknown as string[]).includes(word)
+            ? word
+            : capitalizeUtil(word),
+        )
+        .join(' ');
+    },
+    {
+      i18n: $i18n,
+      input: isSignal($input) ? $input : signal($input),
+    },
+  )();
