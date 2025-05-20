@@ -4,7 +4,6 @@ import { forwardRef } from 'preact/compat';
 import { colors, dimensions } from '../style.js';
 import { half, multiply } from '../style/dimensions.js';
 import { dependentValue } from '../style/main.js';
-import { bindComponent } from '../util/combine-components.js';
 import { GridCell } from './grid.js';
 
 type CellProps = {
@@ -13,27 +12,24 @@ type CellProps = {
   span: number;
 };
 
-export const Cell = bindComponent<CellProps>(
-  styled(GridCell)<CellProps>`
-    --background-color: ${dependentValue(
-      'isHighContrast',
-      colors.backgroundSecondary(),
-      colors.backgroundSecondary(70),
-    )};
-    --border-radius: 9px;
-    --border: ${dependentValue(
-      'isHighContrast',
-      () => `solid ${dimensions.hairline()} ${colors.fontPrimary()()}`,
-      'none',
-    )};
+export const Cell = styled(GridCell)<CellProps>`
+  --background-color: ${dependentValue(
+    'isHighContrast',
+    colors.backgroundSecondary(),
+    colors.backgroundSecondary(70),
+  )};
+  --border-radius: 9px;
+  --border: ${dependentValue(
+    'isHighContrast',
+    () => `solid ${dimensions.hairline()} ${colors.fontPrimary()()}`,
+    'none',
+  )};
 
-    color: ${colors.fontPrimary()};
-    font-size: ${dimensions.fontSizeSmall};
-    overflow: hidden;
-    cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
-  `,
-  { isHighContrast: false, span: 2 },
-);
+  color: ${colors.fontPrimary()};
+  font-size: ${dimensions.fontSizeSmall};
+  overflow: hidden;
+  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
+`;
 
 export const Header = styled('cell-header')`
   align-items: center;

@@ -15,7 +15,8 @@ export const Sensor: FunctionComponent<{
 }> = ({ object, onClick, title }) => {
   if (!('$' in object)) return null;
   switch (object.$) {
-    case 'input': {
+    case 'input':
+    case 'inputGrouping': {
       return <BinarySensor sensor={object} onClick={onClick} title={title} />;
     }
     case 'door':

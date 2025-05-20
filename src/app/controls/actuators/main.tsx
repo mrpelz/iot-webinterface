@@ -2,9 +2,9 @@ import { FunctionComponent } from 'preact';
 
 import { AnyObject } from '../../api.js';
 import { I18nKey } from '../../i18n/main.js';
-import { BinaryActuator, TBinaryActuator } from './binary.js';
-import { BrightnessActuator, TBrightnessActuator } from './brightness.js';
-import { NullActuator, TNullActuator } from './null.js';
+import { BinaryActuator } from './binary.js';
+import { BrightnessActuator } from './brightness.js';
+import { NullActuator } from './null.js';
 import { RGBActuator, TRGBActuator } from './rgb.js';
 
 export const Actuator: FunctionComponent<{
@@ -18,7 +18,8 @@ export const Actuator: FunctionComponent<{
 
   switch (object.$) {
     case 'output':
-    case 'outputGrouping': {
+    case 'outputGrouping':
+    case 'scene': {
       return (
         <BinaryActuator actuator={object} onClick={onClick} title={title} />
       );

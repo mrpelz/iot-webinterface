@@ -1,6 +1,7 @@
+import { ensureKeys } from '@iot/iot-monolith/oop';
 import { Match, TExclude } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
-import { useCallback } from 'preact/hooks';
+import { useCallback, useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../../common/types.js';
 import { BlendOver } from '../../components/blend-over.js';
@@ -17,7 +18,7 @@ import { Cell } from '../main.js';
 // @ts-ignore
 export type TBinaryActuator = Match<
   {
-    $: 'output' | 'outputGrouping';
+    $: 'output' | 'outputGrouping' | 'scene';
   },
   TExclude,
   TSerialization
@@ -37,10 +38,10 @@ export const BinaryActuator: FunctionComponent<{
   title,
 }) => {
   const value = useTypedEmitter(actuator.main);
+
   const loading = useTypedEmitter(
-    'actuatorStaleness' in actuator
-      ? actuator.actuatorStaleness.loading
-      : undefined,
+    useMemo(() => ensureKeys(actuator, 'actuatorStaleness'), [actuator])
+      ?.actuatorStaleness?.loading,
   ).value;
 
   const flip = useTypedCollector(actuator.flip);

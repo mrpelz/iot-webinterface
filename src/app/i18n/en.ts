@@ -129,7 +129,9 @@ const p = {
   mirrorLights: `${s.mirror} ${s.light}s`,
   nightLights: `${s.night}${s.light}s`,
   notifications: `${s.notification}s`,
+  scenes: `${s.scene}s`,
   things: 'things',
+  windows: `${s.window}s`,
 } as const;
 
 const d = {
@@ -138,11 +140,13 @@ const d = {
   airSafety: `${s.air} ${s.safety}`,
   all: `${s.all} ${p.things}`,
   allCeilingLights: `${s.all} ${s.ceiling} ${p.lights}`,
+  allClosed: `${s.all} ${s.closed}`,
   allLights: `${s.all} ${p.lights}`,
   allLightsOff: `${s.all} ${p.lights} ${s.off}`,
   allLightsTimer: `${s.all} ${p.lights} ${s.timer}`,
   allOff: `${s.all} ${s.off}`,
   allTimer: `${s.all} ${p.things} ${s.timer}`,
+  allWindows: `${s.all} ${p.windows}`,
   astronomicalTwilightLighting: `${s.astronomic}al ${s.twilight} ${s.lighting}`,
   autoLight: `${s.auto}matic ${s.light}`,
   b: s.blue,

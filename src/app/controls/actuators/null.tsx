@@ -81,6 +81,10 @@ export const NullActuator: FunctionComponent<{
 
   const { topic } = ensureKeys(actuator, 'topic');
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const name = String(title ?? actuator.$path?.at(-1) ?? topic);
+
   const ColorBody = useColorBody(
     TriggerBody,
     String(actuator.$path?.at(-1)),
@@ -90,7 +94,7 @@ export const NullActuator: FunctionComponent<{
   return (
     <Cell
       onClick={onClick ?? handleClick}
-      title={<Translation i18nKey="scene" capitalize={true} />}
+      title={<Translation i18nKey={name} capitalize={true} />}
     >
       <Overlay
         overlay={
@@ -100,10 +104,7 @@ export const NullActuator: FunctionComponent<{
         }
       >
         <Body ref={baseRef}>
-          <Translation
-            i18nKey={title ?? topic ?? 'trigger'}
-            capitalize={true}
-          />
+          <Translation i18nKey="trigger" capitalize={true} />
         </Body>
       </Overlay>
     </Cell>

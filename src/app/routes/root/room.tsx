@@ -1,3 +1,4 @@
+import { ensureKeys } from '@iot/iot-monolith/oop';
 import {
   any,
   DEFAULT_MATCH_DEPTH,
@@ -10,6 +11,8 @@ import { useMemo } from 'preact/hooks';
 import { AnyObject, groupBy, sortBy } from '../../api.js';
 import { Grid } from '../../components/grid.js';
 import { Control } from '../../controls/main.js';
+import { BinarySensor } from '../../controls/sensor/binary.js';
+import { useArray } from '../../hooks/use-array-compare.js';
 import { actuated, measuredCategories } from '../../i18n/mapping.js';
 import { useMatch } from '../../state/api.js';
 import { $subPath } from '../../state/path.js';
@@ -23,6 +26,12 @@ export const Room: FunctionComponent<{
   // @ts-ignore
   object: AnyObject;
 }> = ({ children, object }) => {
+  const { allWindows } = useMemo(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    () => ensureKeys(object, 'allWindows'),
+    [object],
+  );
   const doors = useMatch({ $: 'door' as const }, excludePattern, object);
   const windows = useMatch({ $: 'window' as const }, excludePattern, object);
   const properties = useMatch(
@@ -30,6 +39,12 @@ export const Room: FunctionComponent<{
     excludePattern,
     object,
     1,
+  );
+  const scenes = useArray(
+    [
+      useMatch({ $: 'scene' as const }, excludePattern, object),
+      useMatch({ $: 'triggerElement' as const }, excludePattern, object),
+    ].flat(1),
   );
 
   const securitySensors = useMemo(
@@ -86,6 +101,14 @@ export const Room: FunctionComponent<{
             {securitySensors.map((element) => (
               <Control object={element} />
             ))}
+            {allWindows ? (
+              <BinarySensor
+                sensor={allWindows}
+                negativeKey="allClosed"
+                positiveKey="open"
+                title="allWindows"
+              />
+            ) : null}
             {doors.map((element) => (
               <Control object={element} />
             ))}
@@ -138,6 +161,16 @@ export const Room: FunctionComponent<{
           </Grid>
         </Category>
       ))}
+
+      {scenes ? (
+        <Category header={<Translation i18nKey={'scenes'} capitalize={true} />}>
+          <Grid>
+            {scenes.map((element) => (
+              <Control object={element} />
+            ))}
+          </Grid>
+        </Category>
+      ) : null}
 
       <Category header={<Translation i18nKey={'other'} capitalize={true} />}>
         <Grid>

@@ -1,5 +1,7 @@
+import { ensureKeys } from '@iot/iot-monolith/oop';
 import { Match, TExclude } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../../common/types.js';
 import { Tag } from '../../components/controls.js';
@@ -12,7 +14,7 @@ import { CellWithBody } from '../main.js';
 // @ts-ignore
 export type TBinarySensor = Match<
   {
-    $: 'input';
+    $: 'input' | 'inputGrouping';
   },
   TExclude,
   TSerialization
@@ -25,12 +27,13 @@ export const BinarySensor: FunctionComponent<{
   sensor: TBinarySensor;
   title?: I18nKey;
 }> = ({ negativeKey = 'no', onClick, positiveKey = 'yes', sensor, title }) => {
+  const { topic } = useMemo(() => ensureKeys(sensor, 'topic'), [sensor]);
   const value = useTypedEmitter(sensor.main).value;
 
   return (
     <CellWithBody
       onClick={onClick}
-      title={<Translation i18nKey={title || sensor.topic} capitalize={true} />}
+      title={<Translation i18nKey={title || topic} capitalize={true} />}
     >
       <Tag>
         {value === undefined ? (
