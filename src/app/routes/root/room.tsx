@@ -38,8 +38,8 @@ export const Room: FunctionComponent<{
     () => ensureKeys(object, 'scenes'),
     [object],
   );
-  const doors = useMatch({ $: 'door' as const }, excludePattern, object);
-  const windows = useMatch({ $: 'window' as const }, excludePattern, object);
+  const doors = useMatch({ $: 'door' as const }, excludePattern, object, 1);
+  const windows = useMatch({ $: 'window' as const }, excludePattern, object, 1);
   const properties = useMatch(
     { level: Level.PROPERTY as const, topic: any },
     excludePattern,

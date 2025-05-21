@@ -1,8 +1,9 @@
 {
+  "background_color": "#000000",
+  "description": "wurstsalat IoT webinterface",
+  "display": "standalone",
   "name": "wurstsalat IoT",
   "short_name": "wurstsalat IoT",
-  "description": "wurstsalat IoT webinterface",
   "start_url": "/",
-  "display": "standalone",
-  "background_color": "#000000"
+  "theme_color": "#000000"
 }
