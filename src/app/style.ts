@@ -63,7 +63,15 @@ const dynamicDimensions = {
   },
   get hairline() {
     return () =>
-      useBreakpointValue(strings.isRetina, dimension(0.5), dimension(1));
+      useBreakpointValue(
+        strings.isRetina2x,
+        useBreakpointValue(
+          strings.isRetina3x,
+          dimension(0.333),
+          dimension(0.5),
+        ),
+        dimension(1),
+      );
   },
   headerHeight: add(strings.safeAreaInsetTop, staticDimensions.titlebarHeight),
   headerHeightShiftDown: add(

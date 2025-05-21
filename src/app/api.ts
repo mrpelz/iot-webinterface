@@ -11,6 +11,10 @@ import {
   InteractionReference,
   InteractionType,
 } from '@iot/iot-monolith/tree-serialization';
+import {
+  SharedWorkerPonyfill,
+  SharedWorkerSupported,
+} from '@okikio/sharedworker';
 import { computed, ReadonlySignal, Signal, signal } from '@preact/signals';
 import { Remote, wrap } from 'comlink';
 
@@ -87,13 +91,25 @@ export class Api {
 
   constructor() {
     this._api = wrap(
-      new SharedWorker(
-        new URL(
-          '../workers/api.js',
-          import.meta.url,
-        ) /* webpackChunkName: 'api' */,
-        { name: 'api' },
-      ).port,
+      SharedWorkerSupported
+        ? new SharedWorkerPonyfill(
+            new SharedWorker(
+              new URL(
+                '../workers/api.js',
+                import.meta.url,
+              ) /* webpackChunkName: 'api' */,
+              { name: 'api' },
+            ),
+          ).port
+        : new SharedWorkerPonyfill(
+            new Worker(
+              new URL(
+                '../workers/api.js',
+                import.meta.url,
+              ) /* webpackChunkName: 'api' */,
+              { name: 'api' },
+            ),
+          ).port,
     );
 
     const $isInit = signal(false);

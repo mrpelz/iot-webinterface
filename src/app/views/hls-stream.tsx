@@ -152,10 +152,6 @@ export const HLSStream: FunctionComponent<{
     (async () => {
       const [response] = await fetchFallback(poster, undefined, {
         credentials: 'omit',
-        headers: {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          'x-sw-skip': '1',
-        },
       });
       if (!response) return;
 

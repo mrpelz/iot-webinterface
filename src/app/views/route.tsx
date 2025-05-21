@@ -9,7 +9,7 @@ import { Global } from '../routes/root/global.js';
 import { Room } from '../routes/root/room.js';
 import { Settings } from '../routes/root/settings.js';
 import { Test } from '../routes/root/test-route.js';
-import { noBackground, setBackgroundOverride } from '../state/background.js';
+import { noBackground, useBackgroundOverride } from '../state/background.js';
 import { $room, $staticPage } from '../state/navigation.js';
 
 export const RootRoute: FunctionComponent = () => {
@@ -39,7 +39,7 @@ export const SubRoute: FunctionComponent<{
   blackOut?: boolean;
   subRoute: ComponentChildren;
 }> = ({ blackOut = true, children, subRoute }) => {
-  setBackgroundOverride(subRoute && blackOut ? noBackground : undefined);
+  useBackgroundOverride(subRoute && blackOut ? noBackground : undefined);
   useScrollRestore(!subRoute);
 
   return (

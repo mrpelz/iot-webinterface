@@ -73,7 +73,6 @@ export const MenuListItem = styled('li', forwardRef)<{
 }>`
   align-items: center;
   block-size: ${dimensions.titlebarHeight};
-  border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
   border-block-start: ${dimensions.hairline} solid ${colors.fontTertiary()};
   cursor: pointer;
   display: flex;
@@ -107,6 +106,10 @@ export const MenuListItem = styled('li', forwardRef)<{
         colors.fontPrimary(),
       )(...args),
     )(...args)};
+
+  &:last-of-type {
+    border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
+  }
 
   * + & {
     margin-block-start: -${dimensions.hairline};

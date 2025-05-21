@@ -32,6 +32,12 @@ export const Room: FunctionComponent<{
     () => ensureKeys(object, 'allWindows'),
     [object],
   );
+  const { scenes: scenesRoot } = useMemo(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    () => ensureKeys(object, 'scenes'),
+    [object],
+  );
   const doors = useMatch({ $: 'door' as const }, excludePattern, object);
   const windows = useMatch({ $: 'window' as const }, excludePattern, object);
   const properties = useMatch(
@@ -42,8 +48,8 @@ export const Room: FunctionComponent<{
   );
   const scenes = useArray(
     [
-      useMatch({ $: 'scene' as const }, excludePattern, object),
-      useMatch({ $: 'triggerElement' as const }, excludePattern, object),
+      useMatch({ $: 'scene' as const }, excludePattern, scenesRoot, 1),
+      useMatch({ $: 'triggerElement' as const }, excludePattern, scenesRoot, 1),
     ].flat(1),
   );
 
@@ -162,7 +168,7 @@ export const Room: FunctionComponent<{
         </Category>
       ))}
 
-      {scenes ? (
+      {scenes.length > 0 ? (
         <Category header={<Translation i18nKey={'scenes'} capitalize={true} />}>
           <Grid>
             {scenes.map((element) => (

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { computed } from '@preact/signals';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
@@ -22,7 +23,6 @@ import {
 } from '../../components/json-viewer/hierarchy-renderers.js';
 import { JSONViewer } from '../../components/json-viewer/main.js';
 import { Details, Properties } from '../../controls/diagnostics.js';
-import { useGetLocalStorage } from '../../hooks/use-local-storage.js';
 import { api } from '../../main.js';
 import {
   useIsInit,
@@ -290,15 +290,12 @@ export const Diagnostics: FunctionComponent = () => {
   const { value: webSocketCount } = useWebSocketCount();
 
   const isDesktop = useBreakpoint(getMediaQuery(dimensions.breakpointDesktop));
+  const hairline = dimensions.hairline();
 
   const streamCount = isWebSocketOnline ? webSocketCount : 0;
 
   // @ts-ignore
   const hierarchy = useIsInit() ? api.hierarchy : undefined;
-
-  const { value: title } = $title;
-
-  const updateId = useGetLocalStorage('updateId');
 
   const jsonViewerRenderers = useMemo(
     () =>
@@ -338,21 +335,21 @@ export const Diagnostics: FunctionComponent = () => {
           <td>
             <b>isVisible</b>
           </td>
-          <td>{$isVisible.toJSON()}</td>
+          <td>{computed(() => JSON.stringify($isVisible.value))}</td>
         </tr>
 
         <tr>
           <td>
             <b>isFocused</b>
           </td>
-          <td>{$isFocused.toJSON()}</td>
+          <td>{computed(() => JSON.stringify($isFocused.value))}</td>
         </tr>
 
         <tr>
           <td>
             <b>isScreensaverActive</b>
           </td>
-          <td>{$isScreensaverActive.toJSON()}</td>
+          <td>{computed(() => JSON.stringify($isScreensaverActive.value))}</td>
         </tr>
 
         <tr>
@@ -369,15 +366,15 @@ export const Diagnostics: FunctionComponent = () => {
             <table>
               <tr>
                 <td>isRoot</td>
-                <td>{$isRoot.toJSON()}</td>
+                <td>{computed(() => JSON.stringify($isRoot.value))}</td>
               </tr>
               <tr>
                 <td>path</td>
-                <td>{$path.toJSON()}</td>
+                <td>{computed(() => JSON.stringify($path.value))}</td>
               </tr>
               <tr>
                 <td>previousPath</td>
-                <td>{$previousPath.toJSON()}</td>
+                <td>{computed(() => JSON.stringify($previousPath.value))}</td>
               </tr>
             </table>
           </td>
@@ -387,7 +384,7 @@ export const Diagnostics: FunctionComponent = () => {
           <td>
             <b>theme</b>
           </td>
-          <td>{$theme.toJSON()}</td>
+          <td>{computed(() => JSON.stringify($theme.value))}</td>
         </tr>
 
         <tr>
@@ -395,6 +392,13 @@ export const Diagnostics: FunctionComponent = () => {
             <b>isDesktop</b>
           </td>
           <td>{useMemo(() => JSON.stringify(isDesktop), [isDesktop])}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>hairline</b>
+          </td>
+          <td>{useMemo(() => JSON.stringify(hairline), [hairline])}</td>
         </tr>
 
         <tr>
@@ -413,7 +417,7 @@ export const Diagnostics: FunctionComponent = () => {
           <td>
             <b>stream client count</b>
           </td>
-          <td>{streamCount}</td>
+          <td>{useMemo(() => JSON.stringify(streamCount), [streamCount])}</td>
         </tr>
 
         <tr>
@@ -436,21 +440,14 @@ export const Diagnostics: FunctionComponent = () => {
           <td>
             <b>menu visible</b>
           </td>
-          <td>{$isMenuVisible.toJSON()}</td>
+          <td>{computed(() => JSON.stringify($isMenuVisible.value))}</td>
         </tr>
 
         <tr>
           <td>
             <b>title</b>
           </td>
-          <td>{useMemo(() => JSON.stringify(title), [title])}</td>
-        </tr>
-
-        <tr>
-          <td>
-            <b>updateId</b>
-          </td>
-          <td>{useMemo(() => JSON.stringify(updateId), [updateId])}</td>
+          <td>{computed(() => JSON.stringify($title.value))}</td>
         </tr>
       </table>
 

@@ -9,7 +9,7 @@ import {
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
 import { useTypedEmitter } from '../../../state/api.js';
-import { setTitleOverride } from '../../../state/title.js';
+import { useTitleOverride } from '../../../state/title.js';
 import { getTranslation } from '../../../state/translation.js';
 import { Entry, List } from '../../../views/list.js';
 import { Translation } from '../../../views/translation.js';
@@ -23,7 +23,7 @@ export const OpenSensor: FunctionComponent<{
   // @ts-ignore
   const { $ } = sensor;
 
-  setTitleOverride(getTranslation($).value);
+  useTitleOverride(getTranslation($).value);
 
   const {
     open: {

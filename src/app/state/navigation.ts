@@ -8,6 +8,7 @@ import { computed, effect } from '@preact/signals';
 import { api } from '../main.js';
 import { $flags } from '../util/flags.js';
 import { persistedSignal, promisedSignal, TSignal } from '../util/signal.js';
+import { setBackground } from './background.js';
 import { $rootPath, setRootPath } from './path.js';
 
 /**
@@ -250,6 +251,10 @@ effect(() => {
   if (!rootPath) return;
 
   $setRootRoute.value = rootPath;
+});
+
+effect(() => {
+  setBackground($staticPage.value ?? $roomName.value);
 });
 
 effect(() => {

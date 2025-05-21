@@ -231,3 +231,5 @@ self.addEventListener('connect', async ({ ports: [port] }) => {
 
   expose(api, port);
 });
+
+if (!('SharedWorkerGlobalScope' in self)) expose(api);
