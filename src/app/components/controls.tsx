@@ -76,7 +76,7 @@ export const Title = styled('cell-title')`
 export const Tag = styled('tag')`
   align-items: center;
   border-radius: ${half(dimensions.controlBase)};
-  border: solid ${dimensions.hairline} ${colors.fontPrimary()};
+  border: solid 1px ${colors.fontPrimary()};
   display: flex;
   flex-wrap: wrap;
   gap: ${dimensions.controlBase};
