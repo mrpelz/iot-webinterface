@@ -20,6 +20,7 @@ export const CategoryHeader = styled('category-header')<{
   padding: 0 ${dimensions.fontPadding};
   position: sticky;
   will-change: contents;
+  z-index: 1;
 
   background-color: ${dependentValue(
     'isHighContrast',

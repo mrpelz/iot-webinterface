@@ -115,16 +115,16 @@ config.plugins = [
         operations: [
           new ConcatOperation(
             'start',
-            `// @ts-expect-error
-            __webpack_base_uri__ = new URL('/', location.href).href;\n\n`,
-          ),
-          new ConcatOperation(
-            'start',
             glob
               .sync(path.resolve(dirSrc, 'common/images/background/*'))
               .map((path_) => path.relative(path.resolve(dirSrc, 'app'), path_))
-              .map((path_) => `import "${path_}";`)
+              .map((path_) => `import '${path_}';`)
               .join('\n'),
+          ),
+          new ConcatOperation(
+            'start',
+            `// @ts-expect-error
+            __webpack_base_uri__ = new URL('/', location.href).href;\n\n`,
           ),
         ],
         test: new RegExp(`^${path.resolve(dirSrc, 'app/main.ts')}$`),
