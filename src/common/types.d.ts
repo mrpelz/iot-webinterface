@@ -12,6 +12,7 @@ export type Flags = {
   absoluteTimes: boolean;
   apiBaseUrl: string | null;
   debug: boolean;
+  hallwayStreamEnable: boolean;
   inactivityTimeout: number | null;
   language: string | null;
   path: string | null;

@@ -6,6 +6,7 @@ import {
 import { FunctionComponent } from 'preact';
 
 import { api } from '../../main.js';
+import { $flags } from '../../util/flags.js';
 import { HallwayStream } from '../../views/hallway-stream.js';
 import { Room } from './room.js';
 
@@ -19,7 +20,7 @@ export const Global: FunctionComponent = () => {
 
   return (
     <Room object={object}>
-      <HallwayStream />
+      {$flags.hallwayStreamEnable.value ? <HallwayStream /> : null}
     </Room>
   );
 };

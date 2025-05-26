@@ -155,6 +155,25 @@ export const Settings: FunctionComponent = () => {
             </optgroup>
           </select>
         </Entry>
+        <Entry
+          id="hallwayStreamEnable"
+          label={
+            <Translation capitalize={true} i18nKey="enableHallwayStream" />
+          }
+        >
+          <input
+            checked={Boolean($flags.hallwayStreamEnable.value)}
+            id="hallwayStreamEnable"
+            name="hallwayStreamEnable"
+            type="checkbox"
+            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+              ({ currentTarget: { checked } }) => {
+                $flags.hallwayStreamEnable.value = checked;
+              },
+              [],
+            )}
+          />
+        </Entry>
       </List>
       <List>
         <Entry

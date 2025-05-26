@@ -1,5 +1,5 @@
 import { effect, Signal, signal } from '@preact/signals';
-import { get, set } from 'idb-keyval';
+import { del, get, set } from 'idb-keyval';
 
 import type { Flags } from '../../common/types.js';
 
@@ -7,6 +7,7 @@ const defaultFlags: Flags = {
   absoluteTimes: false,
   apiBaseUrl: null,
   debug: false,
+  hallwayStreamEnable: false,
   inactivityTimeout: null,
   language: null,
   path: null,
@@ -49,19 +50,25 @@ const isMeaningfulValue = (key: keyof Flags, input: unknown) => {
   return true;
 };
 
+const writeIfMeaningful = (key: keyof Flags, value: unknown) => {
+  if (isMeaningfulValue(key, value)) {
+    set(key, value);
+  } else {
+    del(key);
+  }
+};
+
 for (const [key_, aSignal] of Object.entries($flags)) {
   const key = key_ as keyof Flags;
 
   (async () => {
     const oldValue = await get(key);
-    if (!isMeaningfulValue(key, oldValue)) return;
-
     aSignal.value = oldValue;
   })();
 
-  set(key, aSignal.value);
+  writeIfMeaningful(key, aSignal.value);
   effect(() => {
-    set(key, aSignal.value);
+    writeIfMeaningful(key, aSignal.value);
   });
 }
 

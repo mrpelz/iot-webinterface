@@ -48,8 +48,18 @@ export const Room: FunctionComponent<{
   );
   const scenes = useArray(
     [
-      useMatch({ $: 'scene' as const }, excludePattern, scenesRoot, 1),
-      useMatch({ $: 'triggerElement' as const }, excludePattern, scenesRoot, 1),
+      useMatch(
+        { $: scenesRoot ? ('scene' as const) : null },
+        excludePattern,
+        scenesRoot,
+        1,
+      ),
+      useMatch(
+        { $: scenesRoot ? ('triggerElement' as const) : null },
+        excludePattern,
+        scenesRoot,
+        1,
+      ),
     ].flat(1),
   );
 
@@ -178,13 +188,15 @@ export const Room: FunctionComponent<{
         </Category>
       ) : null}
 
-      <Category header={<Translation i18nKey={'other'} capitalize={true} />}>
-        <Grid>
-          {unlistedActuators.map((element) => (
-            <Control object={element} />
-          ))}
-        </Grid>
-      </Category>
+      {unlistedActuators.length > 0 ? (
+        <Category header={<Translation i18nKey={'other'} capitalize={true} />}>
+          <Grid>
+            {unlistedActuators.map((element) => (
+              <Control object={element} />
+            ))}
+          </Grid>
+        </Category>
+      ) : null}
     </SubRoute>
   );
 };

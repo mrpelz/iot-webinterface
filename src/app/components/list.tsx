@@ -50,6 +50,11 @@ export const Entry = styled('li')`
   &:last-of-type {
     border-block-end: none;
   }
+
+  & > label,
+  & > input {
+    cursor: pointer;
+  }
 `;
 
 export const Button = styled('button')`
