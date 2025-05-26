@@ -10,6 +10,7 @@ import { $flags } from '../util/flags.js';
 import { persistedSignal, promisedSignal, TSignal } from '../util/signal.js';
 import { setBackground } from './background.js';
 import { $rootPath, setRootPath } from './path.js';
+import { $isVisible } from './visibility.js';
 
 /**
  * HOMES
@@ -213,10 +214,19 @@ const $setRootRoute = persistedSignal<string>(
   $rootPath.value ?? START_PAGE,
 );
 
-const startPage = $flags.startPage.value;
-if (startPage) $setRootRoute.value = startPage;
+const init = () => {
+  const startPage = $flags.startPage.value;
+  if (startPage) $setRootRoute.value = startPage;
 
-setRootPath($setRootRoute.value);
+  setRootPath($setRootRoute.value);
+};
+
+init();
+effect(() => {
+  if ($isVisible.value) return;
+
+  init();
+});
 
 export const $roomName = computed(() => {
   const room = $setRootRoute.value;

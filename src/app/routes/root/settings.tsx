@@ -277,33 +277,37 @@ export const Settings: FunctionComponent = () => {
           id="inactivityTimeout"
           label={<Translation capitalize={true} i18nKey="inactivityTimeout" />}
         >
-          <input
-            id="inactivityTimeout"
-            inputMode="numeric"
-            min="5000"
-            name="inactivityTimeout"
-            pattern="[0-9]*"
-            placeholder="0"
-            value={$flags.inactivityTimeout.value || ''}
-            onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
-              ({
-                currentTarget: { value },
-              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
-                const inactivityTimeout = Number.parseInt(value.trim(), 10);
-                if (
-                  !inactivityTimeout ||
-                  Number.isNaN(inactivityTimeout) ||
-                  !Number.isInteger(inactivityTimeout)
-                ) {
-                  $flags.inactivityTimeout.value = null;
-                  return;
-                }
+          <div>
+            <input
+              id="inactivityTimeout"
+              inputMode="numeric"
+              min="10"
+              name="inactivityTimeout"
+              pattern="[0-9]*"
+              placeholder="0"
+              value={($flags.inactivityTimeout.value ?? 0) / 1000 || ''}
+              onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+                ({
+                  currentTarget: { value },
+                }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+                  const inactivityTimeout = Number.parseInt(value.trim(), 10);
+                  if (
+                    !inactivityTimeout ||
+                    inactivityTimeout < 10 ||
+                    Number.isNaN(inactivityTimeout) ||
+                    !Number.isInteger(inactivityTimeout)
+                  ) {
+                    $flags.inactivityTimeout.value = null;
+                    return;
+                  }
 
-                $flags.inactivityTimeout.value = inactivityTimeout;
-              },
-              [],
-            )}
-          />
+                  $flags.inactivityTimeout.value = inactivityTimeout * 1000;
+                },
+                [],
+              )}
+            />
+            <i> s</i>
+          </div>
         </Entry>
         <Entry
           id="screensaverEnable"
