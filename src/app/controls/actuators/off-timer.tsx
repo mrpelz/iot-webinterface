@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Match, TExclude } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
@@ -19,7 +20,6 @@ import { $rootPath } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
 import { Cell } from '../main.js';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export type TOffTimer = Match<
   {
@@ -44,6 +44,7 @@ export const TimerActuator: FunctionComponent<{
     main,
     runoutTime: { main: runoutTime },
     triggerTime: { main: triggerTime },
+    // @ts-ignore
   } = object;
 
   const { value: enabledValue } = useTypedEmitter(main);
@@ -55,6 +56,9 @@ export const TimerActuator: FunctionComponent<{
   const runoutTimeLabel = useTimeLabel(runoutTimeDate, 0);
 
   const [, fraction] = useTimeSpan(triggerTimeDate, runoutTimeDate);
+
+  // @ts-ignore
+  const name = String(title ?? object.$path?.at(-1));
 
   const handleFlip = useTypedCollector(flip);
   const handleCancel = useTypedCollector(cancel);
@@ -92,7 +96,7 @@ export const TimerActuator: FunctionComponent<{
   return (
     <Cell
       onClick={flip && !onClick ? handleClick : onClick}
-      title={<Translation i18nKey={title} capitalize={true} />}
+      title={<Translation i18nKey={name} capitalize={true} />}
     >
       <BlendOver
         blendOver={blendOver}

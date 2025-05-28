@@ -5,6 +5,7 @@ import { I18nKey } from '../../i18n/main.js';
 import { BinaryActuator } from './binary.js';
 import { BrightnessActuator } from './brightness.js';
 import { NullActuator } from './null.js';
+import { TimerActuator } from './off-timer.js';
 import { RGBActuator, TRGBActuator } from './rgb.js';
 
 export const Actuator: FunctionComponent<{
@@ -43,6 +44,9 @@ export const Actuator: FunctionComponent<{
           title={title}
         />
       );
+    }
+    case 'offTimer': {
+      return <TimerActuator object={object} />;
     }
     default: {
       return null;

@@ -10,6 +10,7 @@ const defaultFlags: Flags = {
   hallwayStreamEnable: false,
   inactivityTimeout: null,
   language: null,
+  pagePersistence: true,
   path: null,
   screensaverEnable: false,
   screensaverRandomizePosition: false,
@@ -63,6 +64,8 @@ for (const [key_, aSignal] of Object.entries($flags)) {
 
   (async () => {
     const oldValue = await get(key);
+    if (oldValue === undefined) return;
+
     aSignal.value = oldValue;
   })();
 

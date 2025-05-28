@@ -1,6 +1,5 @@
-import { ensureKeys } from '@iot/iot-monolith/oop';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
-  any,
   DEFAULT_MATCH_DEPTH,
   excludePattern,
   Level,
@@ -8,12 +7,15 @@ import {
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
-import { AnyObject, groupBy, sortBy } from '../../api.js';
+import { LevelObject } from '../../api.js';
 import { Grid } from '../../components/grid.js';
+import { BinaryActuator } from '../../controls/actuators/binary.js';
+import { BrightnessActuator } from '../../controls/actuators/brightness.js';
+import { NullActuator } from '../../controls/actuators/null.js';
 import { Control } from '../../controls/main.js';
 import { BinarySensor } from '../../controls/sensor/binary.js';
+import { OpenSensor } from '../../controls/sensor/open.js';
 import { useArray } from '../../hooks/use-array-compare.js';
-import { actuated, measuredCategories } from '../../i18n/mapping.js';
 import { useMatch } from '../../state/api.js';
 import { $subPath } from '../../state/path.js';
 import { Category } from '../../views/category.js';
@@ -22,83 +24,96 @@ import { Translation } from '../../views/translation.js';
 import { SubPage } from '../sub/room/main.js';
 
 export const Room: FunctionComponent<{
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  object: AnyObject;
+  object: LevelObject[Level.ROOM] | LevelObject[Level.SYSTEM];
 }> = ({ children, object }) => {
-  const { allWindows } = useMemo(
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    () => ensureKeys(object, 'allWindows'),
-    [object],
-  );
-  const { scenes: scenesRoot } = useMemo(
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    () => ensureKeys(object, 'scenes'),
-    [object],
-  );
-  const doors = useMatch({ $: 'door' as const }, excludePattern, object, 1);
-  const windows = useMatch({ $: 'window' as const }, excludePattern, object, 1);
+  const { value: subPath } = $subPath;
+
   const properties = useMatch(
-    { level: Level.PROPERTY as const, topic: any },
+    { level: Level.PROPERTY as const },
     excludePattern,
     object,
     1,
   );
-  const scenes = useArray(
+
+  const security = useArray(
+    [
+      object.$ === 'system' ? [object.wurstHome.sonninstraße16.entryDoor] : [],
+      useMatch({ topic: 'security' as const }, excludePattern, properties, 1),
+    ].flat(1),
+  );
+
+  const doors = useMatch({ $: 'door' as const }, excludePattern, properties, 1);
+
+  const scenes = useMatch(
+    { $: 'scene' as const },
+    excludePattern,
+    properties,
+    1,
+  );
+  const triggers = useMatch(
+    { $: 'triggerElement' as const },
+    excludePattern,
+    properties,
+    1,
+  );
+
+  const binaryLights = useArray(
     [
       useMatch(
-        { $: scenesRoot ? ('scene' as const) : null },
+        { $: 'outputGrouping' as const, topic: 'lighting' as const },
         excludePattern,
-        scenesRoot,
+        properties,
         1,
       ),
       useMatch(
-        { $: scenesRoot ? ('triggerElement' as const) : null },
+        { $: 'output' as const, topic: 'lighting' as const },
         excludePattern,
-        scenesRoot,
+        properties,
         1,
       ),
     ].flat(1),
   );
-
-  const securitySensors = useMemo(
-    () =>
-      sortBy(properties, 'topic', measuredCategories.security).listedResults,
-    [properties],
+  const brightnessLights = useArray(
+    [
+      useMatch({ $: 'ledGrouping' as const }, excludePattern, properties, 1),
+      useMatch({ $: 'led' as const }, excludePattern, properties, 1),
+    ].flat(1),
   );
 
-  const airQualitySensors = useMemo(
-    () =>
-      sortBy(properties, 'topic', measuredCategories.airQuality).listedResults,
-    [properties],
-  );
+  const otherProperties = useMemo(() => {
+    const categorizedProperties = [
+      security,
+      doors,
+      scenes,
+      triggers,
+      binaryLights,
+      brightnessLights,
+    ].flat(1);
 
-  const airSafetySensors = useMemo(
-    () =>
-      sortBy(properties, 'topic', measuredCategories.airSafety).listedResults,
-    [properties],
-  );
+    const remainingProperties = properties.filter(
+      (item) =>
+        !categorizedProperties.includes(
+          item as (typeof categorizedProperties)[number],
+        ),
+    ) as Exclude<
+      (typeof properties)[number],
+      (typeof categorizedProperties)[number]
+    >[];
 
-  const environmentalSensors = useMemo(
-    () =>
-      sortBy(properties, 'topic', measuredCategories.environmental)
-        .listedResults,
-    [properties],
-  );
-
-  const [listedActuators, unlistedActuators] = useMemo(() => {
-    const { listedResults, unlistedResults } = sortBy(
-      properties,
-      'topic',
-      actuated,
+    return remainingProperties.toSorted((item) =>
+      item.main?.$ === 'setter' ? -1 : 1,
     );
+  }, [
+    binaryLights,
+    brightnessLights,
+    doors,
+    properties,
+    scenes,
+    security,
+    triggers,
+  ]);
 
-    return [groupBy(listedResults, 'topic'), unlistedResults] as const;
-  }, [properties]);
-
-  const { value: subPath } = $subPath;
   const [subRouteElement] = useMatch(
     { $id: subPath },
     excludePattern,
@@ -111,88 +126,66 @@ export const Room: FunctionComponent<{
       subRoute={subRouteElement ? <SubPage object={subRouteElement} /> : null}
     >
       {children}
-      {[securitySensors, doors, windows].flat().length > 0 ? (
-        <Category header={<Translation i18nKey="security" capitalize={true} />}>
+
+      {security.length > 0 ? (
+        <Category header={<Translation capitalize={true} i18nKey="security" />}>
           <Grid>
-            {securitySensors.map((element) => (
-              <Control object={element} />
-            ))}
-            {allWindows ? (
-              <BinarySensor
-                sensor={allWindows}
-                negativeKey="allClosed"
-                positiveKey="open"
-                title="allWindows"
-              />
-            ) : null}
-            {doors.map((element) => (
-              <Control object={element} />
-            ))}
-            {windows.map((element) => (
-              <Control object={element} />
-            ))}
+            {security.map((item) =>
+              'open' in item ? (
+                <OpenSensor sensor={item} />
+              ) : (
+                <BinarySensor
+                  negativeKey="allClosed"
+                  positiveKey="open"
+                  sensor={item}
+                />
+              ),
+            )}
           </Grid>
         </Category>
       ) : null}
-      {airQualitySensors.length > 0 ? (
-        <Category
-          header={<Translation i18nKey="airQuality" capitalize={true} />}
-        >
+
+      {doors.length > 0 ? (
+        <Category header={<Translation capitalize={true} i18nKey="doors" />}>
           <Grid>
-            {airQualitySensors.map((element) => (
-              <Control object={element} />
-            ))}
-          </Grid>
-        </Category>
-      ) : null}
-      {airSafetySensors.length > 0 ? (
-        <Category
-          header={<Translation i18nKey="airSafety" capitalize={true} />}
-        >
-          <Grid>
-            {airSafetySensors.map((element) => (
-              <Control object={element} />
-            ))}
-          </Grid>
-        </Category>
-      ) : null}
-      {environmentalSensors.length > 0 ? (
-        <Category
-          header={<Translation i18nKey="environmental" capitalize={true} />}
-        >
-          <Grid>
-            {environmentalSensors.map((element) => (
-              <Control object={element} />
+            {doors.map((item) => (
+              <OpenSensor sensor={item} />
             ))}
           </Grid>
         </Category>
       ) : null}
 
-      {listedActuators.map(({ elements, group }) => (
-        <Category header={<Translation i18nKey={group} capitalize={true} />}>
+      {scenes.length > 0 || triggers.length > 0 ? (
+        <Category header={<Translation capitalize={true} i18nKey="scenes" />}>
           <Grid>
-            {elements.map((element) => (
-              <Control object={element} />
+            {scenes.map((scene) => (
+              <BinaryActuator actuator={scene} />
             ))}
-          </Grid>
-        </Category>
-      ))}
-
-      {scenes.length > 0 ? (
-        <Category header={<Translation i18nKey={'scenes'} capitalize={true} />}>
-          <Grid>
-            {scenes.map((element) => (
-              <Control object={element} />
+            {triggers.map((trigger) => (
+              <NullActuator actuator={trigger} />
             ))}
           </Grid>
         </Category>
       ) : null}
 
-      {unlistedActuators.length > 0 ? (
-        <Category header={<Translation i18nKey={'other'} capitalize={true} />}>
+      {binaryLights.length > 0 || brightnessLights.length > 0 ? (
+        <Category header={<Translation capitalize={true} i18nKey="lights" />}>
           <Grid>
-            {unlistedActuators.map((element) => (
-              <Control object={element} />
+            {binaryLights.map((light) => (
+              <BinaryActuator actuator={light} />
+            ))}
+            {brightnessLights.map((light) => (
+              <BrightnessActuator actuator={light} />
+            ))}
+          </Grid>
+        </Category>
+      ) : null}
+
+      {otherProperties.length > 0 ? (
+        <Category header={<Translation capitalize={true} i18nKey="other" />}>
+          <Grid>
+            {otherProperties.map((item) => (
+              <Control object={item} />
             ))}
           </Grid>
         </Category>

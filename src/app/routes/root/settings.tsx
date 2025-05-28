@@ -156,13 +156,30 @@ export const Settings: FunctionComponent = () => {
           </select>
         </Entry>
         <Entry
+          id="pagePersistence"
+          label={<Translation capitalize={true} i18nKey="persistPage" />}
+        >
+          <input
+            checked={$flags.pagePersistence.value}
+            id="pagePersistence"
+            name="pagePersistence"
+            type="checkbox"
+            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+              ({ currentTarget: { checked } }) => {
+                $flags.pagePersistence.value = checked;
+              },
+              [],
+            )}
+          />
+        </Entry>
+        <Entry
           id="hallwayStreamEnable"
           label={
             <Translation capitalize={true} i18nKey="enableHallwayStream" />
           }
         >
           <input
-            checked={Boolean($flags.hallwayStreamEnable.value)}
+            checked={$flags.hallwayStreamEnable.value}
             id="hallwayStreamEnable"
             name="hallwayStreamEnable"
             type="checkbox"
@@ -259,7 +276,7 @@ export const Settings: FunctionComponent = () => {
           label={<Translation capitalize={true} i18nKey="absoluteTimes" />}
         >
           <input
-            checked={Boolean($flags.absoluteTimes.value)}
+            checked={$flags.absoluteTimes.value}
             id="absoluteTimes"
             name="absoluteTimes"
             type="checkbox"
@@ -314,7 +331,7 @@ export const Settings: FunctionComponent = () => {
           label={<Translation capitalize={true} i18nKey="enableScreensaver" />}
         >
           <input
-            checked={Boolean($flags.screensaverEnable.value)}
+            checked={$flags.screensaverEnable.value}
             id="screensaverEnable"
             name="screensaverEnable"
             type="checkbox"
@@ -330,7 +347,7 @@ export const Settings: FunctionComponent = () => {
             )}
           />
         </Entry>
-        <ShowHide show={Boolean($flags.screensaverEnable.value)}>
+        <ShowHide show={$flags.screensaverEnable.value}>
           <Entry
             id="screensaverRandomizePosition"
             label={
@@ -341,7 +358,7 @@ export const Settings: FunctionComponent = () => {
             }
           >
             <input
-              checked={Boolean($flags.screensaverRandomizePosition.value)}
+              checked={$flags.screensaverRandomizePosition.value}
               id="screensaverRandomizePosition"
               name="screensaverRandomizePosition"
               type="checkbox"
@@ -361,7 +378,7 @@ export const Settings: FunctionComponent = () => {
           label={<Translation capitalize={true} i18nKey="debug" />}
         >
           <input
-            checked={Boolean($flags.debug.value)}
+            checked={$flags.debug.value}
             id="debug"
             name="debug"
             type="checkbox"
@@ -411,7 +428,7 @@ export const Settings: FunctionComponent = () => {
           label={<Translation capitalize={true} i18nKey="updateUnattended" />}
         >
           <input
-            checked={Boolean($flags.updateUnattended.value)}
+            checked={$flags.updateUnattended.value}
             id="updateUnattended"
             name="updateUnattended"
             type="checkbox"

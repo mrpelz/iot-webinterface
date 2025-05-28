@@ -15,6 +15,7 @@ export type Flags = {
   hallwayStreamEnable: boolean;
   inactivityTimeout: number | null;
   language: string | null;
+  pagePersistence: boolean;
   path: string | null;
   screensaverEnable: boolean;
   screensaverRandomizePosition: boolean;

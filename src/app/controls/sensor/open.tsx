@@ -40,13 +40,17 @@ export const OpenSensor: FunctionComponent<{
 
   const handleClick = useCallback(() => setSubPath($id), [$id]);
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const name = String(title ?? sensor.$path?.at(-1) ?? sensor.$);
+
   const value = useTypedEmitter(sensor.open.main).value;
 
   return (
     <CellWithBody
       icon={<ForwardIcon height="1em" />}
       onClick={onClick ?? handleClick}
-      title={<Translation i18nKey={title || sensor.$} capitalize={true} />}
+      title={<Translation i18nKey={name} capitalize={true} />}
     >
       <Tag>
         {value === undefined ? (
