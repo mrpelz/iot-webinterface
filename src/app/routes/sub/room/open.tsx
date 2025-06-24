@@ -21,9 +21,13 @@ export const OpenSensor: FunctionComponent<{
 }> = ({ sensor }) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
+  const name = useMemo(() => String(sensor.$path?.at(-1) ?? ''), [sensor]);
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const { $ } = sensor;
 
-  useTitleOverride(getTranslation($).value);
+  useTitleOverride(getTranslation(name ?? $).value);
 
   const {
     open: {

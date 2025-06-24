@@ -81,30 +81,6 @@ class Api implements API_WORKER_API {
     });
   }
 
-  private async _getValues(): Promise<void> {
-    const { debug, apiBaseUrl } = await getFlags();
-
-    return Api._retry(async () => {
-      const values = await fetch(
-        new URL(PATH_VALUES, apiBaseUrl ?? self.location.href),
-      ).then((response) => response.json() as Promise<Record<string, unknown>>);
-
-      // eslint-disable-next-line no-console
-      if (debug) console.debug(values);
-
-      const result: Values = new Map();
-
-      for (const [key, value] of Object.entries(values)) {
-        const channel = new BroadcastChannel(key);
-        channel.postMessage(value);
-
-        result.set(key, { channel, value });
-      }
-
-      this._values = result;
-    });
-  }
-
   private async _handleWebSocketOnline(online?: boolean) {
     clearTimeout(this._webSocketOfflineTimeout);
 
@@ -118,7 +94,7 @@ class Api implements API_WORKER_API {
     }
 
     if (online === true) {
-      await this._getValues();
+      await this.getValues();
       this._webSocketOnline.postMessage(true);
     }
 
@@ -205,6 +181,30 @@ class Api implements API_WORKER_API {
     if (debug) console.debug('getValue', { reference, result });
 
     return result;
+  }
+
+  async getValues(): Promise<void> {
+    const { debug, apiBaseUrl } = await getFlags();
+
+    return Api._retry(async () => {
+      const values = await fetch(
+        new URL(PATH_VALUES, apiBaseUrl ?? self.location.href),
+      ).then((response) => response.json() as Promise<Record<string, unknown>>);
+
+      // eslint-disable-next-line no-console
+      if (debug) console.debug(values);
+
+      const result: Values = new Map();
+
+      for (const [key, value] of Object.entries(values)) {
+        const channel = new BroadcastChannel(key);
+        channel.postMessage(value);
+
+        result.set(key, { channel, value });
+      }
+
+      this._values = result;
+    });
   }
 
   isOnline() {

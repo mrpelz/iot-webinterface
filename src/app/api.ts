@@ -203,6 +203,10 @@ export class Api {
     return this.$emitter(WEB_API_UUID, abort);
   }
 
+  getValues(): Promise<void> {
+    return this._api.getValues();
+  }
+
   match<
     P extends object,
     E,

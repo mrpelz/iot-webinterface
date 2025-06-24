@@ -9,7 +9,7 @@ import {
   InteractionReference,
   InteractionType,
 } from '@iot/iot-monolith/tree-serialization';
-import { ReadonlySignal } from '@preact/signals';
+import { effect, ReadonlySignal } from '@preact/signals';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../common/types.js';
@@ -18,6 +18,7 @@ import { useHookDebug } from '../hooks/use-hook-debug.js';
 import { usePromise, usePromisify } from '../hooks/use-promise.js';
 import { useAbortableSignalFactory } from '../hooks/use-signal.js';
 import { api } from '../main.js';
+import { $isFocused } from './focus.js';
 
 export const useCollector = <
   T extends InteractionReference<string, InteractionType.COLLECT>,
@@ -115,3 +116,10 @@ export const useWebSocketCount = (): ReadonlySignal<number | undefined> =>
   useAbortableSignalFactory(
     useCallback((...args) => api.$webSocketCount(...args), []),
   );
+
+effect(() => {
+  const { value: isFocused } = $isFocused;
+  if (!isFocused) return;
+
+  api.getValues();
+});

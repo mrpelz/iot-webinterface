@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 
 export const useDelay = <T>(
   value: T,
@@ -7,21 +7,14 @@ export const useDelay = <T>(
 ): T | undefined => {
   const [state, setState] = useState<T | undefined>(undefined);
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
-  );
-
   useEffect(() => {
     if (resetOnDelayStart) {
       setState(undefined);
     }
 
-    timeoutRef.current = setTimeout(() => setState(value), delay);
-
-    const { current: timeout } = timeoutRef;
+    const timeout = setTimeout(() => setState(value), delay);
 
     return () => {
-      if (!timeout) return;
       clearTimeout(timeout);
     };
   }, [delay, resetOnDelayStart, value]);
