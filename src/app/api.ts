@@ -15,14 +15,15 @@ import {
   SharedWorkerPonyfill,
   SharedWorkerSupported,
 } from '@okikio/sharedworker';
-import { computed, ReadonlySignal, Signal, signal } from '@preact/signals';
+import { computed, ReadonlySignal, signal } from '@preact/signals';
 import { Remote, wrap } from 'comlink';
+import { createStore, get, UseStore } from 'idb-keyval';
 
 import { API_WORKER_API, TSerialization } from '../common/types.js';
 import { readOnly } from './util/signal.js';
 
 const WEB_API_UUID = 'c4218bec-e940-4d68-8807-5c43b2aee27b';
-const WEB_API_ONLINE = '562a3aa9-a10e-4347-aa3f-cec9e011a3dc';
+const OBSERVE_NOTIFIER = 'c3a428eb-544e-4d11-927d-4aefcd81210c';
 
 export type LevelObject = {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -57,36 +58,14 @@ export type LevelObject = {
 export type AnyObject = Match<object, TExclude, TSerialization, 15>;
 
 export class Api {
-  private static async _getBroadcastChannel<T>(
-    $signal: Signal<T>,
-    reference: string | Promise<string>,
-    abort?: AbortController,
-  ) {
-    const handleMessage = ({ data }: MessageEvent): void => {
-      if (abort?.signal.aborted) return;
-      $signal.value = data;
-    };
-
-    const reference_ = await reference;
-
-    const channel = new BroadcastChannel(reference_);
-
-    channel.addEventListener('message', handleMessage);
-
-    abort?.signal.addEventListener(
-      'abort',
-      () => {
-        channel.removeEventListener('message', handleMessage);
-        channel.close();
-      },
-      { once: true },
-    );
-  }
-
   private readonly _api: Remote<API_WORKER_API>;
   private _hierarchy?: TSerialization;
+  private readonly _notifier = new BroadcastChannel(OBSERVE_NOTIFIER);
+  private readonly _stateStore = createStore('api_state', 'state');
+  private readonly _valuesStore = createStore('api_values', 'values');
 
   readonly $isInit: ReadonlySignal<boolean>;
+  readonly $isWebsocketOnline: ReadonlySignal<boolean>;
   readonly isInit: Promise<void>;
 
   constructor() {
@@ -112,18 +91,69 @@ export class Api {
           ).port,
     );
 
+    const { promise, resolve } = Promise.withResolvers<void>();
+    this.isInit = promise;
+
     const $isInit = signal(false);
-
-    this.isInit = (async () => {
-      await this._api.isInit;
-      this._hierarchy = await this._api.hierarchy;
-      Object.freeze(this._hierarchy);
-
-      // eslint-disable-next-line no-console
-      console.log(this._hierarchy);
-    })();
-
     this.$isInit = readOnly($isInit);
+    promise.then(() => ($isInit.value = true));
+
+    this._setNotifierReaction<TSerialization>(
+      'hierarchy',
+      this._stateStore,
+      (hierarchy) => (this._hierarchy = hierarchy),
+    );
+
+    this._setNotifierReaction(
+      'init',
+      this._stateStore,
+      () => resolve(),
+      undefined,
+      false,
+    );
+
+    const $isWebsocketOnline = signal(false);
+    this.$isWebsocketOnline = readOnly($isWebsocketOnline);
+    this._setNotifierReaction(
+      'online',
+      this._stateStore,
+      () => ($isWebsocketOnline.value = true),
+      undefined,
+      false,
+    );
+    this._setNotifierReaction(
+      'offline',
+      this._stateStore,
+      () => ($isWebsocketOnline.value = false),
+      undefined,
+      false,
+    );
+  }
+
+  private async _setNotifierReaction<T>(
+    key: string,
+    store: UseStore,
+    callback: (value: T) => void,
+    abort?: AbortController,
+    callbackInit = true,
+  ) {
+    const handleMessage = async ({ data }: MessageEvent) => {
+      if (abort?.signal.aborted) return;
+      if (data !== key) return;
+
+      const value = await get(key, store);
+      callback(value);
+    };
+
+    this._notifier.addEventListener('message', handleMessage, {
+      signal: abort?.signal,
+    });
+
+    if (callbackInit) {
+      const value = await get(key, store);
+      // eslint-disable-next-line callback-return
+      callback(value);
+    }
   }
 
   get hierarchy(): TSerialization | undefined {
@@ -148,29 +178,16 @@ export class Api {
 
     if (reference_) {
       reference_.then((resolved) => {
-        this._api
-          .getValue(resolved)
-          .catch(() => undefined)
-          .then((value) => ($signal.value = value as T | undefined));
+        this._setNotifierReaction(
+          resolved,
+          this._valuesStore,
+          (value) => ($signal.value = value as T | undefined),
+          abort,
+        );
       });
-
-      Api._getBroadcastChannel($signal, reference_, abort);
     }
 
     return computed(() => $signal.value);
-  }
-
-  $isWebSocketOnline(abort?: AbortController): ReadonlySignal<boolean> {
-    const $signal = signal<boolean | undefined>(undefined);
-
-    this._api
-      .isOnline()
-      .catch(() => undefined)
-      .then((value) => ($signal.value = value));
-
-    Api._getBroadcastChannel($signal, WEB_API_ONLINE, abort);
-
-    return computed(() => $signal.value ?? false);
   }
 
   $typedCollector<
@@ -201,10 +218,6 @@ export class Api {
 
   $webSocketCount(abort?: AbortController): ReadonlySignal<number | undefined> {
     return this.$emitter(WEB_API_UUID, abort);
-  }
-
-  getValues(): Promise<void> {
-    return this._api.getValues();
   }
 
   match<

@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { expose } from 'comlink';
+import { createStore, set, setMany } from 'idb-keyval';
 
 import type { API_WORKER_API, TSerialization } from '../common/types.js';
 import { getFlags } from './util.js';
 
 declare const self: SharedWorkerGlobalScope;
 
-type Values = Map<string, { channel: BroadcastChannel; value: unknown }>;
-
 const WEB_API_UUID = 'c4218bec-e940-4d68-8807-5c43b2aee27b';
-const WEB_API_ONLINE = '562a3aa9-a10e-4347-aa3f-cec9e011a3dc';
+const OBSERVE_NOTIFIER = 'c3a428eb-544e-4d11-927d-4aefcd81210c';
 
 const PATH_HIERARCHY = '/api/hierarchy';
 const PATH_STREAM = '/api/stream';
@@ -46,38 +45,57 @@ class Api implements API_WORKER_API {
     }
   }
 
-  private _values?: Values;
+  private readonly _notifier = new BroadcastChannel(OBSERVE_NOTIFIER);
+  private readonly _stateStore = createStore('api_state', 'state');
+  private readonly _valuesStore = createStore('api_values', 'values');
   private _webSocket?: WebSocket;
   private _webSocketOfflineTimeout?: ReturnType<typeof setTimeout>;
-  private _webSocketOnline = new BroadcastChannel(WEB_API_ONLINE);
   private _webSocketPingInterval?: ReturnType<typeof setInterval>;
-  readonly hierarchy: Promise<TSerialization>;
-  readonly isInit: Promise<void>;
 
   constructor() {
-    this._initWebSocket();
-
-    this.hierarchy = this._getHierarchy();
-
-    this.isInit = this.hierarchy.then(() => {
-      // noop
-    });
+    Promise.all([this._initWebSocket(), this._getHierarchy()]).then(() =>
+      this._notifier.postMessage('init'),
+    );
   }
 
   // @ts-ignore
-  private async _getHierarchy(): Promise<TSerialization> {
+  private async _getHierarchy(): Promise<void> {
+    const { debug, apiBaseUrl } = await getFlags();
+
+    await set(
+      'hierarchy',
+      await Api._retry(async () => {
+        // @ts-ignore
+        const hierarchy = await fetch(
+          new URL(PATH_HIERARCHY, apiBaseUrl ?? self.location.href),
+        ).then((response) => response.json() as Promise<TSerialization>);
+
+        // eslint-disable-next-line no-console
+        if (debug) console.debug(hierarchy);
+
+        return hierarchy;
+      }),
+      this._stateStore,
+    );
+
+    this._notifier.postMessage('hierarchy');
+  }
+
+  private async _getValues(): Promise<void> {
     const { debug, apiBaseUrl } = await getFlags();
 
     return Api._retry(async () => {
-      // @ts-ignore
-      const hierarchy = await fetch(
-        new URL(PATH_HIERARCHY, apiBaseUrl ?? self.location.href),
-      ).then((response) => response.json() as Promise<TSerialization>);
+      const values = await fetch(
+        new URL(PATH_VALUES, apiBaseUrl ?? self.location.href),
+      ).then((response) => response.json() as Promise<Record<string, unknown>>);
 
       // eslint-disable-next-line no-console
-      if (debug) console.debug(hierarchy);
+      if (debug) console.debug(values);
 
-      return hierarchy;
+      const entries = Object.entries(values);
+
+      await setMany(entries, this._valuesStore);
+      this._notifier.postMessage('values');
     });
   }
 
@@ -85,7 +103,7 @@ class Api implements API_WORKER_API {
     clearTimeout(this._webSocketOfflineTimeout);
 
     if (online === false) {
-      this._webSocketOnline.postMessage(false);
+      this._notifier.postMessage('offline');
 
       this._webSocket?.close();
       this._webSocket = undefined;
@@ -94,8 +112,8 @@ class Api implements API_WORKER_API {
     }
 
     if (online === true) {
-      await this.getValues();
-      this._webSocketOnline.postMessage(true);
+      await this._getValues();
+      this._notifier.postMessage('online');
     }
 
     clearInterval(this._webSocketPingInterval);
@@ -160,55 +178,13 @@ class Api implements API_WORKER_API {
       try {
         const [key, value] = JSON.parse(data) ?? [];
 
-        const values = await this._values;
-        values?.get(key)?.channel.postMessage(value);
+        await set(key, value, this._valuesStore);
+        this._notifier.postMessage(key);
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('WebSocket incoming message error', error);
       }
     });
-  }
-
-  async getValue<T>(reference: string) {
-    const { debug } = await getFlags();
-
-    const values = await this._values;
-    const result = (values?.get(reference)?.value ?? undefined) as
-      | T
-      | undefined;
-
-    // eslint-disable-next-line no-console
-    if (debug) console.debug('getValue', { reference, result });
-
-    return result;
-  }
-
-  async getValues(): Promise<void> {
-    const { debug, apiBaseUrl } = await getFlags();
-
-    return Api._retry(async () => {
-      const values = await fetch(
-        new URL(PATH_VALUES, apiBaseUrl ?? self.location.href),
-      ).then((response) => response.json() as Promise<Record<string, unknown>>);
-
-      // eslint-disable-next-line no-console
-      if (debug) console.debug(values);
-
-      const result: Values = new Map();
-
-      for (const [key, value] of Object.entries(values)) {
-        const channel = new BroadcastChannel(key);
-        channel.postMessage(value);
-
-        result.set(key, { channel, value });
-      }
-
-      this._values = result;
-    });
-  }
-
-  isOnline() {
-    return Boolean(this._webSocket);
   }
 
   async triggerCollector<T>(reference: string, value: T) {

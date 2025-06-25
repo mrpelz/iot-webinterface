@@ -1,7 +1,9 @@
 import { effect, Signal, signal } from '@preact/signals';
-import { del, get, set } from 'idb-keyval';
+import { createStore, del, get, set } from 'idb-keyval';
 
 import type { Flags } from '../../common/types.js';
+
+const store = createStore('flags', 'flags');
 
 const defaultFlags: Flags = {
   absoluteTimes: false,
@@ -53,9 +55,9 @@ const isMeaningfulValue = (key: keyof Flags, input: unknown) => {
 
 const writeIfMeaningful = (key: keyof Flags, value: unknown) => {
   if (isMeaningfulValue(key, value)) {
-    set(key, value);
+    set(key, value, store);
   } else {
-    del(key);
+    del(key, store);
   }
 };
 
@@ -63,7 +65,7 @@ for (const [key_, aSignal] of Object.entries($flags)) {
   const key = key_ as keyof Flags;
 
   (async () => {
-    const oldValue = await get(key);
+    const oldValue = await get(key, store);
     if (oldValue === undefined) return;
 
     aSignal.value = oldValue;

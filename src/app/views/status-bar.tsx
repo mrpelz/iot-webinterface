@@ -5,10 +5,8 @@ import { StatusBar as StatusBarComponent } from '../components/status-bar.js';
 import { api } from '../main.js';
 import { $theme } from '../state/theme.js';
 
-const $isWebSocketOnline = api.$isWebSocketOnline();
-
 export const StatusBar: FunctionComponent = () => {
-  const isWebSocketOnline = $isWebSocketOnline.value;
+  const isWebSocketOnline = api.$isWebsocketOnline.value;
   const theme = $theme.value;
 
   const isLight = useMemo(
