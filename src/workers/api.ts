@@ -197,7 +197,7 @@ class Api implements API_WORKER_API {
   async init(): Promise<void> {
     await this._init;
 
-    this._notifier.postMessage('init');
+    this._notifier.postMessage('hierarchy');
   }
 
   async triggerCollector<T>(reference: string, value: T) {

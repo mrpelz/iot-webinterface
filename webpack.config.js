@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import path from 'node:path';
 
 import {
@@ -17,6 +18,10 @@ import {
 } from 'modify-source-webpack-plugin';
 import { merge } from 'ts-deepmerge';
 import { InjectManifest } from 'workbox-webpack-plugin';
+
+const version = execSync('npm pkg get "version" --silent', { encoding: 'utf8' })
+  .replaceAll('\n', '')
+  .replaceAll('"', '');
 
 // const API_PROXY = 'http://localhost:1337';
 const API_PROXY =
@@ -120,6 +125,10 @@ config.plugins = [
               .map((path_) => path.relative(path.resolve(dirSrc, 'app'), path_))
               .map((path_) => `import '${path_}';`)
               .join('\n'),
+          ),
+          new ConcatOperation(
+            'start',
+            `window.__version__ = '${version}';\n\n`,
           ),
           new ConcatOperation(
             'start',

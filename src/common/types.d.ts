@@ -1,6 +1,12 @@
 import { TSystem } from '@iot/iot-monolith';
 import type { ElementSerialization } from '@iot/iot-monolith/tree-serialization';
 
+declare global {
+  interface Window {
+    __version__?: string;
+  }
+}
+
 export type { TSystem }
 export type TSerialization = ElementSerialization<TSystem>
 

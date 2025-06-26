@@ -324,6 +324,18 @@ export const Diagnostics: FunctionComponent = () => {
     <DiagnosticsContainer>
       <table>
         <tr>
+          <td>
+            <b>version</b>
+          </td>
+          <td>
+            {
+              // eslint-disable-next-line unicorn/prefer-global-this
+              computed(() => JSON.stringify(window.__version__))
+            }
+          </td>
+        </tr>
+
+        <tr>
           <td colSpan={999}>
             <Details summary={<b>flags</b>}>
               <Flags />

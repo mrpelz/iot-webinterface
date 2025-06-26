@@ -98,10 +98,14 @@ export class Api {
     this.$isInit = readOnly($isInit);
     promise.then(() => ($isInit.value = true));
 
-    this._setNotifierReaction('init', async () => {
-      this._hierarchy = await get('hierarchy', this._stateStore);
-      resolve();
-    });
+    this._setNotifierReaction<TSerialization>(
+      'hierarchy',
+      (hierarchy) => {
+        this._hierarchy = hierarchy;
+        resolve();
+      },
+      this._stateStore,
+    );
     this._api.init();
 
     const $isWebsocketOnline = signal(false);
