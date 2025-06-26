@@ -1,4 +1,3 @@
-import { clear } from 'idb-keyval';
 import { FunctionComponent, JSX } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
@@ -6,6 +5,7 @@ import { Button, Entry as EntryComponent } from '../../components/list.js';
 import { ShowHide } from '../../components/show-hide.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { I18nLanguage, i18nLanguages } from '../../i18n/main.js';
+import { api } from '../../main.js';
 import {
   $building,
   $buildings,
@@ -19,7 +19,7 @@ import {
 import { $theme, Theme, themes } from '../../state/theme.js';
 import { getTranslationFallback } from '../../state/translation.js';
 import { swProxy } from '../../sw.js';
-import { $flags } from '../../util/flags.js';
+import { $flags, clear } from '../../util/flags.js';
 import { Entry, List } from '../../views/list.js';
 import { Translation } from '../../views/translation.js';
 
@@ -491,6 +491,7 @@ export const Settings: FunctionComponent = () => {
             onClick={useCallback(() => {
               localStorage.clear();
               clear();
+              api.clearStores();
             }, [])}
           >
             reset local storage

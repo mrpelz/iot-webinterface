@@ -33,5 +33,7 @@ export type SW_API = {
 };
 
 export abstract class API_WORKER_API {
+  clearStores: () => Promise<void>;
+  init: () => Promise<void>;
   triggerCollector: <T>(reference: string, value: T) => Promise<void>;
 };

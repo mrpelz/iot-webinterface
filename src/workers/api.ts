@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { expose } from 'comlink';
-import { createStore, set, setMany } from 'idb-keyval';
+import { clear, createStore, set, setMany } from 'idb-keyval';
 
 import type { API_WORKER_API, TSerialization } from '../common/types.js';
 import { getFlags } from './util.js';
@@ -45,6 +45,7 @@ class Api implements API_WORKER_API {
     }
   }
 
+  private readonly _init: Promise<void>;
   private readonly _notifier = new BroadcastChannel(OBSERVE_NOTIFIER);
   private readonly _stateStore = createStore('api_state', 'state');
   private readonly _valuesStore = createStore('api_values', 'values');
@@ -53,9 +54,8 @@ class Api implements API_WORKER_API {
   private _webSocketPingInterval?: ReturnType<typeof setInterval>;
 
   constructor() {
-    Promise.all([this._initWebSocket(), this._getHierarchy()]).then(() =>
-      this._notifier.postMessage('init'),
-    );
+    this._init = this._getHierarchy();
+    this._initWebSocket();
   }
 
   // @ts-ignore
@@ -77,8 +77,6 @@ class Api implements API_WORKER_API {
       }),
       this._stateStore,
     );
-
-    this._notifier.postMessage('hierarchy');
   }
 
   private async _getValues(): Promise<void> {
@@ -185,6 +183,21 @@ class Api implements API_WORKER_API {
         console.error('WebSocket incoming message error', error);
       }
     });
+  }
+
+  clearStores(): Promise<void> {
+    return Promise.all([
+      clear(this._stateStore),
+      clear(this._valuesStore),
+    ]).then(() => {
+      // noop
+    });
+  }
+
+  async init(): Promise<void> {
+    await this._init;
+
+    this._notifier.postMessage('init');
   }
 
   async triggerCollector<T>(reference: string, value: T) {

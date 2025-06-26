@@ -98,50 +98,38 @@ export class Api {
     this.$isInit = readOnly($isInit);
     promise.then(() => ($isInit.value = true));
 
-    this._setNotifierReaction<TSerialization>(
-      'hierarchy',
-      this._stateStore,
-      (hierarchy) => (this._hierarchy = hierarchy),
-    );
-
-    this._setNotifierReaction(
-      'init',
-      this._stateStore,
-      () => resolve(),
-      undefined,
-      false,
-    );
+    this._setNotifierReaction('init', async () => {
+      this._hierarchy = await get('hierarchy', this._stateStore);
+      resolve();
+    });
+    this._api.init();
 
     const $isWebsocketOnline = signal(false);
     this.$isWebsocketOnline = readOnly($isWebsocketOnline);
     this._setNotifierReaction(
       'online',
-      this._stateStore,
       () => ($isWebsocketOnline.value = true),
-      undefined,
-      false,
+      this._stateStore,
     );
     this._setNotifierReaction(
       'offline',
-      this._stateStore,
       () => ($isWebsocketOnline.value = false),
-      undefined,
-      false,
+      this._stateStore,
     );
   }
 
   private async _setNotifierReaction<T>(
     key: string,
-    store: UseStore,
     callback: (value: T) => void,
+    store?: UseStore,
     abort?: AbortController,
-    callbackInit = true,
+    callbackInit = false,
   ) {
     const handleMessage = async ({ data }: MessageEvent) => {
       if (abort?.signal.aborted) return;
       if (data !== key) return;
 
-      const value = await get(key, store);
+      const value = store ? await get(key, store) : undefined;
       callback(value);
     };
 
@@ -150,7 +138,7 @@ export class Api {
     });
 
     if (callbackInit) {
-      const value = await get(key, store);
+      const value = store ? await get(key, store) : undefined;
       // eslint-disable-next-line callback-return
       callback(value);
     }
@@ -180,9 +168,10 @@ export class Api {
       reference_.then((resolved) => {
         this._setNotifierReaction(
           resolved,
-          this._valuesStore,
           (value) => ($signal.value = value as T | undefined),
+          this._valuesStore,
           abort,
+          true,
         );
       });
     }
@@ -218,6 +207,10 @@ export class Api {
 
   $webSocketCount(abort?: AbortController): ReadonlySignal<number | undefined> {
     return this.$emitter(WEB_API_UUID, abort);
+  }
+
+  clearStores(): Promise<void> {
+    return this._api.clearStores();
   }
 
   match<

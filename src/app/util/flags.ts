@@ -1,5 +1,5 @@
 import { effect, Signal, signal } from '@preact/signals';
-import { createStore, del, get, set } from 'idb-keyval';
+import { clear as clear_, createStore, del, get, set } from 'idb-keyval';
 
 import type { Flags } from '../../common/types.js';
 
@@ -94,3 +94,5 @@ addEventListener('hashchange', ({ newURL }) => {
     $flags[key].value = value;
   }
 });
+
+export const clear = (): Promise<void> => clear_(store);
