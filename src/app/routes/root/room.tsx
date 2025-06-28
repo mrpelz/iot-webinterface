@@ -16,10 +16,16 @@ import { Control } from '../../controls/main.js';
 import { BinarySensor } from '../../controls/sensor/binary.js';
 import { OpenSensor } from '../../controls/sensor/open.js';
 import { useArray } from '../../hooks/use-array-compare.js';
+import { kitchenAdjacent$ } from '../../i18n/mapping.js';
 import { useMatch } from '../../state/api.js';
 import { $subPath } from '../../state/path.js';
 import { Category } from '../../views/category.js';
-import { SubRoute } from '../../views/route.js';
+import {
+  $buildingOutputGroupings,
+  $buildingScenes,
+  $buildingTriggers,
+  SubRoute,
+} from '../../views/route.js';
 import { Translation } from '../../views/translation.js';
 import { SubPage } from '../sub/room/main.js';
 
@@ -186,6 +192,26 @@ export const Room: FunctionComponent<{
           <Grid>
             {otherProperties.map((item) => (
               <Control object={item} />
+            ))}
+          </Grid>
+        </Category>
+      ) : null}
+
+      {kitchenAdjacent$.includes(
+        object.$ as (typeof kitchenAdjacent$)[number],
+      ) ? (
+        <Category
+          header={<Translation capitalize={true} i18nKey="kitchenAdjacent" />}
+        >
+          <Grid>
+            {$buildingOutputGroupings.value.map((light) => (
+              <BinaryActuator actuator={light} />
+            ))}
+            {$buildingScenes.value.map((scene) => (
+              <BinaryActuator actuator={scene} />
+            ))}
+            {$buildingTriggers.value.map((trigger) => (
+              <NullActuator actuator={trigger} />
             ))}
           </Grid>
         </Category>

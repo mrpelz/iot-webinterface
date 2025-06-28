@@ -20,6 +20,14 @@ export const measuredCategories = {
   security: ['motion'],
 } as const;
 
+export const kitchenAdjacent$ = [
+  'system',
+  'hallway',
+  'kitchen',
+  'livingRoom',
+  'office',
+] as const;
+
 export const defaultNumberFormat: Intl.NumberFormatOptions = {
   maximumFractionDigits: 2,
   minimumFractionDigits: 2,

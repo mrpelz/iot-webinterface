@@ -10,12 +10,11 @@ import { $flags } from '../../util/flags.js';
 import { HallwayStream } from '../../views/hallway-stream.js';
 import { Room } from './room.js';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const object = api.match(levelObjectMatch[Level.SYSTEM], excludePattern).at(0);
+
 export const Global: FunctionComponent = () => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const object = api
-    .match(levelObjectMatch[Level.SYSTEM], excludePattern)
-    .at(0);
   if (!object) return null;
 
   return (
