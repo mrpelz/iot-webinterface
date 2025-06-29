@@ -93,7 +93,9 @@ class Api implements API_WORKER_API {
       const entries = Object.entries(values);
 
       await setMany(entries, this._valuesStore);
-      this._notifier.postMessage('values');
+      for (const key of Object.keys(values)) {
+        this._notifier.postMessage(key);
+      }
     });
   }
 
