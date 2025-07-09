@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { ensureKeys } from '@iot/iot-monolith/oop';
 import {
   DEFAULT_MATCH_DEPTH,
   excludePattern,
@@ -108,7 +109,7 @@ export const Room: FunctionComponent<{
     >[];
 
     return remainingProperties.toSorted((item) =>
-      item.main?.$ === 'setter' ? -1 : 1,
+      ensureKeys(item, 'main').main?.$ === 'setter' ? -1 : 1,
     );
   }, [
     binaryLights,

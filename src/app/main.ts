@@ -51,7 +51,7 @@ try {
     const [office] = api.match({ $: 'office' as const }, excludePattern);
 
     // eslint-disable-next-line no-console
-    console.log(office?.devices.ceilingLight.button);
+    console.log(office?.devices.ceilingLight.host);
 
     // const $emitter = api.$typedEmitter(match?.main);
     // // eslint-disable-next-line no-console

@@ -62,6 +62,8 @@ class Api implements API_WORKER_API {
   private async _getHierarchy(): Promise<void> {
     const { debug, apiBaseUrl } = await getFlags();
 
+    if (!navigator.onLine) return;
+
     await set(
       'hierarchy',
       await Api._retry(async () => {
@@ -96,7 +98,7 @@ class Api implements API_WORKER_API {
       for (const key of Object.keys(values)) {
         this._notifier.postMessage(key);
       }
-    });
+    }, Number.POSITIVE_INFINITY);
   }
 
   private async _handleWebSocketOnline(online?: boolean) {
