@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { isObject } from '@iot/iot-monolith/oop';
+import { isObject } from '@mrpelz/misc-utils/oop';
 import { ComponentChild, createContext, FunctionComponent, JSX } from 'preact';
 import { useCallback, useContext, useEffect, useMemo } from 'preact/hooks';
 

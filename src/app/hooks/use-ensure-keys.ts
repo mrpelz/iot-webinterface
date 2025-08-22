@@ -1,4 +1,4 @@
-import { ensureKeys } from '@iot/iot-monolith/oop';
+import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { useMemo } from 'preact/hooks';
 
 import { useArray } from './use-array-compare.js';

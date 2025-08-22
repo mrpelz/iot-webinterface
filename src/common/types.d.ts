@@ -1,4 +1,4 @@
-import { TSystem } from '@iot/iot-monolith';
+import type { TSystem } from '@iot/iot-monolith';
 import type { ElementSerialization } from '@iot/iot-monolith/tree-serialization';
 
 declare global {

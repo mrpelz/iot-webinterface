@@ -20,6 +20,7 @@
   ],
   "dependencies": {
     "@iot/iot-monolith": "latest",
+    "@mrpelz/misc-utils": "latest",
     "@okikio/sharedworker": "latest",
     "@preact/signals": "latest",
     "comlink": "latest",

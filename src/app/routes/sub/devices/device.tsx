@@ -1,5 +1,5 @@
-import { ensureKeys } from '@iot/iot-monolith/oop';
 import { excludePattern } from '@iot/iot-monolith/tree';
+import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
@@ -224,7 +224,7 @@ export const DeviceDetailsInner: FunctionComponent<{
 }> = ({ device }) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const name = useMemo(() => String(device.$path?.at(-1) ?? ''), [device]);
+  const name = useMemo(() => String(device.$path?.at(-2) ?? ''), [device]);
 
   const { isSubDevice, transportType, type } = useMemo(
     () => ensureKeys(device, 'isSubDevice', 'transportType', 'type'),
@@ -280,15 +280,16 @@ export const DeviceDetails: FunctionComponent<{
 }> = ({ device }) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const name = useMemo(() => String(device.$path.at(-1) ?? ''), [device]);
+  const name = useMemo(() => String(device.$path.at(-2) ?? ''), [device]);
   useTitleOverride(name);
 
-  const { espNow, wifi } = useMemo(
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    () => ensureKeys(device, 'espNow', 'wifi'),
-    [device],
-  );
+  const { espNow: { device: espNow } = {}, wifi: { device: wifi } = {} } =
+    useMemo(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      () => ensureKeys(device, 'espNow', 'wifi'),
+      [device],
+    );
 
   return (
     <>

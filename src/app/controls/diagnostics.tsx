@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { isObject, isPlainObject } from '@iot/iot-monolith/oop';
 import { excludePattern, Level, ValueType } from '@iot/iot-monolith/tree';
 import {
   levelDescription,
   valueTypeDescription,
 } from '@iot/iot-monolith/tree-serialization';
+import { isObject, isPlainObject } from '@mrpelz/misc-utils/oop';
 import { computed } from '@preact/signals';
 import { ComponentChildren, FunctionComponent, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';

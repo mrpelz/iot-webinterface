@@ -1,6 +1,6 @@
-// /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { ensureKeys } from '@iot/iot-monolith/oop';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Level, Match, TExclude } from '@iot/iot-monolith/tree';
+import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
@@ -19,7 +19,6 @@ import { useTypedEmitter } from '../state/api.js';
 import { $theme } from '../state/theme.js';
 import { CellWithBody } from './main.js';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export type TDevice = LevelObject[Level.DEVICE];
 export type TSubDevice = Match<{ isSubDevice: true }, TExclude, TDevice>;
@@ -43,11 +42,13 @@ const DeviceOnlineState: FunctionComponent<{
 }> = ({ device }) => {
   const {
     online: { lastChange: { main: lastChange } = {}, main: online } = {},
+    // @ts-ignore
   } = ensureKeys(device, 'online');
 
   const { value: isOnline } = useTypedEmitter(online);
   const { value: lastChangeValue } = useTypedEmitter(lastChange);
 
+  // @ts-ignore
   const { lastSeen: { main: lastSeen } = {} } = ensureKeys(device, 'lastSeen');
 
   const { value: lastSeenValue } = useTypedEmitter(lastSeen);
@@ -95,16 +96,14 @@ export const Device: FunctionComponent<{
   device: TDevice;
   onClick?: () => void;
 }> = ({ device, onClick }) => {
-  const { espNow, wifi } = useMemo(
-    () => ensureKeys(device, 'espNow', 'wifi'),
-    [device],
-  );
+  const { espNow: { device: espNow } = {}, wifi: { device: wifi } = {} } =
+    useMemo(() => ensureKeys(device, 'espNow', 'wifi'), [device]);
 
   return (
     <CellWithBody
       icon={<ForwardIcon height="1em" />}
       onClick={onClick}
-      title={useMemo(() => device.$path?.at(-1), [device])}
+      title={useMemo(() => device.$path?.at?.(-2), [device])}
     >
       {espNow && wifi ? (
         <>

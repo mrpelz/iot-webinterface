@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { ensureKeys, isPlainObject } from '@iot/iot-monolith/oop';
 import { Level, Match, TExclude, ValueType } from '@iot/iot-monolith/tree';
 import {
   InteractionReference,
@@ -9,6 +8,7 @@ import {
   levelDescription,
   valueTypeDescription,
 } from '@iot/iot-monolith/tree-serialization';
+import { ensureKeys, isPlainObject } from '@mrpelz/misc-utils/oop';
 import { computed } from '@preact/signals';
 import { useContext, useMemo } from 'preact/hooks';
 

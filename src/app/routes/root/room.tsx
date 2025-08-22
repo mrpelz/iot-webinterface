@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { ensureKeys } from '@iot/iot-monolith/oop';
 import {
   DEFAULT_MATCH_DEPTH,
   excludePattern,
   Level,
 } from '@iot/iot-monolith/tree';
+import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 

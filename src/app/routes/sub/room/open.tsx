@@ -31,7 +31,7 @@ export const OpenSensor: FunctionComponent<{
 
   const {
     open: {
-      isReceivedValue,
+      isReceivedValue: { main: isReceivedValue },
       lastChange: { main: lastChange },
       main: open,
       tamperSwitch: {

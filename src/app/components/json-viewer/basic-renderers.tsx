@@ -1,9 +1,9 @@
-import { isPlainObject, objectKeys } from '@iot/iot-monolith/oop';
+import { isPlainObject, objectKeys } from '@mrpelz/misc-utils/oop';
 import { ComponentChild } from 'preact';
 import { useMemo } from 'preact/hooks';
 
 import { useSafeJSONStringify } from '../../hooks/use-safe-json-stringify.js';
-import { PrimitiveValue, TypeAnnotation, TypeString } from './components.js';
+import { PrimitiveValue, TypeString } from './components.js';
 import {
   JSONViewerInner,
   makeExpandingRenderer,
