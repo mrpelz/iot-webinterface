@@ -1,10 +1,15 @@
-import { excludePattern } from '@iot/iot-monolith/tree';
+import {
+  excludePattern,
+  Level,
+  levelObjectMatch,
+} from '@iot/iot-monolith/tree';
 import { computed } from '@preact/signals';
 import { ComponentChildren, FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
 import { ShowHide } from '../components/show-hide.js';
 import { useScrollRestore } from '../hooks/use-scroll-restore.js';
+import { kitchenAdjacent$ } from '../i18n/mapping.js';
 import { api } from '../main.js';
 import { Devices } from '../routes/root/devices.js';
 import { Diagnostics } from '../routes/root/diagnostics.js';
@@ -15,26 +20,40 @@ import { Test } from '../routes/root/test-route.js';
 import { noBackground, useBackgroundOverride } from '../state/background.js';
 import { $building, $room, $staticPage } from '../state/navigation.js';
 
-export const $buildingOutputGroupings = computed(() =>
-  api.match(
-    { $: 'outputGrouping' as const, topic: 'lighting' as const },
-    excludePattern,
-    $building.value,
-    2,
-  ),
+const $roomProperties = computed(() =>
+  api.match(levelObjectMatch[Level.PROPERTY], excludePattern, $room.value, 1),
 );
 
-export const $buildingScenes = computed(() =>
-  api.match({ $: 'scene' as const }, excludePattern, $building.value, 2),
-);
+const $kitchenAdjacent = computed(() => {
+  if (
+    !kitchenAdjacent$.includes(
+      $room.value?.$ as (typeof kitchenAdjacent$)[number],
+    )
+  ) {
+    return [];
+  }
 
-export const $buildingTriggers = computed(() =>
-  api.match(
-    { $: 'triggerElement' as const },
-    excludePattern,
-    $building.value,
-    2,
-  ),
+  return [
+    api.match(
+      { $: 'outputGrouping' as const, topic: 'lighting' as const },
+      excludePattern,
+      $building.value,
+      2,
+    ),
+    api.match({ $: 'scene' as const }, excludePattern, $building.value, 2),
+    api.match(
+      { $: 'triggerElement' as const },
+      excludePattern,
+      $building.value,
+      2,
+    ),
+  ].flat(1);
+});
+
+const $properties = computed(() =>
+  [$roomProperties.value, $kitchenAdjacent.value]
+    .flat(1)
+    .filter((item): item is Exclude<typeof item, undefined> => Boolean(item)),
 );
 
 export const RootRoute: FunctionComponent = () => {
@@ -53,7 +72,7 @@ export const RootRoute: FunctionComponent = () => {
     }
 
     if (room) {
-      return <Room object={room} />;
+      return <Room properties={$properties.value} />;
     }
 
     return null;

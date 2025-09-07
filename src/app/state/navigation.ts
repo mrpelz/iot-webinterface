@@ -13,16 +13,23 @@ import { $rootPath, setRootPath } from './path.js';
 import { $isVisible } from './visibility.js';
 
 /**
+ * ROOT
+ */
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export const $root = promisedSignal(api.isInit.then(() => api.hierarchy));
+
+/**
  * HOMES
  */
 
-export const $homes = promisedSignal(
-  api.isInit.then(() =>
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    api.match(levelObjectMatch[Level.HOME], excludePattern),
-  ),
-);
+export const $homes = computed(() => {
+  const root = $root.value;
+  if (!root) return undefined;
+
+  return api.match(levelObjectMatch[Level.HOME], excludePattern, root);
+});
 
 export type HomeName = Exclude<TSignal<typeof $homes>, undefined>[number]['$'];
 
@@ -267,6 +274,7 @@ effect(() => {
 });
 
 effect(() => {
+  const root = $root.value;
   const home = $home.value;
   const building = $building.value;
   const room = $room.value;
@@ -274,10 +282,29 @@ effect(() => {
 
   // eslint-disable-next-line no-console
   console.log({
+    root,
+    // eslint-disable-next-line sort-keys
     home,
     // eslint-disable-next-line sort-keys
     building,
     room,
     staticPage,
+  });
+});
+
+effect(() => {
+  const homes = $homes.value;
+  const buildings = $buildings.value;
+  const floors = $floors.value;
+  const rooms = $rooms.value;
+
+  // eslint-disable-next-line no-console
+  console.log({
+    homes,
+    // eslint-disable-next-line sort-keys
+    buildings,
+    floors,
+    rooms,
+    staticPages,
   });
 });

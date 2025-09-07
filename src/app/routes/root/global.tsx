@@ -3,23 +3,51 @@ import {
   Level,
   levelObjectMatch,
 } from '@iot/iot-monolith/tree';
+import { computed } from '@preact/signals';
 import { FunctionComponent } from 'preact';
 
 import { api } from '../../main.js';
+import { $building, $floors, $home, $root } from '../../state/navigation.js';
 import { $flags } from '../../util/flags.js';
 import { HallwayStream } from '../../views/hallway-stream.js';
 import { Room } from './room.js';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const object = api.match(levelObjectMatch[Level.SYSTEM], excludePattern).at(0);
+const $rootProperties = computed(() =>
+  api.match(levelObjectMatch[Level.PROPERTY], excludePattern, $root.value, 1),
+);
 
-export const Global: FunctionComponent = () => {
-  if (!object) return null;
+const $homeProperties = computed(() =>
+  api.match(levelObjectMatch[Level.PROPERTY], excludePattern, $home.value, 1),
+);
 
-  return (
-    <Room object={object}>
-      {$flags.hallwayStreamEnable.value ? <HallwayStream /> : null}
-    </Room>
-  );
-};
+const $buildingProperties = computed(() =>
+  api.match(
+    levelObjectMatch[Level.PROPERTY],
+    excludePattern,
+    $building.value,
+    1,
+  ),
+);
+
+const $floorProperties = computed(() =>
+  $floors.value?.flatMap((floor) =>
+    api.match(levelObjectMatch[Level.PROPERTY], excludePattern, floor, 1),
+  ),
+);
+
+const $properties = computed(() =>
+  [
+    $rootProperties.value,
+    $homeProperties.value,
+    $buildingProperties.value,
+    $floorProperties.value,
+  ]
+    .flat(1)
+    .filter((item): item is Exclude<typeof item, undefined> => Boolean(item)),
+);
+
+export const Global: FunctionComponent = () => (
+  <Room properties={$properties.value}>
+    {$flags.hallwayStreamEnable.value ? <HallwayStream /> : null}
+  </Room>
+);

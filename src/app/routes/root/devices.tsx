@@ -30,7 +30,7 @@ const Room: FunctionComponent<{
   const { $ } = room;
 
   const devices = api.match(
-    levelObjectMatch[Level.DEVICE],
+    { ...levelObjectMatch[Level.DEVICE], isSubDevice: false as const },
     excludePattern,
     room,
   );
