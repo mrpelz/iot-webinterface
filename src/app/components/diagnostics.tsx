@@ -3,8 +3,8 @@ import { styled } from 'goober';
 import { colors } from '../style.js';
 
 export const DiagnosticsContainer = styled('diagnostics-container')`
-  background-color: white;
-  color: ${colors.black()};
+  background-color: ${colors.backgroundSecondary()};
+  color: ${colors.fontSecondary()};
   display: flex;
   flex-direction: column;
   font-size: 0.75rem;

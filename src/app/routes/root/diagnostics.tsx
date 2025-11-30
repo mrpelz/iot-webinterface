@@ -23,6 +23,7 @@ import {
 } from '../../components/json-viewer/hierarchy-renderers.js';
 import { JSONViewer } from '../../components/json-viewer/main.js';
 import { Details, Properties } from '../../controls/diagnostics.js';
+import { useFetchText } from '../../hooks/use-fetch.js';
 import { api } from '../../main.js';
 import {
   useIsInit,
@@ -54,6 +55,7 @@ import { useBreakpoint } from '../../style/breakpoint.js';
 import { getMediaQuery } from '../../style/main.js';
 import { isProd } from '../../sw.js';
 import { $flags } from '../../util/flags.js';
+import { LogStream } from '../../views/log-stream.js';
 
 const Fallback: FunctionComponent = () => (
   <tr>
@@ -320,6 +322,13 @@ export const Diagnostics: FunctionComponent = () => {
     [],
   );
 
+  const apiVersionUrl = computed(
+    () =>
+      new URL('/api/version', $flags.apiBaseUrl.value ?? self.location.href)
+        .href,
+  );
+  const apiVersion = useFetchText(apiVersionUrl.value);
+
   return (
     <DiagnosticsContainer>
       <table>
@@ -333,6 +342,13 @@ export const Diagnostics: FunctionComponent = () => {
               computed(() => JSON.stringify(window.__version__))
             }
           </td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>API-version</b>
+          </td>
+          <td>{useMemo(() => JSON.stringify(apiVersion), [apiVersion])}</td>
         </tr>
 
         <tr>
@@ -470,6 +486,8 @@ export const Diagnostics: FunctionComponent = () => {
           renderers={jsonViewerRenderers}
         />
       ) : null}
+
+      <LogStream url="/api/log" />
     </DiagnosticsContainer>
   );
 };

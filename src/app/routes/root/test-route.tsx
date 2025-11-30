@@ -1,9 +1,11 @@
 import { styled } from 'goober';
 import { FunctionComponent } from 'preact';
 
+import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import { JSONViewer } from '../../components/json-viewer/main.js';
 import { $isRoot, getSegment, goRoot, setSegment } from '../../state/path.js';
 import { useTitleOverride } from '../../state/title.js';
+import { LogStream } from '../../views/log-stream.js';
 
 const $route1 = getSegment(1);
 const setRoute1 = setSegment(1);
@@ -76,6 +78,10 @@ export const Test: FunctionComponent = () => {
           }}
         />
       </Margin>
+
+      <DiagnosticsContainer>
+        <LogStream url="/api/logic-reasoning" />
+      </DiagnosticsContainer>
     </>
   );
 };

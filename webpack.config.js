@@ -46,6 +46,24 @@ const configDownstream = {
       },
       {
         changeOrigin: true,
+        context: ['/api/version'],
+        pathRewrite: { '^/api': '' },
+        target: API_PROXY,
+      },
+      {
+        changeOrigin: true,
+        context: ['/api/log'],
+        pathRewrite: { '^/api': '' },
+        target: API_PROXY,
+      },
+      {
+        changeOrigin: true,
+        context: ['/api/logic-reasoning'],
+        pathRewrite: { '^/api': '' },
+        target: API_PROXY,
+      },
+      {
+        changeOrigin: true,
         context: ['/api'],
         target: API_PROXY,
       },
@@ -132,7 +150,7 @@ config.plugins = [
           ),
           new ConcatOperation(
             'start',
-            `// @ts-expect-error
+            `// @ts-ignore
             __webpack_base_uri__ = new URL('/', location.href).href;\n\n`,
           ),
         ],
