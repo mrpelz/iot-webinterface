@@ -3,10 +3,10 @@ import {
   configMeta,
   // @ts-ignore
 } from '@mrpelz/boilerplate-preact/eslint.config.js';
-import { merge } from 'ts-deepmerge';
+import { deepmerge } from 'deepmerge-ts';
 
 /** @type {import('eslint').Linter.Config} */
-export const configApp = merge(configUpstream);
+export const configApp = deepmerge({}, configUpstream);
 configApp.files = ['src/app/**/*.{js,jsx,ts,tsx}'];
 
 /** @type {import('eslint').Linter.Config} */
@@ -19,7 +19,7 @@ const configDownstreamWorkers = {
 };
 
 /** @type {import('eslint').Linter.Config} */
-export const configWorkers = merge(configUpstream, configDownstreamWorkers);
+export const configWorkers = deepmerge(configUpstream, configDownstreamWorkers);
 configWorkers.files = ['src/workers/**/*.{js,ts}'];
 
 /** @type {import('eslint').Linter.Config[]} */

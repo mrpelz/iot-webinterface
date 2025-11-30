@@ -42,7 +42,7 @@ const $properties = computed(() =>
     $buildingProperties.value,
     $floorProperties.value,
   ]
-    .flat(1)
+    .flat()
     .filter((item): item is Exclude<typeof item, undefined> => Boolean(item)),
 );
 

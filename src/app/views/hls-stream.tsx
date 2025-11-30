@@ -41,8 +41,9 @@ export const HLSStream: FunctionComponent<{
     [isActive, src],
   );
 
-  const HLS = usePromise(import(/* webpackChunkName: "hls" */ 'hls.js'))
-    ?.default?.default;
+  const HLS = usePromise(
+    import(/* webpackChunkName: "hls" */ 'hls.js'),
+  )?.default;
   // const HLS = useUMDModule<typeof HLT_t.default>('/modules/hls.js');
 
   const videoRef = useRef<HTMLVideoElement>(null);

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability */
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 export const useAwaitEvent = (

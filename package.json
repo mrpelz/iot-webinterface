@@ -29,13 +29,13 @@
     "idb-keyval": "latest",
     "preact": "latest",
     "proper-tags": "latest",
+    "style-vendorizer": "latest",
     "workbox-precaching": "latest",
     "workbox-window": "latest"
   },
   "devDependencies": {
     "@mrpelz/boilerplate-common": "latest",
     "@mrpelz/boilerplate-preact": "latest",
-    "@types/glob": "latest",
     "favicons-webpack-plugin": "latest",
     "glob": "latest",
     "modify-source-webpack-plugin": "latest",

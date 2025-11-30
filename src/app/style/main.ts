@@ -3,7 +3,7 @@
 export type Value = string | (() => string);
 
 export const useUnwrapValue = (value: Value): string =>
-  value instanceof Function ? value() : value;
+  typeof value === 'function' ? value() : value;
 
 export const useDependentValue =
   <T extends any>(

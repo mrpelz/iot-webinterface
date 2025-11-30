@@ -1,2 +1,1 @@
-declare module 'goober/global';
-declare module 'goober/prefixer';
+// eslint-disable-next-line unicorn/no-empty-file

@@ -8,6 +8,7 @@ import {
 } from '@mrpelz/boilerplate-dom/webpack.config.js';
 // @ts-ignore
 import configUpstream from '@mrpelz/boilerplate-preact/webpack.config.js';
+import { deepmerge } from 'deepmerge-ts';
 import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
 import { glob } from 'glob';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -16,7 +17,6 @@ import {
   ConcatOperation,
   ModifySourcePlugin,
 } from 'modify-source-webpack-plugin';
-import { merge } from 'ts-deepmerge';
 import { InjectManifest } from 'workbox-webpack-plugin';
 
 const version = execSync('npm pkg get "version" --silent', { encoding: 'utf8' })
@@ -61,7 +61,7 @@ const configDownstream = {
 
 // @ts-ignore
 /** @type {import('@mrpelz/boilerplate-dom/webpack.config.js').ConfigurationExtended} */
-const config = merge(configUpstream, configDownstream);
+const config = deepmerge(configUpstream, configDownstream);
 
 config.entry = [
   path.resolve(dirSrc, 'app/main.ts'),

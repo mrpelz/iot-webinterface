@@ -98,6 +98,7 @@ export const NullActuator: FunctionComponent<{
     >
       <Overlay
         overlay={
+          // eslint-disable-next-line react-hooks/static-components
           <ColorBody ref={overlayRef}>
             <Translation i18nKey="triggered" />
           </ColorBody>

@@ -47,12 +47,12 @@ const $kitchenAdjacent = computed(() => {
       $building.value,
       2,
     ),
-  ].flat(1);
+  ].flat();
 });
 
 const $properties = computed(() =>
   [$roomProperties.value, $kitchenAdjacent.value]
-    .flat(1)
+    .flat()
     .filter((item): item is Exclude<typeof item, undefined> => Boolean(item)),
 );
 

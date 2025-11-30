@@ -37,7 +37,7 @@ const clearNotifications = async (tags?: string[]) => {
   const notifications = tags
     ? await Promise.all(
         tags.map((tag) => self.registration.getNotifications({ tag })),
-      ).then((result) => result.flat(1))
+      ).then((result) => result.flat())
     : await self.registration.getNotifications();
 
   for (const notification of notifications) {

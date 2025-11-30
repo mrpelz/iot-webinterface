@@ -4,7 +4,6 @@ import {
   Level,
   levelObjectMatch,
 } from '@iot/iot-monolith/tree';
-import {} from '@iot/iot-monolith/tree-serialization';
 // import { effect } from '@preact/signals';
 import { stripIndent } from 'proper-tags';
 

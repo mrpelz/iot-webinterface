@@ -105,6 +105,7 @@ export const TimerActuator: FunctionComponent<{
         transitionDurationOverride={activeValue ? 1000 : 300}
         overlay={
           enabledValue === null ? undefined : (
+            // eslint-disable-next-line react-hooks/static-components
             <ColorBody>{label || <Translation i18nKey="on" />}</ColorBody>
           )
         }

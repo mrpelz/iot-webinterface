@@ -72,6 +72,7 @@ export const BinaryActuator: FunctionComponent<{
         transition={allowTransition && value_ !== null && !loading}
         overlay={
           value_ === undefined ? undefined : (
+            // eslint-disable-next-line react-hooks/static-components
             <ColorBody>
               <Translation i18nKey={positiveKey} />
             </ColorBody>

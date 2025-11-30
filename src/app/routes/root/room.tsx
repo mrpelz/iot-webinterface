@@ -72,13 +72,13 @@ export const Room: FunctionComponent<{
         properties,
         1,
       ),
-    ].flat(1),
+    ].flat(),
   );
   const brightnessLights_ = useArray(
     [
       useMatch({ $: 'ledGrouping' as const }, excludePattern, properties, 1),
       useMatch({ $: 'led' as const }, excludePattern, properties, 1),
-    ].flat(1),
+    ].flat(),
   );
 
   const {
@@ -115,7 +115,7 @@ export const Room: FunctionComponent<{
       scenes__,
       security__,
       triggers__,
-    ].flat(1);
+    ].flat();
 
     const remainingProperties = properties.filter(
       (item) =>

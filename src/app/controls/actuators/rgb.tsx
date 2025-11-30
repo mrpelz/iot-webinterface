@@ -130,6 +130,7 @@ const Color: FunctionComponent<{
         !isInteracting
       }
       overlay={
+        // eslint-disable-next-line react-hooks/static-components
         <ColorBody onClick={handleClick} ref={refA}>
           {label}
         </ColorBody>

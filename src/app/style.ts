@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import { stripIndents } from 'proper-tags';

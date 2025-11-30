@@ -277,7 +277,7 @@ export const sortBy = <T extends object, K extends keyof Required<T>>(
     listedResultsCollection.push(matchingObject);
   }
 
-  const listedResults = listedResultsCollection.flat(1);
+  const listedResults = listedResultsCollection.flat();
 
   const unlistedResults: T[] = [];
 
@@ -293,7 +293,7 @@ export const sortBy = <T extends object, K extends keyof Required<T>>(
 
   return {
     get all() {
-      return [listedResults, unlistedResults].flat(1);
+      return [listedResults, unlistedResults].flat();
     },
     listedResults,
     unlistedResults,
