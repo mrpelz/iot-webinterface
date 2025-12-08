@@ -13,7 +13,7 @@ import { computed } from '@preact/signals';
 import { useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../../common/types.js';
-import { useFirstTruthy } from '../../hooks/use-first-truthy.js';
+import { useTruthy } from '../../hooks/use-first-truthy.js';
 import { useTypedCollector, useTypedEmitter } from '../../state/api.js';
 import { Details, Inset, useIsOpen } from '../details.js';
 import {
@@ -149,7 +149,7 @@ export const getterRenderer: Renderer<
 
     const { handleToggle, initiallyOpen, path } =
       useExpandingRendererUtils(props);
-    const isParentOpen = useFirstTruthy(useIsOpen() ?? initiallyOpen);
+    const isParentOpen = useTruthy(useIsOpen() ?? initiallyOpen);
 
     // @ts-ignore
     const { unit, valueType } = value;
@@ -258,7 +258,7 @@ export const setterRenderer: Renderer<
 
     const { handleToggle, initiallyOpen, path } =
       useExpandingRendererUtils(props);
-    const isParentOpen = useFirstTruthy(useIsOpen() ?? initiallyOpen);
+    const isParentOpen = useTruthy(useIsOpen() ?? initiallyOpen);
 
     // @ts-ignore
     const { valueType } = value;
@@ -405,7 +405,7 @@ export const triggerRenderer: Renderer<
 
     const { handleToggle, initiallyOpen, path } =
       useExpandingRendererUtils(props);
-    const isParentOpen = useFirstTruthy(useIsOpen() ?? initiallyOpen);
+    const isParentOpen = useTruthy(useIsOpen() ?? initiallyOpen);
 
     // @ts-ignore
     const collector = useTypedCollector(value);

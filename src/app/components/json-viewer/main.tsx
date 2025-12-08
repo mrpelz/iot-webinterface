@@ -319,7 +319,7 @@ export const JSONViewer: FunctionComponent<JSONViewerProps> = ({
     (path: PropertyKey[], isOpen: boolean) => {
       const { current: openPaths_ } = openPathsRef;
 
-      const pathKey = ['$', path].join('.');
+      const pathKey = ['$', path].flat().join('.');
 
       if (isOpen) {
         openPaths_.set(pathKey, path);

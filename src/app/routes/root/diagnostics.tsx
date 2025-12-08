@@ -24,6 +24,7 @@ import {
 import { JSONViewer } from '../../components/json-viewer/main.js';
 import { Details, Properties } from '../../controls/diagnostics.js';
 import { useFetchText } from '../../hooks/use-fetch.js';
+import { useFirstTruthy } from '../../hooks/use-first-truthy.js';
 import { useLocalStorage } from '../../hooks/use-local-storage.js';
 import { api } from '../../main.js';
 import {
@@ -327,6 +328,8 @@ export const Diagnostics: FunctionComponent = () => {
   const [persistedPath, setPersistedPath] = useLocalStorage<PropertyKey[]>(
     'diagnostics-hierarchy-path',
   );
+  const persistedPath_ = useFirstTruthy(persistedPath);
+
   const handlePathChange = useCallback(
     (paths: PropertyKey[][]) => {
       const last = paths.at(-1);
@@ -508,7 +511,7 @@ export const Diagnostics: FunctionComponent = () => {
 
       {hierarchy ? (
         <JSONViewer
-          autoExpandPath={persistedPath ?? DEFAULT_PATH}
+          autoExpandPath={persistedPath_ ?? DEFAULT_PATH}
           handlePathChange={handlePathChange}
           renderers={jsonViewerRenderers}
           rootLabel="Hierarchy"
