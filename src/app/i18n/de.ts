@@ -49,6 +49,8 @@ const s = {
   left: 'links',
   light: 'licht',
   lighting: 'beleuchtung',
+  log: 'log',
+  logicReasoning: 'logik-begründung',
   map: 'karte',
   media: 'medien',
   menu: 'menü',

@@ -182,6 +182,8 @@ export const staticPagesBottom = [
   'devices',
   'settings',
   'diagnostics',
+  'logicReasoning',
+  'log',
 ] as const;
 
 export const staticPages = [...staticPagesTop, ...staticPagesBottom];

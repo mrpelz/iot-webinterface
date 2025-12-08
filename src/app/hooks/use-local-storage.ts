@@ -1,4 +1,12 @@
-import { useEffect, useMemo } from 'preact/hooks';
+import {
+  Dispatch,
+  StateUpdater,
+  useEffect,
+  useMemo,
+  useState,
+} from 'preact/hooks';
+
+import { useSafeJSONStringify } from './use-safe-json-stringify.js';
 
 export const useGetLocalStorage = (key: string): string | undefined =>
   useMemo(() => {
@@ -22,4 +30,26 @@ export const useSetLocalStorage = (key: string, value?: string): void => {
       // noop
     }
   }, [key, value]);
+};
+
+export const useLocalStorage = <T>(
+  key: string,
+  defaultValue?: T,
+): [T | undefined, Dispatch<StateUpdater<T | undefined>>] => {
+  const persisted_ = useGetLocalStorage(key);
+  const persisted = useMemo(() => {
+    if (persisted_ === undefined) return undefined;
+
+    try {
+      return JSON.parse(persisted_);
+    } catch {
+      return undefined;
+    }
+  }, [persisted_]) as T | undefined;
+
+  const [value, setValue] = useState<T | undefined>(persisted ?? defaultValue);
+
+  useSetLocalStorage(key, useSafeJSONStringify(value));
+
+  return [value, setValue];
 };

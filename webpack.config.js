@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
   dirBase,
   dirSrc,
+  webpackServe,
   // @ts-ignore
 } from '@mrpelz/boilerplate-dom/webpack.config.js';
 // @ts-ignore
@@ -17,6 +18,7 @@ import {
   ConcatOperation,
   ModifySourcePlugin,
 } from 'modify-source-webpack-plugin';
+import { stripIndents } from 'proper-tags';
 import { InjectManifest } from 'workbox-webpack-plugin';
 
 const version = execSync('npm pkg get "version" --silent', { encoding: 'utf8' })
@@ -138,20 +140,22 @@ config.plugins = [
         operations: [
           new ConcatOperation(
             'start',
-            glob
-              .sync(path.resolve(dirSrc, 'common/images/background/*'))
-              .map((path_) => path.relative(path.resolve(dirSrc, 'app'), path_))
-              .map((path_) => `import '${path_}';`)
-              .join('\n'),
-          ),
-          new ConcatOperation(
-            'start',
-            `window.__version__ = '${version}';\n\n`,
-          ),
-          new ConcatOperation(
-            'start',
-            `// @ts-ignore
-            __webpack_base_uri__ = new URL('/', location.href).href;\n\n`,
+            stripIndents`
+              ${glob
+                .sync(path.resolve(dirSrc, 'common/images/background/*'))
+                .map((path_) =>
+                  path.relative(path.resolve(dirSrc, 'app'), path_),
+                )
+                .map((path_) => `import '${path_}';`)
+                .join('\n')}
+
+              // @ts-ignore
+              __webpack_base_uri__ = new URL('/', location.href).href;
+
+              window.__version__ = '${version}';
+              window.__webpackServe__ = ${webpackServe ? 'true' : 'false'};
+
+            `,
           ),
         ],
         test: new RegExp(`^${path.resolve(dirSrc, 'app/main.ts')}$`),
@@ -168,10 +172,25 @@ config.plugins = [
     manifest: path.resolve(dirSrc, 'common/manifest.json'),
     mode: 'webapp',
   }),
-  new InjectManifest({
-    maximumFileSizeToCacheInBytes: 10 * 1_000_000,
-    swSrc: path.resolve(dirSrc, 'workers/sw.ts'),
-  }),
+  (() => {
+    const workboxPlugin = new InjectManifest({
+      maximumFileSizeToCacheInBytes: 10 * 1_000_000,
+      swSrc: path.resolve(dirSrc, 'workers/sw.ts'),
+    });
+
+    if (webpackServe) {
+      Object.defineProperty(workboxPlugin, 'alreadyCalled', {
+        get() {
+          return false;
+        },
+        set() {
+          //
+        },
+      });
+    }
+
+    return workboxPlugin;
+  })(),
 ];
 
 // @ts-ignore

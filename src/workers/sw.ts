@@ -13,6 +13,7 @@ const NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG =
 const NOTIFICATION_SERVICEWORKER_ACTIVATE_ACTION_ABORT =
   'notificationServiceWorkerActivateActionAbort';
 
+self.__WB_DISABLE_DEV_LOGS = true;
 const manifest = self.__WB_MANIFEST;
 
 precacheAndRoute(manifest, {

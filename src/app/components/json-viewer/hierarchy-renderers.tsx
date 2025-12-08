@@ -10,10 +10,9 @@ import {
 } from '@iot/iot-monolith/tree-serialization';
 import { ensureKeys, isPlainObject } from '@mrpelz/misc-utils/oop';
 import { computed } from '@preact/signals';
-import { useContext, useMemo } from 'preact/hooks';
+import { useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../../common/types.js';
-import { useArray } from '../../hooks/use-array-compare.js';
 import { useFirstTruthy } from '../../hooks/use-first-truthy.js';
 import { useTypedCollector, useTypedEmitter } from '../../state/api.js';
 import { Details, Inset, useIsOpen } from '../details.js';
@@ -29,11 +28,11 @@ import {
   TypeString,
 } from './components.js';
 import {
-  JSONViewerContext,
   Key,
   makeExpandingRenderer,
   makeRenderer,
   Renderer,
+  useExpandingRendererUtils,
 } from './main.js';
 
 export const idRenderer = makeRenderer<string>(
@@ -145,14 +144,12 @@ export const getterRenderer: Renderer<
   // @ts-ignore
   Match<{ $: 'getter' }, TExclude, TSerialization>
 > = {
-  RenderValue: ({ path, value }) => {
-    // @ts-ignore
-    const path_ = useArray(path);
+  RenderValue: (props) => {
+    const { value } = props;
 
-    const { autoExpandLevel } = useContext(JSONViewerContext);
-    // @ts-ignore
-    const isOpen = path_.length < autoExpandLevel;
-    const isParentOpen = useFirstTruthy(useIsOpen() ?? isOpen);
+    const { handleToggle, initiallyOpen, path } =
+      useExpandingRendererUtils(props);
+    const isParentOpen = useFirstTruthy(useIsOpen() ?? initiallyOpen);
 
     // @ts-ignore
     const { unit, valueType } = value;
@@ -172,19 +169,19 @@ export const getterRenderer: Renderer<
     const key = useMemo(
       () => (
         <>
-          <Key path={path_} />{' '}
+          <Key path={path} />{' '}
           <TypeAnnotation content={`getter (${isDate ? 'date' : type})`} />
           <PrimitiveValue type={type}>{liveValue}</PrimitiveValue>
           <br />
           <TypeAnnotation content="object" />
         </>
       ),
-      [isDate, liveValue, path_, type],
+      [isDate, liveValue, path, type],
     );
 
     // @ts-ignore
     const children = useGetObjectChildren(
-      path_,
+      path,
       isParentOpen ? value : undefined,
     );
 
@@ -199,8 +196,8 @@ export const getterRenderer: Renderer<
 
     return (
       <Details
-        open={isOpen}
-        collapsible={!isOpen}
+        open={initiallyOpen}
+        handleToggle={handleToggle}
         showExpandIcon={false}
         summary={
           <>
@@ -256,14 +253,12 @@ export const setterRenderer: Renderer<
   Match<{ $: 'setter' }, TExclude, TSerialization>
 > = {
   // @ts-ignore
-  RenderValue: ({ path, value }) => {
-    // @ts-ignore
-    const path_ = useArray(path);
+  RenderValue: (props) => {
+    const { value } = props;
 
-    const { autoExpandLevel } = useContext(JSONViewerContext);
-    // @ts-ignore
-    const isOpen = path_.length < autoExpandLevel;
-    const isParentOpen = useFirstTruthy(useIsOpen() ?? isOpen);
+    const { handleToggle, initiallyOpen, path } =
+      useExpandingRendererUtils(props);
+    const isParentOpen = useFirstTruthy(useIsOpen() ?? initiallyOpen);
 
     // @ts-ignore
     const { valueType } = value;
@@ -316,7 +311,7 @@ export const setterRenderer: Renderer<
     const key = useMemo(
       () => (
         <>
-          <Key path={path_} /> <TypeAnnotation content={`setter (${type})`} />
+          <Key path={path} /> <TypeAnnotation content={`setter (${type})`} />
           <Annotation content="set:" />
           {input}
           <Annotation content="actual:" />
@@ -325,12 +320,12 @@ export const setterRenderer: Renderer<
           <TypeAnnotation content="object" />
         </>
       ),
-      [input, liveValue, path_, type],
+      [input, liveValue, path, type],
     );
 
     // @ts-ignore
     const children = useGetObjectChildren(
-      path_,
+      path,
       isParentOpen ? value : undefined,
     );
 
@@ -345,8 +340,8 @@ export const setterRenderer: Renderer<
 
     return (
       <Details
-        open={isOpen}
-        collapsible={!isOpen}
+        handleToggle={handleToggle}
+        open={initiallyOpen}
         showExpandIcon={false}
         summary={
           <>
@@ -405,14 +400,12 @@ export const triggerRenderer: Renderer<
   // @ts-ignore
   Match<{ $: 'trigger' }, TExclude, TSerialization>
 > = {
-  RenderValue: ({ path, value }) => {
-    // @ts-ignore
-    const path_ = useArray(path);
+  RenderValue: (props) => {
+    const { value } = props;
 
-    const { autoExpandLevel } = useContext(JSONViewerContext);
-    // @ts-ignore
-    const isOpen = path_.length < autoExpandLevel;
-    const isParentOpen = useFirstTruthy(useIsOpen() ?? isOpen);
+    const { handleToggle, initiallyOpen, path } =
+      useExpandingRendererUtils(props);
+    const isParentOpen = useFirstTruthy(useIsOpen() ?? initiallyOpen);
 
     // @ts-ignore
     const collector = useTypedCollector(value);
@@ -436,18 +429,18 @@ export const triggerRenderer: Renderer<
     const key = useMemo(
       () => (
         <>
-          <Key path={path_} /> <TypeAnnotation content="trigger" />
+          <Key path={path} /> <TypeAnnotation content="trigger" />
           {input}
           <br />
           <TypeAnnotation content="object" />
         </>
       ),
-      [input, path_],
+      [input, path],
     );
 
     // @ts-ignore
     const children = useGetObjectChildren(
-      path_,
+      path,
       isParentOpen ? value : undefined,
     );
 
@@ -462,8 +455,8 @@ export const triggerRenderer: Renderer<
 
     return (
       <Details
-        open={isOpen}
-        collapsible={!isOpen}
+        handleToggle={handleToggle}
+        open={initiallyOpen}
         showExpandIcon={false}
         summary={
           <>

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { computed } from '@preact/signals';
 import { FunctionComponent } from 'preact';
-import { useMemo } from 'preact/hooks';
+import { useCallback, useMemo } from 'preact/hooks';
 
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import {
@@ -24,6 +24,7 @@ import {
 import { JSONViewer } from '../../components/json-viewer/main.js';
 import { Details, Properties } from '../../controls/diagnostics.js';
 import { useFetchText } from '../../hooks/use-fetch.js';
+import { useLocalStorage } from '../../hooks/use-local-storage.js';
 import { api } from '../../main.js';
 import {
   useIsInit,
@@ -55,7 +56,8 @@ import { useBreakpoint } from '../../style/breakpoint.js';
 import { getMediaQuery } from '../../style/main.js';
 import { isProd } from '../../sw.js';
 import { $flags } from '../../util/flags.js';
-import { LogStream } from '../../views/log-stream.js';
+
+const DEFAULT_PATH = ['wurstHome', 'sonninstraße16', 'firstFloor'];
 
 const Fallback: FunctionComponent = () => (
   <tr>
@@ -322,6 +324,19 @@ export const Diagnostics: FunctionComponent = () => {
     [],
   );
 
+  const [persistedPath, setPersistedPath] = useLocalStorage<PropertyKey[]>(
+    'diagnostics-hierarchy-path',
+  );
+  const handlePathChange = useCallback(
+    (paths: PropertyKey[][]) => {
+      const last = paths.at(-1);
+      if (!last) return;
+
+      setPersistedPath(last.length > DEFAULT_PATH.length ? last : undefined);
+    },
+    [setPersistedPath],
+  );
+
   const apiVersionUrl = computed(
     () =>
       new URL('/api/version', $flags.apiBaseUrl.value ?? self.location.href)
@@ -385,6 +400,18 @@ export const Diagnostics: FunctionComponent = () => {
             <b>isProd</b>
           </td>
           <td>{useMemo(() => JSON.stringify(isProd), [])}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>webpackServe</b>
+          </td>
+          <td>
+            {
+              // eslint-disable-next-line unicorn/prefer-global-this
+              useMemo(() => JSON.stringify(window.__webpackServe__), [])
+            }
+          </td>
         </tr>
 
         <tr>
@@ -481,13 +508,13 @@ export const Diagnostics: FunctionComponent = () => {
 
       {hierarchy ? (
         <JSONViewer
+          autoExpandPath={persistedPath ?? DEFAULT_PATH}
+          handlePathChange={handlePathChange}
+          renderers={jsonViewerRenderers}
           rootLabel="Hierarchy"
           value={hierarchy}
-          renderers={jsonViewerRenderers}
         />
       ) : null}
-
-      <LogStream url="/api/log" />
     </DiagnosticsContainer>
   );
 };

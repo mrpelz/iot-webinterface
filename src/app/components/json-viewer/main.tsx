@@ -2,7 +2,14 @@
 
 import { isObject } from '@mrpelz/misc-utils/oop';
 import { ComponentChild, createContext, FunctionComponent, JSX } from 'preact';
-import { useCallback, useContext, useEffect, useMemo } from 'preact/hooks';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 
 import { useArray } from '../../hooks/use-array-compare.js';
 import { Details, Inset, useIsOpen } from '../details.js';
@@ -33,15 +40,20 @@ export type JSONViewerInnerProps = {
   value: unknown;
 };
 
-export type JSONViewerProps = JSONViewerInnerProps & {
+export type JSONViewerProps = {
   autoExpandLevel?: number;
+  autoExpandPath?: PropertyKey[];
+  handlePathChange?: (paths: PropertyKey[][]) => void;
   renderers?: Set<Renderer<unknown>>;
   rootLabel?: ComponentChild;
+  value: unknown;
 };
 
 type TJSONViewerContext = {
   autoExpandLevel: number;
+  autoExpandPath: PropertyKey[];
   circularCache: WeakSet<object>;
+  handlePathChange: (path: PropertyKey[], isOpen: boolean) => void;
   renderers: Set<Renderer<unknown>>;
   rootLabel: ComponentChild;
 };
@@ -172,6 +184,51 @@ export const makeRenderer = <T,>(
   is,
 });
 
+export const useExpandingRendererUtils = <T,>(props: {
+  path: PropertyKey[];
+  value: T;
+}): {
+  handleToggle: (isOpen: boolean) => void;
+  initiallyOpen: boolean;
+  isParentOpen: boolean;
+  path: PropertyKey[];
+  value: T | undefined;
+} => {
+  const { autoExpandLevel, autoExpandPath, handlePathChange } =
+    useContext(JSONViewerContext);
+
+  const autoExpandPath_ = useArray(autoExpandPath);
+  const path = useArray(props.path);
+
+  const initiallyOpen =
+    useMemo(
+      () =>
+        autoExpandPath_.length > 0
+          ? path.every((key, index) => key === autoExpandPath_.at(index))
+          : false,
+      [autoExpandPath_, path],
+    ) || path.length < autoExpandLevel;
+  const isParentOpen = (useIsOpen() ?? initiallyOpen) || path.length === 0;
+
+  const value = isParentOpen ? props.value : undefined;
+
+  const handleToggle = useCallback(
+    (isOpen: boolean) => handlePathChange(path, isOpen),
+    [handlePathChange, path],
+  );
+
+  return useMemo(
+    () => ({
+      handleToggle,
+      initiallyOpen,
+      isParentOpen,
+      path,
+      value,
+    }),
+    [handleToggle, initiallyOpen, isParentOpen, path, value],
+  );
+};
+
 export const makeExpandingRenderer = <T,>(
   is: Renderer<T>['is'],
   label: string,
@@ -179,26 +236,20 @@ export const makeExpandingRenderer = <T,>(
   prefix: string,
   suffix: string,
 ): Renderer<T> => ({
-  RenderValue: ({ path, value }) => {
-    const { autoExpandLevel } = useContext(JSONViewerContext);
-
-    const path_ = useArray(path);
-
-    const isOpen = path_.length <= autoExpandLevel;
-    const isParentOpen = useIsOpen() ?? isOpen;
-
-    const value_ = isParentOpen ? value : undefined;
+  RenderValue: (props) => {
+    const { handleToggle, initiallyOpen, path, value } =
+      useExpandingRendererUtils(props);
 
     const key = useMemo(
       () => (
         <>
-          <Key path={path_} /> <TypeAnnotation content={label} />
+          <Key path={path} /> <TypeAnnotation content={label} />
         </>
       ),
-      [path_],
+      [path],
     );
 
-    const children = useGetChildren(path_, value_);
+    const children = useGetChildren(path, value);
 
     const annotation = useMemo(
       () => (
@@ -211,9 +262,9 @@ export const makeExpandingRenderer = <T,>(
 
     return (
       <Details
-        open={isOpen}
-        collapsible={!isOpen}
-        showCollapseExpandAllIcon={path_.length > 0}
+        handleToggle={handleToggle}
+        open={initiallyOpen}
+        showCollapseExpandAllIcon={path.length > 0}
         showExpandIcon={false}
         summary={
           <>
@@ -243,21 +294,68 @@ export const makeExpandingRenderer = <T,>(
 
 export const JSONViewer: FunctionComponent<JSONViewerProps> = ({
   autoExpandLevel = 0,
-  path,
+  autoExpandPath = [],
+  handlePathChange,
   renderers = new Set([arrayRenderer, objectRenderer, primitiveRenderer]),
   rootLabel = null,
   value,
-}) => (
-  <JSONViewerContext.Provider
-    value={{
-      autoExpandLevel,
-      circularCache: new WeakSet(),
-      renderers,
-      rootLabel,
-    }}
-  >
-    <Wrapper>
-      <JSONViewerInner path={path} value={value} />
-    </Wrapper>
-  </JSONViewerContext.Provider>
-);
+}) => {
+  const [openPathsKeys_, setOpenPathsArray] = useState([] as string[]);
+  const openPathsKeys = useArray(openPathsKeys_);
+
+  const openPathsRef = useRef(new Map<string, PropertyKey[]>());
+  const openPaths = useMemo(() => {
+    const { current: openPaths_ } = openPathsRef;
+
+    return (
+      openPathsKeys
+        .map((key) => openPaths_.get(key))
+        // eslint-disable-next-line no-implicit-coercion
+        .filter((path) => !!path)
+    );
+  }, [openPathsKeys]);
+
+  const handlePathChange_ = useCallback(
+    (path: PropertyKey[], isOpen: boolean) => {
+      const { current: openPaths_ } = openPathsRef;
+
+      const pathKey = ['$', path].join('.');
+
+      if (isOpen) {
+        openPaths_.set(pathKey, path);
+      } else {
+        for (const [key] of openPaths_) {
+          if (!key.startsWith(pathKey)) continue;
+
+          openPaths_.delete(key);
+        }
+      }
+
+      setOpenPathsArray(
+        Array.from(openPaths_.entries())
+          .toSorted((a, b) => a[1].length - b[1].length)
+          .map(([key]) => key),
+      );
+    },
+    [],
+  );
+
+  useEffect(() => handlePathChange?.(openPaths), [handlePathChange, openPaths]);
+
+  return (
+    <JSONViewerContext.Provider
+      value={{
+        autoExpandLevel,
+        autoExpandPath,
+        circularCache: new WeakSet(),
+        handlePathChange: handlePathChange_,
+        renderers,
+        rootLabel,
+      }}
+    >
+      <Wrapper>
+        <JSONViewerInner path={[]} value={value} />
+      </Wrapper>
+    </JSONViewerContext.Provider>
+  );
+};

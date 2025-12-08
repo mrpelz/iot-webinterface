@@ -1,6 +1,14 @@
 import { styled } from 'goober';
-import { ComponentChild, createContext, FunctionComponent, JSX } from 'preact';
-import { forwardRef, type TargetedEvent } from 'preact/compat';
+import {
+  ComponentChild,
+  createContext,
+  DOMAttributes,
+  EventHandler,
+  FunctionComponent,
+  MouseEventHandler,
+  TargetedEvent,
+} from 'preact';
+import { forwardRef } from 'preact/compat';
 import {
   useCallback,
   useContext,
@@ -21,7 +29,7 @@ const DetailsComponent = styled('details', forwardRef)`
 `;
 
 // eslint-disable-next-line prettier/prettier
-const SummaryComponent = styled<{ collapsible: boolean, showExpandIcon: boolean } & JSX.DOMAttributes<HTMLElement>>('summary')`
+const SummaryComponent = styled<{ collapsible: boolean, showExpandIcon: boolean } & DOMAttributes<HTMLElement>>('summary')`
   cursor: ${({ collapsible }) => (collapsible ? 'zoom-in' : 'initial')};
   display: block;
   pointer-events: ${({ collapsible }) => (collapsible ? 'all' : 'none')};
@@ -75,7 +83,7 @@ const CollapseAll = styled('div')`
 
 const ExpandAllSingle = styled(CollapseAll)`
   &::before {
-    content: '++' / 'expand all';
+    content: '++' / 'expand all' !important;
   }
 `;
 
@@ -121,7 +129,7 @@ export const Inset = styled<{ inset?: number }>('inset' as 'span')`
 
 export const Details: FunctionComponent<{
   collapsible?: boolean;
-  handleToggle?: (open: boolean) => void;
+  handleToggle?: (isOpen: boolean) => void;
   open?: boolean;
   showCollapseExpandAllIcon?: boolean;
   showExpandIcon?: boolean;
@@ -151,16 +159,18 @@ export const Details: FunctionComponent<{
   const parentExpandAll = parentContext?.expandAll;
   const [expandAll, triggerExpandAll] = useRerender('expandAll');
 
-  const parentOpen = parentContext?.isOpen;
+  const isParentOpen = parentContext?.isOpen;
   const [isOpen, setOpen] = useState<boolean | undefined>(
-    collapsible ? initiallyOpen && parentOpen : true,
+    collapsible ? initiallyOpen && (isParentOpen ?? true) : true,
   );
+
+  useEffect(() => setOpen(initiallyOpen), [initiallyOpen]);
 
   const [isCollapsible, setCollapsible] = useState(false);
   const [isExpandable, setExpandable] = useState(false);
 
   const onToggle = useCallback<
-    JSX.EventHandler<TargetedEvent<HTMLDetailsElement, ToggleEvent>>
+    EventHandler<TargetedEvent<HTMLDetailsElement, ToggleEvent>>
   >(
     ({ newState }) => {
       if (!collapsible) {
@@ -175,7 +185,7 @@ export const Details: FunctionComponent<{
     [collapsible],
   );
 
-  const onExpandAllClick = useCallback<JSX.MouseEventHandler<HTMLElement>>(
+  const onExpandAllClick = useCallback<MouseEventHandler<HTMLElement>>(
     (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -185,7 +195,7 @@ export const Details: FunctionComponent<{
     [triggerExpandAll],
   );
 
-  const onCollapseAllClick = useCallback<JSX.MouseEventHandler<HTMLElement>>(
+  const onCollapseAllClick = useCallback<MouseEventHandler<HTMLElement>>(
     (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -196,9 +206,9 @@ export const Details: FunctionComponent<{
   );
 
   useEffect(() => {
-    if (!parentOpen) setOpen(false);
+    if (isParentOpen === false) setOpen(false);
     return () => setOpen(undefined);
-  }, [parentOpen]);
+  }, [isParentOpen]);
 
   useEffect(() => {
     if (!parentExpandAll) return;
@@ -212,8 +222,13 @@ export const Details: FunctionComponent<{
 
   useEffect(() => {
     parentChildCollapseExpandTrigger?.();
-    handleToggle?.(Boolean(isOpen));
-  }, [handleToggle, isOpen, parentChildCollapseExpandTrigger]);
+  }, [isOpen, parentChildCollapseExpandTrigger]);
+
+  useEffect(() => {
+    if (isOpen === undefined) return;
+
+    handleToggle?.(isOpen);
+  }, [handleToggle, isOpen]);
 
   const ref = useRef<HTMLDetailsElement>(null);
 
@@ -237,6 +252,8 @@ export const Details: FunctionComponent<{
         directChildren.length > directChildrenOpen.length,
     );
   }, [childCollapseExpand, isOpen]);
+
+  useEffect(() => () => setOpen(false), []);
 
   return (
     <DetailsContext.Provider

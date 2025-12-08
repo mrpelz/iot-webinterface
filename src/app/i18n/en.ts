@@ -49,6 +49,8 @@ const s = {
   left: 'left',
   light: 'light',
   lighting: 'lighting',
+  log: 'log',
+  logicReasoning: 'logic-reasoning',
   map: 'map',
   media: 'media',
   menu: 'menu',

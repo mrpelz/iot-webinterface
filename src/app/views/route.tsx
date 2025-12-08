@@ -14,6 +14,8 @@ import { api } from '../main.js';
 import { Devices } from '../routes/root/devices.js';
 import { Diagnostics } from '../routes/root/diagnostics.js';
 import { Global } from '../routes/root/global.js';
+import { Log } from '../routes/root/log.js';
+import { LogicReasoning } from '../routes/root/logic-reasoning.js';
 import { Room } from '../routes/root/room.js';
 import { Settings } from '../routes/root/settings.js';
 import { Test } from '../routes/root/test-route.js';
@@ -66,6 +68,8 @@ export const RootRoute: FunctionComponent = () => {
         devices: <Devices />,
         diagnostics: <Diagnostics />,
         global: <Global />,
+        log: <Log />,
+        logicReasoning: <LogicReasoning />,
         map: <Test />,
         settings: <Settings />,
       }[staticPage];
