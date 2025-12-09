@@ -1,17 +1,10 @@
 import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { computed } from '@preact/signals';
-import { createContext, FunctionComponent } from 'preact';
-import {
-  Dispatch,
-  StateUpdater,
-  useContext,
-  useEffect,
-  useState,
-} from 'preact/hooks';
+import { FunctionComponent } from 'preact';
 
+import { useLogStream } from '../hooks/use-array-stream.js';
 import { useAbsoluteTimeLabel } from '../hooks/use-time-label.js';
 import { $flags } from '../util/flags.js';
-import { Tokenize, Tokens } from './tokenize.js';
 
 export type Log = [
   string,
@@ -23,148 +16,73 @@ export type Log = [
   },
 ];
 
-const INTERVAL = 1000;
-
-const matchHierarchyPath = new RegExp(
-  String.raw`(?:(?:[a-zA-Zß][a-zA-Z0-9ß]*\.)+[a-zA-Zß][a-zA-Z0-9ß]*)`,
-  'm',
-);
-
-const LogContext = createContext<Log | undefined>(undefined);
-
-const tokens: Tokens = new Map([
-  [
-    matchHierarchyPath,
-    ({ value }) => {
-      const log = useContext(LogContext);
-      if (!log) return null;
-
-      const [, { head }] = log;
-
-      return (
-        <u>{value.startsWith(head) ? value.slice(head.length + 1) : value}</u>
-      );
-    },
-  ],
-]);
-
-const LogItem: FunctionComponent<{
-  setHeadFilter: Dispatch<StateUpdater<string | undefined>>;
-}> = ({ setHeadFilter }) => {
-  const log = useContext(LogContext);
-
+const LogItem: FunctionComponent<{ log: Log }> = ({ log }) => {
   const [, { date: { epoch } = {}, body, head, level } = {}] = log ?? [];
   const date = useAbsoluteTimeLabel(epoch ? new Date(epoch) : undefined);
 
   return (
     <>
-      {date}:{' '}
-      <a onClick={() => setHeadFilter((filter) => (filter ? undefined : head))}>
-        {head}
-      </a>
-      {'\n'}[{level}] {body ? <Tokenize input={body} tokens={tokens} /> : null}
+      {date}: {head}
+      {head}
+      {'\n'}[{level}] {body}
       {'\n\n'}
     </>
   );
 };
 
-export const LogStream: FunctionComponent<{
-  interval?: number;
-  url: string;
-}> = ({ interval = INTERVAL, url }) => {
-  const { value: baseUrl } = computed(
-    () => new URL(url, $flags.apiBaseUrl.value ?? self.location.href).href,
-  );
+export const isLogs = (input: unknown[]): input is Log[] => {
+  for (const log of input) {
+    if (!Array.isArray(log)) return false;
+    const [key, value] = log;
 
-  const [logs, setLogs] = useState<Log[]>([]);
+    if (typeof key !== 'string') return false;
+    if (typeof value !== 'object') return false;
 
-  useEffect(() => {
-    const abort = new AbortController();
+    const { body, date, head, level } = ensureKeys(
+      value,
+      'body',
+      'date',
+      'head',
+      'level',
+    );
+    if (
+      body === undefined ||
+      date === undefined ||
+      head === undefined ||
+      level === undefined
+    ) {
+      return false;
+    }
 
-    let cursor: string | undefined;
+    const { date: dateDate, epoch } = ensureKeys(date, 'date', 'epoch');
+    if (dateDate === undefined || epoch === undefined) return false;
+  }
 
-    const fn = () => {
-      const cursorUrl = (() => {
-        const result = new URL(baseUrl);
-        if (cursor) result.searchParams.set('cursor', cursor);
+  return true;
+};
 
-        return result;
-      })();
+export const getLogCursor = (newLogs: Log[], lastUrl: URL): URL | undefined => {
+  const cursor = newLogs.at(-1)?.[0];
+  if (!cursor) return undefined;
 
-      fetch(cursorUrl, { signal: abort.signal })
-        .then((response) =>
-          response.ok ? (response.json() as Promise<Log[]>) : undefined,
-        )
-        .then((newLogs) => {
-          if (newLogs === undefined) {
-            cursor = undefined;
-            setLogs([]);
+  const nextUrl = new URL(lastUrl);
+  nextUrl.searchParams.set('cursor', cursor);
 
-            return;
-          }
+  return nextUrl;
+};
 
-          for (const log of newLogs) {
-            if (!Array.isArray(log)) return;
-            const [key, value] = log;
+const baseUrl = computed(
+  () => new URL('/api/log', $flags.apiBaseUrl.value ?? self.location.href).href,
+);
 
-            if (typeof key !== 'string') return;
-            if (typeof value !== 'object') return;
-
-            const { body, date, head, level } = ensureKeys(
-              value,
-              'body',
-              'date',
-              'head',
-              'level',
-            );
-            if (
-              body === undefined ||
-              date === undefined ||
-              head === undefined ||
-              level === undefined
-            ) {
-              return;
-            }
-
-            const { date: dateDate, epoch } = ensureKeys(date, 'date', 'epoch');
-            if (dateDate === undefined || epoch === undefined) return;
-          }
-
-          const nextCursor = newLogs.at(-1)?.[0];
-          if (nextCursor && nextCursor !== cursor) {
-            cursor = nextCursor;
-            setLogs((oldLogs) => [oldLogs, newLogs].flat());
-          }
-        })
-        .catch();
-    };
-
-    fn();
-    const interval_ = setInterval(fn, interval);
-
-    return () => {
-      try {
-        abort.abort();
-      } catch {
-        //
-      }
-      if (interval_) clearInterval(interval_);
-    };
-  }, [baseUrl, interval]);
-
-  const [headFilter, setHeadFilter] = useState<string>();
+export const LogStream: FunctionComponent = () => {
+  const logs = useLogStream<Log>(baseUrl.value, isLogs, getLogCursor);
 
   return (
     <pre>
-      {logs.map((log) => {
-        if (headFilter && log[1].head !== headFilter) return null;
-
-        return (
-          <LogContext.Provider value={log}>
-            <LogItem setHeadFilter={setHeadFilter} />
-          </LogContext.Provider>
-        );
-      })}
+      {logs.map((log) => (
+        <LogItem log={log} />
+      ))}
     </pre>
   );
 };
