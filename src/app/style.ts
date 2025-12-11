@@ -36,7 +36,6 @@ const dynamicDimensions = {
     strings.viewportHeight,
     strings.safeAreaInsetTop,
     staticDimensions.titlebarHeight,
-    strings.safeAreaInsetBottom,
   ),
   appHeightShiftDown: subtract(
     strings.viewportHeight,

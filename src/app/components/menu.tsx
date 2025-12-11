@@ -1,7 +1,7 @@
 import { styled } from 'goober';
 import { forwardRef } from 'preact/compat';
 
-import { colors, dimensions } from '../style.js';
+import { colors, dimensions, strings } from '../style.js';
 import { breakpointValue } from '../style/breakpoint.js';
 import { multiply } from '../style/dimensions.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
@@ -13,7 +13,7 @@ export const Menu = styled('nav')<{ isVisible: boolean }>`
   inline-size: ${dimensions.menuWidth};
   overflow-y: auto;
   overscroll-behavior-y: contain;
-  padding: ${dimensions.titlebarHeight} 0;
+  padding: ${dimensions.titlebarHeight} 0 ${strings.safeAreaInsetBottom};
   pointer-events: ${dependentValue('isVisible', 'auto', 'none')};
   scroll-behavior: smooth;
 `;

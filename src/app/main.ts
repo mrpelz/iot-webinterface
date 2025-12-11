@@ -5,7 +5,7 @@ import {
   levelObjectMatch,
 } from '@iot/iot-monolith/tree';
 // import { effect } from '@preact/signals';
-import { stripIndent } from 'proper-tags';
+import { stripIndents } from 'proper-tags';
 
 import { Api } from './api.js';
 import { init as initReload } from './reload.js';
@@ -24,7 +24,9 @@ try {
 
     render();
     document.documentElement.removeAttribute('static');
-  })();
+  })().catch((error) => {
+    throw new Error('render error', { cause: error });
+  });
 
   defer(async () => {
     requestNotificationPermission();
@@ -60,7 +62,7 @@ try {
   });
 } catch (error) {
   // eslint-disable-next-line no-console
-  console.error(stripIndent`
+  console.error(stripIndents`
       Error!
 
       ${(error as Error).name}: "${(error as Error).message}"

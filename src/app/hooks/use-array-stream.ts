@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 
 export const INTERVAL = 1000;
 
-export const useLogStream = <T>(
+export const useArrayStream = <T>(
   baseUrl: URL | string,
   validate: (input: unknown[]) => boolean,
   getNextUrl: (input: T[], url: URL) => URL | undefined,
@@ -47,11 +47,8 @@ export const useLogStream = <T>(
     const interval_ = setInterval(fn, interval);
 
     return () => {
-      try {
-        abort.abort();
-      } catch {
-        //
-      }
+      abort.abort();
+
       if (interval_) clearInterval(interval_);
     };
   }, [baseUrl_, getNextUrl, interval, validate]);
