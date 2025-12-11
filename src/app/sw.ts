@@ -7,7 +7,7 @@ import { $flags } from './util/flags.js';
 
 export const isProd = location.hostname.endsWith('wurstsalat.cloud');
 
-export const CHECK_INTERVAL = isProd ? 15_000 : 500;
+export const CHECK_INTERVAL = 15_000;
 
 export let workbox: Workbox | undefined;
 export let swProxy: Remote<SW_API> | undefined;
@@ -24,6 +24,9 @@ export const registerServiceWorker = async (): Promise<void> => {
   }
 
   swProxy = workbox ? wrap(await workbox.getSW()) : undefined;
+
+  // eslint-disable-next-line unicorn/prefer-global-this
+  if (window.__webpackServe__) return;
 
   effect(() => {
     const interval = setInterval(

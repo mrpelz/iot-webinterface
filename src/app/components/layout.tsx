@@ -28,7 +28,7 @@ export const Header = styled('header')<{
 export const Aside = styled('aside', forwardRef)<{
   isVisible: boolean;
 }>`
-  block-size: ${dimensions.appHeight};
+  inset-block-end: 0;
   inset-block-start: ${dimensions.headerHeight};
   inset-inline-start: 0;
   position: fixed;

@@ -31,7 +31,7 @@ export const init = (): void => {
     );
   }
 
-  notifier.addEventListener('message', ({ data }) => {
+  notifier.addEventListener('message', async ({ data }) => {
     const data_ = JSON.parse(data);
 
     // eslint-disable-next-line no-console
@@ -43,7 +43,8 @@ export const init = (): void => {
       if (hash === sessionStorage.getItem(RECONNECT_NOTIFIER)) return;
 
       sessionStorage.setItem(RECONNECT_NOTIFIER, hash);
-      swProxy?.reload();
+
+      await swProxy?.removeRegistration();
     }
   });
 };
