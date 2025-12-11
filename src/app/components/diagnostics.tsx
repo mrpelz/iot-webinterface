@@ -45,3 +45,7 @@ export const DiagnosticsContainer = styled('diagnostics-container')`
 export const Summary = styled('summary')`
   cursor: pointer;
 `;
+
+export const Pre = styled('pre')`
+  margin: 0;
+`;

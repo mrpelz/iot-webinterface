@@ -11,6 +11,7 @@ import {
 import configUpstream from '@mrpelz/boilerplate-preact/webpack.config.js';
 import { deepmerge } from 'deepmerge-ts';
 import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import { glob } from 'glob';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
@@ -70,7 +71,6 @@ const configDownstream = {
         target: API_PROXY,
       },
     ],
-    webSocketServer: false,
   },
   output: {
     assetModuleFilename: 'assets/[name][ext]',
@@ -99,6 +99,7 @@ if (config.module) {
           loader: 'ts-loader',
           options: {
             configFile: path.resolve(dirBase, 'tsconfig.build.json'),
+            transpileOnly: true,
           },
         },
       ],
@@ -112,6 +113,7 @@ if (config.module) {
           loader: 'ts-loader',
           options: {
             configFile: path.resolve(dirSrc, 'workers/tsconfig.build.json'),
+            transpileOnly: true,
           },
         },
       ],
@@ -191,6 +193,7 @@ config.plugins = [
 
     return workboxPlugin;
   })(),
+  new ForkTsCheckerWebpackPlugin(),
 ];
 
 // @ts-ignore

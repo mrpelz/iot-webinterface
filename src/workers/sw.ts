@@ -46,7 +46,11 @@ const clearNotifications = async (tags?: string[]) => {
   }
 };
 
+let isReloading = false;
 const reload = async () => {
+  if (isReloading) return;
+  isReloading = true;
+
   const { debug } = await getFlags();
 
   // eslint-disable-next-line no-console
@@ -63,6 +67,9 @@ const reload = async () => {
       // noop
     }
   }
+
+  // eslint-disable-next-line require-atomic-updates
+  isReloading = false;
 };
 
 const removeRegistration = async () => {

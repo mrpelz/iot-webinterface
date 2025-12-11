@@ -29,6 +29,7 @@
     "idb-keyval": "latest",
     "preact": "latest",
     "proper-tags": "latest",
+    "resilient-websocket": "latest",
     "style-vendorizer": "latest",
     "workbox-precaching": "latest",
     "workbox-window": "latest"
@@ -37,6 +38,7 @@
     "@mrpelz/boilerplate-common": "latest",
     "@mrpelz/boilerplate-preact": "latest",
     "favicons-webpack-plugin": "latest",
+    "fork-ts-checker-webpack-plugin": "latest",
     "glob": "latest",
     "modify-source-webpack-plugin": "latest",
     "source-map-loader": "latest",

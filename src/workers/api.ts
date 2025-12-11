@@ -1,11 +1,17 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { expose } from 'comlink';
 import { clear, createStore, set, setMany } from 'idb-keyval';
+import rSock, { WebSocketEvent } from 'resilient-websocket';
 
 import type { API_WORKER_API, TSerialization } from '../common/types.js';
 import { getFlags } from './util.js';
 
+const ResilientWebSocket = rSock as unknown as typeof rSock.default;
+
 declare const self: SharedWorkerGlobalScope;
+
+// make timers work in 'resilient-websocket' library
+Object.defineProperty(globalThis, 'window', { value: self });
 
 const WEB_API_UUID = 'c4218bec-e940-4d68-8807-5c43b2aee27b';
 const OBSERVE_NOTIFIER = 'c3a428eb-544e-4d11-927d-4aefcd81210c';
@@ -49,9 +55,7 @@ class Api implements API_WORKER_API {
   private readonly _notifier = new BroadcastChannel(OBSERVE_NOTIFIER);
   private readonly _stateStore = createStore('api_state', 'state');
   private readonly _valuesStore = createStore('api_values', 'values');
-  private _webSocket?: WebSocket;
-  private _webSocketOfflineTimeout?: ReturnType<typeof setTimeout>;
-  private _webSocketPingInterval?: ReturnType<typeof setInterval>;
+  private _webSocket: InstanceType<typeof ResilientWebSocket>;
 
   constructor() {
     this._init = this._getHierarchy();
@@ -101,38 +105,6 @@ class Api implements API_WORKER_API {
     }, Number.POSITIVE_INFINITY);
   }
 
-  private async _handleWebSocketOnline(online?: boolean) {
-    clearTimeout(this._webSocketOfflineTimeout);
-
-    if (online === false) {
-      this._notifier.postMessage('offline');
-
-      this._webSocket?.close();
-      this._webSocket = undefined;
-
-      return;
-    }
-
-    if (online === true) {
-      await this._getValues();
-      this._notifier.postMessage('online');
-    }
-
-    clearInterval(this._webSocketPingInterval);
-    this._webSocketPingInterval = setInterval(() => {
-      this._webSocket?.send(WEB_API_UUID);
-
-      this._webSocketOfflineTimeout = setTimeout(() => {
-        this._webSocket?.close();
-        this._webSocket = undefined;
-      }, WEBSOCKET_PING_INTERVAL);
-
-      if (!this._webSocket) {
-        this._initWebSocket();
-      }
-    }, WEBSOCKET_PING_INTERVAL);
-  }
-
   private async _initWebSocket(): Promise<void> {
     const { apiBaseUrl, debug } = await getFlags();
 
@@ -142,43 +114,43 @@ class Api implements API_WORKER_API {
     // eslint-disable-next-line no-console
     if (debug) console.debug('WebSocket URL', wsUrl.href);
 
-    const ws = new WebSocket(wsUrl);
-    this._handleWebSocketOnline();
+    this._webSocket = new ResilientWebSocket(wsUrl.href, {
+      pingEnabled: true,
+      pingInterval: WEBSOCKET_PING_INTERVAL,
+      pingMessage: WEB_API_UUID,
+      pongMessage: WEB_API_UUID,
+      pongTimeout: WEBSOCKET_PING_INTERVAL,
+    });
 
-    ws.addEventListener('open', () => {
+    this._webSocket.on(WebSocketEvent.CONNECTION, async () => {
       // eslint-disable-next-line no-console
       if (debug) console.debug('WebSocket opened');
 
-      this._webSocket = ws;
-      this._handleWebSocketOnline(true);
+      await this._getValues();
+      this._notifier.postMessage('online');
     });
 
-    ws.addEventListener('close', () => {
+    this._webSocket.on(WebSocketEvent.CLOSE, () => {
       // eslint-disable-next-line no-console
       if (debug) console.debug('WebSocket closed');
 
-      this._handleWebSocketOnline(false);
+      this._notifier.postMessage('offline');
     });
 
-    ws.addEventListener('error', () => {
+    this._webSocket.on(WebSocketEvent.ERROR, () => {
       // eslint-disable-next-line no-console
       if (debug) console.debug('WebSocket error');
 
-      this._handleWebSocketOnline(false);
+      this._notifier.postMessage('offline');
     });
 
-    ws.addEventListener('message', async ({ data }) => {
+    this._webSocket.on(WebSocketEvent.MESSAGE, async (data) => {
       // eslint-disable-next-line no-console
       if (debug) console.debug('WebSocket message', data);
 
-      if (data === WEB_API_UUID) {
-        clearTimeout(this._webSocketOfflineTimeout);
-
-        return;
-      }
-
       try {
-        const [key, value] = JSON.parse(data) ?? [];
+        const data_ = JSON.parse(data);
+        const [key, value] = Array.isArray(data_) ? data_ : [];
 
         await set(key, value, this._valuesStore);
         this._notifier.postMessage(key);

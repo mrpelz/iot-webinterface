@@ -7,6 +7,10 @@ export const staticStrings = {
   prefersDarkTheme: '(prefers-color-scheme: dark)',
   prefersLightTheme: '(prefers-color-scheme: light)',
   prefersMoreContrast: '(prefers-contrast: more)',
+  safeAreaInsetBottom: cssVar(
+    'safe-area-inset-bottom',
+    cssEnv('safe-area-inset-bottom'),
+  ),
   safeAreaInsetTop: cssVar(
     'safe-area-inset-top',
     cssEnv('safe-area-inset-top'),

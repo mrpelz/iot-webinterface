@@ -2,6 +2,7 @@ import { computed } from '@preact/signals';
 import { createContext, FunctionComponent } from 'preact';
 import { Dispatch, StateUpdater, useContext, useState } from 'preact/hooks';
 
+import { Pre } from '../components/diagnostics.js';
 import { useLogStream } from '../hooks/use-array-stream.js';
 import { useAbsoluteTimeLabel } from '../hooks/use-time-label.js';
 import { $flags } from '../util/flags.js';
@@ -65,7 +66,7 @@ export const LogicReasoningStream: FunctionComponent = () => {
   const [headFilter, setHeadFilter] = useState<string>();
 
   return (
-    <pre>
+    <Pre>
       {logs.map((log) => {
         if (headFilter && log[1].head !== headFilter) return null;
 
@@ -75,6 +76,6 @@ export const LogicReasoningStream: FunctionComponent = () => {
           </LogContext.Provider>
         );
       })}
-    </pre>
+    </Pre>
   );
 };

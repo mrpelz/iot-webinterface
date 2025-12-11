@@ -1,7 +1,7 @@
 import { styled } from 'goober';
 import { forwardRef } from 'preact/compat';
 
-import { colors, dimensions } from '../style.js';
+import { colors, dimensions, strings } from '../style.js';
 import { breakpointValue } from '../style/breakpoint.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
 
@@ -30,6 +30,7 @@ export const Aside = styled('aside', forwardRef)<{
   block-size: ${dimensions.appHeight};
   inset-block-start: ${dimensions.headerHeight};
   inset-inline-start: 0;
+  padding-block-end: ${strings.safeAreaInsetBottom};
   position: fixed;
   transition:
     block-size 0.3s ease-out,
@@ -54,6 +55,7 @@ export const Main = styled('main', forwardRef)<{
   inline-size: ${dimensions.appWidth};
   margin-block-start: ${dimensions.headerHeight};
   min-block-size: ${dimensions.appHeight};
+  padding-block-end: ${strings.safeAreaInsetBottom};
   position: relative;
   scroll-behavior: smooth;
   touch-action: ${dependentValue('isAsideVisible', 'none', 'auto')};

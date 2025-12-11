@@ -8,6 +8,7 @@ import {
 import { stripIndent } from 'proper-tags';
 
 import { Api } from './api.js';
+import { init as initReload } from './reload.js';
 import { registerServiceWorker } from './sw.js';
 import { defer } from './util/defer.js';
 import { iOSHoverStyles, iOSScrollToTop } from './util/ios-fixes.js';
@@ -33,6 +34,7 @@ try {
     iOSScrollToTop();
 
     await persist();
+    initReload();
 
     await api.isInit;
     // @ts-ignore

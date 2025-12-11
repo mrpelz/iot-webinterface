@@ -2,6 +2,7 @@ import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { computed } from '@preact/signals';
 import { FunctionComponent } from 'preact';
 
+import { Pre } from '../components/diagnostics.js';
 import { useLogStream } from '../hooks/use-array-stream.js';
 import { useAbsoluteTimeLabel } from '../hooks/use-time-label.js';
 import { $flags } from '../util/flags.js';
@@ -79,10 +80,10 @@ export const LogStream: FunctionComponent = () => {
   const logs = useLogStream<Log>(baseUrl.value, isLogs, getLogCursor);
 
   return (
-    <pre>
+    <Pre>
       {logs.map((log) => (
         <LogItem log={log} />
       ))}
-    </pre>
+    </Pre>
   );
 };
