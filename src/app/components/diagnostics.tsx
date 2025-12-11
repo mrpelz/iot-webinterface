@@ -8,7 +8,6 @@ export const DiagnosticsContainer = styled('diagnostics-container')`
   display: flex;
   flex-direction: column;
   font-size: 0.75rem;
-  padding: 0.5rem;
 
   &,
   & * {

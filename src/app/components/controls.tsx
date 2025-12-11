@@ -73,7 +73,11 @@ export const Title = styled('cell-title')`
   white-space: nowrap;
 `;
 
-export const Tag = styled('tag')`
+export type TagProps = {
+  invert?: boolean;
+};
+
+export const Tag = styled('tag')<TagProps>`
   align-items: center;
   border-radius: ${half(dimensions.controlBase)};
   border: solid 1px ${colors.fontPrimary()};
@@ -83,6 +87,11 @@ export const Tag = styled('tag')`
   min-inline-size: ${multiply(dimensions.controlBase, '3')};
   overflow: hidden;
   padding-inline: ${dimensions.controlBase};
+
+  background-color: ${({ invert }) =>
+    invert ? colors.fontPrimary()() : 'transparent'};
+  color: ${({ invert }) =>
+    invert ? colors.backgroundPrimary()() : colors.fontPrimary()()};
 
   & > * {
     flex-shrink: 0;

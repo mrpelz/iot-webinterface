@@ -21,6 +21,11 @@ export const NonBreaking = styled('non-breaking')`
   white-space: nowrap;
 `;
 
+export const Pointer = styled('pointer')`
+  display: inline;
+  cursor: pointer;
+`;
+
 export const TabularNums = styled('tabular-nums')`
   display: contents;
   font-variant-numeric: tabular-nums;

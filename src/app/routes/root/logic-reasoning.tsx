@@ -1,9 +1,19 @@
 import { computed } from '@preact/signals';
 import { createContext, FunctionComponent } from 'preact';
-import { Dispatch, StateUpdater, useContext, useState } from 'preact/hooks';
+import {
+  Dispatch,
+  StateUpdater,
+  useContext,
+  useMemo,
+  useState,
+} from 'preact/hooks';
 
+import { Tag } from '../../components/controls.js';
 import { DiagnosticsContainer, Pre } from '../../components/diagnostics.js';
+import { HorizontalSwipe } from '../../components/horizontal-swipe.js';
 import { Tail } from '../../components/tail.js';
+import { Pointer } from '../../components/text.js';
+import { useArray } from '../../hooks/use-array-compare.js';
 import { useArrayStream } from '../../hooks/use-array-stream.js';
 import { useAbsoluteTimeLabel } from '../../hooks/use-time-label.js';
 import { $flags } from '../../util/flags.js';
@@ -11,7 +21,7 @@ import { Tokenize, Tokens } from '../../views/tokenize.js';
 import { getLogCursor, isLogs, Log } from './log.js';
 
 const matchHierarchyPath = new RegExp(
-  String.raw`(?:(?:[a-zA-Zß][a-zA-Z0-9ß]*\.)+[a-zA-Zß][a-zA-Z0-9ß]*)`,
+  String.raw`(?:(?:[a-zA-Zß][a-zA-Z0-9ß]*\.)+[a-zA-Zß][a-zA-Z0-9ß]*)(?= +)`,
   'm',
 );
 
@@ -38,16 +48,19 @@ const LogItem: FunctionComponent<{
 }> = ({ setHeadFilter }) => {
   const log = useContext(LogContext);
 
-  const [, { date: { epoch } = {}, body, head, level } = {}] = log ?? [];
+  const [, { date: { epoch } = {}, body, head } = {}] = log ?? [];
   const date = useAbsoluteTimeLabel(epoch ? new Date(epoch) : undefined);
 
   return (
     <>
       {date}:{' '}
       <a onClick={() => setHeadFilter((filter) => (filter ? undefined : head))}>
-        {head}
+        <Pointer>
+          <u>{head}</u>
+        </Pointer>
       </a>
-      {'\n'}[{level}] {body ? <Tokenize input={body} tokens={tokens} /> : null}
+      {'\n'}
+      {body ? <Tokenize input={body} tokens={tokens} /> : null}
       {'\n\n'}
     </>
   );
@@ -66,21 +79,49 @@ export const LogicReasoning: FunctionComponent = () => {
 
   const [headFilter, setHeadFilter] = useState<string>();
 
-  return (
-    <Tail>
-      <DiagnosticsContainer>
-        <Pre>
-          {logs.map((log) => {
-            if (headFilter && log[1].head !== headFilter) return null;
+  const heads = useArray(
+    useMemo(
+      () => Array.from(new Set(logs.map(([, { head }]) => head))).toSorted(),
+      [logs],
+    ),
+  );
 
-            return (
-              <LogContext.Provider value={log}>
-                <LogItem setHeadFilter={setHeadFilter} />
-              </LogContext.Provider>
-            );
-          })}
-        </Pre>
-      </DiagnosticsContainer>
-    </Tail>
+  return (
+    <>
+      <Tail>
+        <DiagnosticsContainer>
+          <Pre>
+            {logs.map((log) => {
+              if (headFilter !== undefined && log[1].head !== headFilter) {
+                return null;
+              }
+
+              return (
+                <LogContext.Provider value={log}>
+                  <LogItem setHeadFilter={setHeadFilter} />
+                </LogContext.Provider>
+              );
+            })}
+          </Pre>
+        </DiagnosticsContainer>
+      </Tail>
+      <HorizontalSwipe>
+        {heads.map((head) => (
+          <a
+            onClick={() =>
+              setHeadFilter((old) => (old === head ? undefined : head))
+            }
+          >
+            <Pointer>
+              <Tag invert={headFilter === head}>
+                {head.length > 0
+                  ? head.match(new RegExp(String.raw`[^\.]+$`))
+                  : '""'}
+              </Tag>
+            </Pointer>
+          </a>
+        ))}
+      </HorizontalSwipe>
+    </>
   );
 };

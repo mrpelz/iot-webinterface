@@ -18,6 +18,17 @@ export type Log = [
   },
 ];
 
+const logLevelNames = [
+  'EMERGENCY',
+  'ALERT',
+  'CRITICAL',
+  'ERROR',
+  'WARNING',
+  'NOTICE',
+  'INFO',
+  'DEBUG',
+];
+
 const LogItem: FunctionComponent<{ log: Log }> = ({ log }) => {
   const [, { date: { epoch } = {}, body, head, level } = {}] = log ?? [];
   const date = useAbsoluteTimeLabel(epoch ? new Date(epoch) : undefined);
@@ -26,7 +37,7 @@ const LogItem: FunctionComponent<{ log: Log }> = ({ log }) => {
     <>
       {date}: {head}
       {head}
-      {'\n'}[{level}] {body}
+      {'\n'}[{level ? (logLevelNames.at(level) ?? '') : ''}] {body}
       {'\n\n'}
     </>
   );
