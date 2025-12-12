@@ -16,5 +16,6 @@ export const staticStrings = {
     cssEnv('safe-area-inset-top'),
   ),
   translucent: cssVar('translucent', '20px'),
-  viewportHeight: '100vh',
+  viewportHeightLargest: '100lvh',
+  viewportHeightSmallest: '100svh',
 };

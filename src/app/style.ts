@@ -33,12 +33,17 @@ const staticDimensions = {
 
 const dynamicDimensions = {
   appHeight: subtract(
-    strings.viewportHeight,
+    strings.viewportHeightSmallest,
+    strings.safeAreaInsetTop,
+    staticDimensions.titlebarHeight,
+  ),
+  appHeightCover: subtract(
+    strings.viewportHeightLargest,
     strings.safeAreaInsetTop,
     staticDimensions.titlebarHeight,
   ),
   appHeightShiftDown: subtract(
-    strings.viewportHeight,
+    strings.viewportHeightSmallest,
     strings.safeAreaInsetTop,
     staticDimensions.titlebarHeight,
     staticDimensions.titlebarHeight,

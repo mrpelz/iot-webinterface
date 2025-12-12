@@ -9,7 +9,7 @@ export const Background = styled('background' as 'section', forwardRef)`
   display: contents;
 
   & > * {
-    block-size: ${dimensions.appHeight};
+    block-size: ${dimensions.appHeightCover};
     inline-size: ${dimensions.appWidth};
     inset-block-start: ${dimensions.headerHeight};
     object-fit: cover;

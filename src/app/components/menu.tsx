@@ -23,7 +23,7 @@ export const MenuShade = styled('menu-shade' as 'section', forwardRef)<{
   active: boolean;
 }>`
   background-color: black;
-  block-size: ${dimensions.appHeight};
+  block-size: ${dimensions.appHeightCover};
   content: '';
   display: block;
   inline-size: ${dimensions.appWidth};
