@@ -162,6 +162,18 @@ config.plugins = [
         ],
         test: new RegExp(`^${path.resolve(dirSrc, 'app/main.ts')}$`),
       },
+      {
+        operations: [
+          new ConcatOperation(
+            'start',
+            stripIndents`
+              self.__webpackServe__ = ${webpackServe ? 'true' : 'false'};
+
+            `,
+          ),
+        ],
+        test: new RegExp(`^${path.resolve(dirSrc, 'workers/sw.ts')}$`),
+      },
     ],
   }),
   new MiniCssExtractPlugin(),

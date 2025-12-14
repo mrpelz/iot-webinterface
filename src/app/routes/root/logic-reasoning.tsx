@@ -21,7 +21,7 @@ import { Tokenize, Tokens } from '../../views/tokenize.js';
 import { getLogCursor, isLogs, Log } from './log.js';
 
 const matchHierarchyPath = new RegExp(
-  String.raw`(?:(?:[a-zA-Zß][a-zA-Z0-9ß]*\.)+[a-zA-Zß][a-zA-Z0-9ß]*)(?= +)`,
+  String.raw`(?:(?:[a-zA-Zß][a-zA-Z0-9ß]*\.)+[a-zA-Zß][a-zA-Z0-9ß]*)(?=(?: |$)+)`,
   'm',
 );
 
@@ -56,7 +56,11 @@ const LogItem: FunctionComponent<{
       {date}:{' '}
       <a onClick={() => setHeadFilter((filter) => (filter ? undefined : head))}>
         <Pointer>
-          <u>{head}</u>
+          <u>
+            {head && head.length > 0
+              ? head.match(new RegExp(String.raw`[^\.]+$`))
+              : null}
+          </u>
         </Pointer>
       </a>
       {'\n'}
@@ -106,12 +110,13 @@ export const LogicReasoning: FunctionComponent = () => {
         </DiagnosticsContainer>
       </Tail>
       <HorizontalSwipe>
+        <a onClick={() => setHeadFilter(undefined)}>
+          <Pointer>
+            <Tag invert={headFilter === undefined}>✕</Tag>
+          </Pointer>
+        </a>
         {heads.map((head) => (
-          <a
-            onClick={() =>
-              setHeadFilter((old) => (old === head ? undefined : head))
-            }
-          >
+          <a onClick={() => setHeadFilter(head)}>
             <Pointer>
               <Tag invert={headFilter === head}>
                 {head.length > 0

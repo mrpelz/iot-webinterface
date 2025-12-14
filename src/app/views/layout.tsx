@@ -1,5 +1,5 @@
-import { FunctionComponent, JSX } from 'preact';
-import { useLayoutEffect, useMemo, useRef } from 'preact/hooks';
+import { createContext, FunctionComponent, JSX, RefObject } from 'preact';
+import { useContext, useLayoutEffect, useMemo, useRef } from 'preact/hooks';
 
 import { Aside, Header, Main } from '../components/layout.js';
 import { MenuShade } from '../components/menu.js';
@@ -15,6 +15,13 @@ import { SwipeBack } from './swipe-back.js';
 import { Titlebar } from './titlebar.js';
 
 export const swipeCaptureWidth = 30;
+
+const MainRefContext = createContext(
+  undefined as unknown as RefObject<HTMLElement>,
+);
+
+export const useMainRef = (): RefObject<HTMLElement> =>
+  useContext(MainRefContext);
 
 export const Layout: FunctionComponent = ({ children }) => {
   const isDesktop = useBreakpoint(getMediaQuery(dimensions.breakpointDesktop));
@@ -196,7 +203,9 @@ export const Layout: FunctionComponent = ({ children }) => {
         ref={mainRef}
         swipeCaptureWidth={swipeCaptureWidth}
       >
-        {children}
+        <MainRefContext.Provider value={mainRef}>
+          {children}
+        </MainRefContext.Provider>
         <MenuShade active={Boolean(isAsideVisible)} ref={menuShadeRef} />
       </Main>
     </>

@@ -27,6 +27,7 @@ import { useFetchText } from '../../hooks/use-fetch.js';
 import { useFirstTruthy } from '../../hooks/use-first-truthy.js';
 import { useLocalStorage } from '../../hooks/use-local-storage.js';
 import { api } from '../../main.js';
+import { webpackServe } from '../../reload.js';
 import {
   useIsInit,
   useIsWebSocketOnline,
@@ -409,12 +410,7 @@ export const Diagnostics: FunctionComponent = () => {
           <td>
             <b>webpackServe</b>
           </td>
-          <td>
-            {
-              // eslint-disable-next-line unicorn/prefer-global-this
-              useMemo(() => JSON.stringify(window.__webpackServe__), [])
-            }
-          </td>
+          <td>{useMemo(() => JSON.stringify(webpackServe), [])}</td>
         </tr>
 
         <tr>

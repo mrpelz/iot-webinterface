@@ -1,20 +1,20 @@
 import { styled } from 'goober';
 import { forwardRef } from 'preact/compat';
 
-import { colors, dimensions, strings } from '../style.js';
+import { colors, dimensions } from '../style.js';
 import { breakpointValue } from '../style/breakpoint.js';
-import { add, multiply } from '../style/dimensions.js';
+import { multiply } from '../style/dimensions.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
 
 export const Menu = styled('nav')<{ isVisible: boolean }>`
   background-color: ${colors.backgroundSecondary()};
-  block-size: ${dimensions.appHeight};
+  block-size: ${dimensions.appHeightCover};
   border-inline-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
   inline-size: ${dimensions.menuWidth};
   overflow-y: auto;
   overscroll-behavior-y: contain;
-  padding: ${dimensions.headerHeight} 0
-    ${add(dimensions.headerHeight, strings.safeAreaInsetBottom)};
+  padding-block: ${dimensions.titlebarHeight};
+  padding-inline: 0;
   pointer-events: ${dependentValue('isVisible', 'auto', 'none')};
   scroll-behavior: smooth;
 `;
@@ -49,7 +49,10 @@ export const MenuSubdivision = styled('li')`
   list-style: none;
   margin: 0;
   padding: 0;
-  margin-block-end: 1rem;
+
+  & + & {
+    margin-block-start: 1rem;
+  }
 `;
 
 export const MenuSubdivisionHeader = styled('h2')`

@@ -120,14 +120,16 @@ self.addEventListener('install', (event) =>
         NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG,
       ]);
 
-      self.registration
-        .showNotification('New Version Downloading', {
-          body: 'A new version is pre-cached for offline-use',
-          tag: NOTIFICATION_SERVICEWORKER_INSTALL_TAG,
-        })
-        .catch(() => {
-          // noop
-        });
+      if (!self.__webpackServe__) {
+        self.registration
+          .showNotification('New Version Downloading', {
+            body: 'A new version is pre-cached for offline-use',
+            tag: NOTIFICATION_SERVICEWORKER_INSTALL_TAG,
+          })
+          .catch(() => {
+            // noop
+          });
+      }
 
       await self.skipWaiting();
     })(),
@@ -151,7 +153,7 @@ self.addEventListener('activate', (event) =>
 
       const { updateUnattended } = await getFlags();
 
-      if (updateUnattended) {
+      if (updateUnattended || self.__webpackServe__) {
         await reload();
         return;
       }

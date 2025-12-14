@@ -3,15 +3,15 @@ import { forwardRef } from 'preact/compat';
 
 import { colors, dimensions, strings } from '../style.js';
 import { breakpointValue } from '../style/breakpoint.js';
-import { subtract } from '../style/dimensions.js';
+import { invert } from '../style/dimensions.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
 
 export const Header = styled('header')<{
   isVisible: boolean;
 }>`
   background-color: ${colors.backgroundSecondary()};
-  inline-size: 100%;
   inset-block-start: 0;
+  inset-inline-end: 0;
   inset-inline-start: 0;
   position: fixed;
   touch-action: none;
@@ -53,11 +53,9 @@ export const Main = styled('main', forwardRef)<{
   color: ${colors.fontPrimary()};
   display: flow-root;
   inline-size: ${dimensions.appWidth};
+  margin-block-end: ${invert(strings.safeAreaInsetBottom)};
   margin-block-start: ${dimensions.headerHeight};
-  min-block-size: ${subtract(
-    dimensions.appHeight,
-    strings.safeAreaInsetBottom,
-  )};
+  min-block-size: ${dimensions.appHeightCover};
   padding-block-end: ${strings.safeAreaInsetBottom};
   position: relative;
   scroll-behavior: smooth;

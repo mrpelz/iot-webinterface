@@ -1,13 +1,15 @@
 import { SharedWorkerSupported } from '@okikio/sharedworker';
 
-import { swProxy } from './sw.js';
+import { workbox } from './sw.js';
 import { $flags } from './util/flags.js';
 
 const RECONNECT_NOTIFIER = '3ee56e5f-2ddb-4c5e-81a1-8318e05cff72';
 
+// eslint-disable-next-line unicorn/prefer-global-this
+export const webpackServe = Boolean(window.__webpackServe__);
+
 export const init = (): void => {
-  // eslint-disable-next-line unicorn/prefer-global-this
-  if (!window.__webpackServe__) return;
+  if (!webpackServe) return;
 
   const notifier = new BroadcastChannel(RECONNECT_NOTIFIER);
 
@@ -44,7 +46,7 @@ export const init = (): void => {
 
       sessionStorage.setItem(RECONNECT_NOTIFIER, hash);
 
-      await swProxy?.removeRegistration();
+      await workbox?.update();
     }
   });
 };

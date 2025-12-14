@@ -57,7 +57,7 @@ export const Test: FunctionComponent = () => {
 
       <Margin>
         <JSONViewer
-          autoExpandPath={['a', 'b', 'c', 'd', 'e', 1]}
+          autoExpandPath={['a', 'b', 'c', 'd', 'e', 2]}
           rootLabel="Test"
           value={{
             a: {

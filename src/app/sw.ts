@@ -3,6 +3,7 @@ import { Remote, wrap } from 'comlink';
 import { Workbox } from 'workbox-window';
 
 import type { SW_API } from '../common/types.js';
+import { webpackServe } from './reload.js';
 import { $flags } from './util/flags.js';
 
 export const isProd = location.hostname.endsWith('wurstsalat.cloud');
@@ -25,8 +26,7 @@ export const registerServiceWorker = async (): Promise<void> => {
 
   swProxy = workbox ? wrap(await workbox.getSW()) : undefined;
 
-  // eslint-disable-next-line unicorn/prefer-global-this
-  if (window.__webpackServe__) return;
+  if (webpackServe) return;
 
   effect(() => {
     const interval = setInterval(
