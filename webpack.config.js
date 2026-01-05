@@ -3,14 +3,15 @@ import path from 'node:path';
 
 import {
   dirBase,
+  dirDist,
   dirSrc,
   webpackServe,
   // @ts-ignore
 } from '@mrpelz/boilerplate-dom/webpack.config.js';
 // @ts-ignore
 import configUpstream from '@mrpelz/boilerplate-preact/webpack.config.js';
+import CopyPlugin from 'copy-webpack-plugin';
 import { deepmerge } from 'deepmerge-ts';
-import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import { glob } from 'glob';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -181,10 +182,19 @@ config.plugins = [
     scriptLoading: 'module',
     template: path.resolve(dirSrc, 'common/main.html'),
   }),
-  new FaviconsWebpackPlugin({
-    logo: path.resolve(dirSrc, 'common/icon.svg'),
-    manifest: path.resolve(dirSrc, 'common/manifest.json'),
-    mode: 'webapp',
+  new CopyPlugin({
+    patterns: [
+      {
+        context: path.resolve(dirSrc, 'common'),
+        from: path.resolve(dirSrc, 'common/manifest.json'),
+        to: path.resolve(dirDist, 'main.webmanifest'),
+      },
+      {
+        context: path.resolve(dirSrc, 'common/icons'),
+        from: path.resolve(dirSrc, 'common/icons/*'),
+        to: path.resolve(dirDist, 'assets'),
+      },
+    ],
   }),
   (() => {
     const workboxPlugin = new InjectManifest({

@@ -1,9 +1,35 @@
 {
-  "background_color": "#000000",
-  "description": "wurstsalat IoT webinterface",
-  "display": "standalone",
   "name": "wurstsalat IoT",
   "short_name": "wurstsalat IoT",
+  "description": "wurstsalat IoT webinterface",
+  "icons": [
+    {
+      "src": "/assets/manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/manifest-icon-512.maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/manifest-icon-512.maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
   "start_url": "/",
-  "theme_color": "#000000"
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#000000"
 }
