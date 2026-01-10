@@ -33,7 +33,7 @@ export const Cell: FunctionComponent<CellProps> = ({
   >
     <Header>
       <Title>{title}</Title>
-      {icon && onClick ? icon : null}
+      {icon ?? null}
     </Header>
     {children}
   </CellComponent>

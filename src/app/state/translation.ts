@@ -1,4 +1,4 @@
-import { computed, ReadonlySignal, Signal, signal } from '@preact/signals';
+import { computed, ReadonlySignal, signal } from '@preact/signals';
 
 import {
   I18nTranslation,
@@ -10,7 +10,10 @@ import { universal } from '../i18n/universal.js';
 import { $flags } from '../util/flags.js';
 import { getCountry, getLanguage } from '../util/locale.js';
 import { AnySignal, callbackSignal, isSignal } from '../util/signal.js';
-import { capitalize as capitalizeUtil } from '../util/string.js';
+import {
+  camelCaseToWords,
+  capitalize as capitalizeUtil,
+} from '../util/string.js';
 
 const country = getCountry();
 const language = getLanguage();
@@ -67,14 +70,15 @@ export const getTranslationFallback = (
     | string
     | AnySignal<keyof I18nTranslation | string | undefined>,
 ): ReadonlySignal<string> => {
-  const $key_ = $key instanceof Signal ? $key : signal($key);
+  const $key_ =
+    typeof $key === 'object' && $key && 'brand' in $key ? $key : signal($key);
   const $result = getTranslation($key);
 
   return computed(() => {
     const { value } = $result;
 
     if (value) return value;
-    if ($key_.value) return `<${$key_.value}>`;
+    if ($key_.value) return camelCaseToWords($key_.value).join(' ');
 
     return '<[empty]>';
   });

@@ -1,5 +1,9 @@
 import { styled } from 'goober';
-import { ComponentChildren, FunctionComponent } from 'preact';
+import {
+  ComponentChildren,
+  FunctionComponent,
+  MouseEventHandler,
+} from 'preact';
 import { useMemo } from 'preact/hooks';
 
 import { useDelay } from '../hooks/use-delay.js';
@@ -8,6 +12,7 @@ import { usePrevious } from '../hooks/use-previous.js';
 export type BlendOverDirection = 'block' | 'inline';
 
 const BlendOverWrapper = styled('blend-over' as 'section')`
+  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'inherit')};
   display: grid;
   grid-template-areas: 'a';
   overflow: hidden;
@@ -46,6 +51,7 @@ export const BlendOver: FunctionComponent<{
   blendOver?: number;
   direction?: BlendOverDirection;
   invert?: boolean;
+  onClick?: MouseEventHandler<HTMLElement>;
   overlay?: ComponentChildren;
   transition?: boolean;
   transitionDurationOverride?: number;
@@ -54,6 +60,7 @@ export const BlendOver: FunctionComponent<{
   children,
   direction = 'inline',
   invert = false,
+  onClick,
   overlay,
   transition = true,
   transitionDurationOverride,
@@ -100,7 +107,7 @@ export const BlendOver: FunctionComponent<{
   );
 
   return (
-    <BlendOverWrapper>
+    <BlendOverWrapper onClick={onClick}>
       <BlendOverContentBase
         blendOver={blendOver}
         direction={direction}

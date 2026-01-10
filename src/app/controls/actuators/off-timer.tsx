@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Match, TExclude } from '@iot/iot-monolith/tree';
-import { FunctionComponent } from 'preact';
+import { FunctionComponent, MouseEventHandler } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../../common/types.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
+import { ForwardIcon } from '../../components/icons.js';
 import { TabularNums } from '../../components/text.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { useDelay } from '../../hooks/use-delay.js';
@@ -16,7 +17,7 @@ import {
 } from '../../hooks/use-time-label.js';
 import { I18nKey } from '../../i18n/main.js';
 import { useTypedCollector, useTypedEmitter } from '../../state/api.js';
-import { $rootPath } from '../../state/path.js';
+import { $rootPath, setSubPath } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
 import { Cell } from '../main.js';
 
@@ -35,6 +36,7 @@ export const TimerActuator: FunctionComponent<{
   title?: I18nKey;
 }> = ({ object, onClick, title }) => {
   const {
+    $id,
     $path,
     active: {
       cancel: { main: cancel },
@@ -63,14 +65,23 @@ export const TimerActuator: FunctionComponent<{
   const handleFlip = useTypedCollector(flip);
   const handleCancel = useTypedCollector(cancel);
 
-  const handleClick = useCallback(() => {
-    if (activeValue) {
-      handleCancel(null);
-      return;
-    }
+  const handleHeaderClick = useCallback(() => {
+    setSubPath($id);
+  }, [$id]);
 
-    handleFlip(null);
-  }, [activeValue, handleCancel, handleFlip]);
+  const handleBodyClick = useCallback<MouseEventHandler<HTMLElement>>(
+    (event) => {
+      event.stopPropagation();
+
+      if (activeValue) {
+        handleCancel(null);
+        return;
+      }
+
+      handleFlip(null);
+    },
+    [activeValue, handleCancel, handleFlip],
+  );
 
   const ColorBody = useColorBody(BodyLarge, String($path?.at(-1)));
 
@@ -95,12 +106,14 @@ export const TimerActuator: FunctionComponent<{
 
   return (
     <Cell
-      onClick={flip && !onClick ? handleClick : onClick}
+      icon={<ForwardIcon height="1em" />}
+      onClick={onClick ?? handleHeaderClick}
       title={<Translation i18nKey={name} capitalize={true} />}
     >
       <BlendOver
         blendOver={blendOver}
         invert={true}
+        onClick={handleBodyClick}
         transition={allowTransition && activeValue !== null}
         transitionDurationOverride={activeValue ? 1000 : 300}
         overlay={

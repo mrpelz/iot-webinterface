@@ -1,6 +1,6 @@
 import { Match, TExclude } from '@iot/iot-monolith/tree';
 import { ensureKeys } from '@mrpelz/misc-utils/oop';
-import { FunctionComponent } from 'preact';
+import { ButtonHTMLAttributes, FunctionComponent } from 'preact';
 import { useCallback, useRef } from 'preact/hooks';
 
 import { TSerialization } from '../../../common/types.js';
@@ -112,11 +112,27 @@ export const NullActuator: FunctionComponent<{
   );
 };
 
-export const NullActuatorButton: FunctionComponent<{
-  actuator: TNullActuator;
-}> = ({ actuator, children }) => {
+export const NullActuatorButton: FunctionComponent<
+  {
+    actuator:
+      | TNullActuator
+      | {
+          main: Match<
+            {
+              $: 'trigger';
+            },
+            TExclude,
+            TSerialization
+          >;
+        };
+  } & ButtonHTMLAttributes
+> = ({ actuator, children, ...rest }) => {
   const setter = api.$typedCollector(actuator.main);
   const handleClick = useCallback(() => setter?.(null), [setter]);
 
-  return <Button onClick={handleClick}>{children}</Button>;
+  return (
+    <Button onClick={handleClick} {...rest}>
+      {children}
+    </Button>
+  );
 };

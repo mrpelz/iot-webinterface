@@ -26,9 +26,9 @@ export const Cell = styled(GridCell)<CellProps>`
   )};
 
   color: ${colors.fontPrimary()};
+  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
   font-size: ${dimensions.fontSizeSmall};
   overflow: hidden;
-  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
 `;
 
 export const Header = styled('cell-header')`
