@@ -169,8 +169,8 @@ export const Room: FunctionComponent<{
                 <OpenSensor sensor={item} />
               ) : (
                 <BinarySensor
-                  negativeKey="allClosed"
-                  positiveKey="open"
+                  negativeKey={item.$ === 'motion' ? 'noMotion' : 'allClosed'}
+                  positiveKey={item.$ === 'motion' ? 'motion' : 'open'}
                   sensor={item}
                 />
               ),

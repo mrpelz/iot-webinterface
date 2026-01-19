@@ -208,6 +208,7 @@ const d = {
   nightstandLedLeft: `${s.night}${s.table} ${s.led} ${s.left}`,
   nightstandLedRight: `${s.night}${s.table} ${s.led} ${s.right}`,
   nightstandLeds: `${s.night}${s.table} ${p.leds}`,
+  noMotion: `${s.no} ${s.motion}`,
   offTimer: `${s.off} ${s.timer}`,
   persistPage: `${s.page} ${s.persist}`,
   r: s.red,

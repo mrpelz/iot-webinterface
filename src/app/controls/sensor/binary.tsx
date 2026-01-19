@@ -12,7 +12,7 @@ import { CellWithBody } from '../main.js';
 // @ts-ignore
 export type TBinarySensor = Match<
   {
-    $: 'input' | 'inputGrouping';
+    $: 'input' | 'inputGrouping' | 'motion';
   },
   TExclude,
   TSerialization
