@@ -2,66 +2,85 @@ import {
   DEFAULT_MATCH_DEPTH,
   excludePattern,
   Level,
+  levelObjectMatch,
 } from '@iot/iot-monolith/tree';
-import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { FunctionComponent } from 'preact';
-import { useMemo } from 'preact/hooks';
 
 import { LevelObject } from '../../api.js';
 import { Grid } from '../../components/grid.js';
-import { BinaryActuator } from '../../controls/actuators/binary.js';
-import { BrightnessActuator } from '../../controls/actuators/brightness.js';
-import { NullActuator } from '../../controls/actuators/null.js';
+import { Actuator } from '../../controls/actuators/main.js';
 import { Control } from '../../controls/main.js';
-import { BinarySensor } from '../../controls/sensor/binary.js';
-import { OpenSensor } from '../../controls/sensor/open.js';
-import { useArray } from '../../hooks/use-array-compare.js';
+import { Sensor } from '../../controls/sensor/main.js';
+import {
+  useArray,
+  useArrayExclude,
+  useArrayUnique,
+} from '../../hooks/use-array-compare.js';
+import { useExtractKey } from '../../hooks/use-ensure-keys.js';
+import { kitchenAdjacent$ } from '../../i18n/mapping.js';
 import { useMatch } from '../../state/api.js';
+import { $building } from '../../state/navigation.js';
 import { $subPath } from '../../state/path.js';
-import { deduplicate } from '../../util/deduplicate.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
 import { Translation } from '../../views/translation.js';
 import { SubPage } from '../sub/room/main.js';
 
 export const Room: FunctionComponent<{
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  properties: LevelObject[Level.PROPERTY][];
-}> = ({ children, properties }) => {
+  room: LevelObject[Level.ROOM];
+}> = ({ room }) => {
   const { value: subPath } = $subPath;
 
-  const security_ = useMatch(
-    { topic: 'security' as const },
-    excludePattern,
-    properties,
-    1,
-  );
+  const kitchenAdjacentProperties = useArray([
+    useExtractKey($building.value?.firstFloor, 'kitchenAdjacentBright'),
+    useExtractKey($building.value?.firstFloor, 'kitchenAdjacentChillax'),
+    useExtractKey($building.value?.firstFloor, 'kitchenAdjacentLights'),
+  ]);
 
-  const doors_ = useMatch(
-    { $: 'door' as const },
-    excludePattern,
-    properties,
-    1,
-  );
-
-  const scenes_ = useMatch(
-    { $: 'scene' as const },
-    excludePattern,
-    properties,
-    1,
-  );
-  const triggers_ = useMatch(
-    { $: 'triggerElement' as const },
-    excludePattern,
-    properties,
-    1,
-  );
-
-  const binaryLights_ = useArray(
+  const properties = useArrayUnique(
     [
+      useMatch(levelObjectMatch[Level.PROPERTY], excludePattern, room, 1),
+      kitchenAdjacent$.includes(room.$ as (typeof kitchenAdjacent$)[number])
+        ? kitchenAdjacentProperties
+        : [],
+    ].flat(),
+  );
+
+  const security = useArrayUnique(
+    [
+      useExtractKey(room, 'entryDoor'),
+      useExtractKey(room, 'door'),
+      useExtractKey(room, 'allWindows'),
+      useMatch({ $: 'window' as const }, excludePattern, properties, 1),
+      useExtractKey(room, 'motion'),
+    ].flat(),
+  );
+
+  const sensors = useArrayUnique(
+    [
+      useExtractKey(room, 'temperature'),
+      useExtractKey(room, 'humidity'),
+      useExtractKey(room, 'brightness'),
+      useExtractKey(room, 'co2'),
+      useExtractKey(room, 'tvoc'),
+      useExtractKey(room, 'pm10'),
+      useExtractKey(room, 'pm025'),
+      useExtractKey(room, 'uvIndex'),
+      useExtractKey(room, 'pressure'),
+    ].flat(),
+  );
+
+  const lights = useArrayUnique(
+    [
+      useExtractKey(room, 'allLights'),
       useMatch(
         { $: 'outputGrouping' as const, topic: 'lighting' as const },
+        excludePattern,
+        properties,
+        1,
+      ),
+      useMatch(
+        { $: 'ledGrouping' as const, topic: 'lighting' as const },
         excludePattern,
         properties,
         1,
@@ -72,81 +91,33 @@ export const Room: FunctionComponent<{
         properties,
         1,
       ),
-    ].flat(),
-  );
-  const brightnessLights_ = useArray(
-    [
-      useMatch({ $: 'ledGrouping' as const }, excludePattern, properties, 1),
-      useMatch({ $: 'led' as const }, excludePattern, properties, 1),
-    ].flat(),
-  );
-
-  const {
-    binaryLights,
-    brightnessLights,
-    doors,
-    otherProperties,
-    scenes,
-    security,
-    triggers,
-  } = useMemo(() => {
-    const [
-      /* eslint-disable @typescript-eslint/naming-convention */
-      security__,
-      doors__,
-      scenes__,
-      triggers__,
-      binaryLights__,
-      brightnessLights__,
-      /* eslint-enable @typescript-eslint/naming-convention */
-    ] = deduplicate([
-      security_,
-      doors_,
-      scenes_,
-      triggers_,
-      binaryLights_,
-      brightnessLights_,
-    ]);
-
-    const categorizedProperties = [
-      binaryLights__,
-      brightnessLights__,
-      doors__,
-      scenes__,
-      security__,
-      triggers__,
-    ].flat();
-
-    const remainingProperties = properties.filter(
-      (item) =>
-        !categorizedProperties.includes(
-          item as (typeof categorizedProperties)[number],
-        ),
-    ) as Exclude<
-      (typeof properties)[number],
-      (typeof categorizedProperties)[number]
-    >[];
-
-    return {
-      binaryLights: binaryLights__,
-      brightnessLights: brightnessLights__,
-      doors: doors__,
-      otherProperties: remainingProperties.toSorted((item) =>
-        ensureKeys(item, 'main').main?.$ === 'setter' ? -1 : 1,
+      useMatch(
+        { $: 'led' as const, topic: 'lighting' as const },
+        excludePattern,
+        properties,
+        1,
       ),
-      scenes: scenes__,
-      security: security__,
-      triggers: triggers__,
-    };
-  }, [
-    binaryLights_,
-    brightnessLights_,
-    doors_,
+    ].flat(),
+  );
+
+  const scenes = useArray(
+    [
+      useMatch({ $: 'scene' as const }, excludePattern, properties, 1),
+      useMatch({ $: 'triggerElement' as const }, excludePattern, properties, 1),
+    ].flat(),
+  );
+
+  const timers = useMatch(
+    { $: 'offTimer' as const },
+    excludePattern,
     properties,
-    scenes_,
-    security_,
-    triggers_,
-  ]);
+    1,
+  );
+
+  const rest = useArrayExclude(
+    properties,
+    [security, sensors, lights, scenes, timers].flat(),
+  );
 
   const [subRouteElement] = useMatch(
     { $id: subPath },
@@ -159,70 +130,57 @@ export const Room: FunctionComponent<{
     <SubRoute
       subRoute={subRouteElement ? <SubPage object={subRouteElement} /> : null}
     >
-      {children}
-
-      {security.length > 0 ? (
+      {security?.length ? (
         <Category header={<Translation capitalize={true} i18nKey="security" />}>
           <Grid>
-            {security.map((item) =>
-              'open' in item ? (
-                <OpenSensor sensor={item} />
-              ) : (
-                <BinarySensor
-                  negativeKey={item.$ === 'motion' ? 'noMotion' : 'allClosed'}
-                  positiveKey={item.$ === 'motion' ? 'motion' : 'open'}
-                  sensor={item}
-                />
-              ),
-            )}
+            {security.map((item) => (
+              <Sensor object={item} />
+            ))}
           </Grid>
         </Category>
       ) : null}
-
-      {doors.length > 0 ? (
-        <Category header={<Translation capitalize={true} i18nKey="doors" />}>
+      {sensors?.length ? (
+        <Category header={<Translation capitalize={true} i18nKey="sensors" />}>
           <Grid>
-            {doors.map((item) => (
-              <OpenSensor sensor={item} />
+            {sensors.map((item) => (
+              <Sensor object={item} />
             ))}
           </Grid>
         </Category>
       ) : null}
-
-      {scenes.length > 0 || triggers.length > 0 ? (
-        <Category header={<Translation capitalize={true} i18nKey="scenes" />}>
-          <Grid>
-            {scenes.map((scene) => (
-              <BinaryActuator actuator={scene} />
-            ))}
-            {triggers.map((trigger) => (
-              <NullActuator actuator={trigger} />
-            ))}
-          </Grid>
-        </Category>
-      ) : null}
-
-      {binaryLights.length > 0 || brightnessLights.length > 0 ? (
+      {lights?.length ? (
         <Category header={<Translation capitalize={true} i18nKey="lights" />}>
           <Grid>
-            {binaryLights.map((light) => (
-              <BinaryActuator actuator={light} />
-            ))}
-            {brightnessLights.map((light) => (
-              <BrightnessActuator actuator={light} />
+            {lights.map((item) => (
+              <Actuator object={item} />
             ))}
           </Grid>
         </Category>
       ) : null}
-
-      {otherProperties.length > 0 ? (
-        <Category header={<Translation capitalize={true} i18nKey="other" />}>
+      {scenes?.length ? (
+        <Category header={<Translation capitalize={true} i18nKey="scenes" />}>
           <Grid>
-            {otherProperties.map((item) => (
-              <Control object={item} />
+            {scenes.map((item) => (
+              <Actuator object={item} />
             ))}
           </Grid>
         </Category>
+      ) : null}
+      {timers?.length ? (
+        <Category header={<Translation capitalize={true} i18nKey="timers" />}>
+          <Grid>
+            {timers.map((item) => (
+              <Actuator object={item} />
+            ))}
+          </Grid>
+        </Category>
+      ) : null}
+      {rest?.length ? (
+        <Grid>
+          {rest.map((item) => (
+            <Control object={item} />
+          ))}
+        </Grid>
       ) : null}
     </SubRoute>
   );

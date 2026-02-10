@@ -21,7 +21,6 @@ export const measuredCategories = {
 } as const;
 
 export const kitchenAdjacent$ = [
-  'system',
   'hallway',
   'kitchen',
   'livingRoom',

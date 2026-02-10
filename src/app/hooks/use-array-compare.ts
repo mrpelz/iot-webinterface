@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 
-export const useArray = <E, T extends E[] | null>(value: T): T => {
+export const useArray = <E, T extends E[] | undefined>(value: T): T => {
   const [state, setState] = useState(value);
 
   useEffect(() => {
@@ -29,4 +29,32 @@ export const useArray = <E, T extends E[] | null>(value: T): T => {
   }, [value]);
 
   return state;
+};
+
+export const useArrayUnique = <E, T extends E[]>(
+  value: T | undefined,
+): Exclude<T[number], undefined>[] | undefined => {
+  const memoizedArray = useArray(value);
+
+  return useMemo(() => {
+    if (!memoizedArray) return undefined;
+
+    return Array.from(new Set(memoizedArray)).filter(Boolean);
+  }, [memoizedArray]) as Exclude<T[number], undefined>[] | undefined;
+};
+
+export const useArrayExclude = <E, T extends E[]>(
+  value: T | undefined,
+  exclude: unknown[],
+): Exclude<T[number], undefined>[] | undefined => {
+  const memoizedArray = useArrayUnique(value);
+  const memoizedExclude = useArrayUnique(exclude);
+
+  return useMemo(
+    () =>
+      memoizedArray?.filter(
+        (item) => memoizedExclude && !memoizedExclude.includes(item),
+      ),
+    [memoizedArray, memoizedExclude],
+  ) as Exclude<T[number], undefined>[] | undefined;
 };

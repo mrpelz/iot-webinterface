@@ -1,57 +1,37 @@
 import {
+  DEFAULT_MATCH_DEPTH,
   excludePattern,
   Level,
   levelObjectMatch,
 } from '@iot/iot-monolith/tree';
 import { epochs } from '@mrpelz/modifiable-date';
-import { computed } from '@preact/signals';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
+import { Grid } from '../../components/grid.js';
 import { Hidden } from '../../components/hidden.js';
+import { Actuator } from '../../controls/actuators/main.js';
+import { Control } from '../../controls/main.js';
+import { Sensor } from '../../controls/sensor/main.js';
+import {
+  useArray,
+  useArrayExclude,
+  useArrayUnique,
+} from '../../hooks/use-array-compare.js';
+import { useExtractKey } from '../../hooks/use-ensure-keys.js';
 import {
   nextDayIncrement,
   useTimeIncrement,
 } from '../../hooks/use-time-label.js';
-import { api } from '../../main.js';
-import { $building, $floors, $home, $root } from '../../state/navigation.js';
+import { useMatch } from '../../state/api.js';
+import { $building, $home, $root } from '../../state/navigation.js';
+import { $subPath } from '../../state/path.js';
 import { $flags } from '../../util/flags.js';
+import { Category } from '../../views/category.js';
 import { HallwayStream } from '../../views/hallway-stream.js';
-import { Room } from './room.js';
-
-const $rootProperties = computed(() =>
-  api.match(levelObjectMatch[Level.PROPERTY], excludePattern, $root.value, 1),
-);
-
-const $homeProperties = computed(() =>
-  api.match(levelObjectMatch[Level.PROPERTY], excludePattern, $home.value, 1),
-);
-
-const $buildingProperties = computed(() =>
-  api.match(
-    levelObjectMatch[Level.PROPERTY],
-    excludePattern,
-    $building.value,
-    1,
-  ),
-);
-
-const $floorProperties = computed(() =>
-  $floors.value?.flatMap((floor) =>
-    api.match(levelObjectMatch[Level.PROPERTY], excludePattern, floor, 1),
-  ),
-);
-
-const $properties = computed(() =>
-  [
-    $rootProperties.value,
-    $homeProperties.value,
-    $buildingProperties.value,
-    $floorProperties.value,
-  ]
-    .flat()
-    .filter((item): item is Exclude<typeof item, undefined> => Boolean(item)),
-);
+import { SubRoute } from '../../views/route.js';
+import { Translation } from '../../views/translation.js';
+import { SubPage } from '../sub/room/main.js';
 
 const cheesyDevQuotes = [
   'Today’s reminder: Kubernetes still doesn’t care about your feelings.',
@@ -463,12 +443,151 @@ export const Global: FunctionComponent = () => {
     [dayInYear],
   );
 
+  const { value: subPath } = $subPath;
+
+  const properties = useArrayUnique(
+    [
+      useMatch(
+        levelObjectMatch[Level.PROPERTY],
+        excludePattern,
+        $root.value,
+        1,
+      ),
+      useMatch(
+        levelObjectMatch[Level.PROPERTY],
+        excludePattern,
+        $home.value,
+        1,
+      ),
+      useMatch(
+        levelObjectMatch[Level.PROPERTY],
+        excludePattern,
+        $building.value,
+        1,
+      ),
+      useExtractKey($building.value?.firstFloor, 'kitchenAdjacentBright'),
+      useExtractKey($building.value?.firstFloor, 'kitchenAdjacentChillax'),
+      useExtractKey($building.value?.firstFloor, 'kitchenAdjacentLights'),
+    ].flat(),
+  );
+
+  const security = useArrayUnique([
+    useExtractKey($building.value, 'entryDoor'),
+    useExtractKey($root.value, 'allWindows'),
+    useExtractKey($root.value, 'allMotion'),
+  ]);
+
+  // security?.at(0)?.topic
+
+  const lights = useArrayUnique(
+    [
+      useExtractKey($root.value, 'allLights'),
+      useMatch(
+        { $: 'outputGrouping' as const, topic: 'lighting' as const },
+        excludePattern,
+        properties,
+        1,
+      ),
+      useMatch(
+        { $: 'ledGrouping' as const, topic: 'lighting' as const },
+        excludePattern,
+        properties,
+        1,
+      ),
+      useMatch(
+        { $: 'output' as const, topic: 'lighting' as const },
+        excludePattern,
+        properties,
+        1,
+      ),
+      useMatch(
+        { $: 'led' as const, topic: 'lighting' as const },
+        excludePattern,
+        properties,
+        1,
+      ),
+    ].flat(),
+  );
+
+  const scenes = useArray(
+    [
+      useMatch({ $: 'scene' as const }, excludePattern, properties, 1),
+      useMatch({ $: 'triggerElement' as const }, excludePattern, properties, 1),
+    ].flat(),
+  );
+
+  const timers = useMatch(
+    { $: 'offTimer' as const },
+    excludePattern,
+    properties,
+    1,
+  );
+
+  const rest = useArrayExclude(
+    properties,
+    [security, lights, scenes, timers].flat(),
+  );
+
+  const [subRouteElement] = useMatch(
+    { $id: subPath },
+    excludePattern,
+    properties,
+    (subPath ? undefined : -1) as typeof DEFAULT_MATCH_DEPTH,
+  );
+
   return (
-    <>
-      <Hidden>{cheesyDevQuote}</Hidden>
-      <Room properties={$properties.value}>
+    <SubRoute
+      subRoute={subRouteElement ? <SubPage object={subRouteElement} /> : null}
+    >
+      <>
+        <Hidden>{cheesyDevQuote}</Hidden>
         {$flags.hallwayStreamEnable.value ? <HallwayStream /> : null}
-      </Room>
-    </>
+        {security?.length ? (
+          <Category
+            header={<Translation capitalize={true} i18nKey="security" />}
+          >
+            <Grid>
+              {security.map((item) => (
+                <Sensor object={item} />
+              ))}
+            </Grid>
+          </Category>
+        ) : null}
+        {lights?.length ? (
+          <Category header={<Translation capitalize={true} i18nKey="lights" />}>
+            <Grid>
+              {lights.map((item) => (
+                <Actuator object={item} />
+              ))}
+            </Grid>
+          </Category>
+        ) : null}
+        {scenes?.length ? (
+          <Category header={<Translation capitalize={true} i18nKey="scenes" />}>
+            <Grid>
+              {scenes.map((item) => (
+                <Actuator object={item} />
+              ))}
+            </Grid>
+          </Category>
+        ) : null}
+        {timers?.length ? (
+          <Category header={<Translation capitalize={true} i18nKey="timers" />}>
+            <Grid>
+              {timers.map((item) => (
+                <Actuator object={item} />
+              ))}
+            </Grid>
+          </Category>
+        ) : null}
+        {rest?.length ? (
+          <Grid>
+            {rest.map((item) => (
+              <Control object={item} />
+            ))}
+          </Grid>
+        ) : null}
+      </>
+    </SubRoute>
   );
 };

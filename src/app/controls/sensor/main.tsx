@@ -17,7 +17,17 @@ export const Sensor: FunctionComponent<{
   switch (object.$) {
     case 'input':
     case 'inputGrouping': {
-      return <BinarySensor sensor={object} onClick={onClick} title={title} />;
+      return object.topic === 'open' ? (
+        <BinarySensor
+          sensor={object}
+          onClick={onClick}
+          title={title}
+          negativeKey="closed"
+          positiveKey="open"
+        />
+      ) : (
+        <BinarySensor sensor={object} onClick={onClick} title={title} />
+      );
     }
     case 'door':
     case 'window': {

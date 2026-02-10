@@ -1,16 +1,8 @@
-import {
-  excludePattern,
-  Level,
-  levelObjectMatch,
-} from '@iot/iot-monolith/tree';
 import { computed } from '@preact/signals';
 import { ComponentChildren, FunctionComponent } from 'preact';
-import { useMemo } from 'preact/hooks';
 
 import { ShowHide } from '../components/show-hide.js';
 import { useScrollRestore } from '../hooks/use-scroll-restore.js';
-import { kitchenAdjacent$ } from '../i18n/mapping.js';
-import { api } from '../main.js';
 import { Devices } from '../routes/root/devices.js';
 import { Diagnostics } from '../routes/root/diagnostics.js';
 import { Global } from '../routes/root/global.js';
@@ -20,68 +12,29 @@ import { Room } from '../routes/root/room.js';
 import { Settings } from '../routes/root/settings.js';
 import { Test } from '../routes/root/test-route.js';
 import { noBackground, useBackgroundOverride } from '../state/background.js';
-import { $building, $room, $staticPage } from '../state/navigation.js';
+import { $room, $rooms, $staticPage } from '../state/navigation.js';
 
-const $roomProperties = computed(() =>
-  api.match(levelObjectMatch[Level.PROPERTY], excludePattern, $room.value, 1),
-);
-
-const $kitchenAdjacent = computed(() => {
-  if (
-    !kitchenAdjacent$.includes(
-      $room.value?.$ as (typeof kitchenAdjacent$)[number],
-    )
-  ) {
-    return [];
-  }
-
-  return [
-    api.match(
-      { $: 'outputGrouping' as const, topic: 'lighting' as const },
-      excludePattern,
-      $building.value,
-      2,
-    ),
-    api.match({ $: 'scene' as const }, excludePattern, $building.value, 2),
-    api.match(
-      { $: 'triggerElement' as const },
-      excludePattern,
-      $building.value,
-      2,
-    ),
-  ].flat();
-});
-
-const $properties = computed(() =>
-  [$roomProperties.value, $kitchenAdjacent.value]
-    .flat()
-    .filter((item): item is Exclude<typeof item, undefined> => Boolean(item)),
-);
-
-export const RootRoute: FunctionComponent = () => {
-  const { value: staticPage } = $staticPage;
-  const { value: room } = $room;
-
-  return useMemo(() => {
-    if (staticPage) {
-      return {
-        devices: <Devices />,
-        diagnostics: <Diagnostics />,
-        global: <Global />,
-        log: <Log />,
-        logicReasoning: <LogicReasoning />,
-        map: <Test />,
-        settings: <Settings />,
-      }[staticPage];
-    }
-
-    if (room) {
-      return <Room properties={$properties.value} />;
-    }
-
-    return null;
-  }, [room, staticPage]);
-};
+export const RootRoute: FunctionComponent = () =>
+  computed(() =>
+    [
+      <ShowHide show={$staticPage.value === 'devices'}>
+        <Devices />
+      </ShowHide>,
+      $staticPage.value === 'diagnostics' ? <Diagnostics /> : null,
+      <ShowHide show={$staticPage.value === 'global'}>
+        <Global />
+      </ShowHide>,
+      $staticPage.value === 'log' ? <Log /> : null,
+      $staticPage.value === 'logicReasoning' ? <LogicReasoning /> : null,
+      $staticPage.value === 'map' ? <Test /> : null,
+      $staticPage.value === 'settings' ? <Settings /> : null,
+      $rooms.value?.map((room) => (
+        <ShowHide show={room === $room.value}>
+          <Room room={room} />
+        </ShowHide>
+      )),
+    ].flat(),
+  );
 
 export const SubRoute: FunctionComponent<{
   blackOut?: boolean;
