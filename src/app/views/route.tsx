@@ -17,22 +17,28 @@ import { $room, $rooms, $staticPage } from '../state/navigation.js';
 export const RootRoute: FunctionComponent = () =>
   computed(() =>
     [
-      <ShowHide show={$staticPage.value === 'devices'}>
-        <Devices />
-      </ShowHide>,
-      $staticPage.value === 'diagnostics' ? <Diagnostics /> : null,
       <ShowHide show={$staticPage.value === 'global'}>
         <Global />
       </ShowHide>,
-      $staticPage.value === 'log' ? <Log /> : null,
-      $staticPage.value === 'logicReasoning' ? <LogicReasoning /> : null,
-      $staticPage.value === 'map' ? <Test /> : null,
-      $staticPage.value === 'settings' ? <Settings /> : null,
+      <ShowHide show={$staticPage.value === 'map'}>
+        <Test />
+      </ShowHide>,
       $rooms.value?.map((room) => (
         <ShowHide show={room === $room.value}>
           <Room room={room} />
         </ShowHide>
       )),
+      <ShowHide show={$staticPage.value === 'devices'}>
+        <Devices />
+      </ShowHide>,
+      <ShowHide show={$staticPage.value === 'settings'}>
+        <Settings />
+      </ShowHide>,
+      <ShowHide show={$staticPage.value === 'diagnostics'}>
+        <Diagnostics />
+      </ShowHide>,
+      $staticPage.value === 'logicReasoning' ? <LogicReasoning /> : null,
+      $staticPage.value === 'log' ? <Log /> : null,
     ].flat(),
   );
 

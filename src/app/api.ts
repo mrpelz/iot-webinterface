@@ -11,16 +11,14 @@ import {
   InteractionReference,
   InteractionType,
 } from '@iot/iot-monolith/tree-serialization';
-import {
-  SharedWorkerPonyfill,
-  SharedWorkerSupported,
-} from '@okikio/sharedworker';
+import { SharedWorkerSupported } from '@okikio/sharedworker';
 import { computed, ReadonlySignal, signal } from '@preact/signals';
 import { Remote, wrap } from 'comlink';
 import { createStore, get, UseStore } from 'idb-keyval';
 
 import { API_WORKER_API, TSerialization } from '../common/types.js';
 import { readOnly } from './util/signal.js';
+import { isSafari } from './util/useragent.js';
 
 const WEB_API_UUID = 'c4218bec-e940-4d68-8807-5c43b2aee27b';
 const OBSERVE_NOTIFIER = 'c3a428eb-544e-4d11-927d-4aefcd81210c';
@@ -70,25 +68,21 @@ export class Api {
 
   constructor() {
     this._api = wrap(
-      SharedWorkerSupported
-        ? new SharedWorkerPonyfill(
-            new SharedWorker(
-              new URL(
-                '../workers/api.js',
-                import.meta.url,
-              ) /* webpackChunkName: 'api' */,
-              { name: 'api' },
-            ),
+      SharedWorkerSupported && !isSafari
+        ? new SharedWorker(
+            new URL(
+              '../workers/api.js',
+              import.meta.url,
+            ) /* webpackChunkName: 'api' */,
+            { name: 'api' },
           ).port
-        : new SharedWorkerPonyfill(
-            new Worker(
-              new URL(
-                '../workers/api.js',
-                import.meta.url,
-              ) /* webpackChunkName: 'api' */,
-              { name: 'api' },
-            ),
-          ).port,
+        : new Worker(
+            new URL(
+              '../workers/api.js',
+              import.meta.url,
+            ) /* webpackChunkName: 'api' */,
+            { name: 'api' },
+          ),
     );
 
     const { promise, resolve } = Promise.withResolvers<void>();
@@ -106,7 +100,6 @@ export class Api {
       },
       this._stateStore,
     );
-    this._api.init();
 
     const $isWebsocketOnline = signal(false);
     this.$isWebsocketOnline = readOnly($isWebsocketOnline);
@@ -120,6 +113,8 @@ export class Api {
       () => ($isWebsocketOnline.value = false),
       this._stateStore,
     );
+
+    this._api.init();
   }
 
   private async _setNotifierReaction<T>(

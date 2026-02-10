@@ -2,6 +2,7 @@ import { SharedWorkerSupported } from '@okikio/sharedworker';
 
 import { workbox } from './sw.js';
 import { $flags } from './util/flags.js';
+import { isSafari } from './util/useragent.js';
 
 const RECONNECT_NOTIFIER = '3ee56e5f-2ddb-4c5e-81a1-8318e05cff72';
 
@@ -13,7 +14,7 @@ export const init = (): void => {
 
   const notifier = new BroadcastChannel(RECONNECT_NOTIFIER);
 
-  if (SharedWorkerSupported) {
+  if (SharedWorkerSupported && !isSafari) {
     // eslint-disable-next-line no-new
     new SharedWorker(
       new URL(
