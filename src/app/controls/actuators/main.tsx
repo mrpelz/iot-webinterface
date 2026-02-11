@@ -2,6 +2,7 @@ import { FunctionComponent } from 'preact';
 
 import { AnyObject } from '../../api.js';
 import { I18nKey } from '../../i18n/main.js';
+import { AutomatedInputLogic } from './automated-input-logic.js';
 import { BinaryActuator } from './binary.js';
 import { BrightnessActuator } from './brightness.js';
 import { NullActuator } from './null.js';
@@ -48,6 +49,9 @@ export const Actuator: FunctionComponent<{
     case 'offTimer': {
       return <TimerActuator object={object} onClick={onClick} />;
     }
+    // case 'automatedInputLogic': {
+    //   return <AutomatedInputLogic object={object} onClick={onClick} />;
+    // }
     default: {
       return null;
     }

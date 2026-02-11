@@ -19,8 +19,8 @@ import {
   Title,
   Titlebar as TitlebarComponent,
 } from '../components/titlebar.js';
+import { useIsWebSocketOnline } from '../hooks/use-api.js';
 import { useAwaitEvent } from '../hooks/use-await-event.js';
-import { useIsWebSocketOnline } from '../state/api.js';
 import { flipMenuVisible } from '../state/menu.js';
 import {
   $isRoot,

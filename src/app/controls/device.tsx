@@ -14,8 +14,8 @@ import {
   XIcon,
 } from '../components/icons.js';
 import { TabularNums } from '../components/text.js';
+import { useTypedEmitter } from '../hooks/use-api.js';
 import { useTimeLabel } from '../hooks/use-time-label.js';
-import { useTypedEmitter } from '../state/api.js';
 import { $theme } from '../state/theme.js';
 import { CellWithBody } from './main.js';
 

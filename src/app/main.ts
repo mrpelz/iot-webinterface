@@ -8,6 +8,8 @@ import { iOSHoverStyles, iOSScrollToTop } from './util/ios-fixes.js';
 import { requestNotificationPermission } from './util/notifications.js';
 import { persist } from './util/storage.js';
 
+export const id = crypto.randomUUID();
+
 export const api = new Api();
 
 try {

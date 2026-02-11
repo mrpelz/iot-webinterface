@@ -13,11 +13,11 @@ import { ReadonlySignal } from '@preact/signals';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../common/types.js';
-import { useArray } from '../hooks/use-array-compare.js';
-import { useHookDebug } from '../hooks/use-hook-debug.js';
-import { usePromise, usePromisify } from '../hooks/use-promise.js';
-import { useAbortableSignalFactory } from '../hooks/use-signal.js';
 import { api } from '../main.js';
+import { useArray } from './use-array-compare.js';
+import { useHookDebug } from './use-hook-debug.js';
+import { usePromise, usePromisify } from './use-promise.js';
+import { useAbortableSignalFactory } from './use-signal.js';
 
 export const useCollector = <
   T extends InteractionReference<string, InteractionType.COLLECT>,

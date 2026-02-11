@@ -19,13 +19,13 @@ import {
   ColorLabel,
   RGBBody,
 } from '../../components/rgb-actuator.js';
+import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { useColorPicker } from '../../hooks/use-color-picker.js';
 import { useDelay } from '../../hooks/use-delay.js';
 import { useSwipe } from '../../hooks/use-swipe.js';
 import { useWheel } from '../../hooks/use-wheel.js';
 import { I18nKey } from '../../i18n/main.js';
-import { useTypedCollector, useTypedEmitter } from '../../state/api.js';
 import { $rootPath } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
 import { Cell } from '../main.js';
@@ -147,38 +147,4 @@ export const RGBActuator: FunctionComponent<{
   actuator: TRGBActuator;
   onClick?: () => void;
   title?: I18nKey;
-}> = ({ actuator, onClick, title }) => {
-  return null;
-
-  const rBrightness = useTypedEmitter(actuator.r.brightness).value;
-  const rSetBrightness = useTypedCollector(actuator.r.brightness);
-
-  const gBrightness = useTypedEmitter(actuator.g.brightness).value;
-  const gSetBrightness = useTypedCollector(actuator.g.brightness);
-
-  const bBrightness = useTypedEmitter(actuator.b.brightness).value;
-  const bSetBrightness = useTypedCollector(actuator.b.brightness);
-
-  const [focus, colorPicker] = useColorPicker(
-    useMemo(() => [rBrightness, rSetBrightness], [rBrightness, rSetBrightness]),
-    useMemo(() => [gBrightness, gSetBrightness], [gBrightness, gSetBrightness]),
-    useMemo(() => [bBrightness, bSetBrightness], [bBrightness, bSetBrightness]),
-  );
-
-  return (
-    <Cell
-      icon={<ColorIcon height="1em" />}
-      onClick={onClick || focus}
-      title={
-        <>
-          {colorPicker}
-          <Translation i18nKey={title || 'lighting'} capitalize={true} />
-        </>
-      }
-    >
-      <Color base={BodyDisableRoundedCorners} actuator={actuator.r} />
-      <Color base={BodyDisableRoundedCorners} actuator={actuator.g} />
-      <Color actuator={actuator.b} />
-    </Cell>
-  );
-};
+}> = ({ actuator, onClick, title }) => null;

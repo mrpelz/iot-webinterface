@@ -3,8 +3,8 @@ import { FunctionComponent } from 'preact';
 
 import { TSerialization } from '../../../common/types.js';
 import { Tag } from '../../components/controls.js';
+import { useTypedEmitter } from '../../hooks/use-api.js';
 import { I18nKey } from '../../i18n/main.js';
-import { useTypedEmitter } from '../../state/api.js';
 import { Translation } from '../../views/translation.js';
 import { CellWithBody } from '../main.js';
 

@@ -57,10 +57,10 @@ export const Control: FunctionComponent<{
 }> = ({ object, onClick, title }) => {
   if (!('$' in object)) return null;
 
-  return (
-    <>
-      <Sensor object={object} onClick={onClick} title={title} />
-      <Actuator object={object} onClick={onClick} title={title} />
-    </>
-  );
+  // eslint-disable-next-line new-cap
+  const sensor = Sensor({ object, onClick, title });
+  // eslint-disable-next-line new-cap
+  const actuator = Actuator({ object, onClick, title });
+
+  return sensor ?? actuator ?? null;
 };

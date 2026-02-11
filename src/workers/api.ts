@@ -52,7 +52,10 @@ class Api implements API_WORKER_API {
   }
 
   private readonly _init: Promise<void>;
-  private readonly _notifier = new BroadcastChannel(OBSERVE_NOTIFIER);
+  private readonly _notifier = new BroadcastChannel(
+    `${OBSERVE_NOTIFIER}_${self.name}`,
+  );
+
   private readonly _stateStore = createStore('api_state', 'state');
   private readonly _valuesStore = createStore('api_values', 'values');
   private _webSocket: InstanceType<typeof ResilientWebSocket>;

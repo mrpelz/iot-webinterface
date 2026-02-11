@@ -3,22 +3,25 @@ import { createContext, FunctionComponent } from 'preact';
 import {
   Dispatch,
   StateUpdater,
+  useCallback,
   useContext,
+  useEffect,
   useMemo,
-  useState,
 } from 'preact/hooks';
 
 import { Tag } from '../../components/controls.js';
 import { DiagnosticsContainer, Pre } from '../../components/diagnostics.js';
 import { HorizontalSwipe } from '../../components/horizontal-swipe.js';
-import { Tail } from '../../components/tail.js';
+import { Separator, Tail } from '../../components/tail.js';
 import { Pointer } from '../../components/text.js';
 import { useArray } from '../../hooks/use-array-compare.js';
 import { useArrayStream } from '../../hooks/use-array-stream.js';
+import { useLocalStorage } from '../../hooks/use-local-storage.js';
 import { useAbsoluteTimeLabel } from '../../hooks/use-time-label.js';
+import { colors } from '../../style.js';
 import { $flags } from '../../util/flags.js';
 import { Tokenize, Tokens } from '../../views/tokenize.js';
-import { getLogCursor, isLogs, Log } from './log.js';
+import { getLogCursor, isLogs, Log, logSeparator } from './log.js';
 
 const matchHierarchyPath = new RegExp(
   String.raw`(?:(?:[a-zA-Zß][a-zA-Z0-9ß]*\.)+[a-zA-Zß][a-zA-Z0-9ß]*)(?=(?: |$)+)`,
@@ -79,13 +82,35 @@ const baseUrl = computed(
 );
 
 export const LogicReasoning: FunctionComponent = () => {
-  const logs = useArrayStream<Log>(baseUrl.value, isLogs, getLogCursor);
+  const { elements: logs, insert } = useArrayStream<Log | typeof logSeparator>(
+    baseUrl.value,
+    isLogs,
+    getLogCursor,
+  );
 
-  const [headFilter, setHeadFilter] = useState<string>();
+  const handleSeparatorClick = useCallback(() => {
+    if (logs.at(-1) === logSeparator) return;
+
+    insert(logSeparator);
+  }, [insert, logs]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => handleSeparatorClick(), []);
+
+  const [headFilter, setHeadFilter] = useLocalStorage<string>(
+    'logic-reasoning-header-filter',
+  );
 
   const heads = useArray(
     useMemo(
-      () => Array.from(new Set(logs.map(([, { head }]) => head))).toSorted(),
+      () =>
+        Array.from(
+          new Set(
+            logs
+              .filter((log) => log !== logSeparator)
+              .map(([, { head }]) => head),
+          ),
+        ).toSorted(),
       [logs],
     ),
   );
@@ -96,6 +121,10 @@ export const LogicReasoning: FunctionComponent = () => {
         <DiagnosticsContainer>
           <Pre>
             {logs.map((log) => {
+              if (log === logSeparator) {
+                return <Separator />;
+              }
+
               if (headFilter !== undefined && log[1].head !== headFilter) {
                 return null;
               }
@@ -110,6 +139,14 @@ export const LogicReasoning: FunctionComponent = () => {
         </DiagnosticsContainer>
       </Tail>
       <HorizontalSwipe>
+        <a onClick={handleSeparatorClick}>
+          <Pointer>
+            <Tag backgroundColor={colors.selection()()} invert>
+              {/* eslint-disable-next-line no-irregular-whitespace */}
+              insert separator
+            </Tag>
+          </Pointer>
+        </a>
         <a onClick={() => setHeadFilter(undefined)}>
           <Pointer>
             <Tag invert={headFilter === undefined}>✕</Tag>

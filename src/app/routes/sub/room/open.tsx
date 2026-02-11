@@ -3,12 +3,12 @@ import { useMemo } from 'preact/hooks';
 
 import { AlignRight, TabularNums } from '../../../components/text.js';
 import { TOpenSensor } from '../../../controls/sensor/open.js';
+import { useTypedEmitter } from '../../../hooks/use-api.js';
 import {
   useAbsoluteTimeLabel,
   useDateFromEpoch,
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
-import { useTypedEmitter } from '../../../state/api.js';
 import { useTitleOverride } from '../../../state/title.js';
 import { getTranslation } from '../../../state/translation.js';
 import { Entry, List } from '../../../views/list.js';

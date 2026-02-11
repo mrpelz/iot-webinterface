@@ -13,8 +13,8 @@ import { computed } from '@preact/signals';
 import { useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../../common/types.js';
+import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useTruthy } from '../../hooks/use-first-truthy.js';
-import { useTypedCollector, useTypedEmitter } from '../../state/api.js';
 import { Details, Inset, useIsOpen } from '../details.js';
 import {
   useGetObjectChildren,

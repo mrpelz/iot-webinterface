@@ -1,4 +1,4 @@
-import './state/api.js';
+import './hooks/use-api.js';
 import './state/background.js';
 import './state/focus.js';
 import './state/menu.js';

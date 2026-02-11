@@ -17,6 +17,7 @@ import { Remote, wrap } from 'comlink';
 import { createStore, get, UseStore } from 'idb-keyval';
 
 import { API_WORKER_API, TSerialization } from '../common/types.js';
+import { id } from './main.js';
 import { readOnly } from './util/signal.js';
 import { isSafari } from './util/useragent.js';
 
@@ -58,7 +59,7 @@ export type AnyObject = Match<object, TExclude, TSerialization, 15>;
 export class Api {
   private readonly _api: Remote<API_WORKER_API>;
   private _hierarchy?: TSerialization;
-  private readonly _notifier = new BroadcastChannel(OBSERVE_NOTIFIER);
+  private readonly _notifier: BroadcastChannel;
   private readonly _stateStore = createStore('api_state', 'state');
   private readonly _valuesStore = createStore('api_values', 'values');
 
@@ -67,6 +68,8 @@ export class Api {
   readonly isInit: Promise<void>;
 
   constructor() {
+    const workerName = SharedWorkerSupported && !isSafari ? 'api' : `api_${id}`;
+
     this._api = wrap(
       SharedWorkerSupported && !isSafari
         ? new SharedWorker(
@@ -74,16 +77,18 @@ export class Api {
               '../workers/api.js',
               import.meta.url,
             ) /* webpackChunkName: 'api' */,
-            { name: 'api' },
+            { name: workerName },
           ).port
         : new Worker(
             new URL(
               '../workers/api.js',
               import.meta.url,
             ) /* webpackChunkName: 'api' */,
-            { name: 'api' },
+            { name: workerName },
           ),
     );
+
+    this._notifier = new BroadcastChannel(`${OBSERVE_NOTIFIER}_${workerName}`);
 
     const { promise, resolve } = Promise.withResolvers<void>();
     this.isInit = promise;

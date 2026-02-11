@@ -74,13 +74,14 @@ export const Title = styled('cell-title')`
 `;
 
 export type TagProps = {
+  backgroundColor?: string;
   invert?: boolean;
 };
 
 export const Tag = styled('tag')<TagProps>`
   align-items: center;
   border-radius: ${half(dimensions.controlBase)};
-  border: solid 1px ${colors.fontPrimary()};
+  border: solid 1px currentColor;
   display: flex;
   flex-wrap: wrap;
   gap: ${dimensions.controlBase};
@@ -88,8 +89,8 @@ export const Tag = styled('tag')<TagProps>`
   overflow: hidden;
   padding-inline: ${dimensions.controlBase};
 
-  background-color: ${({ invert }) =>
-    invert ? colors.fontPrimary()() : 'transparent'};
+  background-color: ${({ backgroundColor, invert }) =>
+    backgroundColor ?? (invert ? colors.fontPrimary()() : 'transparent')};
   color: ${({ invert }) =>
     invert ? colors.backgroundPrimary()() : colors.fontPrimary()()};
 

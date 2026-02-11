@@ -8,10 +8,10 @@ import { Body } from '../../components/controls.js';
 import { Button } from '../../components/list.js';
 import { TriggerBody } from '../../components/null-actuator.js';
 import { Overlay } from '../../components/overlay.js';
+import { useTypedCollector } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { I18nKey } from '../../i18n/main.js';
 import { api } from '../../main.js';
-import { useTypedCollector } from '../../state/api.js';
 import { Translation } from '../../views/translation.js';
 import { Cell } from '../main.js';
 

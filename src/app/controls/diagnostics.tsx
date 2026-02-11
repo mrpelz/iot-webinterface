@@ -11,7 +11,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import { AnyObject } from '../api.js';
 import { Summary } from '../components/diagnostics.js';
-import { useCollector, useEmitter, useMatch } from '../state/api.js';
+import { useCollector, useEmitter, useMatch } from '../hooks/use-api.js';
 
 export const Details: FunctionComponent<{
   open?: boolean;

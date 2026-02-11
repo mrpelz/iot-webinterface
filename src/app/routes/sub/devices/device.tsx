@@ -7,12 +7,12 @@ import { Entry as EntryComponent } from '../../../components/list.js';
 import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
 import { NullActuatorButton } from '../../../controls/actuators/null.js';
 import { OfflineIcon, OnlineIcon, TDevice } from '../../../controls/device.js';
+import { useMatch, useTypedEmitter } from '../../../hooks/use-api.js';
 import {
   useAbsoluteTimeLabel,
   useDateFromEpoch,
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
-import { useMatch, useTypedEmitter } from '../../../state/api.js';
 import { useTitleOverride } from '../../../state/title.js';
 import { Entry, List } from '../../../views/list.js';
 
@@ -188,6 +188,7 @@ const DeviceHello: FunctionComponent<{ device: TDevice }> = ({ device }) => {
       wifiRssi,
       wifiPhyMode,
       wifiSsid,
+      dieTemp,
     ] = helloValue.split(',').map((element) => element || null);
 
     return (
@@ -197,6 +198,9 @@ const DeviceHello: FunctionComponent<{ device: TDevice }> = ({ device }) => {
         <DeviceDetail label="hardware name">{hardwareName}</DeviceDetail>
         <DeviceDetail label="chip ID">{chipId}</DeviceDetail>
         <DeviceDetail label="flash ID">{flashId}</DeviceDetail>
+        {!dieTemp || dieTemp === 'BYE' ? null : (
+          <DeviceDetail label="die temperature">{dieTemp}</DeviceDetail>
+        )}
         <DeviceDetail label="Ethernet MAC-address">
           {ethMacAddress}
         </DeviceDetail>

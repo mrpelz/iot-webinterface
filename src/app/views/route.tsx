@@ -12,35 +12,53 @@ import { Room } from '../routes/root/room.js';
 import { Settings } from '../routes/root/settings.js';
 import { Test } from '../routes/root/test-route.js';
 import { noBackground, useBackgroundOverride } from '../state/background.js';
+import { globalProperties } from '../state/global-properties.js';
 import { $room, $rooms, $staticPage } from '../state/navigation.js';
+import { roomProperties } from '../state/room-properties.js';
 
-export const RootRoute: FunctionComponent = () =>
-  computed(() =>
-    [
-      <ShowHide show={$staticPage.value === 'global'}>
-        <Global />
-      </ShowHide>,
-      <ShowHide show={$staticPage.value === 'map'}>
-        <Test />
-      </ShowHide>,
-      $rooms.value?.map((room) => (
-        <ShowHide show={room === $room.value}>
-          <Room room={room} />
-        </ShowHide>
-      )),
-      <ShowHide show={$staticPage.value === 'devices'}>
-        <Devices />
-      </ShowHide>,
-      <ShowHide show={$staticPage.value === 'settings'}>
-        <Settings />
-      </ShowHide>,
-      <ShowHide show={$staticPage.value === 'diagnostics'}>
-        <Diagnostics />
-      </ShowHide>,
-      $staticPage.value === 'logicReasoning' ? <LogicReasoning /> : null,
-      $staticPage.value === 'log' ? <Log /> : null,
-    ].flat(),
-  );
+export const RootRoute: FunctionComponent = () => {
+  const $globalProperties = globalProperties();
+
+  const $roomProperties = computed(() => {
+    const { value: rooms } = $rooms;
+    if (!rooms) return undefined;
+
+    return Object.fromEntries(
+      rooms.map((room) => [room.$, roomProperties(room)] as const),
+    ) as Record<(typeof rooms)[number]['$'], ReturnType<typeof roomProperties>>;
+  });
+
+  return computed(() => {
+    switch ($staticPage.value) {
+      case 'global': {
+        return <Global $properties={$globalProperties} />;
+      }
+      case 'map': {
+        return <Test />;
+      }
+      case 'devices': {
+        return <Devices />;
+      }
+      case 'settings': {
+        return <Settings />;
+      }
+      case 'diagnostics': {
+        return <Diagnostics />;
+      }
+      case 'logicReasoning': {
+        return <LogicReasoning />;
+      }
+      case 'log': {
+        return <Log />;
+      }
+      default: {
+        return $room.value && $roomProperties.value ? (
+          <Room $properties={$roomProperties.value[$room.value.$]} />
+        ) : null;
+      }
+    }
+  });
+};
 
 export const SubRoute: FunctionComponent<{
   blackOut?: boolean;

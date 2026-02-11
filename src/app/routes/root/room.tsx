@@ -1,123 +1,37 @@
-import {
-  DEFAULT_MATCH_DEPTH,
-  excludePattern,
-  Level,
-  levelObjectMatch,
-} from '@iot/iot-monolith/tree';
+import { DEFAULT_MATCH_DEPTH, excludePattern } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
+import { useMemo } from 'preact/hooks';
 
-import { LevelObject } from '../../api.js';
 import { Grid } from '../../components/grid.js';
 import { Actuator } from '../../controls/actuators/main.js';
 import { Control } from '../../controls/main.js';
 import { Sensor } from '../../controls/sensor/main.js';
-import {
-  useArray,
-  useArrayExclude,
-  useArrayUnique,
-} from '../../hooks/use-array-compare.js';
-import { useExtractKey } from '../../hooks/use-ensure-keys.js';
-import { kitchenAdjacent$ } from '../../i18n/mapping.js';
-import { useMatch } from '../../state/api.js';
-import { $building } from '../../state/navigation.js';
+import { useMatch } from '../../hooks/use-api.js';
+import { globalProperties } from '../../state/global-properties.js';
 import { $subPath } from '../../state/path.js';
+import { roomProperties } from '../../state/room-properties.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
 import { Translation } from '../../views/translation.js';
 import { SubPage } from '../sub/room/main.js';
 
 export const Room: FunctionComponent<{
-  room: LevelObject[Level.ROOM];
-}> = ({ room }) => {
+  $properties:
+    | ReturnType<typeof roomProperties>
+    | ReturnType<typeof globalProperties>;
+}> = ({
+  children,
+  $properties: {
+    value: { lights, properties, rest, scenes, security, sensors, timers },
+  },
+}) => {
+  const restControls = useMemo(
+    // eslint-disable-next-line new-cap
+    () => rest.map((object) => Control({ object })).filter(Boolean),
+    [rest],
+  );
+
   const { value: subPath } = $subPath;
-
-  const kitchenAdjacentProperties = useArray([
-    useExtractKey($building.value?.firstFloor, 'kitchenAdjacentBright'),
-    useExtractKey($building.value?.firstFloor, 'kitchenAdjacentChillax'),
-    useExtractKey($building.value?.firstFloor, 'kitchenAdjacentLights'),
-  ]);
-
-  const properties = useArrayUnique(
-    [
-      useMatch(levelObjectMatch[Level.PROPERTY], excludePattern, room, 1),
-      kitchenAdjacent$.includes(room.$ as (typeof kitchenAdjacent$)[number])
-        ? kitchenAdjacentProperties
-        : [],
-    ].flat(),
-  );
-
-  const security = useArrayUnique(
-    [
-      useExtractKey(room, 'entryDoor'),
-      useExtractKey(room, 'door'),
-      useExtractKey(room, 'allWindows'),
-      useMatch({ $: 'window' as const }, excludePattern, properties, 1),
-      useExtractKey(room, 'motion'),
-    ].flat(),
-  );
-
-  const sensors = useArrayUnique(
-    [
-      useExtractKey(room, 'temperature'),
-      useExtractKey(room, 'humidity'),
-      useExtractKey(room, 'brightness'),
-      useExtractKey(room, 'co2'),
-      useExtractKey(room, 'tvoc'),
-      useExtractKey(room, 'pm10'),
-      useExtractKey(room, 'pm025'),
-      useExtractKey(room, 'uvIndex'),
-      useExtractKey(room, 'pressure'),
-    ].flat(),
-  );
-
-  const lights = useArrayUnique(
-    [
-      useExtractKey(room, 'allLights'),
-      useMatch(
-        { $: 'outputGrouping' as const, topic: 'lighting' as const },
-        excludePattern,
-        properties,
-        1,
-      ),
-      useMatch(
-        { $: 'ledGrouping' as const, topic: 'lighting' as const },
-        excludePattern,
-        properties,
-        1,
-      ),
-      useMatch(
-        { $: 'output' as const, topic: 'lighting' as const },
-        excludePattern,
-        properties,
-        1,
-      ),
-      useMatch(
-        { $: 'led' as const, topic: 'lighting' as const },
-        excludePattern,
-        properties,
-        1,
-      ),
-    ].flat(),
-  );
-
-  const scenes = useArray(
-    [
-      useMatch({ $: 'scene' as const }, excludePattern, properties, 1),
-      useMatch({ $: 'triggerElement' as const }, excludePattern, properties, 1),
-    ].flat(),
-  );
-
-  const timers = useMatch(
-    { $: 'offTimer' as const },
-    excludePattern,
-    properties,
-    1,
-  );
-
-  const rest = useArrayExclude(
-    properties,
-    [security, sensors, lights, scenes, timers].flat(),
-  );
 
   const [subRouteElement] = useMatch(
     { $id: subPath },
@@ -130,7 +44,8 @@ export const Room: FunctionComponent<{
     <SubRoute
       subRoute={subRouteElement ? <SubPage object={subRouteElement} /> : null}
     >
-      {security?.length ? (
+      {children}
+      {security.length > 0 ? (
         <Category header={<Translation capitalize={true} i18nKey="security" />}>
           <Grid>
             {security.map((item) => (
@@ -139,7 +54,7 @@ export const Room: FunctionComponent<{
           </Grid>
         </Category>
       ) : null}
-      {sensors?.length ? (
+      {sensors.length > 0 ? (
         <Category header={<Translation capitalize={true} i18nKey="sensors" />}>
           <Grid>
             {sensors.map((item) => (
@@ -148,7 +63,7 @@ export const Room: FunctionComponent<{
           </Grid>
         </Category>
       ) : null}
-      {lights?.length ? (
+      {lights.length > 0 ? (
         <Category header={<Translation capitalize={true} i18nKey="lights" />}>
           <Grid>
             {lights.map((item) => (
@@ -157,7 +72,7 @@ export const Room: FunctionComponent<{
           </Grid>
         </Category>
       ) : null}
-      {scenes?.length ? (
+      {scenes.length > 0 ? (
         <Category header={<Translation capitalize={true} i18nKey="scenes" />}>
           <Grid>
             {scenes.map((item) => (
@@ -166,7 +81,7 @@ export const Room: FunctionComponent<{
           </Grid>
         </Category>
       ) : null}
-      {timers?.length ? (
+      {timers.length > 0 ? (
         <Category header={<Translation capitalize={true} i18nKey="timers" />}>
           <Grid>
             {timers.map((item) => (
@@ -175,12 +90,12 @@ export const Room: FunctionComponent<{
           </Grid>
         </Category>
       ) : null}
-      {rest?.length ? (
-        <Grid>
-          {rest.map((item) => (
-            <Control object={item} />
-          ))}
-        </Grid>
+      {restControls.length > 0 ? (
+        <Category
+          header={<Translation capitalize={true} i18nKey="miscellaneous" />}
+        >
+          <Grid>{restControls.map((item) => item)}</Grid>
+        </Category>
       ) : null}
     </SubRoute>
   );

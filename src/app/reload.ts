@@ -1,5 +1,6 @@
 import { SharedWorkerSupported } from '@okikio/sharedworker';
 
+import { id } from './main.js';
 import { workbox } from './sw.js';
 import { $flags } from './util/flags.js';
 import { isSafari } from './util/useragent.js';
@@ -12,7 +13,8 @@ export const webpackServe = Boolean(window.__webpackServe__);
 export const init = (): void => {
   if (!webpackServe) return;
 
-  const notifier = new BroadcastChannel(RECONNECT_NOTIFIER);
+  const workerName =
+    SharedWorkerSupported && !isSafari ? 'reload' : `reload_${id}`;
 
   if (SharedWorkerSupported && !isSafari) {
     // eslint-disable-next-line no-new
@@ -21,7 +23,7 @@ export const init = (): void => {
         '../workers/reload.js',
         import.meta.url,
       ) /* webpackChunkName: 'reload' */,
-      { name: 'reload' },
+      { name: workerName },
     );
   } else {
     // eslint-disable-next-line no-new
@@ -30,9 +32,11 @@ export const init = (): void => {
         '../workers/reload.js',
         import.meta.url,
       ) /* webpackChunkName: 'reload' */,
-      { name: 'reload' },
+      { name: workerName },
     );
   }
+
+  const notifier = new BroadcastChannel(`${RECONNECT_NOTIFIER}_${workerName}`);
 
   notifier.addEventListener('message', async ({ data }) => {
     const data_ = JSON.parse(data);

@@ -5,12 +5,12 @@ import { useMemo } from 'preact/hooks';
 import { TSerialization } from '../../../common/types.js';
 import { Tag, TagGroup } from '../../components/controls.js';
 import { NonBreaking, TabularNums } from '../../components/text.js';
+import { useTypedEmitter } from '../../hooks/use-api.js';
 import { I18nKey } from '../../i18n/main.js';
 import {
   defaultNumberFormat,
   measuredNumberFormats,
 } from '../../i18n/mapping.js';
-import { useTypedEmitter } from '../../state/api.js';
 import { $i18n } from '../../state/translation.js';
 import { Translation } from '../../views/translation.js';
 import { CellWithBody } from '../main.js';

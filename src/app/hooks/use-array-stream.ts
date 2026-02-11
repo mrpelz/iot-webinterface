@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useCallback, useEffect, useMemo, useState } from 'preact/hooks';
 
 export const INTERVAL = 1000;
 
@@ -7,10 +7,10 @@ export const useArrayStream = <T>(
   validate: (input: unknown[]) => boolean,
   getNextUrl: (input: T[], url: URL) => URL | undefined,
   interval = INTERVAL,
-): T[] => {
+): { elements: T[]; insert: (...elements_: T[]) => void } => {
   const baseUrl_ = useMemo(() => new URL(baseUrl), [baseUrl]);
 
-  const [elements, setElememts] = useState<T[]>([]);
+  const [elements, setElements] = useState<T[]>([]);
 
   useEffect(() => {
     const abort = new AbortController();
@@ -29,7 +29,7 @@ export const useArrayStream = <T>(
             !validate(newElements)
           ) {
             url = baseUrl_;
-            setElememts([]);
+            setElements([]);
 
             return;
           }
@@ -37,7 +37,7 @@ export const useArrayStream = <T>(
           const nextUrl = getNextUrl(newElements, url);
           if (nextUrl) {
             url = nextUrl;
-            setElememts((oldElements) => [oldElements, newElements].flat());
+            setElements((oldElements) => [oldElements, newElements].flat());
           }
         })
         .catch();
@@ -53,5 +53,11 @@ export const useArrayStream = <T>(
     };
   }, [baseUrl_, getNextUrl, interval, validate]);
 
-  return elements;
+  const insert = useCallback(
+    (...elements_: T[]) =>
+      setElements((oldElements) => [oldElements, elements_].flat()),
+    [],
+  );
+
+  return { elements, insert };
 };

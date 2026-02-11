@@ -1,11 +1,16 @@
 import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { computed } from '@preact/signals';
 import { FunctionComponent } from 'preact';
+import { useCallback, useEffect } from 'preact/hooks';
 
+import { Tag } from '../../components/controls.js';
 import { DiagnosticsContainer, Pre } from '../../components/diagnostics.js';
-import { Tail } from '../../components/tail.js';
+import { HorizontalSwipe } from '../../components/horizontal-swipe.js';
+import { Separator, Tail } from '../../components/tail.js';
+import { Pointer } from '../../components/text.js';
 import { useArrayStream } from '../../hooks/use-array-stream.js';
 import { useAbsoluteTimeLabel } from '../../hooks/use-time-label.js';
+import { colors } from '../../style.js';
 import { $flags } from '../../util/flags.js';
 
 export type Log = [
@@ -28,6 +33,8 @@ const logLevelNames = [
   'INFO',
   'DEBUG',
 ];
+
+export const logSeparator = Symbol('logSeparator');
 
 const LogItem: FunctionComponent<{ log: Log }> = ({ log }) => {
   const [, { date: { epoch } = {}, body, head, level } = {}] = log ?? [];
@@ -89,17 +96,46 @@ const baseUrl = computed(
 );
 
 export const Log: FunctionComponent = () => {
-  const logs = useArrayStream<Log>(baseUrl.value, isLogs, getLogCursor);
+  const { elements: logs, insert } = useArrayStream<Log | typeof logSeparator>(
+    baseUrl.value,
+    isLogs,
+    getLogCursor,
+  );
+
+  const handleSeparatorClick = useCallback(() => {
+    if (logs.at(-1) === logSeparator) return;
+
+    insert(logSeparator);
+  }, [insert, logs]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => handleSeparatorClick(), []);
 
   return (
-    <Tail>
-      <DiagnosticsContainer>
-        <Pre>
-          {logs.map((log) => (
-            <LogItem log={log} />
-          ))}
-        </Pre>
-      </DiagnosticsContainer>
-    </Tail>
+    <>
+      <Tail>
+        <DiagnosticsContainer>
+          <Pre>
+            {logs.map((log) => {
+              if (log === logSeparator) {
+                return <Separator />;
+              }
+
+              return <LogItem log={log} />;
+            })}
+          </Pre>
+        </DiagnosticsContainer>
+      </Tail>
+      <HorizontalSwipe>
+        <a onClick={handleSeparatorClick}>
+          <Pointer>
+            <Tag backgroundColor={colors.selection()()} invert>
+              {/* eslint-disable-next-line no-irregular-whitespace */}
+              insert separator
+            </Tag>
+          </Pointer>
+        </a>
+      </HorizontalSwipe>
+    </>
   );
 };

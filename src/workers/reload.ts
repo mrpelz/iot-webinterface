@@ -12,7 +12,7 @@ Object.defineProperty(globalThis, 'window', { value: self });
 const PATH_WS = '/ws';
 
 const RECONNECT_NOTIFIER = '3ee56e5f-2ddb-4c5e-81a1-8318e05cff72';
-const notifier = new BroadcastChannel(RECONNECT_NOTIFIER);
+const notifier = new BroadcastChannel(`${RECONNECT_NOTIFIER}_${self.name}`);
 
 (async () => {
   const { debug, apiBaseUrl } = await getFlags();

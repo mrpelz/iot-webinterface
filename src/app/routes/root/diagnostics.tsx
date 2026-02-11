@@ -23,16 +23,16 @@ import {
 } from '../../components/json-viewer/hierarchy-renderers.js';
 import { JSONViewer } from '../../components/json-viewer/main.js';
 import { Details, Properties } from '../../controls/diagnostics.js';
-import { useFetchText } from '../../hooks/use-fetch.js';
-import { useFirstTruthy } from '../../hooks/use-first-truthy.js';
-import { useLocalStorage } from '../../hooks/use-local-storage.js';
-import { api } from '../../main.js';
-import { webpackServe } from '../../reload.js';
 import {
   useIsInit,
   useIsWebSocketOnline,
   useWebSocketCount,
-} from '../../state/api.js';
+} from '../../hooks/use-api.js';
+import { useFetchText } from '../../hooks/use-fetch.js';
+import { useFirstTruthy } from '../../hooks/use-first-truthy.js';
+import { useLocalStorage } from '../../hooks/use-local-storage.js';
+import { api, id } from '../../main.js';
+import { webpackServe } from '../../reload.js';
 import { $isFocused } from '../../state/focus.js';
 import { $isMenuVisible } from '../../state/menu.js';
 import {
@@ -326,10 +326,10 @@ export const Diagnostics: FunctionComponent = () => {
     [],
   );
 
-  const [persistedPath, setPersistedPath] = useLocalStorage<PropertyKey[]>(
+  const [persistedPath_, setPersistedPath] = useLocalStorage<PropertyKey[]>(
     'diagnostics-hierarchy-path',
   );
-  const persistedPath_ = useFirstTruthy(persistedPath);
+  const persistedPath = useFirstTruthy(persistedPath_);
 
   const handlePathChange = useCallback(
     (paths: PropertyKey[][]) => {
@@ -368,6 +368,13 @@ export const Diagnostics: FunctionComponent = () => {
             <b>API-version</b>
           </td>
           <td>{useMemo(() => JSON.stringify(apiVersion), [apiVersion])}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>Instance ID</b>
+          </td>
+          <td>{computed(() => JSON.stringify(id))}</td>
         </tr>
 
         <tr>
@@ -507,7 +514,7 @@ export const Diagnostics: FunctionComponent = () => {
 
       {hierarchy ? (
         <JSONViewer
-          autoExpandPath={persistedPath_ ?? DEFAULT_PATH}
+          autoExpandPath={persistedPath ?? DEFAULT_PATH}
           handlePathChange={handlePathChange}
           renderers={jsonViewerRenderers}
           rootLabel="Hierarchy"

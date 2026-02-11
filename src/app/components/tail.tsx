@@ -1,9 +1,10 @@
 import { styled } from 'goober';
 import { FunctionComponent } from 'preact';
+import { forwardRef, useEffect, useRef } from 'preact/compat';
 
 import { colors, dimensions, strings } from '../style.js';
 
-const TailContainer = styled('tail' as 'section')`
+const TailContainer = styled('tail' as 'section', forwardRef)`
   background-color: ${colors.backgroundSecondary()};
   block-size: 100%;
   display: flex;
@@ -15,8 +16,23 @@ const TailContainer = styled('tail' as 'section')`
   position: absolute;
 `;
 
-export const Tail: FunctionComponent = ({ children }) => (
-  <TailContainer>
-    <div>{children}</div>
-  </TailContainer>
-);
+export const Tail: FunctionComponent = ({ children }) => {
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    ref.current?.scrollTo({ behavior: 'smooth', top: 0 });
+  }, [children]);
+
+  return (
+    <TailContainer ref={ref}>
+      <div>{children}</div>
+    </TailContainer>
+  );
+};
+
+export const Separator = styled('separator' as 'section')`
+  background-color: ${colors.selection()};
+  block-size: ${dimensions.hairline};
+  display: block;
+  inline-size: 100%;
+`;
