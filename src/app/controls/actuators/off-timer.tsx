@@ -60,7 +60,7 @@ export const TimerActuator: FunctionComponent<{
   const [, fraction] = useTimeSpan(triggerTimeDate, runoutTimeDate);
 
   // @ts-ignore
-  const name = String(title ?? object.$path?.at(-1));
+  const name = String(title ?? $path?.at(-1));
 
   const handleFlip = useTypedCollector(flip);
   const handleCancel = useTypedCollector(cancel);

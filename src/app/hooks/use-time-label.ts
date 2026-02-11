@@ -84,6 +84,7 @@ const $nowLabel = getTranslation('now');
 export const useRelativeTimeLabel = (
   date?: Date,
   nowSpan = 4000,
+  options?: Intl.RelativeTimeFormatOptions,
 ): string | undefined => {
   const {
     value: { translationLanguage, translationLocale },
@@ -94,8 +95,8 @@ export const useRelativeTimeLabel = (
   );
 
   const relativeTimeFormat = useMemo(
-    () => new Intl.RelativeTimeFormat(effectiveLocale),
-    [effectiveLocale],
+    () => new Intl.RelativeTimeFormat(effectiveLocale, options),
+    [effectiveLocale, options],
   );
 
   const nowLabel = $nowLabel.value;
@@ -162,12 +163,14 @@ export const useAbsoluteTimeLabel = (date?: Date): string | undefined => {
 export const useTimeLabel = (
   date?: Date,
   nowSpan?: number,
+  options?: Intl.RelativeTimeFormatOptions,
 ): string | undefined => {
   const absoluteTimes = $flags.absoluteTimes.value;
 
   const relativeLabel = useRelativeTimeLabel(
     absoluteTimes ? undefined : date,
     nowSpan,
+    options,
   );
   const absoluteLabel = useAbsoluteTimeLabel(absoluteTimes ? date : undefined);
 

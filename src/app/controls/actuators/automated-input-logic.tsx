@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Match, TExclude } from '@iot/iot-monolith/tree';
-import { FunctionComponent } from 'preact';
-import { useCallback } from 'preact/hooks';
+import { FunctionComponent, MouseEventHandler } from 'preact';
+import { useCallback, useMemo } from 'preact/hooks';
 
 import { TSerialization } from '../../../common/types.js';
-import { ForwardIcon } from '../../components/icons.js';
+import { Tag, TagGroup } from '../../components/controls.js';
+import { TabularNums } from '../../components/text.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
+import { useDateFromEpoch, useTimeLabel } from '../../hooks/use-time-label.js';
 import { I18nKey } from '../../i18n/main.js';
-import { setSubPath } from '../../state/path.js';
-import { extractKey } from '../../util/oop.js';
 import { Translation } from '../../views/translation.js';
-import { Cell } from '../main.js';
+import { CellWithBody } from '../main.js';
+import { TOffTimer } from './off-timer.js';
 
 // @ts-ignore
 export type TAutomatedInputLogic = Match<
@@ -21,68 +22,137 @@ export type TAutomatedInputLogic = Match<
   TSerialization
 >;
 
+const TimerTag: FunctionComponent<{ object: TOffTimer }> = ({
+  object: {
+    $path,
+    active: {
+      cancel: { main: cancel },
+      main: active,
+    },
+    flip: { main: flip },
+    main,
+    runoutTime: { main: runoutTime },
+    // @ts-ignore
+  },
+}) => {
+  const { value: enabledValue } = useTypedEmitter(main);
+  const { value: activeValue } = useTypedEmitter(active);
+
+  const runoutTimeDate = useDateFromEpoch(useTypedEmitter(runoutTime).value);
+  const runoutTimeLabel = useTimeLabel(runoutTimeDate, 0, { style: 'narrow' });
+
+  // @ts-ignore
+  const name = String($path?.at(-1));
+
+  const handleFlip = useTypedCollector(flip);
+  const handleCancel = useTypedCollector(cancel);
+
+  const handleClick = useCallback<MouseEventHandler<HTMLElement>>(
+    (event) => {
+      event.stopPropagation();
+
+      if (activeValue) {
+        handleCancel(null);
+        return;
+      }
+
+      handleFlip(null);
+    },
+    [activeValue, handleCancel, handleFlip],
+  );
+
+  const label = useMemo(() => {
+    if (!activeValue || !runoutTimeLabel) {
+      return null;
+    }
+
+    return <TabularNums>{runoutTimeLabel}</TabularNums>;
+  }, [activeValue, runoutTimeLabel]);
+
+  return (
+    <Tag onClick={handleClick} invert={activeValue} grow>
+      <TagGroup>
+        <Translation i18nKey={name} capitalize />
+      </TagGroup>
+      <TagGroup>
+        {label || (
+          <Translation i18nKey={enabledValue ? 'enabled' : 'disabled'} />
+        )}
+      </TagGroup>
+    </Tag>
+  );
+};
+
 export const AutomatedInputLogic: FunctionComponent<{
   object: TAutomatedInputLogic;
   onClick?: () => void;
   title?: I18nKey;
 }> = ({ object, onClick, title }) => {
   const {
-    $id,
+    // $id,
     $path,
-    internal: { output },
-    automationEnable,
+    internal: {
+      output: { main: output, flip },
+    },
+    automationEnable: {
+      main: automationEnable,
+      manual: automationEnableManual,
+    },
     timerAutomation,
     timerOutput,
     // @ts-ignore
   } = object;
 
-  const { value: automationEnableMain } = useTypedEmitter(
-    automationEnable.main,
-  );
-  const { value: automationEnableManual } = useTypedEmitter(
-    automationEnable.manual,
-  );
-  const setAtomationEnableManual = useTypedCollector(automationEnable.manual);
-  const { value: automationEnableScheduled } = useTypedEmitter(
-    extractKey(automationEnable, 'scheduled'),
-  );
-  const { value: automationEnablePermanent } = useTypedEmitter(
-    automationEnable.permanent,
-  );
-  const setAtomationEnablePermanent = useTypedCollector(
-    automationEnable.permanent,
-  );
-
-  const { value: timerOutputEnabled } = useTypedEmitter(timerOutput.main);
-  const { value: timerOutputActive } = useTypedEmitter(timerOutput.active.main);
-
   // @ts-ignore
-  const name = String(title ?? object.$path?.at(-1));
+  const name = String(title ?? $path?.at(-1));
 
-  const handleHeaderClick = useCallback(() => {
-    setSubPath($id);
-  }, [$id]);
+  const triggerOutputFlip = useTypedCollector(flip);
+  const { value: outputValue } = useTypedEmitter(output);
+
+  const { value: automationEnableValue } = useTypedEmitter(automationEnable);
+  const setAutomationEnableManual = useTypedCollector(automationEnableManual);
+
+  const handleOutputClick = useCallback(() => {
+    triggerOutputFlip(null);
+  }, [triggerOutputFlip]);
+
+  const handleAutomationEnableClick = useCallback(() => {
+    setAutomationEnableManual(!automationEnableValue);
+  }, [automationEnableValue, setAutomationEnableManual]);
+
+  // const handleHeaderClick = useCallback(() => {
+  //   setSubPath($id);
+  // }, [$id]);
 
   return (
-    <Cell
-      icon={<ForwardIcon height="1em" />}
-      onClick={onClick ?? handleHeaderClick}
-      title={<Translation i18nKey={name} capitalize={true} />}
+    <CellWithBody
+      // icon={<ForwardIcon height="1em" />}
+      onClick={onClick}
+      title={<Translation i18nKey={name} capitalize />}
+      span={3}
     >
-      <pre>
-        {JSON.stringify(
-          [
-            automationEnableMain,
-            automationEnableManual,
-            automationEnablePermanent,
-            automationEnableScheduled,
-            timerOutputActive,
-            timerOutputEnabled,
-          ],
-          null,
-          2,
-        )}
-      </pre>
-    </Cell>
+      <Tag onClick={handleOutputClick} invert={outputValue} grow>
+        <TagGroup>
+          <Translation i18nKey="output" capitalize />
+        </TagGroup>
+        <TagGroup>
+          <Translation i18nKey={outputValue ? 'on' : 'off'} />
+        </TagGroup>
+      </Tag>
+      <TimerTag object={timerOutput} />
+      <Tag
+        onClick={handleAutomationEnableClick}
+        invert={automationEnableValue}
+        grow
+      >
+        <TagGroup>
+          <Translation i18nKey="automation" capitalize />
+        </TagGroup>
+        <TagGroup>
+          <Translation i18nKey={automationEnableValue ? 'on' : 'off'} />
+        </TagGroup>
+      </Tag>
+      <TimerTag object={timerAutomation} />
+    </CellWithBody>
   );
 };

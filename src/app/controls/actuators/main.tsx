@@ -49,9 +49,9 @@ export const Actuator: FunctionComponent<{
     case 'offTimer': {
       return <TimerActuator object={object} onClick={onClick} />;
     }
-    // case 'automatedInputLogic': {
-    //   return <AutomatedInputLogic object={object} onClick={onClick} />;
-    // }
+    case 'automatedInputLogic': {
+      return <AutomatedInputLogic object={object} onClick={onClick} />;
+    }
     default: {
       return null;
     }

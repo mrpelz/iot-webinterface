@@ -1,4 +1,5 @@
 import { styled } from 'goober';
+import { MouseEventHandler } from 'preact';
 import { forwardRef } from 'preact/compat';
 
 import { colors, dimensions } from '../style.js';
@@ -75,7 +76,9 @@ export const Title = styled('cell-title')`
 
 export type TagProps = {
   backgroundColor?: string;
+  grow?: boolean;
   invert?: boolean;
+  onClick?: MouseEventHandler<HTMLElement>;
 };
 
 export const Tag = styled('tag')<TagProps>`
@@ -88,6 +91,8 @@ export const Tag = styled('tag')<TagProps>`
   min-inline-size: ${multiply(dimensions.controlBase, '3')};
   overflow: hidden;
   padding-inline: ${dimensions.controlBase};
+  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
+  width: ${({ grow }) => (grow ? '100%' : '')};
 
   background-color: ${({ backgroundColor, invert }) =>
     backgroundColor ?? (invert ? colors.fontPrimary()() : 'transparent')};
@@ -111,6 +116,7 @@ export const TagGroup = styled('tag-group')`
   gap: ${dimensions.controlBase};
   overflow: hidden;
   padding-inline-end: ${dimensions.controlBase};
+  flex-grow: 1;
 
   & > * {
     flex-shrink: 0;
@@ -123,5 +129,6 @@ export const TagGroup = styled('tag-group')`
   &:last-child {
     border-inline-end: none;
     padding-inline-end: 0;
+    flex-grow: 0;
   }
 `;
