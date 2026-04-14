@@ -27,9 +27,7 @@ const version = execSync('npm pkg get "version" --silent', { encoding: 'utf8' })
   .replaceAll('\n', '')
   .replaceAll('"', '');
 
-// const API_PROXY = 'http://localhost:1337';
-const API_PROXY =
-  'https://iot-iot-monolith-latest.rancher-iot.lan.wurstsalat.cloud';
+const apiProxy = process.env.API_PROXY;
 
 // @ts-ignore
 /** @type {import('@mrpelz/boilerplate-dom/webpack.config.js').ConfigurationExtended} */
@@ -45,31 +43,31 @@ const configDownstream = {
       {
         changeOrigin: true,
         context: ['/api/stream'],
-        target: API_PROXY,
+        target: apiProxy,
         ws: true,
       },
       {
         changeOrigin: true,
         context: ['/api/version'],
         pathRewrite: { '^/api': '' },
-        target: API_PROXY,
+        target: apiProxy,
       },
       {
         changeOrigin: true,
         context: ['/api/log'],
         pathRewrite: { '^/api': '' },
-        target: API_PROXY,
+        target: apiProxy,
       },
       {
         changeOrigin: true,
         context: ['/api/logic-reasoning'],
         pathRewrite: { '^/api': '' },
-        target: API_PROXY,
+        target: apiProxy,
       },
       {
         changeOrigin: true,
         context: ['/api'],
-        target: API_PROXY,
+        target: apiProxy,
       },
     ],
   },

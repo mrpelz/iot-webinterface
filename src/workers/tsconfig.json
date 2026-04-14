@@ -3,7 +3,8 @@
     "allowSyntheticDefaultImports": true,
     "declaration": false,
     "declarationMap": false,
-    "lib": ["ESNext", "WebWorker"]
+    "lib": ["ESNext", "WebWorker"],
+    "rootDir": "."
   },
   "extends": "@mrpelz/boilerplate-common/tsconfig.json",
   "include": ["**/*"]

@@ -3,7 +3,8 @@ import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { FunctionComponent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
-import { TSerialization } from '../../../common/types.js';
+import { TSystem } from '../../../common/types.js';
+import { serialized } from '../../api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
@@ -21,7 +22,7 @@ export type TBinaryActuator = Match<
     $: 'output' | 'outputGrouping' | 'scene';
   },
   TExclude,
-  TSerialization
+  TSystem
 >;
 
 export const BinaryActuator: FunctionComponent<{
@@ -37,14 +38,18 @@ export const BinaryActuator: FunctionComponent<{
   positiveKey = 'on',
   title,
 }) => {
-  const value = useTypedEmitter(actuator.main);
+  const value = useTypedEmitter(serialized(actuator.main));
+
+  const loading_ = useMemo(
+    () => ensureKeys(actuator, 'actuatorStaleness'),
+    [actuator],
+  )?.actuatorStaleness?.loading;
 
   const loading = useTypedEmitter(
-    useMemo(() => ensureKeys(actuator, 'actuatorStaleness'), [actuator])
-      ?.actuatorStaleness?.loading,
+    loading_ ? serialized(loading_) : undefined,
   ).value;
 
-  const flip = useTypedCollector(actuator.flip);
+  const flip = useTypedCollector(serialized(actuator.flip));
   const handleClick = useCallback(() => flip?.(null), [flip]);
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -53,7 +58,7 @@ export const BinaryActuator: FunctionComponent<{
 
   const ColorBody = useColorBody(
     BodyLarge,
-    String(actuator.$path?.at(-1)),
+    String(serialized(actuator).$path?.at(-1)),
     actuator.topic,
   );
 

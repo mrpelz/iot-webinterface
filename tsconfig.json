@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "declaration": false,
-    "declarationMap": false
+    "declarationMap": false,
+    "rootDir": "src/app"
   },
   "extends": "@mrpelz/boilerplate-preact/tsconfig.json",
   "include": ["src/app/**/*"]

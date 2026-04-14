@@ -4,7 +4,7 @@ import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
-import { LevelObject } from '../api.js';
+import { LevelObject, serialized } from '../api.js';
 import { Tag, TagGroup } from '../components/controls.js';
 import {
   ActivityIcon,
@@ -21,6 +21,7 @@ import { CellWithBody } from './main.js';
 
 // @ts-ignore
 export type TDevice = LevelObject[Level.DEVICE];
+export type TMainDevice = Match<{ isSubDevice: false }, TExclude, TDevice>;
 export type TSubDevice = Match<{ isSubDevice: true }, TExclude, TDevice>;
 
 export const OnlineIcon: FunctionComponent = () => (
@@ -45,13 +46,13 @@ const DeviceOnlineState: FunctionComponent<{
     // @ts-ignore
   } = ensureKeys(device, 'online');
 
-  const { value: isOnline } = useTypedEmitter(online);
-  const { value: lastChangeValue } = useTypedEmitter(lastChange);
+  const { value: isOnline } = useTypedEmitter(serialized(online));
+  const { value: lastChangeValue } = useTypedEmitter(serialized(lastChange));
 
   // @ts-ignore
   const { lastSeen: { main: lastSeen } = {} } = ensureKeys(device, 'lastSeen');
 
-  const { value: lastSeenValue } = useTypedEmitter(lastSeen);
+  const { value: lastSeenValue } = useTypedEmitter(serialized(lastSeen));
 
   const timeLabel = useTimeLabel(
     useMemo(() => {
@@ -103,7 +104,7 @@ export const Device: FunctionComponent<{
     <CellWithBody
       icon={<ForwardIcon height="1em" />}
       onClick={onClick}
-      title={useMemo(() => device.$path?.at?.(-2), [device])}
+      title={useMemo(() => serialized(device).$path?.at?.(-2), [device])}
     >
       {espNow && wifi ? (
         <>

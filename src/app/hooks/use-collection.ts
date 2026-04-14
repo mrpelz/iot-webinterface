@@ -29,6 +29,8 @@ export const useMap = <K, V>(): [symbol, MutableRef<Map<K, V>>, Map<K, V>] => {
       entries: map.current.entries,
       forEach: map.current.forEach,
       get: map.current.get,
+      getOrInsert: map.current.getOrInsert,
+      getOrInsertComputed: map.current.getOrInsertComputed,
       has: map.current.has,
       keys: map.current.keys,
       set: (key, value) => {

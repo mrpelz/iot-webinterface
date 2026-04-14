@@ -8,6 +8,7 @@ import {
   ValueType,
 } from '@iot/iot-monolith/tree';
 import {
+  ElementSerialization,
   InteractionReference,
   InteractionType,
 } from '@iot/iot-monolith/tree-serialization';
@@ -16,7 +17,7 @@ import { computed, ReadonlySignal, signal } from '@preact/signals';
 import { Remote, wrap } from 'comlink';
 import { createStore, get, UseStore } from 'idb-keyval';
 
-import { API_WORKER_API, TSerialization } from '../common/types.js';
+import { API_WORKER_API, TSystem } from '../common/types.js';
 import { id } from './main.js';
 import { readOnly } from './util/signal.js';
 import { isSafari } from './util/useragent.js';
@@ -27,38 +28,23 @@ const OBSERVE_NOTIFIER = 'c3a428eb-544e-4d11-927d-4aefcd81210c';
 export type LevelObject = {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  [Level.AREA]: Match<{ level: Level.AREA }, TExclude, TSerialization, 15>;
-  [Level.BUILDING]: Match<
-    { level: Level.BUILDING },
-    TExclude,
-    TSerialization,
-    15
-  >;
-  [Level.DEVICE]: Match<{ level: Level.DEVICE }, TExclude, TSerialization, 15>;
-  [Level.ELEMENT]: Match<
-    { level: Level.ELEMENT },
-    TExclude,
-    TSerialization,
-    15
-  >;
-  [Level.FLOOR]: Match<{ level: Level.FLOOR }, TExclude, TSerialization, 15>;
-  [Level.HOME]: Match<{ level: Level.HOME }, TExclude, TSerialization, 15>;
-  [Level.NONE]: Match<{ level: Level.NONE }, TExclude, TSerialization, 15>;
-  [Level.PROPERTY]: Match<
-    { level: Level.PROPERTY },
-    TExclude,
-    TSerialization,
-    15
-  >;
-  [Level.ROOM]: Match<{ level: Level.ROOM }, TExclude, TSerialization, 15>;
-  [Level.SYSTEM]: Match<{ level: Level.SYSTEM }, TExclude, TSerialization, 15>;
+  [Level.AREA]: Match<{ level: Level.AREA }, TExclude, TSystem>;
+  [Level.BUILDING]: Match<{ level: Level.BUILDING }, TExclude, TSystem>;
+  [Level.DEVICE]: Match<{ level: Level.DEVICE }, TExclude, TSystem>;
+  [Level.ELEMENT]: Match<{ level: Level.ELEMENT }, TExclude, TSystem>;
+  [Level.FLOOR]: Match<{ level: Level.FLOOR }, TExclude, TSystem>;
+  [Level.HOME]: Match<{ level: Level.HOME }, TExclude, TSystem>;
+  [Level.NONE]: Match<{ level: Level.NONE }, TExclude, TSystem>;
+  [Level.PROPERTY]: Match<{ level: Level.PROPERTY }, TExclude, TSystem>;
+  [Level.ROOM]: Match<{ level: Level.ROOM }, TExclude, TSystem>;
+  [Level.SYSTEM]: Match<{ level: Level.SYSTEM }, TExclude, TSystem>;
 };
 
-export type AnyObject = Match<object, TExclude, TSerialization, 15>;
+export type AnyObject = Match<object, TExclude, TSystem>;
 
 export class Api {
   private readonly _api: Remote<API_WORKER_API>;
-  private _hierarchy?: TSerialization;
+  private _hierarchy?: TSystem;
   private readonly _notifier: BroadcastChannel;
   private readonly _stateStore = createStore('api_state', 'state');
   private readonly _valuesStore = createStore('api_values', 'values');
@@ -97,7 +83,7 @@ export class Api {
     this.$isInit = readOnly($isInit);
     promise.then(() => ($isInit.value = true));
 
-    this._setNotifierReaction<TSerialization>(
+    this._setNotifierReaction<TSystem>(
       'hierarchy',
       (hierarchy) => {
         this._hierarchy = hierarchy;
@@ -148,7 +134,7 @@ export class Api {
     }
   }
 
-  get hierarchy(): TSerialization | undefined {
+  get hierarchy(): TSystem | undefined {
     return this._hierarchy;
   }
 
@@ -220,7 +206,7 @@ export class Api {
   match<
     P extends object,
     E,
-    R extends object = TSerialization,
+    R extends object = TSystem,
     D extends number = typeof DEFAULT_MATCH_DEPTH,
   >(
     pattern: P,
@@ -232,34 +218,8 @@ export class Api {
   }
 }
 
-type GroupByResult<T extends object, K extends keyof Required<T>> = {
-  elements: T[];
-  group: T[K];
-}[];
-
-export const groupBy = <T extends object, K extends keyof Required<T>>(
-  input: readonly T[],
-  property: K,
-): GroupByResult<T, K> => {
-  const keys = new Set<T[K]>();
-
-  for (const object of input) {
-    keys.add(object[property]);
-  }
-
-  const result: GroupByResult<T, K> = [];
-
-  for (const key of keys) {
-    result.push({
-      elements: input.filter(
-        (object) => property in object && object[property] === key,
-      ),
-      group: key,
-    });
-  }
-
-  return result;
-};
+export const serialized = <T>(value: T): ElementSerialization<T> =>
+  value as ElementSerialization<T>;
 
 export const sortBy = <T extends object, K extends keyof Required<T>>(
   input: readonly T[],

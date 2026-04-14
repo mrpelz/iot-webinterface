@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { isObject } from '@mrpelz/misc-utils/oop';
@@ -32,21 +33,21 @@ import {
 
 export type Renderer<T> = {
   RenderValue: FunctionComponent<{ path: PropertyKey[]; value: T }>;
-  is: (path: PropertyKey[], input: unknown) => input is T;
+  is: (path: PropertyKey[], input: any) => input is T;
 };
 
 export type JSONViewerInnerProps = {
   path?: PropertyKey[];
-  value: unknown;
+  value: any;
 };
 
 export type JSONViewerProps = {
   autoExpandLevel?: number;
   autoExpandPath?: PropertyKey[];
   handlePathChange?: (paths: PropertyKey[][]) => void;
-  renderers?: Set<Renderer<unknown>>;
+  renderers?: Set<Renderer<any>>;
   rootLabel?: ComponentChild;
-  value: unknown;
+  value: any;
 };
 
 type TJSONViewerContext = {
@@ -54,7 +55,7 @@ type TJSONViewerContext = {
   autoExpandPath: PropertyKey[];
   circularCache: WeakSet<object>;
   handlePathChange: (path: PropertyKey[], isOpen: boolean) => void;
-  renderers: Set<Renderer<unknown>>;
+  renderers: Set<Renderer<any>>;
   rootLabel: ComponentChild;
 };
 
@@ -232,7 +233,7 @@ export const useExpandingRendererUtils = <T,>(props: {
 export const makeExpandingRenderer = <T,>(
   is: Renderer<T>['is'],
   label: string,
-  useGetChildren: (path: PropertyKey[], value: unknown) => ComponentChild[],
+  useGetChildren: (path: PropertyKey[], value: any) => ComponentChild[],
   prefix: string,
   suffix: string,
 ): Renderer<T> => ({

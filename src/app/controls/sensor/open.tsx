@@ -2,7 +2,8 @@ import { Match, TExclude } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
 import { useCallback } from 'preact/hooks';
 
-import { TSerialization } from '../../../common/types.js';
+import { TSystem } from '../../../common/types.js';
+import { serialized } from '../../api.js';
 import { Tag } from '../../components/controls.js';
 import { ForwardIcon } from '../../components/icons.js';
 import { useTypedEmitter } from '../../hooks/use-api.js';
@@ -13,11 +14,11 @@ import { CellWithBody } from '../main.js';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-export type TWindowSensor = Match<{ $: 'window' }, TExclude, TSerialization>;
+export type TWindowSensor = Match<{ $: 'window' }, TExclude, TSystem>;
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-export type TDoorSensor = Match<{ $: 'door' }, TExclude, TSerialization>;
+export type TDoorSensor = Match<{ $: 'door' }, TExclude, TSystem>;
 
 export type TOpenSensor = TWindowSensor | TDoorSensor;
 
@@ -44,7 +45,7 @@ export const OpenSensor: FunctionComponent<{
   // @ts-ignore
   const name = String(title ?? sensor.$path?.at(-1) ?? sensor.$);
 
-  const value = useTypedEmitter(sensor.open.main).value;
+  const value = useTypedEmitter(serialized(sensor.open.main)).value;
 
   return (
     <CellWithBody

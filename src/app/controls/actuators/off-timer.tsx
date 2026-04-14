@@ -3,7 +3,8 @@ import { Match, TExclude } from '@iot/iot-monolith/tree';
 import { FunctionComponent, MouseEventHandler } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
-import { TSerialization } from '../../../common/types.js';
+import { TSystem } from '../../../common/types.js';
+import { serialized } from '../../api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
 import { ForwardIcon } from '../../components/icons.js';
@@ -27,17 +28,13 @@ export type TOffTimer = Match<
     $: 'offTimer';
   },
   TExclude,
-  TSerialization
+  TSystem
 >;
 
-export const TimerActuator: FunctionComponent<{
+const TimerActuatorBody: FunctionComponent<{
   object: TOffTimer;
-  onClick?: () => void;
-  title?: I18nKey;
-}> = ({ object, onClick, title }) => {
+}> = ({ object }) => {
   const {
-    $id,
-    $path,
     active: {
       cancel: { main: cancel },
       main: active,
@@ -49,25 +46,24 @@ export const TimerActuator: FunctionComponent<{
     // @ts-ignore
   } = object;
 
-  const { value: enabledValue } = useTypedEmitter(main);
-  const { value: activeValue } = useTypedEmitter(active);
+  const OverlayBody = useColorBody(BodyLarge, '');
 
-  const runoutTimeDate = useDateFromEpoch(useTypedEmitter(runoutTime).value);
-  const triggerTimeDate = useDateFromEpoch(useTypedEmitter(triggerTime).value);
+  const { value: enabledValue } = useTypedEmitter(serialized(main));
+  const { value: activeValue } = useTypedEmitter(serialized(active));
+
+  const runoutTimeDate = useDateFromEpoch(
+    useTypedEmitter(serialized(runoutTime)).value,
+  );
+  const triggerTimeDate = useDateFromEpoch(
+    useTypedEmitter(serialized(triggerTime)).value,
+  );
 
   const runoutTimeLabel = useTimeLabel(runoutTimeDate, 0);
 
   const [, fraction] = useTimeSpan(triggerTimeDate, runoutTimeDate);
 
-  // @ts-ignore
-  const name = String(title ?? $path?.at(-1));
-
-  const handleFlip = useTypedCollector(flip);
-  const handleCancel = useTypedCollector(cancel);
-
-  const handleHeaderClick = useCallback(() => {
-    setSubPath($id);
-  }, [$id]);
+  const handleFlip = useTypedCollector(serialized(flip));
+  const handleCancel = useTypedCollector(serialized(cancel));
 
   const handleBodyClick = useCallback<MouseEventHandler<HTMLElement>>(
     (event) => {
@@ -82,8 +78,6 @@ export const TimerActuator: FunctionComponent<{
     },
     [activeValue, handleCancel, handleFlip],
   );
-
-  const ColorBody = useColorBody(BodyLarge, String($path?.at(-1)));
 
   const allowTransition = Boolean(useDelay($rootPath.value, 300, true));
 
@@ -105,32 +99,55 @@ export const TimerActuator: FunctionComponent<{
     (useDelay(activeValue, 1000) && !activeValue) || (activeValue && !label);
 
   return (
+    <BlendOver
+      blendOver={blendOver}
+      invert={true}
+      onClick={handleBodyClick}
+      transition={allowTransition && activeValue !== null}
+      transitionDurationOverride={activeValue ? 1000 : 300}
+      overlay={
+        enabledValue === null ? undefined : (
+          // eslint-disable-next-line react-hooks/static-components
+          <OverlayBody>{label || <Translation i18nKey="on" />}</OverlayBody>
+        )
+      }
+    >
+      <BodyLarge>
+        {hasJustFinished ? (
+          <Translation i18nKey="finished" />
+        ) : (
+          label || <Translation i18nKey="off" />
+        )}
+      </BodyLarge>
+    </BlendOver>
+  );
+};
+
+export const TimerActuator: FunctionComponent<{
+  object: TOffTimer;
+  onClick?: () => void;
+  title?: I18nKey;
+}> = ({ object, onClick, title }) => {
+  const {
+    $id,
+    $path,
+    // @ts-ignore
+  } = serialized(object);
+
+  // @ts-ignore
+  const name = String(title ?? $path?.at(-1));
+
+  const handleHeaderClick = useCallback(() => {
+    setSubPath($id);
+  }, [$id]);
+
+  return (
     <Cell
       icon={<ForwardIcon height="1em" />}
       onClick={onClick ?? handleHeaderClick}
       title={<Translation i18nKey={name} capitalize={true} />}
     >
-      <BlendOver
-        blendOver={blendOver}
-        invert={true}
-        onClick={handleBodyClick}
-        transition={allowTransition && activeValue !== null}
-        transitionDurationOverride={activeValue ? 1000 : 300}
-        overlay={
-          enabledValue === null ? undefined : (
-            // eslint-disable-next-line react-hooks/static-components
-            <ColorBody>{label || <Translation i18nKey="on" />}</ColorBody>
-          )
-        }
-      >
-        <BodyLarge>
-          {hasJustFinished ? (
-            <Translation i18nKey="finished" />
-          ) : (
-            label || <Translation i18nKey="off" />
-          )}
-        </BodyLarge>
-      </BlendOver>
+      <TimerActuatorBody object={object} />
     </Cell>
   );
 };

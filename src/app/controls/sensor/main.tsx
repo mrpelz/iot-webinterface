@@ -15,8 +15,10 @@ export const Sensor: FunctionComponent<{
 }> = ({ object, onClick, title }) => {
   if (!('$' in object)) return null;
   switch (object.$) {
+    case 'hmmdMotion':
     case 'input':
-    case 'inputGrouping': {
+    case 'inputGrouping':
+    case 'motion': {
       return object.topic === 'open' ? (
         <BinarySensor
           sensor={object}

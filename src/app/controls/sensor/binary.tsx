@@ -1,7 +1,8 @@
 import { Match, TExclude } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
 
-import { TSerialization } from '../../../common/types.js';
+import { TSystem } from '../../../common/types.js';
+import { serialized } from '../../api.js';
 import { Tag } from '../../components/controls.js';
 import { useTypedEmitter } from '../../hooks/use-api.js';
 import { I18nKey } from '../../i18n/main.js';
@@ -12,10 +13,10 @@ import { CellWithBody } from '../main.js';
 // @ts-ignore
 export type TBinarySensor = Match<
   {
-    $: 'input' | 'inputGrouping' | 'motion';
+    $: 'input' | 'inputGrouping' | 'motion' | 'hmmdMotion';
   },
   TExclude,
-  TSerialization
+  TSystem
 >;
 
 export const BinarySensor: FunctionComponent<{
@@ -29,7 +30,7 @@ export const BinarySensor: FunctionComponent<{
   // @ts-ignore
   const name = String(title ?? sensor.$path?.at(-1) ?? sensor.$);
 
-  const value = useTypedEmitter(sensor.main).value;
+  const value = useTypedEmitter(serialized(sensor.main)).value;
 
   return (
     <CellWithBody

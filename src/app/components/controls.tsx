@@ -67,6 +67,13 @@ export const BodyLarge = styled(Body, forwardRef)`
   justify-content: center;
 `;
 
+export const BodyBottomBand = styled(Body, forwardRef)`
+  margin-block-start: ${dimensions.fontSizeLarge};
+  align-content: flex-end;
+  font-size: ${dimensions.fontSizeSmall};
+  justify-content: center;
+`;
+
 export const Title = styled('cell-title')`
   display: block;
   overflow: hidden;

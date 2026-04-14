@@ -3,7 +3,8 @@ import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { ButtonHTMLAttributes, FunctionComponent } from 'preact';
 import { useCallback, useRef } from 'preact/hooks';
 
-import { TSerialization } from '../../../common/types.js';
+import { TSystem } from '../../../common/types.js';
+import { serialized } from '../../api.js';
 import { Body } from '../../components/controls.js';
 import { Button } from '../../components/list.js';
 import { TriggerBody } from '../../components/null-actuator.js';
@@ -22,14 +23,14 @@ export type TTriggerElement = Match<
     $: 'triggerElement';
   },
   TExclude,
-  TSerialization
+  TSystem
 >;
 export type TIdentifyDevice = Match<
   {
     $: 'identifyDevice';
   },
   TExclude,
-  TSerialization,
+  TSystem,
   15
 >;
 export type TResetDevice = Match<
@@ -37,7 +38,7 @@ export type TResetDevice = Match<
     $: 'resetDevice';
   },
   TExclude,
-  TSerialization,
+  TSystem,
   15
 >;
 
@@ -48,7 +49,7 @@ export const NullActuator: FunctionComponent<{
   onClick?: () => void;
   title?: I18nKey;
 }> = ({ actuator, onClick, title }) => {
-  const setter = useTypedCollector(actuator.main);
+  const setter = useTypedCollector(serialized(actuator.main));
 
   const overlayRef = useRef<HTMLElement>(null);
   const baseRef = useRef<HTMLElement>(null);
@@ -122,7 +123,7 @@ export const NullActuatorButton: FunctionComponent<
               $: 'trigger';
             },
             TExclude,
-            TSerialization
+            TSystem
           >;
         };
   } & ButtonHTMLAttributes

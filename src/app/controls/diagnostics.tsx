@@ -9,7 +9,7 @@ import { computed } from '@preact/signals';
 import { ComponentChildren, FunctionComponent, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
-import { AnyObject } from '../api.js';
+import { AnyObject, serialized } from '../api.js';
 import { Summary } from '../components/diagnostics.js';
 import { useCollector, useEmitter, useMatch } from '../hooks/use-api.js';
 
@@ -88,14 +88,16 @@ const Emitter: FunctionComponent<{
     0,
   );
 
-  const state = useEmitter(object_?.state);
+  const objectMapped = serialized(object_);
 
-  if (!object_ || !state) return null;
+  const state = useEmitter(objectMapped?.state);
+
+  if (!objectMapped || !state) return null;
 
   return (
     <tr>
       <td>
-        <b>Getter</b> <i>{object_.state.reference}</i>
+        <b>Getter</b> <i>{objectMapped.state.reference}</i>
       </td>
       <td>
         <pre>{computed(() => JSON.stringify(state.value))}</pre>
@@ -115,14 +117,16 @@ const Collector: FunctionComponent<{
     0,
   ).at(0);
 
-  const valueTypeNamed = object_
-    ? valueTypeDescription[object_.valueType]
+  const objectMapped = serialized(object_);
+
+  const valueTypeNamed = objectMapped
+    ? valueTypeDescription[objectMapped.valueType]
     : undefined;
 
-  const collector = useCollector(object_?.setState);
+  const collector = useCollector(objectMapped?.setState);
   const [input, setInput] = useState<unknown>(undefined);
 
-  if (!object_) return null;
+  if (!objectMapped) return null;
 
   const onChange: JSX.EventHandler<
     JSX.TargetedEvent<HTMLInputElement, Event>
@@ -168,7 +172,7 @@ const Collector: FunctionComponent<{
   return (
     <tr>
       <td>
-        <b>Setter</b> <i>{object_.setState.reference}</i>
+        <b>Setter</b> <i>{objectMapped.setState.reference}</i>
       </td>
       <td>
         {

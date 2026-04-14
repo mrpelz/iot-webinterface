@@ -10,9 +10,10 @@ import {
 } from '@iot/iot-monolith/tree-serialization';
 import { ensureKeys, isPlainObject } from '@mrpelz/misc-utils/oop';
 import { computed } from '@preact/signals';
-import { useMemo } from 'preact/hooks';
+import { useMemo, useState } from 'preact/hooks';
 
-import { TSerialization } from '../../../common/types.js';
+import { TSystem } from '../../../common/types.js';
+import { serialized } from '../../api.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useTruthy } from '../../hooks/use-first-truthy.js';
 import { Details, Inset, useIsOpen } from '../details.js';
@@ -142,7 +143,7 @@ export const emitInteractionReferenceRenderer = makeExpandingRenderer<
 
 export const getterRenderer: Renderer<
   // @ts-ignore
-  Match<{ $: 'getter' }, TExclude, TSerialization>
+  Match<{ $: 'getter' }, TExclude, TSystem>
 > = {
   RenderValue: (props) => {
     const { value } = props;
@@ -155,7 +156,9 @@ export const getterRenderer: Renderer<
     const { unit, valueType } = value;
     const isDate = unit === 'date';
 
-    const emitter = useTypedEmitter(isParentOpen ? value : undefined);
+    const emitter = useTypedEmitter(
+      serialized(isParentOpen ? value : undefined),
+    );
     const liveValue = computed(() => {
       if (isDate && typeof emitter.value === 'number') {
         return new Date(emitter.value).toUTCString();
@@ -221,10 +224,7 @@ export const getterRenderer: Renderer<
     );
   },
   // @ts-ignore
-  is: (
-    _path,
-    input,
-  ): input is Match<{ $: 'getter' }, TExclude, TSerialization> => {
+  is: (_path, input): input is Match<{ $: 'getter' }, TExclude, TSystem> => {
     if (!isPlainObject(input)) return false;
     const { $, state, level, valueType } = ensureKeys(
       // @ts-ignore
@@ -250,7 +250,7 @@ export const getterRenderer: Renderer<
 
 // @ts-ignore
 export const setterRenderer: Renderer<
-  Match<{ $: 'setter' }, TExclude, TSerialization>
+  Match<{ $: 'setter' }, TExclude, TSystem>
 > = {
   // @ts-ignore
   RenderValue: (props) => {
@@ -264,49 +264,82 @@ export const setterRenderer: Renderer<
     const { valueType } = value;
     const type = useMemo(() => valueTypeDescription[valueType], [valueType]);
 
-    const emitter = useTypedEmitter(isParentOpen ? value : undefined);
+    const emitter = useTypedEmitter(
+      serialized(isParentOpen ? value : undefined),
+    );
     const liveValue = computed(() => JSON.stringify(emitter.value));
 
     // @ts-ignore
-    const collector = useTypedCollector(value);
+    const collector = useTypedCollector(serialized(value));
+
+    const [inputValue, setInputValue] = useState('');
 
     const input = useMemo(() => {
       if (valueType === ValueType.BOOLEAN) {
         return (
-          <input
-            type="checkbox"
-            indeterminate={computed(() => emitter.value === null)}
-            checked={computed(
-              () => (emitter.value as boolean | undefined) ?? false,
-            )}
-            onChange={(event) => {
-              event.preventDefault();
-              collector(event.currentTarget.checked);
-            }}
-          />
+          <>
+            <button
+              type="button"
+              style={{ cursor: 'pointer' }}
+              onClick={(event) => {
+                event.preventDefault();
+                collector(true);
+              }}
+            >
+              true
+            </button>
+            <button
+              type="button"
+              style={{ cursor: 'pointer', marginInlineStart: '1ch' }}
+              onClick={(event) => {
+                event.preventDefault();
+                collector(false);
+              }}
+            >
+              false
+            </button>
+          </>
         );
       }
 
       if (valueType === ValueType.NUMBER) {
         return (
-          <input
-            type="text"
-            inputMode="decimal"
-            value={computed(() => emitter.value as number | undefined)}
-            onKeyDown={(event) => {
-              if (!['Enter', 'NumpadEnter'].includes(event.code)) return;
+          <>
+            <input
+              inputMode="decimal"
+              onInput={(event) => setInputValue(event.currentTarget.value)}
+              placeholder={computed(() => emitter.value?.toString())}
+              type="text"
+              value={inputValue}
+              onKeyDown={(event) => {
+                if (!['Enter', 'NumpadEnter'].includes(event.code)) return;
 
-              event.preventDefault();
-              if (event.currentTarget.value.length === 0) return;
+                event.preventDefault();
+                if (inputValue.length === 0) return;
 
-              collector(Number.parseFloat(event.currentTarget.value) ?? 0);
-            }}
-          />
+                collector(Number.parseFloat(inputValue) ?? 0);
+                setInputValue('');
+              }}
+            />
+            <button
+              type="button"
+              style={{ cursor: 'pointer', marginInlineStart: '1ch' }}
+              onClick={(event) => {
+                event.preventDefault();
+                if (inputValue.length === 0) return;
+
+                collector(Number.parseFloat(inputValue) ?? 0);
+                setInputValue('');
+              }}
+            >
+              set
+            </button>
+          </>
         );
       }
 
       return null;
-    }, [collector, emitter.value, valueType]);
+    }, [collector, emitter.value, inputValue, valueType]);
 
     const key = useMemo(
       () => (
@@ -365,10 +398,7 @@ export const setterRenderer: Renderer<
     );
   },
   // @ts-ignore
-  is: (
-    _path,
-    input,
-  ): input is Match<{ $: 'setter' }, TExclude, TSerialization> => {
+  is: (_path, input): input is Match<{ $: 'setter' }, TExclude, TSystem> => {
     if (!isPlainObject(input)) return false;
     const { $, setState, state, level, valueType } = ensureKeys(
       input as Record<PropertyKey, unknown>,
@@ -398,7 +428,7 @@ export const setterRenderer: Renderer<
 
 export const triggerRenderer: Renderer<
   // @ts-ignore
-  Match<{ $: 'trigger' }, TExclude, TSerialization>
+  Match<{ $: 'trigger' }, TExclude, TSystem>
 > = {
   RenderValue: (props) => {
     const { value } = props;
@@ -408,7 +438,7 @@ export const triggerRenderer: Renderer<
     const isParentOpen = useTruthy(useIsOpen() ?? initiallyOpen);
 
     // @ts-ignore
-    const collector = useTypedCollector(value);
+    const collector = useTypedCollector(serialized(value));
 
     const input = useMemo(
       () => (
@@ -480,10 +510,7 @@ export const triggerRenderer: Renderer<
     );
   },
   // @ts-ignore
-  is: (
-    _path,
-    input,
-  ): input is Match<{ $: 'trigger' }, TExclude, TSerialization> => {
+  is: (_path, input): input is Match<{ $: 'trigger' }, TExclude, TSystem> => {
     if (!isPlainObject(input)) return false;
     const { $, setState, level, valueType } = ensureKeys(
       input as Record<PropertyKey, unknown>,

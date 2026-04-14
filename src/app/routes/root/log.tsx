@@ -81,8 +81,20 @@ export const isLogs = (input: unknown[]): input is Log[] => {
   return true;
 };
 
-export const getLogCursor = (newLogs: Log[], lastUrl: URL): URL | undefined => {
-  const cursor = newLogs.at(-1)?.[0];
+export const getLogCursor = (
+  newLogs: (Log | typeof logSeparator)[],
+  lastUrl: URL,
+): URL | undefined => {
+  let cursor: string | undefined;
+
+  for (let index = newLogs.length; index > 0; index -= 1) {
+    const log = newLogs.at(index);
+    if (!log) break;
+    if (log === logSeparator) continue;
+
+    cursor = log[0];
+  }
+
   if (!cursor) return undefined;
 
   const nextUrl = new URL(lastUrl);

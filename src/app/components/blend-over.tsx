@@ -11,36 +11,39 @@ import { usePrevious } from '../hooks/use-previous.js';
 
 export type BlendOverDirection = 'block' | 'inline';
 
-const BlendOverWrapper = styled('blend-over' as 'section')`
+export const BlendOverWrapper = styled('blend-over' as 'section')`
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'inherit')};
   display: grid;
   grid-template-areas: 'a';
   overflow: hidden;
 `;
 
-const BlendOverContent = styled('blend-over-content' as 'section')<{
-  blendOver: number;
-  direction: BlendOverDirection;
-  transitionDuration: number;
-}>`
+export const BlendOverContent = styled('blend-over-content' as 'section')`
   grid-area: a;
   position: relative;
-  transition: ${({ transitionDuration }) =>
-    `clip-path ${transitionDuration}ms linear`};
 
   & > * {
     height: 100%;
   }
 `;
 
-const BlendOverContentBase = styled(BlendOverContent)`
+const BlendOverContentCommon = styled(BlendOverContent)<{
+  blendOver: number;
+  direction: BlendOverDirection;
+  transitionDuration: number;
+}>`
+  transition: ${({ transitionDuration }) =>
+    `clip-path ${transitionDuration}ms linear`};
+`;
+
+const BlendOverContentBase = styled(BlendOverContentCommon)`
   clip-path: ${({ blendOver, direction }) =>
     `inset(0 0 ${direction === 'block' ? String(blendOver * 100) : '0'}% ${
       direction === 'inline' ? String(blendOver * 100) : '0'
     }%)`};
 `;
 
-const BlendOverContentOverlay = styled(BlendOverContent)`
+const BlendOverContentOverlay = styled(BlendOverContentCommon)`
   clip-path: ${({ blendOver, direction }) =>
     `inset(${direction === 'block' ? String((blendOver - 1) * -100) : '0'}% ${
       direction === 'inline' ? String((blendOver - 1) * -100) : '0'
