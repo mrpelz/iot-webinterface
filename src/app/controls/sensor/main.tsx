@@ -3,6 +3,7 @@ import { FunctionComponent } from 'preact';
 import { AnyObject } from '../../api.js';
 import { I18nKey } from '../../i18n/main.js';
 import { BinarySensor } from './binary.js';
+import { HMMDMotionSensor } from './hmmd-motion.js';
 import { NumericSensor } from './numeric.js';
 import { OpenSensor } from './open.js';
 
@@ -15,7 +16,6 @@ export const Sensor: FunctionComponent<{
 }> = ({ object, onClick, title }) => {
   if (!('$' in object)) return null;
   switch (object.$) {
-    case 'hmmdMotion':
     case 'input':
     case 'inputGrouping':
     case 'motion': {
@@ -45,6 +45,11 @@ export const Sensor: FunctionComponent<{
     case 'pm10':
     case 'uvIndex': {
       return <NumericSensor sensor={object} onClick={onClick} title={title} />;
+    }
+    case 'hmmdMotion': {
+      return (
+        <HMMDMotionSensor sensor={object} onClick={onClick} title={title} />
+      );
     }
     default: {
       return null;

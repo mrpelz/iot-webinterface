@@ -1,6 +1,5 @@
 import type { TSystem } from '@iot/iot-monolith';
 import type { ElementSerialization } from '@iot/iot-monolith/tree-serialization';
-import type { THierarchy } from './hierarchy.ts';
 
 declare global {
   interface ServiceWorkerGlobalScope {

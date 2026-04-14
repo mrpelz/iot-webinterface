@@ -48,6 +48,7 @@ export const useColorBody = <P extends object = {}>(
   actuated?: string,
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 ) => {
+  // eslint-disable-next-line complexity
   const component = useMemo(() => {
     const mixedinOverlayBodies = colorBodies(base);
 
@@ -83,7 +84,11 @@ export const useColorBody = <P extends object = {}>(
       ];
     }
 
-    return mixedinOverlayBodies._;
+    if (property !== undefined || actuated !== undefined) {
+      return mixedinOverlayBodies._;
+    }
+
+    return base;
   }, [actuated, base, property]);
 
   return component;

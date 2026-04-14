@@ -40,6 +40,11 @@ export const measuredNumberFormats: Record<string, Intl.NumberFormatOptions> = {
     maximumFractionDigits: 0,
     minimumFractionDigits: 0,
   },
+  hmmdMotion: {
+    ...defaultNumberFormat,
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  },
   pm025: defaultNumberFormat,
   pm10: defaultNumberFormat,
   pressure: {

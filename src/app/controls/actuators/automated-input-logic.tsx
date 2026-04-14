@@ -5,25 +5,14 @@ import { useCallback, useMemo } from 'preact/hooks';
 
 import { TSystem } from '../../../common/types.js';
 import { serialized } from '../../api.js';
-import {
-  BlendOver,
-  BlendOverContent,
-  BlendOverWrapper,
-} from '../../components/blend-over.js';
 import { BodyBottomBand, BodyLarge } from '../../components/controls.js';
 import { ForwardIcon } from '../../components/icons.js';
-import { TabularNums } from '../../components/text.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
-import { useDelay } from '../../hooks/use-delay.js';
 import { useExtractKey } from '../../hooks/use-ensure-keys.js';
-import {
-  useDateFromEpoch,
-  useTimeLabel,
-  useTimeSpan,
-} from '../../hooks/use-time-label.js';
+import { useDateFromEpoch, useTimeLabel } from '../../hooks/use-time-label.js';
 import { I18nKey } from '../../i18n/main.js';
-import { $rootPath, setSubPath } from '../../state/path.js';
+import { setSubPath } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
 import { Cell } from '../main.js';
 
@@ -35,116 +24,6 @@ export type TAutomatedInputLogic = Match<
   TExclude,
   TSystem
 >;
-
-export const TimerOutputBody: FunctionComponent<{
-  object: TAutomatedInputLogic;
-}> = ({ object }) => {
-  const {
-    automationEnable: {
-      main: automationEnable,
-      manual: automationEnableManual,
-    },
-    timerOutput: {
-      active: {
-        cancel: { main: cancel },
-        main: active,
-      },
-      flip: { main: flip },
-      runoutTime: { main: runoutTime },
-      triggerTime: { main: triggerTime },
-      // @ts-ignore
-    },
-    // @ts-ignore
-  } = object;
-
-  const OverlayBody = useColorBody(BodyLarge, '');
-
-  const { value: enabledValue } = useTypedEmitter(serialized(automationEnable));
-  const { value: enabledManualValue } = useTypedEmitter(
-    serialized(automationEnableManual),
-  );
-
-  const { value: activeValue } = useTypedEmitter(serialized(active));
-
-  const runoutTimeDate = useDateFromEpoch(
-    useTypedEmitter(serialized(runoutTime)).value,
-  );
-  const triggerTimeDate = useDateFromEpoch(
-    useTypedEmitter(serialized(triggerTime)).value,
-  );
-
-  const runoutTimeLabel = useTimeLabel(runoutTimeDate, 0);
-
-  const [, fraction] = useTimeSpan(triggerTimeDate, runoutTimeDate);
-
-  const handleFlip = useTypedCollector(serialized(flip));
-  const handleCancel = useTypedCollector(serialized(cancel));
-
-  const handleBodyClick = useCallback<MouseEventHandler<HTMLElement>>(
-    (event) => {
-      event.stopPropagation();
-
-      if (activeValue) {
-        handleCancel(null);
-        return;
-      }
-
-      handleFlip(null);
-    },
-    [activeValue, handleCancel, handleFlip],
-  );
-
-  const allowTransition = Boolean(useDelay($rootPath.value, 300, true));
-
-  const label = useMemo(() => {
-    if (!activeValue || !runoutTimeLabel) {
-      return null;
-    }
-
-    return <TabularNums>{runoutTimeLabel}</TabularNums>;
-  }, [activeValue, runoutTimeLabel]);
-
-  const blendOver = useMemo(() => {
-    if (activeValue && fraction !== undefined) return fraction;
-    if (!enabledValue) return 0;
-    return 1;
-  }, [activeValue, enabledValue, fraction]);
-
-  const hasJustFinished =
-    (useDelay(activeValue, 1000) && !activeValue) || (activeValue && !label);
-
-  // console.log(enabledValue, blendOver);
-
-  return (
-    <BlendOver
-      blendOver={blendOver}
-      invert={true}
-      onClick={handleBodyClick}
-      transition={allowTransition && activeValue !== undefined}
-      transitionDurationOverride={activeValue ? 1000 : 300}
-      overlay={
-        enabledValue ? (
-          // eslint-disable-next-line react-hooks/static-components
-          <OverlayBody>
-            {label || <Translation i18nKey="enabled" />}
-          </OverlayBody>
-        ) : undefined
-      }
-    >
-      <BodyLarge>
-        {hasJustFinished ? (
-          <Translation i18nKey="finished" />
-        ) : (
-          label || (
-            <Translation
-              i18nKey={enabledManualValue ? 'disabled' : 'inhibited'}
-            />
-          )
-        )}
-      </BodyLarge>
-    </BlendOver>
-  );
-};
 
 export const AutomatedInputLogic: FunctionComponent<{
   object: TAutomatedInputLogic;
@@ -163,7 +42,7 @@ export const AutomatedInputLogic: FunctionComponent<{
     timerAutomation: {
       active: { main: timerAutomationActive },
       runoutTime: { main: timerAutomationRunoutTime },
-      triggerTime: { main: timerAutomationTriggerTime },
+      // triggerTime: { main: timerAutomationTriggerTime },
     },
     timerOutput: {
       active: {
@@ -171,7 +50,7 @@ export const AutomatedInputLogic: FunctionComponent<{
         cancel: { main: timerOutputCancel },
       },
       runoutTime: { main: timerOutputRunoutTime },
-      triggerTime: { main: timerOutputTriggerTime },
+      // triggerTime: { main: timerOutputTriggerTime },
     },
     // @ts-ignore
   } = serialized(object);
@@ -195,10 +74,10 @@ export const AutomatedInputLogic: FunctionComponent<{
     useTypedEmitter(serialized(timerOutputRunoutTime)).value,
   );
   const timerOutputRunoutTimeLabel = useTimeLabel(timerOutputRunoutTimeDate, 0);
-  const [, timerOutputFraction] = useTimeSpan(
-    useDateFromEpoch(useTypedEmitter(serialized(timerOutputTriggerTime)).value),
-    timerOutputRunoutTimeDate,
-  );
+  // const [, timerOutputFraction] = useTimeSpan(
+  //   useDateFromEpoch(useTypedEmitter(serialized(timerOutputTriggerTime)).value),
+  //   timerOutputRunoutTimeDate,
+  // );
   const cancelTimerOutput = useTypedCollector(serialized(timerOutputCancel));
 
   const { value: isAutomationEnabledPermanent } = useTypedEmitter(
@@ -229,12 +108,12 @@ export const AutomatedInputLogic: FunctionComponent<{
     timerAutomationRunoutTimeDate,
     0,
   );
-  const [, timerAutomationFraction] = useTimeSpan(
-    useDateFromEpoch(
-      useTypedEmitter(serialized(timerAutomationTriggerTime)).value,
-    ),
-    timerAutomationRunoutTimeDate,
-  );
+  // const [, timerAutomationFraction] = useTimeSpan(
+  //   useDateFromEpoch(
+  //     useTypedEmitter(serialized(timerAutomationTriggerTime)).value,
+  //   ),
+  //   timerAutomationRunoutTimeDate,
+  // );
 
   const labelPrimary = useMemo(() => {
     if (isAutomationEnabledMain) {
@@ -343,20 +222,24 @@ export const AutomatedInputLogic: FunctionComponent<{
     ],
   );
 
+  const OverlayBody = useColorBody(
+    BodyLarge,
+    isAutomationEnabledMain ? '' : undefined,
+  );
+
   return (
     <Cell
       icon={<ForwardIcon height="1em" />}
       onClick={handleHeaderClick ?? onClick}
       title={<Translation i18nKey={name} capitalize />}
     >
-      <BlendOverWrapper>
-        <BlendOverContent>
-          <BodyLarge onClick={handleBodyClick}>{labelPrimary}</BodyLarge>
-        </BlendOverContent>
-        <BlendOverContent>
-          <BodyBottomBand>{labelSecondary}</BodyBottomBand>
-        </BlendOverContent>
-      </BlendOverWrapper>
+      {/* eslint-disable-next-line react-hooks/static-components*/}
+      <OverlayBody onClick={handleBodyClick} borderRadius={!labelSecondary}>
+        {labelPrimary}
+      </OverlayBody>
+      {labelSecondary ? (
+        <BodyBottomBand>{labelSecondary}</BodyBottomBand>
+      ) : null}
     </Cell>
   );
 };

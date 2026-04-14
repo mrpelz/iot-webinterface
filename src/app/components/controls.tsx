@@ -32,12 +32,16 @@ export const Cell = styled(GridCell)<CellProps>`
   overflow: hidden;
 `;
 
-export const Header = styled('cell-header')`
+export const Header = styled('cell-header')<{
+  borderRadius?: boolean;
+}>`
   align-items: center;
   background-color: ${colors.backgroundSecondary()};
   block-size: ${multiply(dimensions.controlBase, '4')};
-  border-start-end-radius: var(--border-radius);
-  border-start-start-radius: var(--border-radius);
+  border-start-end-radius: ${({ borderRadius = true }) =>
+    borderRadius ? 'var(--border-radius)' : 'none'};
+  border-start-start-radius: ${({ borderRadius = true }) =>
+    borderRadius ? 'var(--border-radius)' : 'none'};
   border: var(--border);
   display: flex;
   gap: ${dimensions.controlBase};
@@ -46,12 +50,16 @@ export const Header = styled('cell-header')`
   padding: ${dimensions.controlBase};
 `;
 
-export const Body = styled('cell-body' as 'section', forwardRef)`
+export const Body = styled('cell-body' as 'section', forwardRef)<{
+  borderRadius?: boolean;
+}>`
   align-content: flex-start;
   background-color: var(--background-color, none);
   border-block-end: var(--border);
-  border-end-end-radius: var(--border-radius);
-  border-end-start-radius: var(--border-radius);
+  border-end-end-radius: ${({ borderRadius = true }) =>
+    borderRadius ? 'var(--border-radius)' : 'none'};
+  border-end-start-radius: ${({ borderRadius = true }) =>
+    borderRadius ? 'var(--border-radius)' : 'none'};
   border-inline-end: var(--border);
   border-inline-start: var(--border);
   display: flex;
@@ -68,10 +76,12 @@ export const BodyLarge = styled(Body, forwardRef)`
 `;
 
 export const BodyBottomBand = styled(Body, forwardRef)`
-  margin-block-start: ${dimensions.fontSizeLarge};
   align-content: flex-end;
+  block-size: ${dimensions.fontSize};
+  border-block-start: solid ${dimensions.hairline} ${colors.fontPrimary()};
   font-size: ${dimensions.fontSizeSmall};
   justify-content: center;
+  padding-block: 0;
 `;
 
 export const Title = styled('cell-title')`
