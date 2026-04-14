@@ -11,7 +11,8 @@ import {
   useState,
 } from 'preact/hooks';
 
-import { TSerialization } from '../../../common/types.js';
+import { TSystem } from '../../../common/types.js';
+import { serialized } from '../../api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
 import { NonBreaking, TabularNums } from '../../components/text.js';
@@ -32,7 +33,7 @@ export type TBrightnessActuator = Match<
     $: 'led' | 'ledGrouping';
   },
   TExclude,
-  TSerialization
+  TSystem
 >;
 
 export const useWheelBrightness = (
@@ -129,12 +130,12 @@ export const BrightnessActuator: FunctionComponent<{
   onClick?: () => void;
   title?: I18nKey;
 }> = ({ actuator, onClick, title }) => {
-  const value = useTypedEmitter(actuator.main).value;
+  const value = useTypedEmitter(serialized(actuator.main)).value;
 
-  const brightness = useTypedEmitter(actuator.brightness).value;
+  const brightness = useTypedEmitter(serialized(actuator.brightness)).value;
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const setBrightness = useTypedCollector(actuator.brightness);
+  const setBrightness = useTypedCollector(serialized(actuator.brightness));
   const brightnessRef = useRef(brightness);
   useEffect(() => {
     brightnessRef.current = brightness;
@@ -142,7 +143,7 @@ export const BrightnessActuator: FunctionComponent<{
 
   const loading = useTypedEmitter(
     'actuatorStaleness' in actuator
-      ? actuator.actuatorStaleness.loading
+      ? serialized(actuator.actuatorStaleness.loading)
       : undefined,
   ).value;
   const loadingRef = useRef(loading);
@@ -150,7 +151,7 @@ export const BrightnessActuator: FunctionComponent<{
     loadingRef.current = loading;
   }, [loading]);
 
-  const flip = useTypedCollector(actuator.flip);
+  const flip = useTypedCollector(serialized(actuator.flip));
   const handleClick = useCallback(() => flip?.(null), [flip]);
 
   const [isInteracting, setInteracting] = useState(false);
@@ -182,7 +183,7 @@ export const BrightnessActuator: FunctionComponent<{
 
   const ColorBody = useColorBody(
     BodyLarge,
-    String(actuator.$path?.at(-1) ?? ''),
+    String(serialized(actuator).$path?.at(-1) ?? ''),
     actuator.topic,
   );
 

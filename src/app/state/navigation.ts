@@ -5,6 +5,7 @@ import {
 } from '@iot/iot-monolith/tree';
 import { computed, effect, signal } from '@preact/signals';
 
+import { LevelObject } from '../api.js';
 import { api } from '../main.js';
 import { $flags } from '../util/flags.js';
 import { persistedSignal, promisedSignal, TSignal } from '../util/signal.js';
@@ -28,7 +29,11 @@ export const $homes = computed(() => {
   const root = $root.value;
   if (!root) return undefined;
 
-  return api.match(levelObjectMatch[Level.HOME], excludePattern, root);
+  return api.match(
+    levelObjectMatch[Level.HOME],
+    excludePattern,
+    root,
+  ) as LevelObject[Level.HOME][];
 });
 
 export type HomeName = Exclude<TSignal<typeof $homes>, undefined>[number]['$'];
@@ -92,7 +97,11 @@ export const $buildings = computed(() => {
   const home = $home.value;
   if (!home) return undefined;
 
-  return api.match(levelObjectMatch[Level.BUILDING], excludePattern, home);
+  return api.match(
+    levelObjectMatch[Level.BUILDING],
+    excludePattern,
+    home,
+  ) as LevelObject[Level.BUILDING][];
 });
 
 export type BuildingName = Exclude<
@@ -158,7 +167,11 @@ export const $floors = computed(() => {
   const building = $building.value;
   if (!building) return undefined;
 
-  return api.match(levelObjectMatch[Level.FLOOR], excludePattern, building);
+  return api.match(
+    levelObjectMatch[Level.FLOOR],
+    excludePattern,
+    building,
+  ) as LevelObject[Level.FLOOR][];
 });
 
 export type FloorName = Exclude<
@@ -174,7 +187,11 @@ export const $rooms = computed(() => {
   const building = $building.value;
   if (!building) return undefined;
 
-  return api.match(levelObjectMatch[Level.ROOM], excludePattern, building);
+  return api.match(
+    levelObjectMatch[Level.ROOM],
+    excludePattern,
+    building,
+  ) as LevelObject[Level.ROOM][];
 });
 
 export const staticPagesTop = ['global', 'map'] as const;

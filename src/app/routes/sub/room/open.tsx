@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
+import { serialized } from '../../../api.js';
 import { AlignRight, TabularNums } from '../../../components/text.js';
 import { TOpenSensor } from '../../../controls/sensor/open.js';
 import { useTypedEmitter } from '../../../hooks/use-api.js';
@@ -41,17 +42,17 @@ export const OpenSensor: FunctionComponent<{
     },
   } = sensor;
 
-  const openValue = useTypedEmitter(open).value;
+  const openValue = useTypedEmitter(serialized(open)).value;
 
   const openLastChangeDate = useDateFromEpoch(
-    useTypedEmitter(lastChange).value,
+    useTypedEmitter(serialized(lastChange)).value,
   );
   const openLastChangeRelative = useRelativeTimeLabel(openLastChangeDate);
   const openLastChangeAbsolute = useAbsoluteTimeLabel(openLastChangeDate);
 
-  const tamperSwitchValue = useTypedEmitter(tamperSwitch).value;
+  const tamperSwitchValue = useTypedEmitter(serialized(tamperSwitch)).value;
   const tamperSwitchLastChangeDate = useDateFromEpoch(
-    useTypedEmitter(tamperSwitchLastChange).value,
+    useTypedEmitter(serialized(tamperSwitchLastChange)).value,
   );
   const tamperSwitchLastChangeRelative = useRelativeTimeLabel(
     tamperSwitchLastChangeDate,
@@ -60,7 +61,7 @@ export const OpenSensor: FunctionComponent<{
     tamperSwitchLastChangeDate,
   );
 
-  const openIsReceived = useTypedEmitter(isReceivedValue).value;
+  const openIsReceived = useTypedEmitter(serialized(isReceivedValue)).value;
 
   return (
     <>

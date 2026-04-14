@@ -12,12 +12,11 @@ declare global {
   }
 }
 
-export type { TSystem }
-export type TSerialization = ElementSerialization<TSystem>
+export type { TSystem };
 
 // https://stackoverflow.com/a/50375286
 export type UnionToIntersection<U> =
-(U extends any ? (x: U)=>void : never) extends ((x: infer I)=>void) ? I : never
+(U extends any ? (x: U)=>void : never) extends ((x: infer I)=>void) ? I : never;
 
 export type Flags = {
   absoluteTimes: boolean;

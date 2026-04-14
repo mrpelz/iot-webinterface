@@ -12,7 +12,7 @@ import {
 import { ReadonlySignal } from '@preact/signals';
 import { useCallback, useMemo } from 'preact/hooks';
 
-import { TSerialization } from '../../common/types.js';
+import { TSystem } from '../../common/types.js';
 import { api } from '../main.js';
 import { useArray } from './use-array-compare.js';
 import { useHookDebug } from './use-hook-debug.js';
@@ -50,7 +50,7 @@ export const useIsInit = (): boolean =>
 export const useMatch = <
   P extends object,
   E,
-  R extends object = TSerialization,
+  R extends object = TSystem,
   D extends number = typeof DEFAULT_MATCH_DEPTH,
 >(
   pattern: P,

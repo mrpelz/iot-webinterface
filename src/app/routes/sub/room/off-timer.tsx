@@ -2,6 +2,7 @@ import { epochs } from '@mrpelz/modifiable-date';
 import { FunctionComponent, GenericEventHandler, TargetedEvent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
+import { serialized } from '../../../api.js';
 import { Entry as EntryComponent } from '../../../components/list.js';
 import { NonBreaking } from '../../../components/text.js';
 import { NullActuatorButton } from '../../../controls/actuators/null.js';
@@ -41,18 +42,18 @@ export const OffTimer: FunctionComponent<{
     triggerTime: { main: triggerTime },
   } = actuator;
 
-  const { value: enabledValue } = useTypedEmitter(main);
-  const { value: activeValue } = useTypedEmitter(active);
-  const { value: isChangedValue } = useTypedEmitter(isChanged);
-  const { value: timeValue } = useTypedEmitter(time);
+  const { value: enabledValue } = useTypedEmitter(serialized(main));
+  const { value: activeValue } = useTypedEmitter(serialized(active));
+  const { value: isChangedValue } = useTypedEmitter(serialized(isChanged));
+  const { value: timeValue } = useTypedEmitter(serialized(time));
 
-  const setTime = useTypedCollector(time);
+  const setTime = useTypedCollector(serialized(time));
 
   const triggerTimeDate = useDateFromEpoch(
-    useTypedEmitter(triggerTime).value ?? undefined,
+    useTypedEmitter(serialized(triggerTime)).value ?? undefined,
   );
   const runoutTimeDate = useDateFromEpoch(
-    useTypedEmitter(runoutTime).value ?? undefined,
+    useTypedEmitter(serialized(runoutTime)).value ?? undefined,
   );
 
   const triggerTimeLabel = useTimeLabel(triggerTimeDate, 0);

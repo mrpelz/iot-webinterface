@@ -7,7 +7,7 @@ import {
 import { FunctionComponent } from 'preact';
 import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 
-import { LevelObject, sortBy } from '../api.js';
+import { LevelObject, serialized, sortBy } from '../api.js';
 import {
   Menu as MenuComponent,
   MenuContent,
@@ -42,7 +42,7 @@ const AllLightState: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
   room,
 }) => {
   const { main: allLights } = 'allLights' in room ? room.allLights : {};
-  const { value: on } = useTypedEmitter(allLights);
+  const { value: on } = useTypedEmitter(serialized(allLights));
 
   return (on ?? false) ? (
     <MenuIndicatorItem color="hsl(40deg 100% 50%)" />
@@ -53,7 +53,7 @@ const AllWindowsState: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
   room,
 }) => {
   const allWindows = 'allWindows' in room ? room.allWindows.main : undefined;
-  const open = useTypedEmitter(allWindows);
+  const open = useTypedEmitter(serialized(allWindows));
 
   return (open.value ?? false) ? (
     <MenuIndicatorItem color="hsl(0deg 100% 50%)" />
@@ -66,7 +66,7 @@ const DoorState: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
   const fontColor = colors.fontPrimary()();
   // @ts-ignore
   const door = 'door' in room ? room.door.open.main : undefined;
-  const open = useTypedEmitter(door);
+  const open = useTypedEmitter(serialized(door));
 
   return (open.value ?? false) ? <MenuIndicatorItem color={fontColor} /> : null;
 };

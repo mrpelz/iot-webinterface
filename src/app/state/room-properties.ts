@@ -111,12 +111,20 @@ export const roomProperties = (room: LevelObject[Level.ROOM]) => {
 
   const $timers = computed(() =>
     unique(
-      api.match(
-        { $: 'offTimer' as const },
-        excludePattern,
-        $properties.value,
-        1,
-      ),
+      [
+        api.match(
+          { $: 'offTimer' as const },
+          excludePattern,
+          $properties.value,
+          1,
+        ),
+        api.match(
+          { $: 'automatedInputLogic' as const },
+          excludePattern,
+          $properties.value,
+          1,
+        ),
+      ].flat(),
     ),
   );
 

@@ -2,7 +2,8 @@ import { Match, TExclude } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
-import { TSerialization } from '../../../common/types.js';
+import { TSystem } from '../../../common/types.js';
+import { serialized } from '../../api.js';
 import { Tag, TagGroup } from '../../components/controls.js';
 import { NonBreaking, TabularNums } from '../../components/text.js';
 import { useTypedEmitter } from '../../hooks/use-api.js';
@@ -31,7 +32,7 @@ export type TNumericSensor = Match<
       | 'uvIndex';
   },
   TExclude,
-  TSerialization
+  TSystem
 >;
 
 export const NumericSensor: FunctionComponent<{
@@ -58,7 +59,7 @@ export const NumericSensor: FunctionComponent<{
     [effectiveLocale, sensor.$],
   );
 
-  const value = useTypedEmitter(sensor.main).value;
+  const value = useTypedEmitter(serialized(sensor.main)).value;
   const formattedValue = useMemo(
     () => (value === undefined ? undefined : numberFormat.format(value)),
     [numberFormat, value],

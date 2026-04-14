@@ -18,6 +18,9 @@
     "nginx_template.conf",
     "dist/**/*.{js,map,ts}"
   ],
+  "overrides": {
+    "serialize-javascript": "^7.0.3"
+  },
   "dependencies": {
     "@iot/iot-monolith": "latest",
     "@mrpelz/misc-utils": "latest",
@@ -38,11 +41,13 @@
   "devDependencies": {
     "@mrpelz/boilerplate-common": "latest",
     "@mrpelz/boilerplate-preact": "latest",
+    "@types/node": "latest",
     "copy-webpack-plugin": "latest",
     "fork-ts-checker-webpack-plugin": "latest",
     "glob": "latest",
     "modify-source-webpack-plugin": "latest",
     "source-map-loader": "latest",
+    "typescript": "latest",
     "workbox-webpack-plugin": "latest"
   }
 }

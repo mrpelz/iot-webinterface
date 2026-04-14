@@ -3,10 +3,17 @@ import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
+import { serialized } from '../../../api.js';
 import { Entry as EntryComponent } from '../../../components/list.js';
 import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
 import { NullActuatorButton } from '../../../controls/actuators/null.js';
-import { OfflineIcon, OnlineIcon, TDevice } from '../../../controls/device.js';
+import {
+  OfflineIcon,
+  OnlineIcon,
+  TDevice,
+  TMainDevice,
+  TSubDevice,
+} from '../../../controls/device.js';
 import { useMatch, useTypedEmitter } from '../../../hooks/use-api.js';
 import {
   useAbsoluteTimeLabel,
@@ -37,11 +44,13 @@ const DeviceDetail: FunctionComponent<{ label: string }> = ({
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-const DeviceAddress: FunctionComponent<{ device: TDevice }> = ({ device }) =>
+const DeviceAddress: FunctionComponent<{
+  device: TMainDevice | TSubDevice;
+}> = ({ device }) =>
   useMemo(() => {
     const { type } = ensureKeys(device, 'type');
     const { host, port } = ensureKeys(device, 'host', 'port');
-    const { identifier } = ensureKeys(device, 'host');
+    const { identifier } = ensureKeys(device, 'identifier');
 
     if (type === 'ESPNowDevice') {
       if (!identifier) return null;
@@ -89,15 +98,17 @@ const DeviceAddress: FunctionComponent<{ device: TDevice }> = ({ device }) =>
     return null;
   }, [device]);
 
-const DeviceOnline: FunctionComponent<{ device: TDevice }> = ({ device }) => {
+const DeviceOnline: FunctionComponent<{ device: TMainDevice | TSubDevice }> = ({
+  device,
+}) => {
   const {
     online: { lastChange: { main: lastChange } = {}, main: online } = {},
   } = useMemo(() => ensureKeys(device, 'online'), [device]);
 
-  const { value: isOnline } = useTypedEmitter(online);
+  const { value: isOnline } = useTypedEmitter(serialized(online));
 
   const onlineLastChangeDate = useDateFromEpoch(
-    useTypedEmitter(lastChange).value,
+    useTypedEmitter(serialized(lastChange)).value,
   );
 
   const onlineChangeLabelAbsolute = useAbsoluteTimeLabel(onlineLastChangeDate);
@@ -114,7 +125,9 @@ const DeviceOnline: FunctionComponent<{ device: TDevice }> = ({ device }) => {
     return lastSeen_;
   }, [device]);
 
-  const lastSeenDate = useDateFromEpoch(useTypedEmitter(lastSeen).value);
+  const lastSeenDate = useDateFromEpoch(
+    useTypedEmitter(serialized(lastSeen)).value,
+  );
 
   const lastSeenLabelAbsolute = useAbsoluteTimeLabel(lastSeenDate);
   const lastSeenLabelRelative = useRelativeTimeLabel(lastSeenDate);
@@ -157,7 +170,9 @@ const DeviceOnline: FunctionComponent<{ device: TDevice }> = ({ device }) => {
   );
 };
 
-const DeviceHello: FunctionComponent<{ device: TDevice }> = ({ device }) => {
+const DeviceHello: FunctionComponent<{ device: TMainDevice | TSubDevice }> = ({
+  device,
+}) => {
   const { hello: { main: hello } = {} } = useMemo(
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -165,7 +180,7 @@ const DeviceHello: FunctionComponent<{ device: TDevice }> = ({ device }) => {
     [device],
   );
 
-  const { value: helloValue } = useTypedEmitter(hello);
+  const { value: helloValue } = useTypedEmitter(serialized(hello));
 
   return useMemo(() => {
     if (!helloValue) return null;
@@ -224,7 +239,7 @@ const DeviceHello: FunctionComponent<{ device: TDevice }> = ({ device }) => {
 export const DeviceDetailsInner: FunctionComponent<{
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  device: TDevice;
+  device: TMainDevice | TSubDevice;
 }> = ({ device }) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -297,7 +312,7 @@ export const DeviceDetails: FunctionComponent<{
 
   return (
     <>
-      <DeviceDetailsInner device={device} />
+      <DeviceDetailsInner device={device as TMainDevice} />
       {espNow ? <DeviceDetailsInner device={espNow} /> : null}
       {wifi ? <DeviceDetailsInner device={wifi} /> : null}
     </>
