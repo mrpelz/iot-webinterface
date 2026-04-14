@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import {
+  anyString,
   excludePattern,
   Level,
   levelObjectMatch,
@@ -8,12 +9,18 @@ import { computed } from '@preact/signals';
 
 import { api } from '../main.js';
 import { exclude, unique } from '../util/array.js';
+import { extractKey } from '../util/oop.js';
 import { $building, $home, $root } from './navigation.js';
 
 export const globalProperties = () => {
+  const $hallway = computed(
+    () => $root.value?.wurstHome.sonninstraße16.firstFloor.hallway,
+  );
+
   const $properties = computed(() =>
     unique(
       [
+        api.match({ $: anyString }, excludePattern, $hallway.value, 1),
         api.match(
           levelObjectMatch[Level.PROPERTY],
           excludePattern,
@@ -40,11 +47,20 @@ export const globalProperties = () => {
   );
 
   const $security = computed(() =>
-    unique([
-      $building.value?.entryDoor,
-      $root.value?.allWindows,
-      $root.value?.allMotion,
-    ]),
+    unique(
+      [
+        api.match(
+          { $: 'window' as const },
+          excludePattern,
+          $properties.value,
+          1,
+        ),
+        $building.value?.entryDoor,
+        $hallway.value ? extractKey($hallway.value, 'motion') : [],
+        $root.value?.allWindows,
+        $root.value?.allMotion,
+      ].flat(),
+    ),
   );
 
   const $lights = computed(() =>
