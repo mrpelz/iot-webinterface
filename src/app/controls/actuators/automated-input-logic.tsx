@@ -29,7 +29,7 @@ export const AutomatedInputLogic: FunctionComponent<{
   object: TAutomatedInputLogic;
   onClick?: () => void;
   title?: I18nKey;
-}> = ({ object, onClick, title }) => {
+}> = ({ object, title }) => {
   const {
     $id,
     $path,
@@ -92,9 +92,6 @@ export const AutomatedInputLogic: FunctionComponent<{
   );
 
   const { value: isAutomationEnabledManual } = useTypedEmitter(
-    serialized(automationEnableManual),
-  );
-  const setAutomationEnableManual = useTypedCollector(
     serialized(automationEnableManual),
   );
 
@@ -194,30 +191,17 @@ export const AutomatedInputLogic: FunctionComponent<{
     (event) => {
       event.stopPropagation();
 
-      if (isAutomationEnabledMain) {
-        if (isTimerOutputActive) {
-          cancelTimerOutput(null);
-          return;
-        }
-
-        setAutomationEnablePermanent(false);
+      if (isTimerOutputActive) {
+        cancelTimerOutput(null);
         return;
       }
 
-      if (isAutomationEnabledManual) {
-        setAutomationEnablePermanent(!isAutomationEnabledPermanent);
-        return;
-      }
-
-      setAutomationEnableManual(true);
+      setAutomationEnablePermanent(!isAutomationEnabledPermanent);
     },
     [
       cancelTimerOutput,
-      isAutomationEnabledMain,
-      isAutomationEnabledManual,
       isAutomationEnabledPermanent,
       isTimerOutputActive,
-      setAutomationEnableManual,
       setAutomationEnablePermanent,
     ],
   );
@@ -230,7 +214,7 @@ export const AutomatedInputLogic: FunctionComponent<{
   return (
     <Cell
       icon={<ForwardIcon height="1em" />}
-      onClick={handleHeaderClick ?? onClick}
+      onClick={handleHeaderClick}
       title={<Translation i18nKey={name} capitalize />}
     >
       {/* eslint-disable-next-line react-hooks/static-components*/}

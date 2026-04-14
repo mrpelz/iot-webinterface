@@ -20,7 +20,11 @@ export const Tail: FunctionComponent = ({ children }) => {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    ref.current?.scrollTo({ behavior: 'smooth', top: 0 });
+    const { current: element } = ref;
+    if (!element) return;
+    if (element.scrollTop < -5) return;
+
+    element.scrollTo({ behavior: 'smooth', top: 0 });
   }, [children]);
 
   return (

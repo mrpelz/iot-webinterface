@@ -85,15 +85,11 @@ export const getLogCursor = (
   newLogs: (Log | typeof logSeparator)[],
   lastUrl: URL,
 ): URL | undefined => {
-  let cursor: string | undefined;
-
-  for (let index = newLogs.length; index > 0; index -= 1) {
-    const log = newLogs.at(index);
-    if (!log) break;
-    if (log === logSeparator) continue;
-
-    cursor = log[0];
-  }
+  const lastLog = newLogs.at(-1);
+  const cursor =
+    lastLog === logSeparator
+      ? (newLogs.at(-2) as Log | undefined)?.[0]
+      : lastLog?.[0];
 
   if (!cursor) return undefined;
 
