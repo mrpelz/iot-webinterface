@@ -2,7 +2,9 @@
   "compilerOptions": {
     "declaration": false,
     "declarationMap": false,
-    "rootDir": "src/app"
+    "outDir": "dist",
+    "rootDir": "src/app",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
   "extends": "@mrpelz/boilerplate-preact/tsconfig.json",
   "include": ["src/app/**/*"]

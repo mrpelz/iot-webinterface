@@ -4,7 +4,9 @@
     "declaration": false,
     "declarationMap": false,
     "lib": ["ESNext", "WebWorker"],
-    "rootDir": "."
+    "outDir": "../../dist",
+    "rootDir": ".",
+    "tsBuildInfoFile": "../../dist/tsconfig.workers.tsbuildinfo"
   },
   "extends": "@mrpelz/boilerplate-common/tsconfig.json",
   "include": ["**/*"]
