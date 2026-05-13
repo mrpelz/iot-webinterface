@@ -16,7 +16,7 @@ tmux \
 	set-option -w status off \; \
 	set-option -p pane-border-format "eslint (eslint.config.json, includes files outside \"src\")" \; \
 	split-window -h -l 66% "make -s util_mitmproxy" \; \
-	set-option -p pane-border-format "mitmproxy (https://ndnd.local)" \; \
+	set-option -p pane-border-format "mitmproxy" \; \
 	split-window -h -l 50% "make -s watch_test" \; \
 	set-option -p pane-border-format "jest (jest.config.json)" \; \
 	split-window -f -v -l 50% "make -s watch_stylelint" \; \
