@@ -6,8 +6,9 @@ BASE_FILE := $(shell npm ls --parseable --silent "@mrpelz/boilerplate-preact" 2>
 
 include $(BASE_FILE)/Makefile
 
-MITM_TOKEN := $(PKG_NAME)@$(PKG_VERSION)
-MITM_HOST := $(PKG_NAME)@$(PKG_VERSION)
+PACKAGE_LOCK_LINT_ARGS := $(PACKAGE_LOCK_LINT_ARGS) git.i.wurstsalat.cloud
+
+MITM_TOKEN := $(shell uuidgen)
 
 .PHONY: .PHONY \
 	util_mitmproxy \
