@@ -19,7 +19,8 @@
     "dist/**/*.{js,map,ts}"
   ],
   "overrides": {
-    "serialize-javascript": "^7.0.3"
+    "serialize-javascript": "^7.0.3",
+    "uuid": "^13.0.1"
   },
   "dependencies": {
     "@iot/iot-monolith": "latest",

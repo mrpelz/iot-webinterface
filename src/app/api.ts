@@ -178,6 +178,23 @@ export class Api {
     return this.$collector(object?.setState.reference);
   }
 
+  $typedCollectorEmitter<
+    T extends {
+      setState: InteractionReference<string, InteractionType.COLLECT>;
+      valueType: ValueType;
+    },
+  >(
+    object?: T | Promise<T> | undefined,
+    abort?: AbortController,
+  ): ReadonlySignal<TValueType[T['valueType']] | undefined> {
+    return this.$emitter(
+      (object ? Promise.resolve(object) : undefined)?.then(
+        (resolved) => resolved.setState.reference,
+      ),
+      abort,
+    );
+  }
+
   $typedEmitter<
     T extends {
       state: InteractionReference<string, InteractionType.EMIT>;

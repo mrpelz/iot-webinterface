@@ -14,7 +14,11 @@ import { useMemo, useState } from 'preact/hooks';
 
 import { TSystem } from '../../../common/types.js';
 import { serialized } from '../../api.js';
-import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
+import {
+  useTypedCollector,
+  useTypedCollectorEmitter,
+  useTypedEmitter,
+} from '../../hooks/use-api.js';
 import { useTruthy } from '../../hooks/use-first-truthy.js';
 import { Details, Inset, useIsOpen } from '../details.js';
 import {
@@ -174,6 +178,7 @@ export const getterRenderer: Renderer<
         <>
           <Key path={path} />{' '}
           <TypeAnnotation content={`getter (${isDate ? 'date' : type})`} />
+          <br />
           <PrimitiveValue type={type}>{liveValue}</PrimitiveValue>
           <br />
           <TypeAnnotation content="object" />
@@ -269,6 +274,11 @@ export const setterRenderer: Renderer<
     );
     const liveValue = computed(() => JSON.stringify(emitter.value));
 
+    const setEmitter = useTypedCollectorEmitter(
+      serialized(isParentOpen ? value : undefined),
+    );
+    const setLiveValue = computed(() => JSON.stringify(setEmitter.value));
+
     // @ts-ignore
     const collector = useTypedCollector(serialized(value));
 
@@ -345,15 +355,17 @@ export const setterRenderer: Renderer<
       () => (
         <>
           <Key path={path} /> <TypeAnnotation content={`setter (${type})`} />
+          <br />
           <Annotation content="set:" />
-          {input}
+          <PrimitiveValue type={type}>{setLiveValue}</PrimitiveValue> {input}
+          <br />
           <Annotation content="actual:" />
           <PrimitiveValue type={type}>{liveValue}</PrimitiveValue>
           <br />
           <TypeAnnotation content="object" />
         </>
       ),
-      [input, liveValue, path, type],
+      [input, liveValue, path, setLiveValue, type],
     );
 
     // @ts-ignore

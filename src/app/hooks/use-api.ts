@@ -81,6 +81,34 @@ export const useTypedCollector = <
 }): ((value: TValueType[T]) => void) =>
   useMemo(() => api.$typedCollector(object), [object]);
 
+export const useTypedCollectorEmitter = <
+  R extends string,
+  S extends InteractionReference<R, InteractionType.COLLECT>,
+  T extends ValueType,
+>(
+  object?:
+    | {
+        setState: S;
+        valueType: T;
+      }
+    | undefined,
+): ReadonlySignal<TValueType[T] | undefined> => {
+  useHookDebug('useTypedEmitter');
+
+  return useAbortableSignalFactory<
+    [
+      object extends undefined
+        ? undefined
+        : Promise<Exclude<typeof object, undefined>>,
+    ],
+    ReadonlySignal<TValueType[T] | undefined>,
+    typeof api.$typedCollectorEmitter
+  >(
+    useCallback((...args) => api.$typedCollectorEmitter(...args), []),
+    [usePromisify(object)],
+  );
+};
+
 export const useTypedEmitter = <
   R extends string,
   S extends InteractionReference<R, InteractionType.EMIT>,

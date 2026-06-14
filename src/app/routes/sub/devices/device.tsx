@@ -1,10 +1,10 @@
 import { excludePattern } from '@iot/iot-monolith/tree';
 import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { FunctionComponent } from 'preact';
-import { useMemo } from 'preact/hooks';
+import { useCallback, useMemo } from 'preact/hooks';
 
 import { serialized } from '../../../api.js';
-import { Entry as EntryComponent } from '../../../components/list.js';
+import { Button, Entry as EntryComponent } from '../../../components/list.js';
 import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
 import { NullActuatorButton } from '../../../controls/actuators/null.js';
 import {
@@ -14,7 +14,12 @@ import {
   TMainDevice,
   TSubDevice,
 } from '../../../controls/device.js';
-import { useMatch, useTypedEmitter } from '../../../hooks/use-api.js';
+import {
+  useMatch,
+  useTypedCollector,
+  useTypedCollectorEmitter,
+  useTypedEmitter,
+} from '../../../hooks/use-api.js';
 import {
   useAbsoluteTimeLabel,
   useDateFromEpoch,
@@ -106,6 +111,7 @@ const DeviceOnline: FunctionComponent<{ device: TMainDevice | TSubDevice }> = ({
   } = useMemo(() => ensureKeys(device, 'online'), [device]);
 
   const { value: isOnline } = useTypedEmitter(serialized(online));
+  const { value: isSetOnline } = useTypedCollectorEmitter(serialized(online));
 
   const onlineLastChangeDate = useDateFromEpoch(
     useTypedEmitter(serialized(lastChange)).value,
@@ -135,31 +141,37 @@ const DeviceOnline: FunctionComponent<{ device: TMainDevice | TSubDevice }> = ({
   return useMemo(
     () => (
       <>
-        {isOnline ? (
+        {isSetOnline === undefined ? null : (
+          <DeviceDetail label="setOnline">
+            {isSetOnline ? <OnlineIcon /> : <OfflineIcon />}
+          </DeviceDetail>
+        )}
+        {isOnline === undefined ? null : (
           <DeviceDetail label="online">
             {isOnline ? <OnlineIcon /> : <OfflineIcon />}
           </DeviceDetail>
-        ) : null}
-        {lastChange ? (
+        )}
+        {lastChange === undefined ? null : (
           <DeviceDetail label="online change">
             <TabularNums>
               {onlineChangeLabelAbsolute || '—'} <br />(
               {onlineChangeLabelRelative || '—'})
             </TabularNums>
           </DeviceDetail>
-        ) : null}
-        {lastSeen ? (
+        )}
+        {lastSeen === undefined ? null : (
           <DeviceDetail label="last seen">
             <TabularNums>
               {lastSeenLabelAbsolute || '—'} <br />(
               {lastSeenLabelRelative || '—'})
             </TabularNums>
           </DeviceDetail>
-        ) : null}
+        )}
       </>
     ),
     [
       isOnline,
+      isSetOnline,
       lastChange,
       lastSeen,
       lastSeenLabelAbsolute,
@@ -262,6 +274,13 @@ export const DeviceDetailsInner: FunctionComponent<{
     device,
   );
 
+  const [online] = useMatch({ $: 'online' as const }, excludePattern, device);
+  const flipOnline = useTypedCollector(serialized(online?.flip));
+  const handleFlipOnlineClick = useCallback(
+    () => flipOnline?.(null),
+    [flipOnline],
+  );
+
   return (
     <List>
       <DeviceDetail label={isSubDevice ? 'sub name' : 'name'}>
@@ -276,8 +295,11 @@ export const DeviceDetailsInner: FunctionComponent<{
 
       <DeviceHello device={device} />
 
-      {identifyDevice || resetDevice ? (
+      {online?.flip || identifyDevice || resetDevice ? (
         <EntryComponent>
+          {online?.flip ? (
+            <Button onClick={handleFlipOnlineClick}>flip online state</Button>
+          ) : null}
           {identifyDevice ? (
             <NullActuatorButton actuator={identifyDevice}>
               identify device
