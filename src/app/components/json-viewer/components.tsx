@@ -1,5 +1,5 @@
 import { styled } from 'goober';
-import { JSX } from 'preact/jsx-runtime';
+import { ClipboardEventHandler } from 'preact';
 
 import { dimensions } from '../../style.js';
 
@@ -32,6 +32,11 @@ export const Wrapper = styled('section')`
   font-size: ${dimensions.fontSize};
   line-height: 1.5;
   padding: 1ch;
+  overflow-x: auto;
+
+  & > * {
+    inline-size: max-content;
+  }
 `;
 
 export const Property = styled('div')`
@@ -45,7 +50,7 @@ export const Property = styled('div')`
 
 export const Key = styled<{
   isIndex?: boolean;
-  onCopy?: JSX.ClipboardEventHandler<HTMLSpanElement>;
+  onCopy?: ClipboardEventHandler<HTMLSpanElement>;
   title?: string;
 }>('span')`
   color: var(

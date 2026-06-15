@@ -5,7 +5,12 @@ import { useCallback, useMemo } from 'preact/hooks';
 
 import { serialized } from '../../../api.js';
 import { Button, Entry as EntryComponent } from '../../../components/list.js';
-import { AlignRight, BreakAll, TabularNums } from '../../../components/text.js';
+import {
+  AlignRight,
+  BreakAll,
+  Selectable,
+  TabularNums,
+} from '../../../components/text.js';
 import { NullActuatorButton } from '../../../controls/actuators/null.js';
 import {
   OfflineIcon,
@@ -41,7 +46,9 @@ const DeviceDetail: FunctionComponent<{ label: string }> = ({
   return (
     <Entry id={label} label={label}>
       <BreakAll>
-        <AlignRight>{children}</AlignRight>
+        <AlignRight>
+          <Selectable>{children}</Selectable>
+        </AlignRight>
       </BreakAll>
     </Entry>
   );

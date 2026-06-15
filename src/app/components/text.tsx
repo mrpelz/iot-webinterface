@@ -30,3 +30,16 @@ export const TabularNums = styled('tabular-nums')`
   display: contents;
   font-variant-numeric: tabular-nums;
 `;
+
+export const Selectable = styled('selectable')`
+  display: contents;
+  &,
+  & * {
+    -moz-user-select: text;
+    -ms-user-select: text;
+    -webkit-tap-highlight-color: text;
+    -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+`;
