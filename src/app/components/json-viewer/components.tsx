@@ -29,7 +29,7 @@ export const Wrapper = styled('section')`
 
   background-color: var(--background);
   color: var(--foreground);
-  font-size: ${dimensions.fontSize};
+  font-size: ${dimensions.fontSizeSmall};
   line-height: 1.5;
   padding: 1ch;
   overflow-x: auto;
