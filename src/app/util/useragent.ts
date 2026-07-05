@@ -11,3 +11,6 @@ export const isSafari = (() => {
 
   return true;
 })();
+
+export const isiPhone =
+  isSafari && navigator.userAgent.toLowerCase().includes('iphone');

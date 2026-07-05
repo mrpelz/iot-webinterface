@@ -23,9 +23,9 @@ import {
 import { stripIndents } from 'proper-tags';
 import { InjectManifest } from 'workbox-webpack-plugin';
 
-const version = execSync('npm pkg get "version" --silent', { encoding: 'utf8' })
-  .replaceAll('\n', '')
-  .replaceAll('"', '');
+const version = execSync('npm pkg get "version" --silent', {
+  encoding: 'utf8',
+}).replaceAll(/[\n"]/g, '');
 
 const apiProxy = process.env.API_PROXY;
 
@@ -143,6 +143,7 @@ config.plugins = [
             'start',
             stripIndents`
               ${glob
+                // eslint-disable-next-line unicorn/max-nested-calls
                 .sync(path.resolve(dirSrc, 'common/images/background/*'))
                 .map((path_) =>
                   path.relative(path.resolve(dirSrc, 'app'), path_),

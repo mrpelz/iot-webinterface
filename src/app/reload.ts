@@ -7,7 +7,6 @@ import { isSafari } from './util/useragent.js';
 
 const RECONNECT_NOTIFIER = '3ee56e5f-2ddb-4c5e-81a1-8318e05cff72';
 
-// eslint-disable-next-line unicorn/prefer-global-this
 export const webpackServe = Boolean(window.__webpackServe__);
 
 export const init = (): void => {

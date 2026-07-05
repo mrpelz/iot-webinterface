@@ -16,7 +16,7 @@
     "dist/**/*",
     "Dockerfile",
     "nginx_template.conf",
-    "dist/**/*.{js,map,ts}"
+    "npm-shrinkwrap.json"
   ],
   "overrides": {
     "serialize-javascript": "^7.0.3",

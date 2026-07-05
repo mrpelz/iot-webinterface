@@ -17,8 +17,7 @@ import { SubPage } from '../sub/room/main.js';
 
 export const Room: FunctionComponent<{
   $properties:
-    | ReturnType<typeof roomProperties>
-    | ReturnType<typeof globalProperties>;
+    ReturnType<typeof roomProperties> | ReturnType<typeof globalProperties>;
 }> = ({
   children,
   $properties: {

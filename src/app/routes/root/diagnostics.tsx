@@ -355,12 +355,7 @@ export const Diagnostics: FunctionComponent = () => {
           <td>
             <b>version</b>
           </td>
-          <td>
-            {
-              // eslint-disable-next-line unicorn/prefer-global-this
-              computed(() => JSON.stringify(window.__version__))
-            }
-          </td>
+          <td>{computed(() => JSON.stringify(window.__version__))}</td>
         </tr>
 
         <tr>

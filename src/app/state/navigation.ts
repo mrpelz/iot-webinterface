@@ -208,8 +208,7 @@ export const staticPages = [...staticPagesTop, ...staticPagesBottom];
 export type RoomName = Exclude<TSignal<typeof $rooms>, undefined>[number]['$'];
 
 export type StaticPage =
-  | (typeof staticPagesTop)[number]
-  | (typeof staticPagesBottom)[number];
+  (typeof staticPagesTop)[number] | (typeof staticPagesBottom)[number];
 
 const START_PAGE: StaticPage = 'global';
 

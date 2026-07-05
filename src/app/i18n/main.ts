@@ -18,8 +18,7 @@ export const nonCapitalizations = {
 };
 
 export type I18nKey =
-  | keyof (typeof translations)[I18nLanguage]
-  | keyof typeof universal;
+  keyof (typeof translations)[I18nLanguage] | keyof typeof universal;
 export type I18nTranslation = Record<I18nKey, string>;
 
 export type I18nNonCapitalization = (typeof nonCapitalizations)[I18nLanguage];

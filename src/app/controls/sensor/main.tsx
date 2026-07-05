@@ -35,15 +35,15 @@ export const Sensor: FunctionComponent<{
     case 'window': {
       return <OpenSensor sensor={object} onClick={onClick} title={title} />;
     }
+    // case 'co2':
+    // case 'pm025':
+    // case 'pm10':
+    // case 'uvIndex':
     case 'brightness':
     case 'humidity':
     case 'pressure':
     case 'temperature':
-    case 'tvoc':
-    case 'co2':
-    case 'pm025':
-    case 'pm10':
-    case 'uvIndex': {
+    case 'tvoc': {
       return <NumericSensor sensor={object} onClick={onClick} title={title} />;
     }
     case 'hmmdMotion': {

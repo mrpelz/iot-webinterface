@@ -10,7 +10,6 @@ import {
   ActivityIcon,
   CheckIcon,
   ForwardIcon,
-  WiFiIcon,
   XIcon,
 } from '../components/icons.js';
 import { TabularNums } from '../components/text.js';
@@ -96,9 +95,10 @@ const DeviceOnlineState: FunctionComponent<{
 export const Device: FunctionComponent<{
   device: TDevice;
   onClick?: () => void;
+  // eslint-disable-next-line arrow-body-style
 }> = ({ device, onClick }) => {
-  const { espNow: { device: espNow } = {}, wifi: { device: wifi } = {} } =
-    useMemo(() => ensureKeys(device, 'espNow', 'wifi'), [device]);
+  // const { espNow: { device: espNow } = {}, wifi: { device: wifi } = {} } =
+  //   useMemo(() => ensureKeys(device, 'espNow', 'wifi'), [device]);
 
   return (
     <CellWithBody
@@ -106,7 +106,7 @@ export const Device: FunctionComponent<{
       onClick={onClick}
       title={useMemo(() => serialized(device).$path?.at?.(-2), [device])}
     >
-      {espNow && wifi ? (
+      {/* {espNow && wifi ? (
         <>
           <Tag>
             <TagGroup>
@@ -122,11 +122,11 @@ export const Device: FunctionComponent<{
             </TagGroup>
           </Tag>
         </>
-      ) : (
-        <Tag>
-          <DeviceOnlineState device={device} />
-        </Tag>
-      )}
+      ) : ( */}
+      <Tag>
+        <DeviceOnlineState device={device} />
+      </Tag>
+      {/* )} */}
     </CellWithBody>
   );
 };

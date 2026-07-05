@@ -7,6 +7,7 @@ import { TSystem } from '../../../common/types.js';
 import { serialized } from '../../api.js';
 import { BodyBottomBand, BodyLarge } from '../../components/controls.js';
 import { ForwardIcon } from '../../components/icons.js';
+import { TabularNums } from '../../components/text.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { useExtractKey } from '../../hooks/use-ensure-keys.js';
@@ -222,7 +223,9 @@ export const AutomatedInputLogic: FunctionComponent<{
         {labelPrimary}
       </OverlayBody>
       {labelSecondary ? (
-        <BodyBottomBand>{labelSecondary}</BodyBottomBand>
+        <BodyBottomBand>
+          <TabularNums>{labelSecondary}</TabularNums>
+        </BodyBottomBand>
       ) : null}
     </Cell>
   );

@@ -86,8 +86,7 @@ export const useSwipe = <T extends HTMLElement>(
     const onTouchEnd: (
       this: HTMLElement,
       event:
-        | HTMLElementEventMap['touchend']
-        | HTMLElementEventMap['touchcancel'],
+        HTMLElementEventMap['touchend'] | HTMLElementEventMap['touchcancel'],
     ) => void = () => {
       update = 0;
 

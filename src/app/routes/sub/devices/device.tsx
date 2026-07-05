@@ -331,19 +331,19 @@ export const DeviceDetails: FunctionComponent<{
   const name = useMemo(() => String(device.$path.at(-2) ?? ''), [device]);
   useTitleOverride(name);
 
-  const { espNow: { device: espNow } = {}, wifi: { device: wifi } = {} } =
-    useMemo(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      () => ensureKeys(device, 'espNow', 'wifi'),
-      [device],
-    );
+  // const { espNow: { device: espNow } = {}, wifi: { device: wifi } = {} } =
+  //   useMemo(
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore
+  //     () => ensureKeys(device, 'espNow', 'wifi'),
+  //     [device],
+  //   );
 
   return (
     <>
       <DeviceDetailsInner device={device as TMainDevice} />
-      {espNow ? <DeviceDetailsInner device={espNow} /> : null}
-      {wifi ? <DeviceDetailsInner device={wifi} /> : null}
+      {/* {espNow ? <DeviceDetailsInner device={espNow} /> : null}
+      {wifi ? <DeviceDetailsInner device={wifi} /> : null} */}
     </>
   );
 };

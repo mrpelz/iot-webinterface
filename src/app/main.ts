@@ -7,6 +7,7 @@ import { defer } from './util/defer.js';
 import { iOSHoverStyles, iOSScrollToTop } from './util/ios-fixes.js';
 import { requestNotificationPermission } from './util/notifications.js';
 import { persist } from './util/storage.js';
+import { isiPhone } from './util/useragent.js';
 
 export const id = crypto.randomUUID();
 
@@ -27,8 +28,10 @@ try {
     requestNotificationPermission();
     await registerServiceWorker();
 
-    iOSHoverStyles();
-    iOSScrollToTop();
+    if (isiPhone) {
+      iOSHoverStyles();
+      iOSScrollToTop();
+    }
 
     await persist();
     initReload();
