@@ -17,6 +17,9 @@ MITM_TOKEN := $(shell uuidgen)
 check_commit:
 	commitlint --verbose --config commitlint.config.mjs --last
 
+check_package_lock:
+	lockfile-lint --path npm-shrinkwrap.json --type npm $(PACKAGE_LOCK_LINT_ARGS)
+
 util_mitmproxy:
 	clear \
 
