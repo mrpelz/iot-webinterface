@@ -36,10 +36,12 @@
     "goober": "2.1.19",
     "hls.js": "1.6.16",
     "idb-keyval": "6.3.0",
+    "konsta": "5.2.0",
     "preact": "10.29.7",
     "proper-tags": "2.0.2",
     "resilient-websocket": "2.0.0",
     "style-vendorizer": "2.2.3",
+    "tailwindcss": "4.3.2",
     "workbox-precaching": "7.4.1",
     "workbox-window": "7.4.1"
   },
