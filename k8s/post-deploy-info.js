@@ -1,4 +1,5 @@
 #!/usr/bin/env -S node --experimental-modules
+
 /* eslint-disable no-console */
 
 import {
@@ -59,9 +60,11 @@ import {
 
       ### API-Info
 
-      This prerelease is set up to proxy \`/api\` to \`iot-monolith@${iotMonolithVersion}\` deployment in k8s [namespace "${iotMonolithNamespace}" on cluster \`${rancherCluster}\`](https://rancher.lan.wurstsalat.cloud/dashboard/c/${rancherCluster}/explorer/apps.deployment/${iotMonolithNamespace}/iot-monolith).
+      This prerelease is set up to proxy \`/api\` to \`iot-monolith@${iotMonolithVersion}\`.
+        * version \`latest\` is a special case, with [the proxy upstream pointing to \`prod\`](http://${iotMonolithNamespace}.rancher-iot.lan.wurstsalat.cloud).
+        * other versions utilize k8s [namespace "${iotMonolithNamespace}" on same cluster \`${rancherCluster}\` as prerelease](https://rancher.lan.wurstsalat.cloud/dashboard/c/${rancherCluster}/explorer/apps.deployment/${iotMonolithNamespace}/iot-monolith) as [the upstream](http://${iotMonolithNamespace}.${domain}).
 
-      [visit \`/api\`](https://${iotMonolithNamespace}.${domain}/api)
+      [\`/__proxy-api-hostname\`](https://${namespace}.${domain}/__proxy-api-hostname)
     `);
 
     const [projectMergeRequests, pipelineUsername] = await Promise.all([
