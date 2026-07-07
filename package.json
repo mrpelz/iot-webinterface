@@ -37,9 +37,11 @@
     "hls.js": "1.6.17",
     "idb-keyval": "6.3.0",
     "preact": "10.29.8",
+    "konsta": "5.2.0",
     "proper-tags": "2.0.2",
     "resilient-websocket": "2.0.0",
     "style-vendorizer": "2.2.3",
+    "tailwindcss": "4.3.2",
     "workbox-precaching": "7.4.1",
     "workbox-window": "7.4.1"
   },

@@ -1,3 +1,4 @@
+import { App as KApp } from 'konsta/react';
 import { FunctionComponent } from 'preact';
 import { useLayoutEffect } from 'preact/hooks';
 
@@ -23,12 +24,17 @@ export const App: FunctionComponent = () => {
   }, [backgroundColor]);
 
   return (
-    <AppComponent className="root">
-      {$flags.screensaverEnable.value ? <Screensaver /> : null}
-      <Layout>
-        <RootRoute />
-        <Background />
-      </Layout>
+    <AppComponent>
+      <KApp
+        safeAreas
+        theme="ios"
+      >
+        {$flags.screensaverEnable.value ? <Screensaver /> : null}
+        <Layout>
+          <RootRoute />
+          <Background />
+        </Layout>
+      </KApp>
     </AppComponent>
   );
 };
