@@ -11,6 +11,7 @@ import {
 // @ts-ignore
 import configUpstream from '@mrpelz/boilerplate-preact/webpack.config.js';
 import CopyPlugin from 'copy-webpack-plugin';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import { deepmerge } from 'deepmerge-ts';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import { glob } from 'glob';
@@ -76,6 +77,14 @@ const configDownstream = {
     chunkFormat: false,
     publicPath: '/',
   },
+  resolve: {
+    alias: {
+      react: 'preact/compat',
+      'react-dom': 'preact/compat',
+      'react/jsx-runtime': 'preact/jsx-runtime',
+    },
+    conditionNames: ['import'],
+  },
 };
 
 // @ts-ignore
@@ -125,7 +134,7 @@ if (config.module) {
     },
     {
       test: /\.css$/i,
-      use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      use: [MiniCssExtractPlugin.loader, 'css-loader', '@tailwindcss/webpack'],
     },
     {
       test: /\.png$/i,
@@ -133,6 +142,23 @@ if (config.module) {
     },
   ];
 }
+
+config.optimization = {
+  minimize: true,
+  minimizer: [
+    '...',
+    new CssMinimizerPlugin({
+      minimizerOptions: {
+        preset: [
+          'default',
+          {
+            calc: false,
+          },
+        ],
+      },
+    }),
+  ],
+};
 
 config.plugins = [
   new ModifySourcePlugin({
@@ -191,6 +217,11 @@ config.plugins = [
       {
         context: path.resolve(dirSrc, 'common/icons'),
         from: path.resolve(dirSrc, 'common/icons/*'),
+        to: path.resolve(dirDist, 'assets'),
+      },
+      {
+        context: path.resolve(dirSrc, 'common/fonts'),
+        from: path.resolve(dirSrc, 'common/fonts/*'),
         to: path.resolve(dirDist, 'assets'),
       },
     ],

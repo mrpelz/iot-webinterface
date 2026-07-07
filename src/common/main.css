@@ -1,3 +1,9 @@
+@import url('./roboto.css');
+/* stylelint-disable-next-line import-notation */
+@import 'tailwindcss';
+/* stylelint-disable-next-line import-notation */
+@import 'konsta/react/theme.css';
+
 html {
   --inset-size: env(safe-area-inset-top, 1px);
 }
