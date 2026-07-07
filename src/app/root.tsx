@@ -13,6 +13,7 @@ import './state/visibility.js';
 import { setup } from 'goober';
 import { createGlobalStyles as createGlobalStyle } from 'goober/global';
 import { prefix } from 'goober/prefixer';
+import { KonstaProvider } from 'konsta/react';
 import { FunctionComponent, h, render as preactRender } from 'preact';
 
 import { dimensions, strings } from './style.js';
@@ -53,7 +54,9 @@ const GlobalStyles = createGlobalStyle`
 export const Root: FunctionComponent = () => (
   <>
     <GlobalStyles />
-    <App />
+    <KonstaProvider theme="ios" dark>
+      <App />
+    </KonstaProvider>
   </>
 );
 
