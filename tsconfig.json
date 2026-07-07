@@ -2,7 +2,14 @@
   "compilerOptions": {
     "declaration": false,
     "declarationMap": false,
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "outDir": "dist",
+    "paths": {
+      "react-dom": ["./node_modules/preact/compat/src/index.d.ts"],
+      "react": ["./node_modules/preact/compat/src/index.d.ts"],
+      "react/jsx-runtime": ["./node_modules/preact/jsx-runtime/src/index.d.ts"]
+    },
     "rootDir": "src/app",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
