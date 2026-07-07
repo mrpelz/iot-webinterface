@@ -1,3 +1,4 @@
+import { Toggle } from 'konsta/react';
 import { FunctionComponent, GenericEventHandler, TargetedEvent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
@@ -193,11 +194,10 @@ export const Settings: FunctionComponent = () => {
             />
           }
         >
-          <input
+          <Toggle
             checked={flags$.hallwayStreamEnable.value}
             id="hallwayStreamEnable"
             name="hallwayStreamEnable"
-            type="checkbox"
             onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked } }) => {
                 flags$.hallwayStreamEnable.value = checked;
@@ -316,11 +316,10 @@ export const Settings: FunctionComponent = () => {
             />
           }
         >
-          <input
+          <Toggle
             checked={flags$.absoluteTimes.value}
             id="absoluteTimes"
             name="absoluteTimes"
-            type="checkbox"
             onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked } }) => {
                 flags$.absoluteTimes.value = checked;
@@ -381,11 +380,10 @@ export const Settings: FunctionComponent = () => {
             />
           }
         >
-          <input
+          <Toggle
             checked={flags$.screensaverEnable.value}
             id="screensaverEnable"
             name="screensaverEnable"
-            type="checkbox"
             onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked } }) => {
                 flags$.screensaverEnable.value = checked;
@@ -408,11 +406,10 @@ export const Settings: FunctionComponent = () => {
               />
             }
           >
-            <input
+            <Toggle
               checked={flags$.screensaverRandomizePosition.value}
               id="screensaverRandomizePosition"
               name="screensaverRandomizePosition"
-              type="checkbox"
               onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
                 ({ currentTarget: { checked } }) => {
                   flags$.screensaverRandomizePosition.value = checked;
@@ -433,11 +430,10 @@ export const Settings: FunctionComponent = () => {
             />
           }
         >
-          <input
+          <Toggle
             checked={flags$.debug.value}
             id="debug"
             name="debug"
-            type="checkbox"
             onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked } }) => {
                 flags$.debug.value = checked;
@@ -493,11 +489,10 @@ export const Settings: FunctionComponent = () => {
             />
           }
         >
-          <input
+          <Toggle
             checked={flags$.updateUnattended.value}
             id="updateUnattended"
             name="updateUnattended"
-            type="checkbox"
             onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({
                 currentTarget: { checked },
