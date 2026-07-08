@@ -21,7 +21,11 @@ precacheAndRoute(manifest, {
     const { pathname } = url;
     const pathChunks = pathname.slice(1).split('/');
 
-    if (pathChunks[0] !== 'api' && !pathname.includes('.')) {
+    if (
+      pathChunks[0] !== 'api' &&
+      !pathname.startsWith('__') &&
+      !pathname.includes('.')
+    ) {
       url.pathname = '/index.html';
     }
 

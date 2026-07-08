@@ -1,6 +1,12 @@
+import {
+  excludePattern,
+  Level,
+  levelObjectMatch,
+} from '@iot/iot-monolith/tree';
+import { effect } from '@preact/signals';
 import { stripIndents } from 'proper-tags';
 
-import { Api } from './api.js';
+import { Api, serialized } from './api.js';
 import { init as initReload } from './reload.js';
 import { registerServiceWorker } from './sw.js';
 import { defer } from './util/defer.js';
@@ -36,27 +42,25 @@ try {
     await persist();
     initReload();
 
-    // await api.isInit;
-    // // @ts-ignore
-    // const [match] = api.match({ $: 'sunElevation' as const }, excludePattern);
+    await api.isInit;
 
-    // // eslint-disable-next-line no-console
-    // console.log({ match, reference: match?.main.state.reference });
+    const [match] = api.match({ $: 'sunElevation' as const }, excludePattern);
 
-    // // @ts-ignore
-    // const rooms = api.match(levelObjectMatch[Level.ROOM], excludePattern);
-    // // eslint-disable-next-line no-console
-    // console.log({ rooms: rooms.map((room) => room.$) });
+    // eslint-disable-next-line no-console
+    console.log({ match, reference: serialized(match?.main.state)?.reference });
 
-    // // @ts-ignore
-    // const [office] = api.match({ $: 'office' as const }, excludePattern);
+    const rooms = api.match(levelObjectMatch[Level.ROOM], excludePattern);
+    // eslint-disable-next-line no-console
+    console.log({ rooms: rooms.map((room) => room.$) });
 
-    // // eslint-disable-next-line no-console
-    // console.log(office?.devices.ceilingLight.device.host);
+    const [office] = api.match({ $: 'office' as const }, excludePattern);
 
-    // // const $emitter = api.$typedEmitter(match?.main);
-    // // // eslint-disable-next-line no-console
-    // // effect(() => console.log(match?.$, $emitter.value));
+    // eslint-disable-next-line no-console
+    console.log(office?.devices.ceilingLight.device.host);
+
+    const $emitter = api.$typedEmitter(serialized(match?.main));
+    // eslint-disable-next-line no-console
+    effect(() => console.log(match?.$, $emitter.value));
   });
 } catch (error) {
   // eslint-disable-next-line no-console
