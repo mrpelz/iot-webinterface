@@ -3,7 +3,7 @@ import { expose } from 'comlink';
 import { clear, createStore, set, setMany } from 'idb-keyval';
 import rSock, { WebSocketEvent } from 'resilient-websocket';
 
-import type { API_WORKER_API, TSerialization } from '../common/types.js';
+import type { API_WORKER_API, TSystem } from '../common/types.js';
 import { getFlags } from './util.js';
 
 const ResilientWebSocket = rSock as unknown as typeof rSock.default;
@@ -21,6 +21,7 @@ const PATH_STREAM = '/api/stream';
 const PATH_VALUES = '/api/values';
 
 const WEBSOCKET_PING_INTERVAL = 1000;
+const VALUE_THROTTLE = 50;
 
 const sleep = () =>
   new Promise((resolve) =>
@@ -57,8 +58,9 @@ class Api implements API_WORKER_API {
   );
 
   private readonly _stateStore = createStore('api_state', 'state');
+  private readonly _valueThrottles = new Map<string, number>();
   private readonly _valuesStore = createStore('api_values', 'values');
-  private _webSocket: InstanceType<typeof ResilientWebSocket>;
+  private _webSocket?: InstanceType<typeof ResilientWebSocket>;
 
   constructor() {
     this._init = this._getHierarchy();
@@ -77,7 +79,7 @@ class Api implements API_WORKER_API {
         // @ts-ignore
         const hierarchy = await fetch(
           new URL(PATH_HIERARCHY, apiBaseUrl ?? self.location.href),
-        ).then((response) => response.json() as Promise<TSerialization>);
+        ).then((response) => response.json() as Promise<TSystem>);
 
         // eslint-disable-next-line no-console
         if (debug) console.debug(hierarchy);
@@ -122,7 +124,7 @@ class Api implements API_WORKER_API {
       pingInterval: WEBSOCKET_PING_INTERVAL,
       pingMessage: WEB_API_UUID,
       pongMessage: WEB_API_UUID,
-      pongTimeout: WEBSOCKET_PING_INTERVAL,
+      pongTimeout: WEBSOCKET_PING_INTERVAL * 3,
     });
 
     this._webSocket.on(WebSocketEvent.CONNECTION, async () => {
@@ -155,8 +157,21 @@ class Api implements API_WORKER_API {
         const data_ = JSON.parse(data);
         const [key, value] = Array.isArray(data_) ? data_ : [];
 
-        await set(key, value, this._valuesStore);
-        this._notifier.postMessage(key);
+        const existingThrottle = this._valueThrottles.get(key);
+        clearTimeout(existingThrottle);
+
+        if (debug && existingThrottle) {
+          // eslint-disable-next-line no-console
+          console.debug('Throttled incoming WebSocket value');
+        }
+
+        this._valueThrottles.set(
+          key,
+          setTimeout(() => {
+            set(key, value, this._valuesStore);
+            this._notifier.postMessage(key);
+          }, VALUE_THROTTLE),
+        );
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('WebSocket incoming message error', error);
