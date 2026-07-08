@@ -14,9 +14,11 @@ export PACKAGE_BUNDLE="$(npm pack --silent "${PACKAGE_SPEC}")" && \
 tar --strip-components=1 -xf "${PACKAGE_BUNDLE}" "package/" && \
 export IOT_MONOLITH_VERSION="$(npm --silent pkg get "dependencies.@iot/iot-monolith" | sed -nr 's/^"(.+)"$/\1/p')" && \
 if [ $IOT_MONOLITH_VERSION = "latest" ]; then \
-  sed -e "s#{IOT_MONOLITH_SCHEMA}#https#g" \
+  sed -e "s#{PACKAGE_SPEC}#${PACKAGE_SPEC}#g" \
+      -e "s#{IOT_MONOLITH_SCHEMA}#https#g" \
       -e "s#{IOT_MONOLITH_HOSTNAME}#iot-iot-monolith-latest.rancher-iot.lan.wurstsalat.cloud#g" "nginx_template.conf" >"nginx.conf"; else \
-  sed -e "s#{IOT_MONOLITH_SCHEMA}#http#g" \
+  sed -e "s#{PACKAGE_SPEC}#${PACKAGE_SPEC}#g" \
+      -e "s#{IOT_MONOLITH_SCHEMA}#http#g" \
       -e "s#{IOT_MONOLITH_HOSTNAME}#iot-monolith-http.iot-iot-monolith-${IOT_MONOLITH_VERSION}.svc.cluster.local#g" "nginx_template.conf" >"nginx.conf"; fi && \
 rm "${PACKAGE_BUNDLE}"
 
