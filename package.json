@@ -1,6 +1,6 @@
 {
   "name": "@iot/iot-webinterface",
-  "version": "2.29.2",
+  "version": "2.29.3-feat-konsta-ui.5",
   "description": "web interface for \"iot-monolith\".",
   "repository": {
     "type": "git",
