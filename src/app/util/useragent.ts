@@ -14,3 +14,8 @@ export const isSafari = (() => {
 
 export const isiPhone =
   isSafari && navigator.userAgent.toLowerCase().includes('iphone');
+
+export const isPWA =
+  window.matchMedia('(display-mode: standalone)').matches ||
+  ('standalone' in navigator && navigator.standalone) ||
+  document.referrer.startsWith('android-app://');

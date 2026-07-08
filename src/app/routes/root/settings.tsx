@@ -26,7 +26,6 @@ import { Translation } from '../../views/translation.js';
 
 const $staticPageLabel = getTranslationFallback('staticPage');
 const $roomLabel = getTranslationFallback('room');
-const $autoLabel = getTranslationFallback('auto');
 
 export const Settings: FunctionComponent = () => {
   const rooms = $rooms.value;
@@ -392,7 +391,10 @@ export const Settings: FunctionComponent = () => {
           <input
             id="apiBaseUrl"
             name="apiBaseUrl"
-            placeholder={$autoLabel}
+            placeholder={useMemo(
+              () => new URL('/', self.location.href).href,
+              [],
+            )}
             type="url"
             value={$flags.apiBaseUrl.value || ''}
             onBlur={useCallback<GenericEventHandler<HTMLInputElement>>(

@@ -58,6 +58,7 @@ import { useBreakpoint } from '../../style/breakpoint.js';
 import { getMediaQuery } from '../../style/main.js';
 import { isPrerelease, isProd } from '../../sw.js';
 import { $flags } from '../../util/flags.js';
+import { isPWA } from '../../util/useragent.js';
 
 const DEFAULT_PATH = ['wurstHome', 'sonninstraße16', 'firstFloor'];
 
@@ -341,12 +342,23 @@ export const Diagnostics: FunctionComponent = () => {
     [setPersistedPath],
   );
 
-  const apiVersionUrl = computed(
-    () =>
-      new URL('/api/version', $flags.apiBaseUrl.value ?? self.location.href)
-        .href,
+  const apiVersion = useFetchText(
+    computed(
+      () =>
+        new URL('/api/version', $flags.apiBaseUrl.value ?? self.location.href)
+          .href,
+    ).value,
   );
-  const apiVersion = useFetchText(apiVersionUrl.value);
+
+  const apiUpstream = useFetchText(
+    computed(
+      () =>
+        new URL(
+          '/__proxy-api-hostname',
+          $flags.apiBaseUrl.value ?? self.location.href,
+        ).href,
+    ).value,
+  );
 
   return (
     <DiagnosticsContainer>
@@ -367,6 +379,13 @@ export const Diagnostics: FunctionComponent = () => {
 
         <tr>
           <td>
+            <b>API-upstream</b>
+          </td>
+          <td>{useMemo(() => JSON.stringify(apiUpstream), [apiUpstream])}</td>
+        </tr>
+
+        <tr>
+          <td>
             <b>Instance ID</b>
           </td>
           <td>{computed(() => JSON.stringify(id))}</td>
@@ -378,6 +397,13 @@ export const Diagnostics: FunctionComponent = () => {
               <Flags />
             </Details>
           </td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>isPWA</b>
+          </td>
+          <td>{computed(() => JSON.stringify(isPWA))}</td>
         </tr>
 
         <tr>
