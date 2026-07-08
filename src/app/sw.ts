@@ -6,7 +6,11 @@ import type { SW_API } from '../common/types.js';
 import { webpackServe } from './reload.js';
 import { $flags } from './util/flags.js';
 
-export const isProd = location.hostname.endsWith('wurstsalat.cloud');
+export const isProd = location.hostname === 'iot.i.wurstsalat.cloud';
+export const isPrerelease =
+  !isProd &&
+  (location.hostname.endsWith('rancher.lan.wurstsalat.cloud') ||
+    location.hostname.endsWith('rancher-iot.lan.wurstsalat.cloud'));
 
 export const CHECK_INTERVAL = 15_000;
 

@@ -32,7 +32,7 @@ import { useFetchText } from '../../hooks/use-fetch.js';
 import { useFirstTruthy } from '../../hooks/use-first-truthy.js';
 import { useLocalStorage } from '../../hooks/use-local-storage.js';
 import { api, id } from '../../main.js';
-import { webpackServe } from '../../reload.js';
+import { RECONNECT_NOTIFIER, webpackServe } from '../../reload.js';
 import { $isFocused } from '../../state/focus.js';
 import { $isMenuVisible } from '../../state/menu.js';
 import {
@@ -56,7 +56,7 @@ import { $isVisible } from '../../state/visibility.js';
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { getMediaQuery } from '../../style/main.js';
-import { isProd } from '../../sw.js';
+import { isPrerelease, isProd } from '../../sw.js';
 import { $flags } from '../../util/flags.js';
 
 const DEFAULT_PATH = ['wurstHome', 'sonninstraße16', 'firstFloor'];
@@ -410,9 +410,28 @@ export const Diagnostics: FunctionComponent = () => {
 
         <tr>
           <td>
+            <b>isPrerelease</b>
+          </td>
+          <td>{useMemo(() => JSON.stringify(isPrerelease), [])}</td>
+        </tr>
+
+        <tr>
+          <td>
             <b>webpackServe</b>
           </td>
           <td>{useMemo(() => JSON.stringify(webpackServe), [])}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>webpackHash</b>
+          </td>
+          <td>
+            {useMemo(
+              () => JSON.stringify(sessionStorage.getItem(RECONNECT_NOTIFIER)),
+              [],
+            )}
+          </td>
         </tr>
 
         <tr>
