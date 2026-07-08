@@ -1,3 +1,4 @@
+import { sleep } from '@mrpelz/misc-utils/sleep';
 import { SharedWorkerSupported } from '@okikio/sharedworker';
 
 import { id } from './main.js';
@@ -5,12 +6,25 @@ import { workbox } from './sw.js';
 import { $flags } from './util/flags.js';
 import { isSafari } from './util/useragent.js';
 
-const RECONNECT_NOTIFIER = '3ee56e5f-2ddb-4c5e-81a1-8318e05cff72';
+export const RECONNECT_NOTIFIER = '3ee56e5f-2ddb-4c5e-81a1-8318e05cff72';
 
-export const webpackServe = Boolean(window.__webpackServe__);
+export let webpackServe = false;
+export const webpackServeAsync = (async () => {
+  while (true) {
+    if (window.__webpackServe__ === undefined) {
+      // eslint-disable-next-line no-await-in-loop
+      await sleep(10);
 
-export const init = (): void => {
-  if (!webpackServe) return;
+      continue;
+    }
+
+    webpackServe = window.__webpackServe__;
+    return webpackServe;
+  }
+})();
+
+export const init = async (): Promise<void> => {
+  if (!(await webpackServeAsync)) return;
 
   const workerName =
     SharedWorkerSupported && !isSafari ? 'reload' : `reload_${id}`;
