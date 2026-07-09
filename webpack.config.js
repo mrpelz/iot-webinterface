@@ -143,7 +143,6 @@ config.plugins = [
             'start',
             stripIndents`
               ${glob
-                // eslint-disable-next-line unicorn/max-nested-calls
                 .sync(path.resolve(dirSrc, 'common/images/background/*'))
                 .map((path_) =>
                   path.relative(path.resolve(dirSrc, 'app'), path_),
