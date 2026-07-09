@@ -36,7 +36,7 @@ const configDownstream = {
   devServer: {
     allowedHosts: 'all',
     client: false,
-    historyApiFallback: true,
+    historyApiFallback: false,
     host: '::1',
     hot: false,
     liveReload: false,
@@ -68,6 +68,10 @@ const configDownstream = {
       {
         changeOrigin: true,
         context: ['/api'],
+        target: apiProxy,
+      },
+      {
+        context: ['/__proxy-api-hostname'],
         target: apiProxy,
       },
     ],

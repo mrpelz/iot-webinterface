@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { computed, effect, signal } from '@preact/signals';
 import { expose } from 'comlink';
 import { clear, createStore, set, setMany } from 'idb-keyval';
 import rSock, { WebSocketEvent } from 'resilient-websocket';
@@ -61,9 +62,18 @@ class Api implements API_WORKER_API {
   private readonly _valueThrottles = new Map<string, number>();
   private readonly _valuesStore = createStore('api_values', 'values');
   private _webSocket?: InstanceType<typeof ResilientWebSocket>;
+  private readonly _websocketOnline = signal<boolean>(false);
+  private readonly _websocketStatus = computed(() =>
+    this._websocketOnline.value ? 'online' : 'offline',
+  );
 
   constructor() {
     this._init = this._getHierarchy();
+
+    effect(() => {
+      this._notifier.postMessage(this._websocketStatus.value);
+    });
+
     this._initWebSocket();
   }
 
@@ -132,21 +142,21 @@ class Api implements API_WORKER_API {
       if (debug) console.debug('WebSocket opened');
 
       await this._getValues();
-      this._notifier.postMessage('online');
+      this._websocketOnline.value = true;
     });
 
     this._webSocket.on(WebSocketEvent.CLOSE, () => {
       // eslint-disable-next-line no-console
       if (debug) console.debug('WebSocket closed');
 
-      this._notifier.postMessage('offline');
+      this._websocketOnline.value = false;
     });
 
     this._webSocket.on(WebSocketEvent.ERROR, () => {
       // eslint-disable-next-line no-console
       if (debug) console.debug('WebSocket error');
 
-      this._notifier.postMessage('offline');
+      this._websocketOnline.value = false;
     });
 
     this._webSocket.on(WebSocketEvent.MESSAGE, async (data) => {
@@ -194,6 +204,10 @@ class Api implements API_WORKER_API {
     this._notifier.postMessage('hierarchy');
   }
 
+  async onConnection(): Promise<void> {
+    this._notifier.postMessage(this._websocketStatus.value);
+  }
+
   async triggerCollector<T>(reference: string, value: T) {
     const { debug } = await getFlags();
 
@@ -213,6 +227,7 @@ self.addEventListener('connect', async ({ ports: [port] }) => {
   if (debug) console.debug('new connection');
 
   expose(api, port);
+  api.onConnection();
 });
 
 if (!('SharedWorkerGlobalScope' in self)) expose(api);
