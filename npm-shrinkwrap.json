@@ -9,7 +9,7 @@
       "version": "2.30.1",
       "license": "UNLICENSED",
       "dependencies": {
-        "@iot/iot-monolith": "8.9.0",
+        "@iot/iot-monolith": "latest",
         "@mrpelz/misc-utils": "6.1.0",
         "@mrpelz/modifiable-date": "6.1.0",
         "@okikio/sharedworker": "1.1.0",
@@ -26,8 +26,8 @@
         "workbox-window": "7.4.1"
       },
       "devDependencies": {
-        "@mrpelz/boilerplate-common": "16.2.0",
-        "@mrpelz/boilerplate-preact": "16.2.0",
+        "@mrpelz/boilerplate-common": "16.2.1",
+        "@mrpelz/boilerplate-preact": "16.2.1",
         "@types/node": "26.1.1",
         "copy-webpack-plugin": "14.0.0",
         "fork-ts-checker-webpack-plugin": "9.1.0",
@@ -3941,9 +3941,9 @@
       "license": "MIT"
     },
     "node_modules/@mrpelz/boilerplate-common": {
-      "version": "16.2.0",
-      "resolved": "https://git.i.wurstsalat.cloud/api/v4/projects/111/packages/npm/@mrpelz/boilerplate-common/-/@mrpelz/boilerplate-common-16.2.0.tgz",
-      "integrity": "sha1-/2nxaOayJKmdAkUDJb3Vb1ht0mc=",
+      "version": "16.2.1",
+      "resolved": "https://git.i.wurstsalat.cloud/api/v4/projects/111/packages/npm/@mrpelz/boilerplate-common/-/@mrpelz/boilerplate-common-16.2.1.tgz",
+      "integrity": "sha1-c69Pcnfc1ckNOQEQCH2yRKRxnEk=",
       "dev": true,
       "dependencies": {
         "@commitlint/cli": "21.2.1",
@@ -4678,9 +4678,9 @@
       }
     },
     "node_modules/@mrpelz/boilerplate-preact": {
-      "version": "16.2.0",
-      "resolved": "https://git.i.wurstsalat.cloud/api/v4/projects/111/packages/npm/@mrpelz/boilerplate-preact/-/@mrpelz/boilerplate-preact-16.2.0.tgz",
-      "integrity": "sha1-S+UiWU2vuEuahIO1y7AiKFZhgIE=",
+      "version": "16.2.1",
+      "resolved": "https://git.i.wurstsalat.cloud/api/v4/projects/111/packages/npm/@mrpelz/boilerplate-preact/-/@mrpelz/boilerplate-preact-16.2.1.tgz",
+      "integrity": "sha1-VZ1zY8Nm8ONDaC7wUFbDgmscWhs=",
       "dev": true,
       "dependencies": {
         "@mrpelz/boilerplate-dom": "*",
