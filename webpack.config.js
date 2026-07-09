@@ -70,6 +70,17 @@ const configDownstream = {
         target: apiProxy,
       },
     ],
+    /**
+     *
+     * @type {import('webpack-dev-server').Configuration['setupMiddlewares']}
+     */
+    setupMiddlewares: (middlewares, devServer) => {
+      devServer.app?.get('/__proxy-api-hostname', (_request, response) => {
+        response.send(apiProxy);
+      });
+
+      return middlewares;
+    },
   },
   output: {
     assetModuleFilename: 'assets/[name][ext]',

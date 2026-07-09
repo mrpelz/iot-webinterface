@@ -52,6 +52,7 @@
     "modify-source-webpack-plugin": "4.1.0",
     "source-map-loader": "5.0.0",
     "typescript": "6.0.2",
+    "webpack-dev-server": "6.0.0",
     "workbox-webpack-plugin": "7.4.1"
   },
   "packageManager": "npm@11.14.1+sha512.6a8a4d67478497a2dbc6815cad72e64c43f33413717e242756047d466241ab39bee61e691683a64658e94496ec5f1a1c05e4a5ec62dcc773280dfd949443a367",

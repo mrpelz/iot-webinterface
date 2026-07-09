@@ -1,4 +1,5 @@
 #!/usr/bin/env -S node --experimental-modules
+
 /* eslint-disable no-console */
 
 import {
@@ -49,19 +50,27 @@ import {
     });
 
     const iotMonolithNamespace = `iot-iot-monolith-${iotMonolithVersion}`;
+    const rancherClusterProd = 'c-m-bpsrsvjz';
+    const domainProd = 'rancher-iot.lan.wurstsalat.cloud';
 
     const [body, headline] = getProcessedBody(`
       ## Prerelease Deployed on k8s / \`${rancherCluster}\`
 
       Release based on [tag "${version}"](${projectUrl}/-/tags/${version}) has been deployed to [namespace "${namespace}" on cluster \`${rancherCluster}\`](https://rancher.lan.wurstsalat.cloud/dashboard/c/${rancherCluster}/explorer/apps.deployment/${namespace}/iot-webinterface).
 
-      [visit live deployment](https://${namespace}.${domain})
+      → [live deployment](https://${namespace}.${domain})
 
       ### API-Info
 
-      This prerelease is set up to proxy \`/api\` to \`iot-monolith@${iotMonolithVersion}\` deployment in k8s [namespace "${iotMonolithNamespace}" on cluster \`${rancherCluster}\`](https://rancher.lan.wurstsalat.cloud/dashboard/c/${rancherCluster}/explorer/apps.deployment/${iotMonolithNamespace}/iot-monolith).
+      This prerelease is set up to proxy \`/api\` to \`iot-monolith@${iotMonolithVersion}\`.
 
-      [visit \`/api\`](https://${iotMonolithNamespace}.${domain}/api)
+        ${
+          iotMonolithVersion === 'latest'
+            ? `→ using \`prod\` API present on k8s [namespace "${iotMonolithNamespace}" on cluster \`${rancherClusterProd}\`](https://rancher.lan.wurstsalat.cloud/dashboard/c/${rancherClusterProd}/explorer/apps.deployment/${iotMonolithNamespace}/iot-monolith) as [the upstream](https://${iotMonolithNamespace}.${domainProd}).`
+            : `→ expecting prerelease API present on k8s [namespace "${iotMonolithNamespace}" on cluster \`${rancherCluster}\`](https://rancher.lan.wurstsalat.cloud/dashboard/c/${rancherCluster}/explorer/apps.deployment/${iotMonolithNamespace}/iot-monolith) to be usable as [the upstream](https://${iotMonolithNamespace}.${domain}).`
+        }
+
+      [\`/__proxy-api-hostname\`](https://${namespace}.${domain}/__proxy-api-hostname)
     `);
 
     const [projectMergeRequests, pipelineUsername] = await Promise.all([

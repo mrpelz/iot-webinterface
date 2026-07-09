@@ -1,4 +1,4 @@
-import { FunctionComponent, JSX } from 'preact';
+import { FunctionComponent, GenericEventHandler, TargetedEvent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import { Button, Entry as EntryComponent } from '../../components/list.js';
@@ -25,7 +25,6 @@ import { Translation } from '../../views/translation.js';
 
 const $staticPageLabel = getTranslationFallback('staticPage');
 const $roomLabel = getTranslationFallback('room');
-const $autoLabel = getTranslationFallback('auto');
 
 export const Settings: FunctionComponent = () => {
   const rooms = $rooms.value;
@@ -46,10 +45,10 @@ export const Settings: FunctionComponent = () => {
             disabled={!$homes.value || $homes.value.length <= 1}
             id="home"
             name="home"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
+            onChange={useCallback<GenericEventHandler<HTMLSelectElement>>(
               ({
                 currentTarget: { value },
-              }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
+              }: TargetedEvent<HTMLSelectElement, Event>) => {
                 const matchingHome = $homes.value?.find(
                   (home) => home.$ === value,
                 );
@@ -78,10 +77,10 @@ export const Settings: FunctionComponent = () => {
             disabled={!$buildings.value || $buildings.value.length <= 1}
             id="building"
             name="building"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
+            onChange={useCallback<GenericEventHandler<HTMLSelectElement>>(
               ({
                 currentTarget: { value },
-              }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
+              }: TargetedEvent<HTMLSelectElement, Event>) => {
                 const matchingBuilding = $buildings.value?.find(
                   (building) => building.$ === value,
                 );
@@ -111,10 +110,10 @@ export const Settings: FunctionComponent = () => {
           <select
             id="startPage"
             name="startPage"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
+            onChange={useCallback<GenericEventHandler<HTMLSelectElement>>(
               ({
                 currentTarget: { value },
-              }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
+              }: TargetedEvent<HTMLSelectElement, Event>) => {
                 const selectedOverride = value;
                 if (selectedOverride === 'auto') {
                   $flags.startPage.value = null;
@@ -164,7 +163,7 @@ export const Settings: FunctionComponent = () => {
             id="pagePersistence"
             name="pagePersistence"
             type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+            onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked } }) => {
                 $flags.pagePersistence.value = checked;
               },
@@ -183,7 +182,7 @@ export const Settings: FunctionComponent = () => {
             id="hallwayStreamEnable"
             name="hallwayStreamEnable"
             type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+            onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked } }) => {
                 $flags.hallwayStreamEnable.value = checked;
               },
@@ -200,10 +199,10 @@ export const Settings: FunctionComponent = () => {
           <select
             id="theme"
             name="theme"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
+            onChange={useCallback<GenericEventHandler<HTMLSelectElement>>(
               ({
                 currentTarget: { value },
-              }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
+              }: TargetedEvent<HTMLSelectElement, Event>) => {
                 const theme = value as Theme | 'auto';
                 if (theme === 'auto') {
                   $flags.theme.value = null;
@@ -236,10 +235,10 @@ export const Settings: FunctionComponent = () => {
           <select
             id="language"
             name="language"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLSelectElement>>(
+            onChange={useCallback<GenericEventHandler<HTMLSelectElement>>(
               ({
                 currentTarget: { value },
-              }: JSX.TargetedEvent<HTMLSelectElement, Event>) => {
+              }: TargetedEvent<HTMLSelectElement, Event>) => {
                 const language = value as I18nLanguage | 'auto';
                 if (language === 'auto') {
                   $flags.language.value = null;
@@ -280,7 +279,7 @@ export const Settings: FunctionComponent = () => {
             id="absoluteTimes"
             name="absoluteTimes"
             type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+            onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked } }) => {
                 $flags.absoluteTimes.value = checked;
               },
@@ -303,10 +302,10 @@ export const Settings: FunctionComponent = () => {
               pattern="[0-9]*"
               placeholder="0"
               value={($flags.inactivityTimeout.value ?? 0) / 1000 || ''}
-              onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+              onBlur={useCallback<GenericEventHandler<HTMLInputElement>>(
                 ({
                   currentTarget: { value },
-                }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+                }: TargetedEvent<HTMLInputElement, Event>) => {
                   const inactivityTimeout = Number.parseInt(value.trim(), 10);
                   if (
                     !inactivityTimeout ||
@@ -335,7 +334,7 @@ export const Settings: FunctionComponent = () => {
             id="screensaverEnable"
             name="screensaverEnable"
             type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+            onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked } }) => {
                 $flags.screensaverEnable.value = checked;
 
@@ -362,7 +361,7 @@ export const Settings: FunctionComponent = () => {
               id="screensaverRandomizePosition"
               name="screensaverRandomizePosition"
               type="checkbox"
-              onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+              onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
                 ({ currentTarget: { checked } }) => {
                   $flags.screensaverRandomizePosition.value = checked;
                 },
@@ -382,7 +381,7 @@ export const Settings: FunctionComponent = () => {
             id="debug"
             name="debug"
             type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+            onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({ currentTarget: { checked } }) => {
                 $flags.debug.value = checked;
               },
@@ -397,13 +396,16 @@ export const Settings: FunctionComponent = () => {
           <input
             id="apiBaseUrl"
             name="apiBaseUrl"
-            placeholder={$autoLabel}
+            placeholder={useMemo(
+              () => new URL('/', self.location.href).href,
+              [],
+            )}
             type="url"
             value={$flags.apiBaseUrl.value || ''}
-            onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+            onBlur={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({
                 currentTarget: { value },
-              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+              }: TargetedEvent<HTMLInputElement, Event>) => {
                 const apiBaseUrl = value.trim();
                 if (apiBaseUrl.length === 0) {
                   $flags.apiBaseUrl.value = null;
@@ -432,10 +434,10 @@ export const Settings: FunctionComponent = () => {
             id="updateUnattended"
             name="updateUnattended"
             type="checkbox"
-            onChange={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+            onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({
                 currentTarget: { checked },
-              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+              }: TargetedEvent<HTMLInputElement, Event>) => {
                 $flags.updateUnattended.value = checked;
               },
               [],
@@ -456,10 +458,10 @@ export const Settings: FunctionComponent = () => {
             pattern="[0-9]*"
             placeholder="0"
             value={$flags.updateCheckInterval.value || ''}
-            onBlur={useCallback<JSX.GenericEventHandler<HTMLInputElement>>(
+            onBlur={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({
                 currentTarget: { value },
-              }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+              }: TargetedEvent<HTMLInputElement, Event>) => {
                 const updateCheckInterval = Number.parseInt(value.trim(), 10);
                 if (
                   !updateCheckInterval ||

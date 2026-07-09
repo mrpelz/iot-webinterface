@@ -1,4 +1,4 @@
-import { expose } from 'comlink';
+import { Endpoint, expose } from 'comlink';
 import { precacheAndRoute } from 'workbox-precaching';
 
 import type { SW_API } from '../common/types.js';
@@ -21,7 +21,11 @@ precacheAndRoute(manifest, {
     const { pathname } = url;
     const pathChunks = pathname.slice(1).split('/');
 
-    if (pathChunks[0] !== 'api' && !pathname.includes('.')) {
+    if (
+      pathChunks[0] !== 'api' &&
+      !pathname.startsWith('/__') &&
+      !pathname.includes('.')
+    ) {
       url.pathname = '/index.html';
     }
 
@@ -214,7 +218,7 @@ expose(api, {
     listener: (
       this: ServiceWorkerGlobalScope,
       event: ExtendableMessageEvent,
-    ) => Promise<void>,
+    ) => void,
   ): void {
     self.addEventListener(type, (event) => {
       event.waitUntil(
@@ -232,4 +236,4 @@ expose(api, {
     }
   },
   removeEventListener: self.removeEventListener,
-});
+} as Endpoint);

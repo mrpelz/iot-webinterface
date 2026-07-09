@@ -1,4 +1,4 @@
-import { computed } from '@preact/signals';
+import { computed, effect } from '@preact/signals';
 
 import { $breakpoint } from '../style/breakpoint.js';
 import { staticStrings } from '../style/strings.js';
@@ -25,4 +25,8 @@ export const $theme = computed(() => {
   if ($isPrefersLightTheme.value) return 'light';
 
   return 'light';
+});
+
+effect(() => {
+  document.documentElement.classList.toggle('dark', $theme.value === 'dark');
 });
