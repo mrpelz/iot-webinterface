@@ -1,12 +1,12 @@
 {
   "name": "@iot/iot-webinterface",
-  "version": "2.30.1",
+  "version": "2.30.2",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "@iot/iot-webinterface",
-      "version": "2.30.1",
+      "version": "2.30.2",
       "license": "UNLICENSED",
       "dependencies": {
         "@iot/iot-monolith": "latest",
