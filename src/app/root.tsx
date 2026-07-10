@@ -54,7 +54,10 @@ const GlobalStyles = createGlobalStyle`
 export const Root: FunctionComponent = () => (
   <>
     <GlobalStyles />
-    <KonstaProvider theme="ios" dark>
+    <KonstaProvider
+      dark
+      theme="ios"
+    >
       <App />
     </KonstaProvider>
   </>
