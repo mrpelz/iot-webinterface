@@ -68,8 +68,13 @@ export const BinaryActuator: FunctionComponent<{
 
   return (
     <Cell
+      title={
+        <Translation
+          capitalize={true}
+          i18nKey={name}
+        />
+      }
       onClick={onClick ?? handleClick}
-      title={<Translation i18nKey={name} capitalize={true} />}
     >
       <BlendOver
         blendOver={value_ ? 1 : 0}

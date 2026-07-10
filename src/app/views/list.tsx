@@ -12,7 +12,7 @@ export const Entry: FunctionComponent<{
   label?: ComponentChild;
 }> = ({ children, id, label }) => (
   <EntryComponent>
-    {label ? <label for={id}>{label}</label> : null}
+    {label ? <label htmlFor={id}>{label}</label> : null}
     {children}
   </EntryComponent>
 );

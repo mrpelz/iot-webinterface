@@ -268,10 +268,10 @@ export const Details: FunctionComponent<{
       )}
     >
       <DetailsComponent
-        onToggle={onToggle}
-        open={isOpen}
         ref={ref}
+        open={isOpen}
         title={isOpen ? undefined : 'expand'}
+        onToggle={onToggle}
       >
         <SummaryComponent
           collapsible={collapsible}
@@ -289,17 +289,23 @@ export const Details: FunctionComponent<{
         {showCollapseExpandAllIcon ? (
           <>
             {isCollapsible ? (
-              <CollapseAll onClick={onCollapseAllClick} title="collapse all" />
+              <CollapseAll
+                title="collapse all"
+                onClick={onCollapseAllClick}
+              />
             ) : null}
             {
               // eslint-disable-next-line no-nested-ternary
               isExpandable ? (
                 isCollapsible ? (
-                  <ExpandAll onClick={onExpandAllClick} title="expand all" />
+                  <ExpandAll
+                    title="expand all"
+                    onClick={onExpandAllClick}
+                  />
                 ) : (
                   <ExpandAllSingle
-                    onClick={onExpandAllClick}
                     title="expand all"
+                    onClick={onExpandAllClick}
                   />
                 )
               ) : null

@@ -1,6 +1,7 @@
 import { FunctionComponent, GenericEventHandler, TargetedEvent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
+import { serialized } from '../../api.js';
 import { Button, Entry as EntryComponent } from '../../components/list.js';
 import { ShowHide } from '../../components/show-hide.js';
 import { useArray } from '../../hooks/use-array-compare.js';
@@ -39,7 +40,12 @@ export const Settings: FunctionComponent = () => {
       <List>
         <Entry
           id="home"
-          label={<Translation capitalize={true} i18nKey="home" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="home"
+            />
+          }
         >
           <select
             disabled={!$homes.value || $homes.value.length <= 1}
@@ -63,7 +69,11 @@ export const Settings: FunctionComponent = () => {
             )}
           >
             {$homes.value?.map((home) => (
-              <option value={home.$} selected={home === $home.value}>
+              <option
+                key={serialized(home).$id}
+                selected={home === $home.value}
+                value={home.$}
+              >
                 <Translation i18nKey={home.$} />
               </option>
             )) ?? null}
@@ -71,7 +81,12 @@ export const Settings: FunctionComponent = () => {
         </Entry>
         <Entry
           id="building"
-          label={<Translation capitalize={true} i18nKey="building" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="building"
+            />
+          }
         >
           <select
             disabled={!$buildings.value || $buildings.value.length <= 1}
@@ -95,8 +110,9 @@ export const Settings: FunctionComponent = () => {
           >
             {$buildings.value?.map((building) => (
               <option
-                value={building.$}
+                key={serialized(building).$id}
                 selected={building === $building.value}
+                value={building.$}
               >
                 <Translation i18nKey={building.$} />
               </option>
@@ -105,7 +121,12 @@ export const Settings: FunctionComponent = () => {
         </Entry>
         <Entry
           id="startPage"
-          label={<Translation capitalize={true} i18nKey="startPage" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="startPage"
+            />
+          }
         >
           <select
             id="startPage"
@@ -132,14 +153,18 @@ export const Settings: FunctionComponent = () => {
               [startPages],
             )}
           >
-            <option value="auto" selected={$flags.startPage.value === null}>
+            <option
+              selected={$flags.startPage.value === null}
+              value="auto"
+            >
               <Translation i18nKey="auto" />
             </option>
             <optgroup label={$staticPageLabel}>
               {staticPages.map((staticPage) => (
                 <option
-                  value={staticPage}
+                  key={staticPage}
                   selected={staticPage === $flags.startPage.value}
+                  value={staticPage}
                 >
                   <Translation i18nKey={staticPage} />
                 </option>
@@ -147,7 +172,11 @@ export const Settings: FunctionComponent = () => {
             </optgroup>
             <optgroup label={$roomLabel}>
               {roomNames.map((room) => (
-                <option value={room} selected={room === $flags.startPage.value}>
+                <option
+                  key={room}
+                  selected={room === $flags.startPage.value}
+                  value={room}
+                >
                   <Translation i18nKey={room} />
                 </option>
               ))}
@@ -156,7 +185,12 @@ export const Settings: FunctionComponent = () => {
         </Entry>
         <Entry
           id="pagePersistence"
-          label={<Translation capitalize={true} i18nKey="persistPage" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="persistPage"
+            />
+          }
         >
           <input
             checked={$flags.pagePersistence.value}
@@ -174,7 +208,10 @@ export const Settings: FunctionComponent = () => {
         <Entry
           id="hallwayStreamEnable"
           label={
-            <Translation capitalize={true} i18nKey="enableHallwayStream" />
+            <Translation
+              capitalize={true}
+              i18nKey="enableHallwayStream"
+            />
           }
         >
           <input
@@ -194,7 +231,12 @@ export const Settings: FunctionComponent = () => {
       <List>
         <Entry
           id="theme"
-          label={<Translation capitalize={true} i18nKey="theme" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="theme"
+            />
+          }
         >
           <select
             id="theme"
@@ -218,11 +260,18 @@ export const Settings: FunctionComponent = () => {
               [],
             )}
           >
-            <option value="auto" selected={$flags.theme.value === null}>
+            <option
+              selected={$flags.theme.value === null}
+              value="auto"
+            >
               <Translation i18nKey="auto" />
             </option>
             {themes.map((theme) => (
-              <option value={theme} selected={theme === $flags.theme.value}>
+              <option
+                key={theme}
+                selected={theme === $flags.theme.value}
+                value={theme}
+              >
                 <Translation i18nKey={theme} />
               </option>
             ))}
@@ -230,7 +279,12 @@ export const Settings: FunctionComponent = () => {
         </Entry>
         <Entry
           id="language"
-          label={<Translation capitalize={true} i18nKey="language" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="language"
+            />
+          }
         >
           <select
             id="language"
@@ -257,13 +311,17 @@ export const Settings: FunctionComponent = () => {
               [],
             )}
           >
-            <option value="auto" selected={$flags.language.value === null}>
+            <option
+              selected={$flags.language.value === null}
+              value="auto"
+            >
               <Translation i18nKey="auto" />
             </option>
             {i18nLanguages.map((language) => (
               <option
-                value={language}
+                key={language}
                 selected={language === $flags.language.value}
+                value={language}
               >
                 <Translation i18nKey={language} />
               </option>
@@ -272,7 +330,12 @@ export const Settings: FunctionComponent = () => {
         </Entry>
         <Entry
           id="absoluteTimes"
-          label={<Translation capitalize={true} i18nKey="absoluteTimes" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="absoluteTimes"
+            />
+          }
         >
           <input
             checked={$flags.absoluteTimes.value}
@@ -291,7 +354,12 @@ export const Settings: FunctionComponent = () => {
       <List>
         <Entry
           id="inactivityTimeout"
-          label={<Translation capitalize={true} i18nKey="inactivityTimeout" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="inactivityTimeout"
+            />
+          }
         >
           <div>
             <input
@@ -327,7 +395,12 @@ export const Settings: FunctionComponent = () => {
         </Entry>
         <Entry
           id="screensaverEnable"
-          label={<Translation capitalize={true} i18nKey="enableScreensaver" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="enableScreensaver"
+            />
+          }
         >
           <input
             checked={$flags.screensaverEnable.value}
@@ -374,7 +447,12 @@ export const Settings: FunctionComponent = () => {
       <List>
         <Entry
           id="debug"
-          label={<Translation capitalize={true} i18nKey="debug" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="debug"
+            />
+          }
         >
           <input
             checked={$flags.debug.value}
@@ -391,17 +469,22 @@ export const Settings: FunctionComponent = () => {
         </Entry>
         <Entry
           id="apiBaseUrl"
-          label={<Translation capitalize={true} i18nKey="apiBaseUrl" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="apiBaseUrl"
+            />
+          }
         >
           <input
             id="apiBaseUrl"
             name="apiBaseUrl"
+            type="url"
+            value={$flags.apiBaseUrl.value || ''}
             placeholder={useMemo(
               () => new URL('/', self.location.href).href,
               [],
             )}
-            type="url"
-            value={$flags.apiBaseUrl.value || ''}
             onBlur={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({
                 currentTarget: { value },
@@ -427,7 +510,12 @@ export const Settings: FunctionComponent = () => {
       <List>
         <Entry
           id="updateUnattended"
-          label={<Translation capitalize={true} i18nKey="updateUnattended" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="updateUnattended"
+            />
+          }
         >
           <input
             checked={$flags.updateUnattended.value}
@@ -447,7 +535,10 @@ export const Settings: FunctionComponent = () => {
         <Entry
           id="updateCheckInterval"
           label={
-            <Translation capitalize={true} i18nKey="updateCheckInterval" />
+            <Translation
+              capitalize={true}
+              i18nKey="updateCheckInterval"
+            />
           }
         >
           <input

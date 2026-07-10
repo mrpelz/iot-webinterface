@@ -94,8 +94,13 @@ export const NullActuator: FunctionComponent<{
 
   return (
     <Cell
+      title={
+        <Translation
+          capitalize={true}
+          i18nKey={name}
+        />
+      }
       onClick={onClick ?? handleClick}
-      title={<Translation i18nKey={name} capitalize={true} />}
     >
       <Overlay
         overlay={
@@ -106,7 +111,10 @@ export const NullActuator: FunctionComponent<{
         }
       >
         <Body ref={baseRef}>
-          <Translation i18nKey="trigger" capitalize={true} />
+          <Translation
+            capitalize={true}
+            i18nKey="trigger"
+          />
         </Body>
       </Overlay>
     </Cell>
@@ -132,7 +140,10 @@ export const NullActuatorButton: FunctionComponent<
   const handleClick = useCallback(() => setter?.(null), [setter]);
 
   return (
-    <Button onClick={handleClick} {...rest}>
+    <Button
+      onClick={handleClick}
+      {...rest}
+    >
       {children}
     </Button>
   );

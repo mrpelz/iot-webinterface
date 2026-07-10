@@ -23,17 +23,31 @@ export const Actuator: FunctionComponent<{
     case 'outputGrouping':
     case 'scene': {
       return (
-        <BinaryActuator actuator={object} onClick={onClick} title={title} />
+        <BinaryActuator
+          actuator={object}
+          title={title}
+          onClick={onClick}
+        />
       );
     }
     case 'led':
     case 'ledGrouping': {
       return (
-        <BrightnessActuator actuator={object} onClick={onClick} title={title} />
+        <BrightnessActuator
+          actuator={object}
+          title={title}
+          onClick={onClick}
+        />
       );
     }
     case 'triggerElement': {
-      return <NullActuator actuator={object} onClick={onClick} title={title} />;
+      return (
+        <NullActuator
+          actuator={object}
+          title={title}
+          onClick={onClick}
+        />
+      );
     }
     // fake correct species as long as there’s no RGB lights present
     case 'rgb' as typeof object.$: {
@@ -41,16 +55,26 @@ export const Actuator: FunctionComponent<{
         <RGBActuator
           // fake correct object shape as long as there’s no RGB lights present
           actuator={object as TRGBActuator}
-          onClick={onClick}
           title={title}
+          onClick={onClick}
         />
       );
     }
     case 'offTimer': {
-      return <TimerActuator object={object} onClick={onClick} />;
+      return (
+        <TimerActuator
+          object={object}
+          onClick={onClick}
+        />
+      );
     }
     case 'automatedInputLogic': {
-      return <AutomatedInputLogic object={object} onClick={onClick} />;
+      return (
+        <AutomatedInputLogic
+          object={object}
+          onClick={onClick}
+        />
+      );
     }
     default: {
       return null;

@@ -66,7 +66,14 @@ export const OpenSensor: FunctionComponent<{
   return (
     <>
       <List>
-        <Entry label={<Translation i18nKey="state" capitalize={true} />}>
+        <Entry
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="state"
+            />
+          }
+        >
           {useMemo(() => {
             if (openValue === undefined) {
               return <Translation i18nKey="unknown" />;
@@ -99,7 +106,14 @@ export const OpenSensor: FunctionComponent<{
         </Entry>
       </List>
       <List>
-        <Entry label={<Translation i18nKey="tamperSwitch" capitalize={true} />}>
+        <Entry
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="tamperSwitch"
+            />
+          }
+        >
           {useMemo(
             () =>
               tamperSwitchValue ? <Translation i18nKey="triggered" /> : '—',

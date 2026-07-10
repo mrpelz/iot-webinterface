@@ -2,6 +2,7 @@ import { DEFAULT_MATCH_DEPTH, excludePattern } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
+import { serialized } from '../../api.js';
 import { Grid } from '../../components/grid.js';
 import { Actuator } from '../../controls/actuators/main.js';
 import { Control } from '../../controls/main.js';
@@ -45,53 +46,108 @@ export const Room: FunctionComponent<{
     >
       {children}
       {security.length > 0 ? (
-        <Category header={<Translation capitalize={true} i18nKey="security" />}>
+        <Category
+          header={
+            <Translation
+              capitalize={true}
+              i18nKey="security"
+            />
+          }
+        >
           <Grid>
             {security.map((item) => (
-              <Sensor object={item} />
+              <Sensor
+                key={serialized(item).$id}
+                object={item}
+              />
             ))}
           </Grid>
         </Category>
       ) : null}
       {sensors.length > 0 ? (
-        <Category header={<Translation capitalize={true} i18nKey="sensors" />}>
+        <Category
+          header={
+            <Translation
+              capitalize={true}
+              i18nKey="sensors"
+            />
+          }
+        >
           <Grid>
             {sensors.map((item) => (
-              <Sensor object={item} />
+              <Sensor
+                key={serialized(item).$id}
+                object={item}
+              />
             ))}
           </Grid>
         </Category>
       ) : null}
       {lights.length > 0 ? (
-        <Category header={<Translation capitalize={true} i18nKey="lights" />}>
+        <Category
+          header={
+            <Translation
+              capitalize={true}
+              i18nKey="lights"
+            />
+          }
+        >
           <Grid>
             {lights.map((item) => (
-              <Actuator object={item} />
+              <Actuator
+                key={serialized(item).$id}
+                object={item}
+              />
             ))}
           </Grid>
         </Category>
       ) : null}
       {scenes.length > 0 ? (
-        <Category header={<Translation capitalize={true} i18nKey="scenes" />}>
+        <Category
+          header={
+            <Translation
+              capitalize={true}
+              i18nKey="scenes"
+            />
+          }
+        >
           <Grid>
             {scenes.map((item) => (
-              <Actuator object={item} />
+              <Actuator
+                key={serialized(item).$id}
+                object={item}
+              />
             ))}
           </Grid>
         </Category>
       ) : null}
       {timers.length > 0 ? (
-        <Category header={<Translation capitalize={true} i18nKey="timers" />}>
+        <Category
+          header={
+            <Translation
+              capitalize={true}
+              i18nKey="timers"
+            />
+          }
+        >
           <Grid>
             {timers.map((item) => (
-              <Actuator object={item} />
+              <Actuator
+                key={serialized(item).$id}
+                object={item}
+              />
             ))}
           </Grid>
         </Category>
       ) : null}
       {restControls.length > 0 ? (
         <Category
-          header={<Translation capitalize={true} i18nKey="miscellaneous" />}
+          header={
+            <Translation
+              capitalize={true}
+              i18nKey="miscellaneous"
+            />
+          }
         >
           <Grid>{restControls.map((item) => item)}</Grid>
         </Category>

@@ -171,24 +171,33 @@ export const HLSStream: FunctionComponent<{
     <Category
       header={
         <>
-          <Translation i18nKey="surveillance" capitalize={true} />{' '}
+          <Translation
+            capitalize={true}
+            i18nKey="surveillance"
+          />{' '}
           <Translation i18nKey="is" />{' '}
           {effectiveSrc ? (
-            <PlayIcon height={dimensions.fontSizeSmall} viewBox="0 -2 24 24" />
+            <PlayIcon
+              height={dimensions.fontSizeSmall}
+              viewBox="0 -2 24 24"
+            />
           ) : (
-            <PauseIcon height={dimensions.fontSizeSmall} viewBox="0 -2 24 24" />
+            <PauseIcon
+              height={dimensions.fontSizeSmall}
+              viewBox="0 -2 24 24"
+            />
           )}
         </>
       }
     >
       <Video
+        ref={videoRef}
         autoPlay={true}
         loop={false}
         muted={true}
-        onClick={onClick}
         playsInline={true}
         poster={posterUrl}
-        ref={videoRef}
+        onClick={onClick}
       />
     </Category>
   );

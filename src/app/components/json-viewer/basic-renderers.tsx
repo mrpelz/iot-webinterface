@@ -38,6 +38,7 @@ export const useGetObjectChildren = (
       value
         ? objectKeys(value).map((childKey) => (
             <JSONViewerInner
+              key={childKey}
               path={[path, childKey].flat()}
               value={value[childKey]}
             />
@@ -60,9 +61,17 @@ export const useGetArrayChildren = (
 ): ComponentChild[] =>
   useMemo(
     () =>
-      value?.map((childValue, index) => (
-        <JSONViewerInner path={[path, index].flat()} value={childValue} />
-      )) ?? [],
+      value?.map((childValue, index) => {
+        const fullPath = [path, index].flat();
+
+        return (
+          <JSONViewerInner
+            key={fullPath.join('.')}
+            path={fullPath}
+            value={childValue}
+          />
+        );
+      }) ?? [],
     [path, value],
   );
 

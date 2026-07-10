@@ -28,8 +28,8 @@ export const Cell: FunctionComponent<CellProps> = ({
 }) => (
   <CellComponent
     isHighContrast={$theme.value === 'highContrast'}
-    onClick={onClick}
     span={span ?? 2}
+    onClick={onClick}
   >
     <Header>
       <Title>{title}</Title>

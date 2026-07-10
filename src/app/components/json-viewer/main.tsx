@@ -85,8 +85,8 @@ export const Key: FunctionComponent<{
   const keyNode = (
     <KeyComponent
       isIndex={typeof key === 'number'}
-      onCopy={onCopy}
       title={path_}
+      onCopy={onCopy}
     >
       {key.toString()}:
     </KeyComponent>
@@ -94,7 +94,10 @@ export const Key: FunctionComponent<{
 
   return (
     <>
-      <Treeline content={isOpen ? undefined : '›'} indent={path.length - 1} />
+      <Treeline
+        content={isOpen ? undefined : '›'}
+        indent={path.length - 1}
+      />
       {key === 'main' ? <Background type="key">{keyNode}</Background> : keyNode}
     </>
   );
@@ -127,7 +130,10 @@ export const JSONViewerInner: FunctionComponent<JSONViewerInnerProps> = ({
 
     return (
       <Property>
-        <renderer.RenderValue path={path} value={value} />
+        <renderer.RenderValue
+          path={path}
+          value={value}
+        />
       </Property>
     );
   }
@@ -355,7 +361,10 @@ export const JSONViewer: FunctionComponent<JSONViewerProps> = ({
       }}
     >
       <Wrapper>
-        <JSONViewerInner path={[]} value={value} />
+        <JSONViewerInner
+          path={[]}
+          value={value}
+        />
       </Wrapper>
     </JSONViewerContext.Provider>
   );

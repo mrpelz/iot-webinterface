@@ -103,8 +103,8 @@ export const Device: FunctionComponent<{
   return (
     <CellWithBody
       icon={<ForwardIcon height="1em" />}
-      onClick={onClick}
       title={useMemo(() => serialized(device).$path?.at?.(-2), [device])}
+      onClick={onClick}
     >
       {/* {espNow && wifi ? (
         <>

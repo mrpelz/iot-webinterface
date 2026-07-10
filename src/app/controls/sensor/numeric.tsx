@@ -67,8 +67,13 @@ export const NumericSensor: FunctionComponent<{
 
   return (
     <CellWithBody
+      title={
+        <Translation
+          capitalize={true}
+          i18nKey={title || sensor.$}
+        />
+      }
       onClick={onClick}
-      title={<Translation i18nKey={title || sensor.$} capitalize={true} />}
     >
       <Tag>
         {value === undefined ? (

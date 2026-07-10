@@ -3,6 +3,7 @@ import { computed } from '@preact/signals';
 import { FunctionComponent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
+import { serialized } from '../../api.js';
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import {
   arrayRenderer,
@@ -71,7 +72,7 @@ const Fallback: FunctionComponent = () => (
 const Flags: FunctionComponent = () => (
   <table>
     {Object.entries($flags).map(([key, observable]) => (
-      <tr>
+      <tr key={key}>
         <td>{key}</td>
         <td>{JSON.stringify(observable.value)}</td>
       </tr>
@@ -104,7 +105,7 @@ const Navigation: FunctionComponent = () => {
               <td colSpan={999}>elements</td>
             </tr>
             {homes?.map((element) => (
-              <tr>
+              <tr key={serialized(element).$id}>
                 <td>
                   <table>
                     <Properties object={element} />
@@ -129,7 +130,7 @@ const Navigation: FunctionComponent = () => {
               <td colSpan={999}>elements</td>
             </tr>
             {buildings?.map((element) => (
-              <tr>
+              <tr key={serialized(element).$id}>
                 <td>
                   <table>
                     <Properties object={element} />
@@ -154,7 +155,7 @@ const Navigation: FunctionComponent = () => {
               <td colSpan={999}>elements</td>
             </tr>
             {floors?.map((element) => (
-              <tr>
+              <tr key={serialized(element).$id}>
                 <td>
                   <table>
                     <Properties object={element} />
@@ -173,7 +174,7 @@ const Navigation: FunctionComponent = () => {
               <td colSpan={999}>elements</td>
             </tr>
             {rooms?.map((element) => (
-              <tr>
+              <tr key={serialized(element).$id}>
                 <td>
                   <table>
                     <Properties object={element} />
@@ -201,7 +202,7 @@ const Navigation: FunctionComponent = () => {
               <td>top</td>
               <td>
                 {staticPagesTop.map((page) => (
-                  <tr>
+                  <tr key={page}>
                     <td>{JSON.stringify(page)}</td>
                   </tr>
                 ))}
@@ -211,7 +212,7 @@ const Navigation: FunctionComponent = () => {
               <td>bottom</td>
               <td>
                 {staticPagesBottom.map((page) => (
-                  <tr>
+                  <tr key={page}>
                     <td>{JSON.stringify(page)}</td>
                   </tr>
                 ))}
@@ -282,7 +283,7 @@ const I18n: FunctionComponent = () => {
 
       <table>
         {Object.entries(translation).map(([key, value]) => (
-          <tr>
+          <tr key={key}>
             <td>{key}</td>
             <td>{JSON.stringify(value)}</td>
           </tr>

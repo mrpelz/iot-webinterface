@@ -8,7 +8,7 @@ import {
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
-import { LevelObject } from '../../api.js';
+import { LevelObject, serialized } from '../../api.js';
 import { Grid } from '../../components/grid.js';
 import { Device } from '../../controls/device.js';
 import { roomSorting as roomsSorting } from '../../i18n/mapping.js';
@@ -37,13 +37,22 @@ const Room: FunctionComponent<{
 
   return (
     <Category
-      header={<Translation capitalize={true} i18nKey={$ || undefined} />}
+      header={
+        <Translation
+          capitalize={true}
+          i18nKey={$ || undefined}
+        />
+      }
     >
       <Grid>
         {useMemo(
           () =>
             devices.map((device) => (
-              <Device device={device} onClick={() => setSubPath(device.$id)} />
+              <Device
+                key={serialized(device).$id}
+                device={device}
+                onClick={() => setSubPath(device.$id)}
+              />
             )),
           [devices],
         )}
@@ -66,7 +75,10 @@ export const Devices: FunctionComponent = () => {
   return (
     <SubRoute subRoute={device ? <DeviceDetails device={device} /> : null}>
       {roomsSorted.map((aRoom) => (
-        <Room room={aRoom} />
+        <Room
+          key={serialized(aRoom).$id}
+          room={aRoom}
+        />
       ))}
     </SubRoute>
   );

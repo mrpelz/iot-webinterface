@@ -47,6 +47,7 @@
     "@mrpelz/boilerplate-preact": "16.2.1",
     "@types/node": "26.1.1",
     "copy-webpack-plugin": "14.0.0",
+    "eslint-plugin-react": "7.37.5",
     "fork-ts-checker-webpack-plugin": "9.1.0",
     "glob": "13.0.6",
     "modify-source-webpack-plugin": "4.1.0",

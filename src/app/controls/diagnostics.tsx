@@ -33,7 +33,10 @@ export const Details: FunctionComponent<{
   }, []);
 
   return (
-    <details open={isOpen} ref={ref}>
+    <details
+      ref={ref}
+      open={isOpen}
+    >
       <Summary>{summary}</Summary>
       {isOpen ? children : null}
     </details>
@@ -66,7 +69,7 @@ export const Properties: FunctionComponent<{
                 : undefined;
 
             return (
-              <tr>
+              <tr key={key}>
                 <td>{key}</td>
                 <td>{level || valueType || JSON.stringify(value)}</td>
               </tr>
@@ -180,8 +183,14 @@ const Collector: FunctionComponent<{
           object.valueType === ValueType.NULL ? (
             <button onClick={() => collector(null)}>null</button>
           ) : (
-            <form action="#" onSubmit={onSubmit}>
-              <input placeholder={valueTypeNamed} onChange={onChange} />
+            <form
+              action="#"
+              onSubmit={onSubmit}
+            >
+              <input
+                placeholder={valueTypeNamed}
+                onChange={onChange}
+              />
             </form>
           )
         }
@@ -237,7 +246,12 @@ export const Hierarchy: FunctionComponent<{
       <Emitter object={object} />
       <Collector object={object} />
       {Object.entries(object).map(([name, child]) => (
-        <Child name={name} object={child} open={openChildList} />
+        <Child
+          key={name}
+          name={name}
+          object={child}
+          open={openChildList}
+        />
       ))}
     </table>
   );

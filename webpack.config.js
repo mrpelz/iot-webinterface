@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-string-raw */
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 
@@ -69,6 +70,10 @@ const configDownstream = {
         context: ['/api'],
         target: apiProxy,
       },
+      {
+        context: ['/__proxy-api-hostname'],
+        target: apiProxy,
+      },
     ],
     /**
      *
@@ -86,6 +91,14 @@ const configDownstream = {
     assetModuleFilename: 'assets/[name][ext]',
     chunkFormat: false,
     publicPath: '/',
+  },
+  resolve: {
+    alias: {
+      react: 'preact/compat',
+      'react-dom': 'preact/compat',
+      'react/jsx-runtime': 'preact/jsx-runtime',
+    },
+    conditionNames: ['import'],
   },
 };
 
@@ -153,6 +166,7 @@ config.plugins = [
           new ConcatOperation(
             'start',
             stripIndents`
+              ${webpackServe ? String.raw`import 'preact/debug';` : ''}
               ${glob
                 .sync(path.resolve(dirSrc, 'common/images/background/*'))
                 .map((path_) =>

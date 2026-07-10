@@ -50,8 +50,13 @@ export const OpenSensor: FunctionComponent<{
   return (
     <CellWithBody
       icon={<ForwardIcon height="1em" />}
+      title={
+        <Translation
+          capitalize={true}
+          i18nKey={name}
+        />
+      }
       onClick={onClick ?? handleClick}
-      title={<Translation i18nKey={name} capitalize={true} />}
     >
       <Tag>
         {value === undefined ? (

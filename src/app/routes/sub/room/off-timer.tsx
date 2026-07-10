@@ -62,31 +62,80 @@ export const OffTimer: FunctionComponent<{
   return (
     <>
       <List>
-        <Entry label={<Translation i18nKey="enabled" capitalize={true} />}>
+        <Entry
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="enabled"
+            />
+          }
+        >
           <Translation i18nKey={enabledValue ? 'true' : 'false'} />
         </Entry>
-        <Entry label={<Translation i18nKey="active" capitalize={true} />}>
+        <Entry
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="active"
+            />
+          }
+        >
           <Translation i18nKey={activeValue ? 'true' : 'false'} />
         </Entry>
-        <Entry label={<Translation i18nKey="triggerTime" capitalize={true} />}>
+        <Entry
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="triggerTime"
+            />
+          }
+        >
           {triggerTimeLabel ?? '—'}
         </Entry>
-        <Entry label={<Translation i18nKey="runoutTime" capitalize={true} />}>
+        <Entry
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="runoutTime"
+            />
+          }
+        >
           {runoutTimeLabel ?? '—'}
         </Entry>
-        <Entry label={<Translation i18nKey="initialTime" capitalize={true} />}>
+        <Entry
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="initialTime"
+            />
+          }
+        >
           <NonBreaking>
             {useMemo(() => initialTime / epochs.minute, [initialTime])}{' '}
             <Translation i18nKey="minutes" />
           </NonBreaking>
         </Entry>
-        <Entry label={<Translation i18nKey="setTime" capitalize={true} />}>
+        <Entry
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="setTime"
+            />
+          }
+        >
           <NonBreaking>
             {useMemo(() => (timeValue ?? 0) / epochs.minute, [timeValue])}{' '}
             <Translation i18nKey="minutes" />
           </NonBreaking>
         </Entry>
-        <Entry label={<Translation i18nKey="isChanged" capitalize={true} />}>
+        <Entry
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="isChanged"
+            />
+          }
+        >
           <Translation i18nKey={isChangedValue ? 'true' : 'false'} />
         </Entry>
         <EntryComponent>
@@ -95,12 +144,20 @@ export const OffTimer: FunctionComponent<{
           </NullActuatorButton>
         </EntryComponent>
         <EntryComponent>
-          <NullActuatorButton actuator={cancel} disabled={!activeValue}>
+          <NullActuatorButton
+            actuator={cancel}
+            disabled={!activeValue}
+          >
             cancel timer
           </NullActuatorButton>
         </EntryComponent>
         <Entry
-          label={<Translation capitalize={true} i18nKey="override time" />}
+          label={
+            <Translation
+              capitalize={true}
+              i18nKey="override time"
+            />
+          }
         >
           <div>
             <input
@@ -137,7 +194,10 @@ export const OffTimer: FunctionComponent<{
           </div>
         </Entry>
         <EntryComponent>
-          <NullActuatorButton actuator={reset} disabled={!isChangedValue}>
+          <NullActuatorButton
+            actuator={reset}
+            disabled={!isChangedValue}
+          >
             reset time
           </NullActuatorButton>
         </EntryComponent>

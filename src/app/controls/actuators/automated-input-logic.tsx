@@ -215,11 +215,19 @@ export const AutomatedInputLogic: FunctionComponent<{
   return (
     <Cell
       icon={<ForwardIcon height="1em" />}
+      title={
+        <Translation
+          capitalize
+          i18nKey={name}
+        />
+      }
       onClick={handleHeaderClick}
-      title={<Translation i18nKey={name} capitalize />}
     >
       {/* eslint-disable-next-line react-hooks/static-components*/}
-      <OverlayBody onClick={handleBodyClick} borderRadius={!labelSecondary}>
+      <OverlayBody
+        borderRadius={!labelSecondary}
+        onClick={handleBodyClick}
+      >
         {labelPrimary}
       </OverlayBody>
       {labelSecondary ? (

@@ -21,19 +21,29 @@ export const Sensor: FunctionComponent<{
     case 'motion': {
       return object.topic === 'open' ? (
         <BinarySensor
-          sensor={object}
-          onClick={onClick}
-          title={title}
           negativeKey="closed"
           positiveKey="open"
+          sensor={object}
+          title={title}
+          onClick={onClick}
         />
       ) : (
-        <BinarySensor sensor={object} onClick={onClick} title={title} />
+        <BinarySensor
+          sensor={object}
+          title={title}
+          onClick={onClick}
+        />
       );
     }
     case 'door':
     case 'window': {
-      return <OpenSensor sensor={object} onClick={onClick} title={title} />;
+      return (
+        <OpenSensor
+          sensor={object}
+          title={title}
+          onClick={onClick}
+        />
+      );
     }
     // case 'co2':
     // case 'pm025':
@@ -44,11 +54,21 @@ export const Sensor: FunctionComponent<{
     case 'pressure':
     case 'temperature':
     case 'tvoc': {
-      return <NumericSensor sensor={object} onClick={onClick} title={title} />;
+      return (
+        <NumericSensor
+          sensor={object}
+          title={title}
+          onClick={onClick}
+        />
+      );
     }
     case 'hmmdMotion': {
       return (
-        <HMMDMotionSensor sensor={object} onClick={onClick} title={title} />
+        <HMMDMotionSensor
+          sensor={object}
+          title={title}
+          onClick={onClick}
+        />
       );
     }
     default: {

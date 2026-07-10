@@ -65,7 +65,10 @@ export const Screensaver: FunctionComponent = () => {
       onClick={flipScreensaverActive}
     >
       {isScreensaverActive ? (
-        <Time x={x} y={y}>
+        <Time
+          x={x}
+          y={y}
+        >
           {date}
           <br />
           {time}

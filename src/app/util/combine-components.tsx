@@ -7,12 +7,15 @@ export const combineComponents = (
   // eslint-disable-next-line unicorn/no-array-reduce
   components.reduce(
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    (AccumulatedComponents, CurrentComponent) =>
-      ({ children }: PreactDOMAttributes): JSX.Element => (
+    (AccumulatedComponents, CurrentComponent) => {
+      const Result = ({ children }: PreactDOMAttributes): JSX.Element => (
         <AccumulatedComponents>
           <CurrentComponent>{children}</CurrentComponent>
         </AccumulatedComponents>
-      ),
+      );
+
+      return Result;
+    },
     ({ children }) => <>{children}</>,
   );
 
