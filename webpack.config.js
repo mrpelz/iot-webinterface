@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-string-raw */
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 
@@ -36,7 +37,7 @@ const configDownstream = {
   devServer: {
     allowedHosts: 'all',
     client: false,
-    historyApiFallback: false,
+    historyApiFallback: true,
     host: '::1',
     hot: false,
     liveReload: false,
@@ -183,6 +184,7 @@ config.plugins = [
           new ConcatOperation(
             'start',
             stripIndents`
+              ${webpackServe ? String.raw`import 'preact/debug';` : ''}
               ${glob
                 .sync(path.resolve(dirSrc, 'common/images/background/*'))
                 .map((path_) =>
