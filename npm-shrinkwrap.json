@@ -1,12 +1,12 @@
 {
   "name": "@iot/iot-webinterface",
-  "version": "2.30.3",
+  "version": "2.30.4-feat-base-ui.0",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "@iot/iot-webinterface",
-      "version": "2.30.3",
+      "version": "2.30.4-feat-base-ui.0",
       "license": "UNLICENSED",
       "dependencies": {
         "@base-ui/react": "1.6.0",
