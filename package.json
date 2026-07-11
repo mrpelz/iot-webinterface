@@ -27,6 +27,7 @@
     "webpack-dev-server": "6.0.0"
   },
   "dependencies": {
+    "@base-ui/react": "1.6.0",
     "@iot/iot-monolith": "latest",
     "@mrpelz/misc-utils": "7.4.4",
     "@mrpelz/modifiable-date": "7.4.4",
