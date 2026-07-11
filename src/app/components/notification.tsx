@@ -6,22 +6,21 @@ import { dependentValue } from '../style/main.js';
 export const Notification = styled('notification' as 'section')<{
   isVisible: boolean;
 }>`
-  align-items: center;
-  block-size: ${dependentValue('isVisible', dimensions.titlebarHeight, '0')};
-  color: ${colors.backgroundPrimary()};
-  cursor: ${dependentValue('onClick', 'pointer', 'default')};
   display: flex;
-  justify-content: space-between;
   overflow: hidden;
-  transition:
-    background-color 0.3s ease-out,
-    block-size 0.3s ease-out;
-
+  align-items: center;
+  justify-content: space-between;
   background-color: ${dependentValue(
     'isVisible',
     colors.selection(),
     'rgba(0, 0, 0, 0)',
   )};
+  block-size: ${dependentValue('isVisible', dimensions.titlebarHeight, '0')};
+  color: ${colors.backgroundPrimary()};
+  cursor: ${dependentValue('onClick', 'pointer', 'default')};
+  transition:
+    background-color 0.3s ease-out,
+    block-size 0.3s ease-out;
 `;
 
 export const DismissButton = styled('button')`

@@ -1,3 +1,5 @@
+import { mergeClassNames } from '@base-ui/react';
+import { isPlainObject } from '@mrpelz/misc-utils/oop';
 import { FunctionComponent, JSX, PreactDOMAttributes } from 'preact';
 import { useMemo } from 'preact/hooks';
 
@@ -19,15 +21,44 @@ export const combineComponents = (
     ({ children }) => <>{children}</>,
   );
 
-export const bindComponent =
-  <T,>(
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    Component: FunctionComponent<T>,
-    props: T,
-    overrideProps?: Partial<T>,
-  ): FunctionComponent<Partial<T>> =>
-  (innerProps) =>
-    useMemo(
-      () => <Component {...{ ...props, ...innerProps, ...overrideProps }} />,
+export const bindComponent = <T,>(
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  Component: FunctionComponent<T>,
+  props: Partial<T>,
+  overrideProps: Partial<T> = {},
+): FunctionComponent<T> => {
+  const outerClassName = mergeClassNames(
+    isPlainObject(props) &&
+      'className' in props &&
+      typeof props.className === 'string'
+      ? props.className
+      : undefined,
+    isPlainObject(overrideProps) &&
+      'className' in overrideProps &&
+      typeof overrideProps.className === 'string'
+      ? overrideProps.className
+      : undefined,
+  );
+
+  return (innerProps) => {
+    const className = useMemo(
+      () =>
+        mergeClassNames(
+          outerClassName,
+          'className' in innerProps && typeof innerProps.className === 'string'
+            ? innerProps.className
+            : undefined,
+        ),
       [innerProps],
     );
+
+    return useMemo(
+      () => (
+        <Component
+          {...{ ...props, ...innerProps, ...overrideProps, className }}
+        />
+      ),
+      [className, innerProps],
+    );
+  };
+};

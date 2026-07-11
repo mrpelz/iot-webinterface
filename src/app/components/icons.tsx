@@ -4,17 +4,16 @@ import { FunctionComponent } from 'preact';
 import { dependentValue } from '../style/main.js';
 
 const Svg = styled('svg')<{ color?: string; zIndex?: number }>`
+  z-index: ${({ zIndex }) => zIndex};
   color: ${({ color }) => color || 'currentColor'};
   fill: none;
   stroke: none;
-  z-index: ${({ zIndex }) => zIndex};
 `;
 
 const SvgStroke = styled(Svg)<{ thin?: boolean }>`
+  stroke: currentcolor !important;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke: currentColor !important;
-
   stroke-width: ${dependentValue('thin', '1', '2')};
 
   ${({ onClick }) => (onClick ? 'cursor: pointer' : '')};
@@ -287,6 +286,7 @@ const WaitIconOuter = styled(SvgStroke)`
     0% {
       transform: rotateZ(0deg);
     }
+
     100% {
       transform: rotateZ(360deg);
     }

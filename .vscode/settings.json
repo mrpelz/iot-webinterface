@@ -1,1 +1,19 @@
-../node_modules/@mrpelz/boilerplate-common/.vscode/settings.json
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "editor.formatOnSave": false,
+  "eslint.useFlatConfig": true,
+  "eslint.format.enable": true,
+  "files.autoSave": "onWindowChange",
+  "js/ts.implicitProjectConfig.checkJs": true,
+  "prettier.enable": false,
+  "js/ts.format.enabled": false,
+  "js/ts.preferences.importModuleSpecifierEnding": "js",
+  "stylelint.lintFiles.glob": "src/{app,common}/**/*.{css,jsx,tsx}",
+  "stylelint.validate": [
+    "css",
+    "javascriptreact",
+    "typescriptreact"
+  ]
+}

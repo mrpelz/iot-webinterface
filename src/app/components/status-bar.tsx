@@ -7,23 +7,22 @@ export const StatusBar = styled('status-bar')<{
   isConnected: boolean;
   isLight: boolean;
 }>`
+  position: relative;
+  display: block;
   animation-duration: 1s;
   animation-fill-mode: forwards;
-  animation-name: ${dependentValue('isConnected', 'onConnect', 'none')};
+  animation-name: ${dependentValue('isConnected', 'on-connect', 'none')};
   animation-timing-function: ease-out;
-  block-size: ${strings.safeAreaInsetTop};
-  display: block;
-  position: relative;
-
   background-color: ${dependentValue(
     'isConnected',
     'rgba(0, 255, 0, 0.4)',
     'rgba(255, 0, 0, 0.8)',
   )};
+  block-size: ${strings.safeAreaInsetTop};
 
-  @keyframes onConnect {
+  @keyframes on-connect {
     from {
-      background-color: rgba(0, 255, 0, 0.4);
+      background-color: rgb(0 255 0 / 40%);
     }
 
     to {
@@ -32,14 +31,12 @@ export const StatusBar = styled('status-bar')<{
   }
 
   &::before {
-    background-color: ${colors.black()};
-    content: '';
-    display: ${dependentValue('isLight', 'block', 'none')};
-    inset-block-end: 0;
-    inset-block-start: 0;
-    inset-inline-end: 0;
-    inset-inline-start: 0;
     position: absolute;
     z-index: -1;
+    display: ${dependentValue('isLight', 'block', 'none')};
+    background-color: ${colors.black()};
+    content: '';
+    inset-block: 0;
+    inset-inline: 0;
   }
 `;

@@ -3,19 +3,16 @@ import { styled } from 'goober';
 import { colors } from '../style.js';
 
 export const DiagnosticsContainer = styled('diagnostics-container')`
-  background-color: ${colors.backgroundSecondary()};
-  color: ${colors.fontSecondary()};
   display: flex;
   flex-direction: column;
+  background-color: ${colors.backgroundSecondary()};
+  color: ${colors.fontSecondary()};
   font-size: 0.75rem;
 
   &,
   & * {
-    -moz-user-select: text;
-    -ms-user-select: text;
-    -webkit-tap-highlight-color: text;
-    -webkit-touch-callout: text;
-    -webkit-user-select: text;
+    -webkit-tap-highlight-color: currentcolor;
+    -webkit-touch-callout: none;
     user-select: text;
     white-space: break-spaces;
     word-break: break-all;
@@ -23,8 +20,8 @@ export const DiagnosticsContainer = styled('diagnostics-container')`
 
   table,
   td {
+    border: 1px solid currentcolor;
     border-collapse: collapse;
-    border: 1px solid currentColor;
     vertical-align: top;
   }
 

@@ -8,7 +8,6 @@ export const AlignRight = styled('align-right')`
 export const BreakAll = styled('break-all')`
   display: contents;
   word-break: break-all;
-  word-break: break-word;
 `;
 
 export const Capitalize = styled('capitalize')`
@@ -33,13 +32,11 @@ export const TabularNums = styled('tabular-nums')`
 
 export const Selectable = styled('selectable')`
   display: contents;
+
   &,
   & * {
-    -moz-user-select: text;
-    -ms-user-select: text;
-    -webkit-tap-highlight-color: text;
-    -webkit-touch-callout: text;
-    -webkit-user-select: text;
+    -webkit-tap-highlight-color: currentcolor;
+    -webkit-touch-callout: none;
     user-select: text;
   }
 `;

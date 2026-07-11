@@ -3,10 +3,10 @@ import { styled } from 'goober';
 export const VisuallyHidden = styled('visually-hidden')`
   &,
   & > * {
-    opacity: 0;
-    overflow: hidden;
-    pointer-events: none;
     position: absolute;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
     size: 0;
   }
 `;

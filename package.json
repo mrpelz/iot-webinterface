@@ -26,6 +26,7 @@
     "webpack-dev-server": "6.0.0"
   },
   "dependencies": {
+    "@base-ui/react": "1.6.0",
     "@iot/iot-monolith": "latest",
     "@mrpelz/misc-utils": "6.1.0",
     "@mrpelz/modifiable-date": "6.1.0",
@@ -51,6 +52,7 @@
     "fork-ts-checker-webpack-plugin": "9.1.0",
     "glob": "13.0.6",
     "modify-source-webpack-plugin": "4.1.0",
+    "postcss-styled-syntax": "0.7.2",
     "source-map-loader": "5.0.0",
     "typescript": "6.0.2",
     "webpack-dev-server": "6.0.0",

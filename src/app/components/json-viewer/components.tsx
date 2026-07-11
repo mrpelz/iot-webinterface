@@ -27,11 +27,11 @@ export const Wrapper = styled('section')`
   --foreground-undefined: #569cd6;
   --foreground: #d4d4d4;
 
+  padding: 1ch;
   background-color: var(--background);
   color: var(--foreground);
   font-size: ${dimensions.fontSizeSmall};
   line-height: 1.5;
-  padding: 1ch;
   overflow-x: auto;
 
   & > * {
@@ -41,6 +41,7 @@ export const Wrapper = styled('section')`
 
 export const Property = styled('div')`
   position: relative;
+
   --last-key: initial;
 
   &:last-of-type {
@@ -100,22 +101,21 @@ export const Treeline = styled<{ content?: string; indent: number }>('span')`
   color: ${({ indent }) => treelineColors.at(indent % treelineColors.length)};
 
   &::before {
+    position: absolute;
     border-inline-start: ${dimensions.hairline} solid currentColor;
     content: '${({ content = '' }) => content}';
     inline-size: ${INSET_CH - 0.75}ch;
-    inset-block-end: calc(var(--last-key, 0) * calc(100% - 0.5lh));
-    inset-block-start: 0;
+    inset-block: 0 calc(var(--last-key, 0) * calc(100% - 0.5lh));
     inset-inline-start: -${INSET_CH - 0.5}ch;
-    position: absolute;
     text-align: right;
   }
 
   &::after {
+    position: absolute;
     border-block-start: ${dimensions.hairline} solid currentColor;
     content: '';
     inline-size: ${INSET_CH - 1}ch;
     inset-block-start: 0.5lh;
     inset-inline-start: -${INSET_CH - 0.5}ch;
-    position: absolute;
   }
 `;

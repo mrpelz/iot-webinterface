@@ -22,34 +22,34 @@ import { useRerender } from '../hooks/use-rerender.js';
 import { dimensions } from '../style.js';
 
 const DetailsComponent = styled('details', forwardRef)`
+  position: relative;
   display: flex;
   flex-direction: column;
   font-family: monospace;
-  position: relative;
 `;
 
 // eslint-disable-next-line prettier/prettier
 const SummaryComponent = styled<{ collapsible: boolean, showExpandIcon: boolean } & DOMAttributes<HTMLElement>>('summary')`
-  cursor: ${({ collapsible }) => (collapsible ? 'zoom-in' : 'initial')};
-  display: block;
-  pointer-events: ${({ collapsible }) => (collapsible ? 'all' : 'none')};
   position: ${({ collapsible, showExpandIcon }) =>
     collapsible && showExpandIcon ? 'relative' : 'static'};
+  display: block;
+  cursor: ${({ collapsible }) => (collapsible ? 'zoom-in' : 'initial')};
+  pointer-events: ${({ collapsible }) => (collapsible ? 'all' : 'none')};
 
   details[open] > & {
     cursor: ${({ collapsible }) => (collapsible ? 'zoom-out' : 'initial')};
   }
 
   &::after {
-    aspect-ratio: 1;
-    border: solid ${dimensions.hairline} currentColor;
-    content: '+' / 'expand';
+    position: absolute;
     display: ${({ collapsible, showExpandIcon }) =>
       collapsible && showExpandIcon ? 'block' : 'none'};
+    border: solid ${dimensions.hairline} currentColor;
+    aspect-ratio: 1;
     block-size: 1lh;
+    content: '+' / 'expand';
     font-size: ${dimensions.fontSizeSmall};
     inset-block: 0;
-    position: absolute;
     text-align: center;
     translate: -100%;
   }
@@ -60,14 +60,14 @@ const SummaryComponent = styled<{ collapsible: boolean, showExpandIcon: boolean 
 `;
 
 const CollapseAll = styled('div')`
+  position: absolute;
+  border: solid ${dimensions.hairline} currentColor;
   aspect-ratio: 1;
   block-size: 1lh;
-  border: solid ${dimensions.hairline} currentColor;
   cursor: pointer;
   font-size: ${dimensions.fontSizeSmall};
   inset-block-start: 0;
   inset-inline-start: 0;
-  position: absolute;
   text-align: center;
   translate: -100% calc(1lh + ${dimensions.hairline});
   visibility: hidden;

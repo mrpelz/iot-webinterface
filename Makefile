@@ -6,6 +6,7 @@ BASE_FILE := $(shell npm ls --parseable --silent "@mrpelz/boilerplate-preact" 2>
 
 include $(BASE_FILE)/Makefile
 
+STYLELINT := stylelint "src/{app,common}/**/*.{css,jsx,tsx}"
 PACKAGE_LOCK_LINT_ARGS := $(PACKAGE_LOCK_LINT_ARGS) git.i.wurstsalat.cloud
 
 MITM_TOKEN := $(shell uuidgen)
@@ -32,3 +33,8 @@ util_mitmproxy:
 
 watch_dev_proxy:
 	scripts/watch-dev-proxy.sh
+
+watch_stylelint:
+	nodemon --quiet --watch "src/**/*" --ext "css,jsx,tsx" \
+		--exec 'clear; $(STYLELINT); exit 0'; \
+	exit 0;

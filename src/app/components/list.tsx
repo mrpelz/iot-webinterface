@@ -6,14 +6,11 @@ import { double, half, multiply } from '../style/dimensions.js';
 import { mediaQuery } from '../style/main.js';
 
 export const List = styled('ul')<{ isHighContrast: boolean }>`
-  list-style: none;
-  margin: 0 auto;
   padding: 0;
-
+  margin: 0 auto;
   border-block: ${() =>
     `solid ${dimensions.hairline()} ${colors.fontTertiary()()}`};
   border-block-end-color: ${colors.fontSecondary()};
-
   inline-size: ${breakpointValue(
     mediaQuery(dimensions.breakpointTablet),
     () =>
@@ -24,6 +21,12 @@ export const List = styled('ul')<{ isHighContrast: boolean }>`
       )(),
     '100%',
   )};
+  list-style: none;
+
+  & + & {
+    border-block-start: none;
+    padding-block-start: ${double(dimensions.fontPadding)};
+  }
 
   &:first-of-type {
     border-block-start: none;
@@ -32,20 +35,15 @@ export const List = styled('ul')<{ isHighContrast: boolean }>`
   &:last-of-type {
     border-block-end: none;
   }
-
-  & + & {
-    border-block-start: none;
-    padding-block-start: ${double(dimensions.fontPadding)};
-  }
 `;
 
 export const Entry = styled('li')`
-  border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
   display: flex;
-  font-size: ${dimensions.fontSize};
-  gap: 1ch;
   justify-content: space-between;
   padding: ${dimensions.fontPadding};
+  border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
+  font-size: ${dimensions.fontSize};
+  gap: 1ch;
 
   &:last-of-type {
     border-block-end: none;
@@ -58,14 +56,13 @@ export const Entry = styled('li')`
 `;
 
 export const Button = styled('button')`
-  -webkit-appearance: none;
+  display: block;
+  border: ${dimensions.hairline} solid ${colors.fontPrimary()};
+  border-radius: ${half(dimensions.controlBase)};
   appearance: none;
   background: none;
-  border-radius: ${half(dimensions.controlBase)};
-  border: ${dimensions.hairline} solid ${colors.fontPrimary()};
   color: ${colors.fontPrimary()};
   cursor: pointer;
-  display: block;
   font-size: ${dimensions.fontSizeSmall};
   inline-size: 100%;
   min-block-size: 3em;

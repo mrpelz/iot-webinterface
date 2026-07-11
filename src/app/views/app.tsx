@@ -23,7 +23,7 @@ export const App: FunctionComponent = () => {
   }, [backgroundColor]);
 
   return (
-    <AppComponent>
+    <AppComponent className="root">
       {$flags.screensaverEnable.value ? <Screensaver /> : null}
       <Layout>
         <RootRoute />

@@ -7,16 +7,14 @@ import { add, invert } from '../style/dimensions.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
 
 export const Titlebar = styled('titlebar')<{ padding: number }>`
+  position: relative;
+  display: flex;
   align-items: center;
+  justify-content: center;
   block-size: ${dimensions.titlebarHeight};
   border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
-  display: flex;
   font-weight: bold;
-  justify-content: center;
-  position: relative;
-  word-break: break-all;
-
-  padding-inline-start: ${({ padding }) =>
+  padding-inline: ${({ padding }) =>
     add(
       breakpointValue(
         mediaQuery(dimensions.breakpointDesktop),
@@ -24,15 +22,16 @@ export const Titlebar = styled('titlebar')<{ padding: number }>`
         '0px',
       )(),
       `${padding}px`,
-    )};
-  padding-inline-end: ${({ padding }) => `${padding}px`};
+    )}
+    ${({ padding }) => `${padding}px`};
+  word-break: break-all;
 `;
 
 export const Title = styled('h1')`
+  overflow: hidden;
+  margin: 0;
   color: ${colors.fontPrimary()};
   font-size: ${dimensions.fontSizeLargeAdaptive};
-  margin: 0;
-  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
@@ -40,19 +39,19 @@ export const Title = styled('h1')`
 export const IconContainer = styled('icon-container' as 'section', forwardRef)<{
   right?: true;
 }>`
+  position: absolute;
+  display: flex;
   align-items: center;
+  justify-content: ${dependentValue('right', 'flex-end', 'flex-start')};
   block-size: 100%;
   color: ${colors.fontPrimary()};
-  display: flex;
   inset-block-start: 0;
-  justify-content: ${dependentValue('right', 'flex-end', 'flex-start')};
-  position: absolute;
 
   ${({ right }) => (right ? 'inset-inline-end' : 'inset-inline-start')}: 0;
 
   & > * {
-    block-size: ${dimensions.titlebarHeight};
     padding: ${dimensions.fontPadding};
+    block-size: ${dimensions.titlebarHeight};
 
     & + * {
       margin-inline-start: ${() => invert(dimensions.fontPadding)};
