@@ -221,7 +221,7 @@ config.plugins = [
   }),
   (() => {
     const workboxPlugin = new InjectManifest({
-      maximumFileSizeToCacheInBytes: 10 * 1_000_000,
+      maximumFileSizeToCacheInBytes: 20 * 1_000_000,
       swSrc: path.resolve(dirSrc, 'workers/sw.ts'),
     });
 
