@@ -2,8 +2,6 @@
   "compilerOptions": {
     "declaration": false,
     "declarationMap": false,
-    "module": "preserve",
-    "moduleResolution": "bundler",
     "outDir": "dist",
     "paths": {
       "react-dom": ["./node_modules/preact/compat/src/index.d.ts"],
