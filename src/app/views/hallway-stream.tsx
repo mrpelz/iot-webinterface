@@ -8,7 +8,7 @@ export const HallwayStream: FunctionComponent = () => {
 
   return (
     <HLSStream
-      poster={'https://nvr.i.wurstsalat.cloud/flur/still/jpg/'}
+      poster="https://nvr.i.wurstsalat.cloud/flur/still/jpg/"
       src={subRoute || 'https://nvr.i.wurstsalat.cloud/flur/stream/'}
     />
   );

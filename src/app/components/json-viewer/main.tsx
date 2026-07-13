@@ -278,8 +278,7 @@ export const makeExpandingRenderer = <T,>(
             {key}
             {prefix}
             {annotation}
-            {suffix}
-            {','}
+            {suffix},
           </>
         }
         summaryExpanded={
@@ -291,8 +290,7 @@ export const makeExpandingRenderer = <T,>(
         }
       >
         <Inset inset={INSET_CH}>{children}</Inset>
-        {suffix}
-        {','}
+        {suffix},
       </Details>
     );
   },

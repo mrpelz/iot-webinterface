@@ -16,7 +16,16 @@ const configDownstream = {
   },
   rules: {
     ...react.configs.recommended.rules,
+    'react/display-name': 'off',
     'react/function-component-definition': 'off',
+    'react/jsx-curly-brace-presence': [
+      'error',
+      {
+        children: 'never',
+        propElementValues: 'always',
+        props: 'never',
+      },
+    ],
     'react/jsx-filename-extension': 'off',
     'react/jsx-indent': 'off',
     'react/jsx-indent-props': ['error', 2],
