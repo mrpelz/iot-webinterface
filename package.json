@@ -20,6 +20,8 @@
   ],
   "overrides": {
     "copy-webpack-plugin": "14.0.0",
+    "react": "npm:@preact/compat",
+    "react-dom": "npm:@preact/compat",
     "serialize-javascript": "7.0.7",
     "uuid": "13.0.1",
     "webpack-dev-server": "6.0.0"
