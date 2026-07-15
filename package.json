@@ -29,10 +29,10 @@
   "dependencies": {
     "@base-ui/react": "1.6.0",
     "@iot/iot-monolith": "latest",
-    "@mrpelz/misc-utils": "7.4.0",
-    "@mrpelz/modifiable-date": "7.4.0",
+    "@mrpelz/misc-utils": "7.4.4",
+    "@mrpelz/modifiable-date": "7.4.4",
     "@okikio/sharedworker": "1.1.0",
-    "@preact/signals": "2.9.3",
+    "@preact/signals": "2.9.4",
     "comlink": "4.4.2",
     "goober": "2.1.19",
     "hls.js": "1.6.16",
