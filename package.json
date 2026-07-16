@@ -1,6 +1,6 @@
 {
   "name": "@iot/iot-webinterface",
-  "version": "2.31.0",
+  "version": "2.31.1",
   "description": "web interface for \"iot-monolith\".",
   "repository": {
     "type": "git",
