@@ -22,23 +22,22 @@ export const Menu = styled('nav')<{ isVisible: boolean }>`
 export const MenuShade = styled('menu-shade' as 'section', forwardRef)<{
   active: boolean;
 }>`
-  background-color: black;
-  block-size: ${dimensions.appHeightCover};
-  content: '';
-  display: block;
-  inline-size: ${dimensions.appWidth};
-  inset-block-start: ${dimensions.headerHeight};
-  inset-inline-start: 0;
   position: fixed;
-  transition: opacity 0.3s ease-out;
-
+  display: block;
   margin-left: ${breakpointValue(
     mediaQuery(dimensions.breakpointDesktop),
     dimensions.menuWidth,
     'unset',
   )};
+  background-color: black;
+  block-size: ${dimensions.appHeightCover};
+  content: '';
+  inline-size: ${dimensions.appWidth};
+  inset-block-start: ${dimensions.headerHeight};
+  inset-inline-start: 0;
   opacity: ${dependentValue('active', '0.5', '0')};
   pointer-events: ${dependentValue('active', 'all', 'none')};
+  transition: opacity 0.3s ease-out;
 `;
 
 export const MenuContent = styled('ul')`
@@ -46,9 +45,9 @@ export const MenuContent = styled('ul')`
 `;
 
 export const MenuSubdivision = styled('li')`
-  list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
+  list-style: none;
 
   & + & {
     margin-block-start: 1rem;
@@ -56,18 +55,18 @@ export const MenuSubdivision = styled('li')`
 `;
 
 export const MenuSubdivisionHeader = styled('h2')`
+  padding: 0 0.5rem;
+  margin: 0;
   color: ${colors.fontPrimary()};
   font-size: 0.75rem;
   font-weight: normal;
-  margin: 0;
-  padding: 0 0.5rem;
   text-transform: uppercase;
 `;
 
 export const MenuList = styled('ul')`
-  list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
+  list-style: none;
 `;
 
 export const MenuListItem = styled('li', forwardRef)<{
@@ -75,17 +74,11 @@ export const MenuListItem = styled('li', forwardRef)<{
   isHighContrast: boolean;
   isHovered: boolean;
 }>`
-  align-items: center;
-  block-size: ${dimensions.titlebarHeight};
-  border-block-start: ${dimensions.hairline} solid ${colors.fontTertiary()};
-  cursor: pointer;
   display: flex;
-  font-size: ${dimensions.fontSize};
+  align-items: center;
   justify-content: space-between;
-  line-height: ${dimensions.fontSize};
-  margin: 0;
   padding: ${dimensions.fontPadding};
-
+  margin: 0;
   background-color: ${(...args) =>
     dependentValue(
       'isActive',
@@ -96,6 +89,8 @@ export const MenuListItem = styled('li', forwardRef)<{
         colors.backgroundPrimary(),
       )(...args),
     )(...args)};
+  block-size: ${dimensions.titlebarHeight};
+  border-block-start: ${dimensions.hairline} solid ${colors.fontTertiary()};
   color: ${(...args) =>
     dependentValue(
       'isActive',
@@ -110,13 +105,16 @@ export const MenuListItem = styled('li', forwardRef)<{
         colors.fontPrimary(),
       )(...args),
     )(...args)};
-
-  &:last-of-type {
-    border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
-  }
+  cursor: pointer;
+  font-size: ${dimensions.fontSize};
+  line-height: ${dimensions.fontSize};
 
   * + & {
     margin-block-start: -${dimensions.hairline};
+  }
+
+  &:last-of-type {
+    border-block-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
   }
 `;
 
@@ -128,12 +126,12 @@ export const MenuIndicatorSection = styled('menu-indicator-section')`
 export const MenuIndicatorItem = styled('menu-indicator-item')<{
   color: string;
 }>`
-  background-color: ${({ color }) => color};
-  block-size: ${multiply(dimensions.controlBase, '1.5')};
-  border-radius: 50%;
-  border: solid ${dimensions.hairline} ${colors.backgroundPrimary()};
   display: block;
   flex-grow: 0;
   flex-shrink: 0;
+  border: solid ${dimensions.hairline} ${colors.backgroundPrimary()};
+  border-radius: 50%;
+  background-color: ${({ color }) => color};
+  block-size: ${multiply(dimensions.controlBase, '1.5')};
   inline-size: ${multiply(dimensions.controlBase, '1.5')};
 `;

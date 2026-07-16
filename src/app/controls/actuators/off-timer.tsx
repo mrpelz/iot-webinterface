@@ -102,7 +102,6 @@ const TimerActuatorBody: FunctionComponent<{
     <BlendOver
       blendOver={blendOver}
       invert={true}
-      onClick={handleBodyClick}
       transition={allowTransition && activeValue !== null}
       transitionDurationOverride={activeValue ? 1000 : 300}
       overlay={
@@ -111,6 +110,7 @@ const TimerActuatorBody: FunctionComponent<{
           <OverlayBody>{label || <Translation i18nKey="on" />}</OverlayBody>
         )
       }
+      onClick={handleBodyClick}
     >
       <BodyLarge>
         {hasJustFinished ? (
@@ -144,8 +144,13 @@ export const TimerActuator: FunctionComponent<{
   return (
     <Cell
       icon={<ForwardIcon height="1em" />}
+      title={
+        <Translation
+          capitalize={true}
+          i18nKey={name}
+        />
+      }
       onClick={onClick ?? handleHeaderClick}
-      title={<Translation i18nKey={name} capitalize={true} />}
     >
       <TimerActuatorBody object={object} />
     </Cell>

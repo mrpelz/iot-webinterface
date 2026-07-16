@@ -6,7 +6,8 @@
     "lib": ["ESNext", "WebWorker"],
     "outDir": "../../dist",
     "rootDir": ".",
-    "tsBuildInfoFile": "../../dist/tsconfig.workers.tsbuildinfo"
+    "tsBuildInfoFile": "../../dist/tsconfig.workers.tsbuildinfo",
+    "types": ["@types/webpack-env"]
   },
   "extends": "@mrpelz/boilerplate-common/tsconfig.json",
   "include": ["**/*"]

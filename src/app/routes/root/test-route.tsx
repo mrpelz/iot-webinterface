@@ -33,7 +33,10 @@ export const Test: FunctionComponent = () => {
         {route1 || '<none>'}
       </button>
       <br />
-      <button disabled={!route1} onClick={() => setRoute1(undefined)}>
+      <button
+        disabled={!route1}
+        onClick={() => setRoute1(undefined)}
+      >
         reset
       </button>
       <br />
@@ -46,15 +49,20 @@ export const Test: FunctionComponent = () => {
         {route2 || '<none>'}
       </button>
       <br />
-      <button disabled={!route2} onClick={() => setRoute2(undefined)}>
+      <button
+        disabled={!route2}
+        onClick={() => setRoute2(undefined)}
+      >
         reset
       </button>
       <br />
       <br />
-      <button disabled={isRoot} onClick={() => goRoot()}>
+      <button
+        disabled={isRoot}
+        onClick={() => goRoot()}
+      >
         go root
       </button>
-
       <Margin>
         <JSONViewer
           autoExpandPath={['a', 'b', 'c', 'd', 'e', 2]}

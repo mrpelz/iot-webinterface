@@ -6,26 +6,23 @@ import { dependentValue } from '../style/main.js';
 export const Screensaver = styled('screensaver' as 'section')<{
   isVisible: boolean;
 }>`
+  position: fixed;
+  z-index: 4;
+  overflow: hidden;
   background-color: black;
-  color: rgb(128, 128, 128);
+  color: rgb(128 128 128);
   font-size: ${dimensions.fontSizeLarge};
   font-variant-numeric: tabular-nums;
   inset: 0;
-  overflow: hidden;
-  position: fixed;
-  touch-action: none;
-  transition: opacity 0.3s ease-out;
-  z-index: 4;
-
   opacity: ${dependentValue('isVisible', '1', '0')};
   pointer-events: ${dependentValue('isVisible', 'all', 'none')};
+  touch-action: none;
+  transition: opacity 0.3s ease-out;
 `;
 
 export const Time = styled('screensaver-time')<{ x: number; y: number }>`
   display: inline-block;
   text-align: center;
-  transition: transform 0.3s ease-out;
-
   transform: translate3d(
     calc((100vw - 100%) * ${({ x }) => x}),
     calc(
@@ -34,4 +31,5 @@ export const Time = styled('screensaver-time')<{ x: number; y: number }>`
     ),
     0
   );
+  transition: transform 0.3s ease-out;
 `;

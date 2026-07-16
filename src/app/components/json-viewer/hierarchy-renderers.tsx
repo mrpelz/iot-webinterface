@@ -204,8 +204,8 @@ export const getterRenderer: Renderer<
 
     return (
       <Details
-        open={initiallyOpen}
         handleToggle={handleToggle}
+        open={initiallyOpen}
         showExpandIcon={false}
         summary={
           <>
@@ -289,8 +289,8 @@ export const setterRenderer: Renderer<
         return (
           <>
             <button
-              type="button"
               style={{ cursor: 'pointer' }}
+              type="button"
               onClick={(event) => {
                 event.preventDefault();
                 collector(true);
@@ -299,8 +299,8 @@ export const setterRenderer: Renderer<
               true
             </button>
             <button
-              type="button"
               style={{ cursor: 'pointer', marginInlineStart: '1ch' }}
+              type="button"
               onClick={(event) => {
                 event.preventDefault();
                 collector(false);
@@ -317,10 +317,10 @@ export const setterRenderer: Renderer<
           <>
             <input
               inputMode="decimal"
-              onInput={(event) => setInputValue(event.currentTarget.value)}
               placeholder={computed(() => emitter.value?.toString())}
               type="text"
               value={inputValue}
+              onInput={(event) => setInputValue(event.currentTarget.value)}
               onKeyDown={(event) => {
                 if (!['Enter', 'NumpadEnter'].includes(event.code)) return;
 
@@ -332,8 +332,8 @@ export const setterRenderer: Renderer<
               }}
             />
             <button
-              type="button"
               style={{ cursor: 'pointer', marginInlineStart: '1ch' }}
+              type="button"
               onClick={(event) => {
                 event.preventDefault();
                 if (inputValue.length === 0) return;

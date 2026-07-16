@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-string-raw */
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 
@@ -34,10 +35,14 @@ const apiProxy = process.env.API_PROXY;
 const configDownstream = {
   devServer: {
     allowedHosts: 'all',
-    client: false,
+    client: {
+      overlay: false,
+      reconnect: true,
+      webSocketURL: 'auto://0.0.0.0:0/ws',
+    },
     historyApiFallback: true,
     host: '::1',
-    hot: false,
+    hot: webpackServe,
     liveReload: false,
     proxy: [
       {
@@ -69,6 +74,10 @@ const configDownstream = {
         context: ['/api'],
         target: apiProxy,
       },
+      {
+        context: ['/__proxy-api-hostname'],
+        target: apiProxy,
+      },
     ],
     /**
      *
@@ -84,8 +93,15 @@ const configDownstream = {
   },
   output: {
     assetModuleFilename: 'assets/[name][ext]',
-    chunkFormat: false,
     publicPath: '/',
+  },
+  resolve: {
+    alias: {
+      react: 'preact/compat',
+      'react-dom': 'preact/compat',
+      'react/jsx-runtime': 'preact/jsx-runtime',
+    },
+    conditionNames: ['import'],
   },
 };
 
@@ -153,6 +169,7 @@ config.plugins = [
           new ConcatOperation(
             'start',
             stripIndents`
+              ${webpackServe ? String.raw`import 'preact/debug';` : ''}
               ${glob
                 .sync(path.resolve(dirSrc, 'common/images/background/*'))
                 .map((path_) =>
@@ -207,7 +224,7 @@ config.plugins = [
   }),
   (() => {
     const workboxPlugin = new InjectManifest({
-      maximumFileSizeToCacheInBytes: 10 * 1_000_000,
+      maximumFileSizeToCacheInBytes: 20 * 1_000_000,
       swSrc: path.resolve(dirSrc, 'workers/sw.ts'),
     });
 

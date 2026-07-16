@@ -33,7 +33,10 @@ export const Details: FunctionComponent<{
   }, []);
 
   return (
-    <details open={isOpen} ref={ref}>
+    <details
+      ref={ref}
+      open={isOpen}
+    >
       <Summary>{summary}</Summary>
       {isOpen ? children : null}
     </details>
@@ -53,26 +56,29 @@ export const Properties: FunctionComponent<{
       </td>
       <td>
         <table>
-          {Object.entries(object).map(([key, value]) => {
-            if (isObject(value)) return null;
-            const level =
-              key === 'level'
-                ? levelDescription[value as unknown as Level]
-                : undefined;
+          <tbody>
+            {' '}
+            {Object.entries(object).map(([key, value]) => {
+              if (isObject(value)) return null;
+              const level =
+                key === 'level'
+                  ? levelDescription[value as unknown as Level]
+                  : undefined;
 
-            const valueType =
-              key === 'valueType'
-                ? valueTypeDescription[value as unknown as ValueType]
-                : undefined;
+              const valueType =
+                key === 'valueType'
+                  ? valueTypeDescription[value as unknown as ValueType]
+                  : undefined;
 
-            return (
-              <tr>
-                <td>{key}</td>
-                <td>{level || valueType || JSON.stringify(value)}</td>
-              </tr>
-            );
-          })}
-        </table>
+              return (
+                <tr key={key}>
+                  <td>{key}</td>
+                  <td>{level || valueType || JSON.stringify(value)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>{' '}
       </td>
     </tr>
   );
@@ -180,8 +186,14 @@ const Collector: FunctionComponent<{
           object.valueType === ValueType.NULL ? (
             <button onClick={() => collector(null)}>null</button>
           ) : (
-            <form action="#" onSubmit={onSubmit}>
-              <input placeholder={valueTypeNamed} onChange={onChange} />
+            <form
+              action="#"
+              onSubmit={onSubmit}
+            >
+              <input
+                placeholder={valueTypeNamed}
+                onChange={onChange}
+              />
             </form>
           )
         }
@@ -233,12 +245,20 @@ export const Hierarchy: FunctionComponent<{
 
   return (
     <table>
-      <Properties object={object} />
-      <Emitter object={object} />
-      <Collector object={object} />
-      {Object.entries(object).map(([name, child]) => (
-        <Child name={name} object={child} open={openChildList} />
-      ))}
+      <tbody>
+        {' '}
+        <Properties object={object} />
+        <Emitter object={object} />
+        <Collector object={object} />
+        {Object.entries(object).map(([name, child]) => (
+          <Child
+            key={name}
+            name={name}
+            object={child}
+            open={openChildList}
+          />
+        ))}
+      </tbody>
     </table>
   );
 };

@@ -20,17 +20,18 @@
   ],
   "overrides": {
     "copy-webpack-plugin": "14.0.0",
+    "react": "npm:@preact/compat",
+    "react-dom": "npm:@preact/compat",
     "serialize-javascript": "7.0.7",
-    "typescript": "6.0.2",
     "uuid": "13.0.1",
     "webpack-dev-server": "6.0.0"
   },
   "dependencies": {
     "@iot/iot-monolith": "latest",
-    "@mrpelz/misc-utils": "6.1.0",
-    "@mrpelz/modifiable-date": "6.1.0",
+    "@mrpelz/misc-utils": "7.4.4",
+    "@mrpelz/modifiable-date": "7.4.4",
     "@okikio/sharedworker": "1.1.0",
-    "@preact/signals": "2.9.3",
+    "@preact/signals": "2.9.4",
     "comlink": "4.4.2",
     "goober": "2.1.19",
     "hls.js": "1.6.16",
@@ -43,15 +44,17 @@
     "workbox-window": "7.4.1"
   },
   "devDependencies": {
-    "@mrpelz/boilerplate-common": "16.2.1",
-    "@mrpelz/boilerplate-preact": "16.2.1",
+    "@mrpelz/boilerplate-common": "16.3.0",
+    "@mrpelz/boilerplate-preact": "16.3.0",
     "@types/node": "26.1.1",
+    "@types/webpack-env": "1.18.8",
     "copy-webpack-plugin": "14.0.0",
+    "eslint-plugin-react": "7.37.5",
     "fork-ts-checker-webpack-plugin": "9.1.0",
     "glob": "13.0.6",
     "modify-source-webpack-plugin": "4.1.0",
+    "postcss-styled-syntax": "0.7.2",
     "source-map-loader": "5.0.0",
-    "typescript": "6.0.2",
     "webpack-dev-server": "6.0.0",
     "workbox-webpack-plugin": "7.4.1"
   },

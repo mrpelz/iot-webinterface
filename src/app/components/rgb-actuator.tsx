@@ -13,8 +13,8 @@ export const BodyDisableRoundedCorners = styled(RGBBody, forwardRef)`
 `;
 
 export const ColorLabel = styled('color-label')`
-  align-self: end;
   flex-grow: 1;
+  align-self: end;
   font-size: ${dimensions.fontSizeSmall};
   font-weight: normal;
 `;

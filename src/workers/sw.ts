@@ -4,6 +4,8 @@ import { precacheAndRoute } from 'workbox-precaching';
 import type { SW_API } from '../common/types.js';
 import { getFlags } from './util.js';
 
+if (module.hot) module.hot.accept();
+
 declare const self: ServiceWorkerGlobalScope;
 
 const NOTIFICATION_SERVICEWORKER_INSTALL_TAG =
@@ -124,7 +126,7 @@ self.addEventListener('install', (event) =>
         NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG,
       ]);
 
-      if (!self.__webpackServe__) {
+      if (!flags.updateUnattended && !self.__webpackServe__) {
         self.registration
           .showNotification('New Version Downloading', {
             body: 'A new version is pre-cached for offline-use',
@@ -143,10 +145,10 @@ self.addEventListener('install', (event) =>
 self.addEventListener('activate', (event) =>
   event.waitUntil(
     (async () => {
-      const { debug } = await getFlags();
+      const flags = await getFlags();
 
       // eslint-disable-next-line no-console
-      if (debug) console.debug('activate event');
+      if (flags.debug) console.debug('activate event');
 
       await self.clients.claim();
 
@@ -155,9 +157,9 @@ self.addEventListener('activate', (event) =>
         NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG,
       ]);
 
-      const { updateUnattended } = await getFlags();
+      if (self.__webpackServe__) return;
 
-      if (updateUnattended || self.__webpackServe__) {
+      if (flags.updateUnattended) {
         await reload();
         return;
       }

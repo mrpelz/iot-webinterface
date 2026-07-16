@@ -44,7 +44,10 @@ const DeviceDetail: FunctionComponent<{ label: string }> = ({
   }
 
   return (
-    <Entry id={label} label={label}>
+    <Entry
+      id={label}
+      label={label}
+    >
       <BreakAll>
         <AlignRight>
           <Selectable>{children}</Selectable>

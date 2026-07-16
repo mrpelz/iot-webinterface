@@ -9,6 +9,8 @@ import { requestNotificationPermission } from './util/notifications.js';
 import { persist } from './util/storage.js';
 import { isiPhone } from './util/useragent.js';
 
+if (module.hot) module.hot.accept();
+
 export const id = crypto.randomUUID();
 
 export const api = new Api();

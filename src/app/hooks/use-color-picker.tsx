@@ -68,10 +68,10 @@ export const useColorPicker = (
     () => (
       <VisuallyHidden>
         <input
-          onInput={handleColorInput}
           ref={colorPickerRef}
           type="color"
           value={colorValue}
+          onInput={handleColorInput}
         />
       </VisuallyHidden>
     ),

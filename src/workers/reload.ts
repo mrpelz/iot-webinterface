@@ -2,6 +2,8 @@ import rSock, { WebSocketEvent } from 'resilient-websocket';
 
 import { getFlags } from './util.js';
 
+if (module.hot) module.hot.accept();
+
 const ResilientWebSocket = rSock as unknown as typeof rSock.default;
 
 declare const self: SharedWorkerGlobalScope;

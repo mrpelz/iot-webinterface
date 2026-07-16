@@ -12,15 +12,15 @@ import { usePrevious } from '../hooks/use-previous.js';
 export type BlendOverDirection = 'block' | 'inline';
 
 export const BlendOverWrapper = styled('blend-over' as 'section')`
-  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'inherit')};
   display: grid;
-  grid-template-areas: 'a';
   overflow: hidden;
+  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'inherit')};
+  grid-template-areas: 'a';
 `;
 
 export const BlendOverContent = styled('blend-over-content' as 'section')`
-  grid-area: a;
   position: relative;
+  grid-area: a;
 
   & > * {
     height: 100%;

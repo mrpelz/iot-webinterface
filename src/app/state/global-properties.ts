@@ -8,7 +8,7 @@ import {
 import { computed } from '@preact/signals';
 
 import { api } from '../main.js';
-import { exclude, unique } from '../util/array.js';
+import { excludeById, unique } from '../util/array.js';
 import { extractKey } from '../util/oop.js';
 import { $building, $home, $root } from './navigation.js';
 
@@ -134,7 +134,7 @@ export const globalProperties = () => {
   );
 
   const $rest = computed(() =>
-    exclude(
+    excludeById(
       $properties.value,
       [$security.value, $lights.value, $scenes.value, $timers.value].flat(),
     ),

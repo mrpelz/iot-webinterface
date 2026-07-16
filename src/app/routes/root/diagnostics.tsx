@@ -3,6 +3,7 @@ import { computed } from '@preact/signals';
 import { FunctionComponent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
+import { serialized } from '../../api.js';
 import { DiagnosticsContainer } from '../../components/diagnostics.js';
 import {
   arrayRenderer,
@@ -70,12 +71,15 @@ const Fallback: FunctionComponent = () => (
 
 const Flags: FunctionComponent = () => (
   <table>
-    {Object.entries($flags).map(([key, observable]) => (
-      <tr>
-        <td>{key}</td>
-        <td>{JSON.stringify(observable.value)}</td>
-      </tr>
-    ))}
+    <tbody>
+      {' '}
+      {Object.entries($flags).map(([key, observable]) => (
+        <tr key={key}>
+          <td>{key}</td>
+          <td>{JSON.stringify(observable.value)}</td>
+        </tr>
+      ))}
+    </tbody>
   </table>
 );
 
@@ -96,138 +100,182 @@ const Navigation: FunctionComponent = () => {
 
   return (
     <table>
-      <tr>
-        <td>home</td>
-        <td>
-          <table>
-            <tr>
-              <td colSpan={999}>elements</td>
-            </tr>
-            {homes?.map((element) => (
-              <tr>
-                <td>
-                  <table>
-                    <Properties object={element} />
-                  </table>
-                </td>
-              </tr>
-            ))}
-          </table>
-          <table>
-            <tr>
-              <td colSpan={999}>state</td>
-            </tr>
-            {home ? <Properties object={home} /> : <Fallback />}
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td>building</td>
-        <td>
-          <table>
-            <tr>
-              <td colSpan={999}>elements</td>
-            </tr>
-            {buildings?.map((element) => (
-              <tr>
-                <td>
-                  <table>
-                    <Properties object={element} />
-                  </table>
-                </td>
-              </tr>
-            ))}
-          </table>
-          <table>
-            <tr>
-              <td colSpan={999}>state</td>
-            </tr>
-            {building ? <Properties object={building} /> : <Fallback />}
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td>floor</td>
-        <td>
-          <table>
-            <tr>
-              <td colSpan={999}>elements</td>
-            </tr>
-            {floors?.map((element) => (
-              <tr>
-                <td>
-                  <table>
-                    <Properties object={element} />
-                  </table>
-                </td>
-              </tr>
-            ))}
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td>room</td>
-        <td>
-          <table>
-            <tr>
-              <td colSpan={999}>elements</td>
-            </tr>
-            {rooms?.map((element) => (
-              <tr>
-                <td>
-                  <table>
-                    <Properties object={element} />
-                  </table>
-                </td>
-              </tr>
-            ))}
-          </table>
-          <table>
-            <tr>
-              <td colSpan={999}>state</td>
-            </tr>
-            {room ? <Properties object={room} /> : <Fallback />}
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td>staticPage</td>
-        <td>
-          <table>
-            <tr>
-              <td colSpan={999}>elements</td>
-            </tr>
-            <tr>
-              <td>top</td>
-              <td>
-                {staticPagesTop.map((page) => (
-                  <tr>
-                    <td>{JSON.stringify(page)}</td>
+      <tbody>
+        {' '}
+        <tr>
+          <td>home</td>
+          <td>
+            <table>
+              <tbody>
+                {' '}
+                <tr>
+                  <td colSpan={999}>elements</td>
+                </tr>
+                {homes?.map((element) => (
+                  <tr key={serialized(element).$id}>
+                    <td>
+                      <table>
+                        <tbody>
+                          {' '}
+                          <Properties object={element} />
+                        </tbody>
+                      </table>{' '}
+                    </td>
                   </tr>
                 ))}
-              </td>
-            </tr>
-            <tr>
-              <td>bottom</td>
-              <td>
-                {staticPagesBottom.map((page) => (
-                  <tr>
-                    <td>{JSON.stringify(page)}</td>
+              </tbody>
+            </table>{' '}
+            <table>
+              <tbody>
+                {' '}
+                <tr>
+                  <td colSpan={999}>state</td>
+                </tr>
+                {home ? <Properties object={home} /> : <Fallback />}
+              </tbody>
+            </table>{' '}
+          </td>
+        </tr>
+        <tr>
+          <td>building</td>
+          <td>
+            <table>
+              <tbody>
+                {' '}
+                <tr>
+                  <td colSpan={999}>elements</td>
+                </tr>
+                {buildings?.map((element) => (
+                  <tr key={serialized(element).$id}>
+                    <td>
+                      <table>
+                        <tbody>
+                          {' '}
+                          <Properties object={element} />
+                        </tbody>
+                      </table>{' '}
+                    </td>
                   </tr>
                 ))}
-              </td>
-            </tr>
-          </table>
-          <table>
-            <tr>
-              <td>state</td>
-            </tr>
-            <tr>
-              <td>{useMemo(() => JSON.stringify(staticPage), [staticPage])}</td>
-            </tr>
-          </table>
-        </td>
-      </tr>
+              </tbody>
+            </table>{' '}
+            <table>
+              <tbody>
+                {' '}
+                <tr>
+                  <td colSpan={999}>state</td>
+                </tr>
+                {building ? <Properties object={building} /> : <Fallback />}
+              </tbody>
+            </table>{' '}
+          </td>
+        </tr>
+        <tr>
+          <td>floor</td>
+          <td>
+            <table>
+              <tbody>
+                {' '}
+                <tr>
+                  <td colSpan={999}>elements</td>
+                </tr>
+                {floors?.map((element) => (
+                  <tr key={serialized(element).$id}>
+                    <td>
+                      <table>
+                        <tbody>
+                          {' '}
+                          <Properties object={element} />
+                        </tbody>
+                      </table>{' '}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>{' '}
+          </td>
+        </tr>
+        <tr>
+          <td>room</td>
+          <td>
+            <table>
+              <tbody>
+                {' '}
+                <tr>
+                  <td colSpan={999}>elements</td>
+                </tr>
+                {rooms?.map((element) => (
+                  <tr key={serialized(element).$id}>
+                    <td>
+                      <table>
+                        <tbody>
+                          {' '}
+                          <Properties object={element} />
+                        </tbody>
+                      </table>{' '}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>{' '}
+            <table>
+              <tbody>
+                {' '}
+                <tr>
+                  <td colSpan={999}>state</td>
+                </tr>
+                {room ? <Properties object={room} /> : <Fallback />}
+              </tbody>
+            </table>{' '}
+          </td>
+        </tr>
+        <tr>
+          <td>staticPage</td>
+          <td>
+            <table>
+              <tbody>
+                {' '}
+                <tr>
+                  <td colSpan={999}>elements</td>
+                </tr>
+                <tr>
+                  <td>top</td>
+                  <td>
+                    {staticPagesTop.map((page) => (
+                      <tr key={page}>
+                        <td>{JSON.stringify(page)}</td>
+                      </tr>
+                    ))}
+                  </td>
+                </tr>
+                <tr>
+                  <td>bottom</td>
+                  <td>
+                    {staticPagesBottom.map((page) => (
+                      <tr key={page}>
+                        <td>{JSON.stringify(page)}</td>
+                      </tr>
+                    ))}
+                  </td>
+                </tr>
+              </tbody>
+            </table>{' '}
+            <table>
+              <tbody>
+                {' '}
+                <tr>
+                  <td>state</td>
+                </tr>
+                <tr>
+                  <td>
+                    {useMemo(() => JSON.stringify(staticPage), [staticPage])}
+                  </td>
+                </tr>
+              </tbody>
+            </table>{' '}
+          </td>
+        </tr>
+      </tbody>
     </table>
   );
 };
@@ -248,46 +296,51 @@ const I18n: FunctionComponent = () => {
   return (
     <>
       <table>
-        <tr>
-          <td>country</td>
-          <td>{useMemo(() => JSON.stringify(country), [country])}</td>
-        </tr>
-        <tr>
-          <td>language</td>
-          <td>{useMemo(() => JSON.stringify(language), [language])}</td>
-        </tr>
-        <tr>
-          <td>locale</td>
-          <td>{useMemo(() => JSON.stringify(locale), [locale])}</td>
-        </tr>
-        <tr>
-          <td>translationLanguage</td>
-          <td>
-            {useMemo(
-              () => JSON.stringify(translationLanguage),
-              [translationLanguage],
-            )}
-          </td>
-        </tr>
-        <tr>
-          <td>translationLocale</td>
-          <td>
-            {useMemo(
-              () => JSON.stringify(translationLocale),
-              [translationLocale],
-            )}
-          </td>
-        </tr>
-      </table>
-
-      <table>
-        {Object.entries(translation).map(([key, value]) => (
+        <tbody>
+          {' '}
           <tr>
-            <td>{key}</td>
-            <td>{JSON.stringify(value)}</td>
+            <td>country</td>
+            <td>{useMemo(() => JSON.stringify(country), [country])}</td>
           </tr>
-        ))}
+          <tr>
+            <td>language</td>
+            <td>{useMemo(() => JSON.stringify(language), [language])}</td>
+          </tr>
+          <tr>
+            <td>locale</td>
+            <td>{useMemo(() => JSON.stringify(locale), [locale])}</td>
+          </tr>
+          <tr>
+            <td>translationLanguage</td>
+            <td>
+              {useMemo(
+                () => JSON.stringify(translationLanguage),
+                [translationLanguage],
+              )}
+            </td>
+          </tr>
+          <tr>
+            <td>translationLocale</td>
+            <td>
+              {useMemo(
+                () => JSON.stringify(translationLocale),
+                [translationLocale],
+              )}
+            </td>
+          </tr>
+        </tbody>
       </table>
+      <table>
+        <tbody>
+          {' '}
+          {Object.entries(translation).map(([key, value]) => (
+            <tr key={key}>
+              <td>{key}</td>
+              <td>{JSON.stringify(value)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>{' '}
     </>
   );
 };
@@ -363,195 +416,203 @@ export const Diagnostics: FunctionComponent = () => {
   return (
     <DiagnosticsContainer>
       <table>
-        <tr>
-          <td>
-            <b>version</b>
-          </td>
-          <td>{computed(() => JSON.stringify(window.__version__))}</td>
-        </tr>
+        <tbody>
+          <tr>
+            <td>
+              <b>version</b>
+            </td>
+            <td>{computed(() => JSON.stringify(window.__version__))}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>API-version</b>
-          </td>
-          <td>{useMemo(() => JSON.stringify(apiVersion), [apiVersion])}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>API-version</b>
+            </td>
+            <td>{useMemo(() => JSON.stringify(apiVersion), [apiVersion])}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>API-upstream</b>
-          </td>
-          <td>{useMemo(() => JSON.stringify(apiUpstream), [apiUpstream])}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>API-upstream</b>
+            </td>
+            <td>{useMemo(() => JSON.stringify(apiUpstream), [apiUpstream])}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>Instance ID</b>
-          </td>
-          <td>{computed(() => JSON.stringify(id))}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>Instance ID</b>
+            </td>
+            <td>{computed(() => JSON.stringify(id))}</td>
+          </tr>
 
-        <tr>
-          <td colSpan={999}>
-            <Details summary={<b>flags</b>}>
-              <Flags />
-            </Details>
-          </td>
-        </tr>
+          <tr>
+            <td colSpan={999}>
+              <Details summary={<b>flags</b>}>
+                <Flags />
+              </Details>
+            </td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>isPWA</b>
-          </td>
-          <td>{computed(() => JSON.stringify(isPWA))}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>isPWA</b>
+            </td>
+            <td>{computed(() => JSON.stringify(isPWA))}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>isVisible</b>
-          </td>
-          <td>{computed(() => JSON.stringify($isVisible.value))}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>isVisible</b>
+            </td>
+            <td>{computed(() => JSON.stringify($isVisible.value))}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>isFocused</b>
-          </td>
-          <td>{computed(() => JSON.stringify($isFocused.value))}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>isFocused</b>
+            </td>
+            <td>{computed(() => JSON.stringify($isFocused.value))}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>isScreensaverActive</b>
-          </td>
-          <td>{computed(() => JSON.stringify($isScreensaverActive.value))}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>isScreensaverActive</b>
+            </td>
+            <td>
+              {computed(() => JSON.stringify($isScreensaverActive.value))}
+            </td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>isProd</b>
-          </td>
-          <td>{useMemo(() => JSON.stringify(isProd), [])}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>isProd</b>
+            </td>
+            <td>{useMemo(() => JSON.stringify(isProd), [])}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>isPrerelease</b>
-          </td>
-          <td>{useMemo(() => JSON.stringify(isPrerelease), [])}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>isPrerelease</b>
+            </td>
+            <td>{useMemo(() => JSON.stringify(isPrerelease), [])}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>webpackServe</b>
-          </td>
-          <td>{useMemo(() => JSON.stringify(webpackServe), [])}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>webpackServe</b>
+            </td>
+            <td>{useMemo(() => JSON.stringify(webpackServe), [])}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>webpackHash</b>
-          </td>
-          <td>
-            {useMemo(
-              () => JSON.stringify(sessionStorage.getItem(RECONNECT_NOTIFIER)),
-              [],
-            )}
-          </td>
-        </tr>
+          <tr>
+            <td>
+              <b>webpackHash</b>
+            </td>
+            <td>
+              {useMemo(
+                () =>
+                  JSON.stringify(sessionStorage.getItem(RECONNECT_NOTIFIER)),
+                [],
+              )}
+            </td>
+          </tr>
 
-        <tr>
-          <td colSpan={999}>
-            <b>path</b>
+          <tr>
+            <td colSpan={999}>
+              <b>path</b>
+              <table>
+                <tbody>
+                  {' '}
+                  <tr>
+                    <td>isRoot</td>
+                    <td>{computed(() => JSON.stringify($isRoot.value))}</td>
+                  </tr>
+                  <tr>
+                    <td>path</td>
+                    <td>{computed(() => JSON.stringify($path.value))}</td>
+                  </tr>
+                  <tr>
+                    <td>previousPath</td>
+                    <td>
+                      {computed(() => JSON.stringify($previousPath.value))}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>{' '}
+            </td>
+          </tr>
 
-            <table>
-              <tr>
-                <td>isRoot</td>
-                <td>{computed(() => JSON.stringify($isRoot.value))}</td>
-              </tr>
-              <tr>
-                <td>path</td>
-                <td>{computed(() => JSON.stringify($path.value))}</td>
-              </tr>
-              <tr>
-                <td>previousPath</td>
-                <td>{computed(() => JSON.stringify($previousPath.value))}</td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+          <tr>
+            <td>
+              <b>theme</b>
+            </td>
+            <td>{computed(() => JSON.stringify($theme.value))}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>theme</b>
-          </td>
-          <td>{computed(() => JSON.stringify($theme.value))}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>isDesktop</b>
+            </td>
+            <td>{useMemo(() => JSON.stringify(isDesktop), [isDesktop])}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>isDesktop</b>
-          </td>
-          <td>{useMemo(() => JSON.stringify(isDesktop), [isDesktop])}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>hairline</b>
+            </td>
+            <td>{useMemo(() => JSON.stringify(hairline), [hairline])}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>hairline</b>
-          </td>
-          <td>{useMemo(() => JSON.stringify(hairline), [hairline])}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>stream connected</b>
+            </td>
+            <td>
+              {useMemo(
+                () => JSON.stringify(isWebSocketOnline),
+                [isWebSocketOnline],
+              )}
+            </td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>stream connected</b>
-          </td>
-          <td>
-            {useMemo(
-              () => JSON.stringify(isWebSocketOnline),
-              [isWebSocketOnline],
-            )}
-          </td>
-        </tr>
+          <tr>
+            <td>
+              <b>stream client count</b>
+            </td>
+            <td>{useMemo(() => JSON.stringify(streamCount), [streamCount])}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>stream client count</b>
-          </td>
-          <td>{useMemo(() => JSON.stringify(streamCount), [streamCount])}</td>
-        </tr>
+          <tr>
+            <td colSpan={999}>
+              <Details summary={<b>navigation</b>}>
+                <Navigation />
+              </Details>
+            </td>
+          </tr>
 
-        <tr>
-          <td colSpan={999}>
-            <Details summary={<b>navigation</b>}>
-              <Navigation />
-            </Details>
-          </td>
-        </tr>
+          <tr>
+            <td colSpan={999}>
+              <Details summary={<b>i18n</b>}>
+                <I18n />
+              </Details>
+            </td>
+          </tr>
 
-        <tr>
-          <td colSpan={999}>
-            <Details summary={<b>i18n</b>}>
-              <I18n />
-            </Details>
-          </td>
-        </tr>
+          <tr>
+            <td>
+              <b>menu visible</b>
+            </td>
+            <td>{computed(() => JSON.stringify($isMenuVisible.value))}</td>
+          </tr>
 
-        <tr>
-          <td>
-            <b>menu visible</b>
-          </td>
-          <td>{computed(() => JSON.stringify($isMenuVisible.value))}</td>
-        </tr>
-
-        <tr>
-          <td>
-            <b>title</b>
-          </td>
-          <td>{computed(() => JSON.stringify($title.value))}</td>
-        </tr>
+          <tr>
+            <td>
+              <b>title</b>
+            </td>
+            <td>{computed(() => JSON.stringify($title.value))}</td>
+          </tr>
+        </tbody>
       </table>
-
       {hierarchy ? (
         <JSONViewer
           autoExpandPath={persistedPath ?? DEFAULT_PATH}

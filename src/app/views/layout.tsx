@@ -185,28 +185,34 @@ export const Layout: FunctionComponent = ({ children }) => {
         <Titlebar />
       </Header>
       <Aside
+        ref={menuRef}
         isVisible={
           (isDesktop && !isScreensaverActive) || Boolean(isAsideVisible)
         }
-        ref={menuRef}
       >
         <Menu />
       </Aside>
       {isRoot ? null : (
-        <Aside isVisible={false} ref={swipeBackRef}>
+        <Aside
+          ref={swipeBackRef}
+          isVisible={false}
+        >
           <SwipeBack />
         </Aside>
       )}
       <Main
-        isAsideVisible={isScreensaverActive || Boolean(isAsideVisible)}
-        onClickCapture={handleAsideOutsideClick}
         ref={mainRef}
+        isAsideVisible={isScreensaverActive || Boolean(isAsideVisible)}
         swipeCaptureWidth={swipeCaptureWidth}
+        onClickCapture={handleAsideOutsideClick}
       >
         <MainRefContext.Provider value={mainRef}>
           {children}
         </MainRefContext.Provider>
-        <MenuShade active={Boolean(isAsideVisible)} ref={menuShadeRef} />
+        <MenuShade
+          ref={menuShadeRef}
+          active={Boolean(isAsideVisible)}
+        />
       </Main>
     </>
   );

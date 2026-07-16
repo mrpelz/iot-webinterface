@@ -67,7 +67,12 @@ const LogItem: FunctionComponent<{
         </Pointer>
       </a>
       {'\n'}
-      {body ? <Tokenize input={body} tokens={tokens} /> : null}
+      {body ? (
+        <Tokenize
+          input={body}
+          tokens={tokens}
+        />
+      ) : null}
       {'\n\n'}
     </>
   );
@@ -122,7 +127,7 @@ export const LogicReasoning: FunctionComponent = () => {
           <Pre>
             {logs.map((log) => {
               if (log === logSeparator) {
-                return <Separator />;
+                return <Separator key={log.toString()} />;
               }
 
               if (headFilter !== undefined && log[1].head !== headFilter) {
@@ -130,7 +135,10 @@ export const LogicReasoning: FunctionComponent = () => {
               }
 
               return (
-                <LogContext.Provider value={log}>
+                <LogContext.Provider
+                  key={log.toString()}
+                  value={log}
+                >
                   <LogItem setHeadFilter={setHeadFilter} />
                 </LogContext.Provider>
               );
@@ -141,7 +149,10 @@ export const LogicReasoning: FunctionComponent = () => {
       <HorizontalSwipe>
         <a onClick={handleSeparatorClick}>
           <Pointer>
-            <Tag backgroundColor={colors.selection()()} invert>
+            <Tag
+              invert
+              backgroundColor={colors.selection()()}
+            >
               {/* eslint-disable-next-line no-irregular-whitespace */}
               insert separator
             </Tag>
@@ -153,7 +164,10 @@ export const LogicReasoning: FunctionComponent = () => {
           </Pointer>
         </a>
         {heads.map((head) => (
-          <a onClick={() => setHeadFilter(head)}>
+          <a
+            key={head}
+            onClick={() => setHeadFilter(head)}
+          >
             <Pointer>
               <Tag invert={headFilter === head}>
                 {head.length > 0

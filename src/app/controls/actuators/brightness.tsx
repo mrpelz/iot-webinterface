@@ -190,13 +190,22 @@ export const BrightnessActuator: FunctionComponent<{
   const allowTransition = Boolean(useDelay($rootPath.value, 300, true));
 
   const label = (
-    <BrightnessLabel brightness={brightness} loading={loading} value={value} />
+    <BrightnessLabel
+      brightness={brightness}
+      loading={loading}
+      value={value}
+    />
   );
 
   return (
     <Cell
+      title={
+        <Translation
+          capitalize={true}
+          i18nKey={name}
+        />
+      }
       onClick={onClick ?? handleClick}
-      title={<Translation i18nKey={name} capitalize={true} />}
     >
       <BlendOver
         blendOver={brightness === null ? 0 : brightness}

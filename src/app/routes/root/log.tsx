@@ -126,10 +126,15 @@ export const Log: FunctionComponent = () => {
           <Pre>
             {logs.map((log) => {
               if (log === logSeparator) {
-                return <Separator />;
+                return <Separator key={log.toString()} />;
               }
 
-              return <LogItem log={log} />;
+              return (
+                <LogItem
+                  key={log.toString()}
+                  log={log}
+                />
+              );
             })}
           </Pre>
         </DiagnosticsContainer>
@@ -137,7 +142,10 @@ export const Log: FunctionComponent = () => {
       <HorizontalSwipe>
         <a onClick={handleSeparatorClick}>
           <Pointer>
-            <Tag backgroundColor={colors.selection()()} invert>
+            <Tag
+              invert
+              backgroundColor={colors.selection()()}
+            >
               {/* eslint-disable-next-line no-irregular-whitespace */}
               insert separator
             </Tag>

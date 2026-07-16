@@ -69,8 +69,13 @@ export const HMMDMotionSensor: FunctionComponent<{
 
   return (
     <CellWithBody
+      title={
+        <Translation
+          capitalize={true}
+          i18nKey={name}
+        />
+      }
       onClick={onClick}
-      title={<Translation i18nKey={name} capitalize={true} />}
     >
       <Tag>
         {value === undefined ? (

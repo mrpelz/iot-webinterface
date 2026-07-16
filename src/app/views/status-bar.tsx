@@ -15,6 +15,9 @@ export const StatusBar: FunctionComponent = () => {
   );
 
   return (
-    <StatusBarComponent isConnected={isWebSocketOnline} isLight={isLight} />
+    <StatusBarComponent
+      isConnected={isWebSocketOnline}
+      isLight={isLight}
+    />
   );
 };

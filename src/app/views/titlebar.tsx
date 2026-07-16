@@ -59,7 +59,10 @@ export const IconContainer: FunctionComponent<{
   }, [ref]);
 
   return (
-    <IconContainerComponent ref={ref} right={right}>
+    <IconContainerComponent
+      ref={ref}
+      right={right}
+    >
       {children}
     </IconContainerComponent>
   );
@@ -136,7 +139,10 @@ export const Titlebar: FunctionComponent = () => {
       {leftIcon ? (
         <IconContainer paddingSetter={setPaddingLeft}>{leftIcon}</IconContainer>
       ) : null}
-      <IconContainer paddingSetter={setPaddingRight} right>
+      <IconContainer
+        right
+        paddingSetter={setPaddingRight}
+      >
         <WaitIconView />
         {rightIcon}
       </IconContainer>

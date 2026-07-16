@@ -5,15 +5,15 @@ import { forwardRef, useEffect, useRef } from 'preact/compat';
 import { colors, dimensions, strings } from '../style.js';
 
 const TailContainer = styled('tail' as 'section', forwardRef)`
-  background-color: ${colors.backgroundSecondary()};
-  block-size: 100%;
+  position: absolute;
   display: flex;
   flex-direction: column-reverse;
+  background-color: ${colors.backgroundSecondary()};
+  block-size: 100%;
   inline-size: 100%;
   overflow-block: auto;
   padding-block-end: ${strings.safeAreaInsetBottom};
   padding-inline: ${dimensions.fontPadding};
-  position: absolute;
 `;
 
 export const Tail: FunctionComponent = ({ children }) => {
@@ -35,8 +35,8 @@ export const Tail: FunctionComponent = ({ children }) => {
 };
 
 export const Separator = styled('separator' as 'section')`
+  display: block;
   background-color: ${colors.selection()};
   block-size: ${dimensions.hairline};
-  display: block;
   inline-size: 100%;
 `;

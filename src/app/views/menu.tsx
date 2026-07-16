@@ -97,13 +97,13 @@ const MenuListItem: FunctionComponent<{
 
   return (
     <MenuListItemComponent
+      ref={ref}
       isActive={active}
       isHighContrast={isHighContrast}
       isHovered={isHovered}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      ref={ref}
     >
       {children}
     </MenuListItemComponent>
@@ -140,7 +140,10 @@ export const Floor: FunctionComponent<{
               isActive={isActive}
               onClick={() => (isActive ? goRoot() : setRootPath(room_.$))}
             >
-              <Translation capitalize={true} i18nKey={room_.$} />
+              <Translation
+                capitalize={true}
+                i18nKey={room_.$}
+              />
               <MenuIndicatorSection>
                 <AllWindowsState room={room_} />
                 <DoorState room={room_} />
@@ -183,7 +186,10 @@ export const Menu: FunctionComponent = () => {
                     isActive ? goRoot() : setRootPath(staticPage_)
                   }
                 >
-                  <Translation capitalize={true} i18nKey={staticPage_} />
+                  <Translation
+                    capitalize={true}
+                    i18nKey={staticPage_}
+                  />
                 </MenuListItem>
               );
             })}
@@ -192,7 +198,10 @@ export const Menu: FunctionComponent = () => {
 
         <MenuSubdivision>
           {floors?.map((floor, key) => (
-            <Floor key={key} floor={floor} />
+            <Floor
+              key={key}
+              floor={floor}
+            />
           ))}
         </MenuSubdivision>
 
@@ -209,7 +218,10 @@ export const Menu: FunctionComponent = () => {
                     isActive ? goRoot() : setRootPath(staticPage_)
                   }
                 >
-                  <Translation capitalize={true} i18nKey={staticPage_} />
+                  <Translation
+                    capitalize={true}
+                    i18nKey={staticPage_}
+                  />
                 </MenuListItem>
               );
             })}
@@ -219,8 +231,14 @@ export const Menu: FunctionComponent = () => {
         {isScreensaverEnabled ? (
           <MenuSubdivision>
             <MenuList>
-              <MenuListItem isActive={false} onClick={flipScreensaverActive}>
-                <Translation capitalize={true} i18nKey="startScreensaver" />
+              <MenuListItem
+                isActive={false}
+                onClick={flipScreensaverActive}
+              >
+                <Translation
+                  capitalize={true}
+                  i18nKey="startScreensaver"
+                />
               </MenuListItem>
             </MenuList>
           </MenuSubdivision>

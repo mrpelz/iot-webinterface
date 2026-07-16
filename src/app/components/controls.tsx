@@ -26,34 +26,37 @@ export const Cell = styled(GridCell)<CellProps>`
     'none',
   )};
 
+  overflow: hidden;
   color: ${colors.fontPrimary()};
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
   font-size: ${dimensions.fontSizeSmall};
-  overflow: hidden;
 `;
 
 export const Header = styled('cell-header')<{
   borderRadius?: boolean;
 }>`
+  display: flex;
+  overflow: hidden;
   align-items: center;
+  justify-content: space-between;
+  padding: ${dimensions.controlBase};
+  border: var(--border);
   background-color: ${colors.backgroundSecondary()};
   block-size: ${multiply(dimensions.controlBase, '4')};
   border-start-end-radius: ${({ borderRadius = true }) =>
     borderRadius ? 'var(--border-radius)' : 'none'};
   border-start-start-radius: ${({ borderRadius = true }) =>
     borderRadius ? 'var(--border-radius)' : 'none'};
-  border: var(--border);
-  display: flex;
   gap: ${dimensions.controlBase};
-  justify-content: space-between;
-  overflow: hidden;
-  padding: ${dimensions.controlBase};
 `;
 
 export const Body = styled('cell-body' as 'section', forwardRef)<{
   borderRadius?: boolean;
 }>`
+  display: flex;
+  flex-wrap: wrap;
   align-content: flex-start;
+  padding: ${dimensions.controlBase};
   background-color: var(--background-color, none);
   border-block-end: var(--border);
   border-end-end-radius: ${({ borderRadius = true }) =>
@@ -62,26 +65,21 @@ export const Body = styled('cell-body' as 'section', forwardRef)<{
     borderRadius ? 'var(--border-radius)' : 'none'};
   border-inline-end: var(--border);
   border-inline-start: var(--border);
-  display: flex;
-  flex-wrap: wrap;
   gap: ${dimensions.controlBase};
-  padding: ${dimensions.controlBase};
 `;
 
 export const BodyLarge = styled(Body, forwardRef)`
-  align-content: center;
   font-size: ${dimensions.fontSizeLarge};
   font-weight: bold;
-  justify-content: center;
+  place-content: center center;
 `;
 
 export const BodyBottomBand = styled(Body, forwardRef)`
-  align-content: flex-end;
   block-size: ${dimensions.fontSize};
   border-block-start: solid ${dimensions.hairline} ${colors.fontPrimary()};
   font-size: ${dimensions.fontSizeSmall};
-  justify-content: center;
   padding-block: 0;
+  place-content: flex-end center;
 `;
 
 export const Title = styled('cell-title')`
@@ -99,22 +97,21 @@ export type TagProps = {
 };
 
 export const Tag = styled('tag')<TagProps>`
-  align-items: center;
-  border-radius: ${half(dimensions.controlBase)};
-  border: solid 1px currentColor;
   display: flex;
-  flex-wrap: wrap;
-  gap: ${dimensions.controlBase};
-  min-inline-size: ${multiply(dimensions.controlBase, '3')};
   overflow: hidden;
-  padding-inline: ${dimensions.controlBase};
-  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
   width: ${({ grow }) => (grow ? '100%' : '')};
-
+  flex-wrap: wrap;
+  align-items: center;
+  border: solid 1px currentcolor;
+  border-radius: ${half(dimensions.controlBase)};
   background-color: ${({ backgroundColor, invert }) =>
     backgroundColor ?? (invert ? colors.fontPrimary()() : 'transparent')};
   color: ${({ invert }) =>
     invert ? colors.backgroundPrimary()() : colors.fontPrimary()()};
+  cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
+  gap: ${dimensions.controlBase};
+  min-inline-size: ${multiply(dimensions.controlBase, '3')};
+  padding-inline: ${dimensions.controlBase};
 
   & > * {
     flex-shrink: 0;
@@ -126,14 +123,14 @@ export const Tag = styled('tag')<TagProps>`
 `;
 
 export const TagGroup = styled('tag-group')`
+  display: flex;
+  overflow: hidden;
+  flex-grow: 1;
   align-items: center;
   block-size: ${multiply(dimensions.controlBase, '3')};
   border-inline-end: solid ${dimensions.hairline} ${colors.fontPrimary()};
-  display: flex;
   gap: ${dimensions.controlBase};
-  overflow: hidden;
   padding-inline-end: ${dimensions.controlBase};
-  flex-grow: 1;
 
   & > * {
     flex-shrink: 0;
@@ -144,8 +141,8 @@ export const TagGroup = styled('tag-group')`
   }
 
   &:last-child {
+    flex-grow: 0;
     border-inline-end: none;
     padding-inline-end: 0;
-    flex-grow: 0;
   }
 `;

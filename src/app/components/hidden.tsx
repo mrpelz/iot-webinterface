@@ -3,13 +3,13 @@ import { styled } from 'goober';
 import { colors, dimensions } from '../style.js';
 
 export const Hidden = styled('hidden' as 'section')`
-  align-items: center;
-  color: ${colors.fontPrimary(undefined, 'light')};
+  position: absolute;
   display: flex;
   flex-direction: column;
-  inline-size: 100%;
-  inset-block-end: 100%;
+  align-items: center;
   justify-content: end;
   padding: ${dimensions.fontPadding};
-  position: absolute;
+  color: ${colors.fontPrimary(undefined, 'light')};
+  inline-size: 100%;
+  inset-block-end: 100%;
 `;
