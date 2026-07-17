@@ -6,12 +6,15 @@ import { getFlags } from './util.js';
 
 if (module.hot) module.hot.accept();
 
+type NotificationOptionsExtended = NotificationOptions & {
+  actions: { action: string; title: string }[];
+  renotify?: boolean;
+};
+
 declare const self: ServiceWorkerGlobalScope;
 
-const NOTIFICATION_SERVICEWORKER_INSTALL_TAG =
-  'notificationServiceWorkerInstall';
-const NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG =
-  'notificationServiceWorkerActivate';
+const NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG =
+  'notificationServiceWorkerNewVersion';
 const NOTIFICATION_SERVICEWORKER_ACTIVATE_ACTION_ABORT =
   'notificationServiceWorkerActivateActionAbort';
 
@@ -121,17 +124,15 @@ self.addEventListener('install', (event) =>
         console.table(flags);
       }
 
-      await clearNotifications([
-        NOTIFICATION_SERVICEWORKER_INSTALL_TAG,
-        NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG,
-      ]);
+      await clearNotifications([NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG]);
 
       if (!flags.updateUnattended && !self.__webpackServe__) {
         self.registration
           .showNotification('New Version Downloading', {
             body: 'A new version is pre-cached for offline-use',
-            tag: NOTIFICATION_SERVICEWORKER_INSTALL_TAG,
-          })
+            renotify: true,
+            tag: NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG,
+          } as NotificationOptionsExtended)
           .catch(() => {
             // noop
           });
@@ -152,10 +153,7 @@ self.addEventListener('activate', (event) =>
 
       await self.clients.claim();
 
-      await clearNotifications([
-        NOTIFICATION_SERVICEWORKER_INSTALL_TAG,
-        NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG,
-      ]);
+      await clearNotifications([NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG]);
 
       if (self.__webpackServe__) return;
 
@@ -173,11 +171,10 @@ self.addEventListener('activate', (event) =>
             },
           ],
           body: 'Reload all windows to make use of new version?',
+          renotify: true,
           requireInteraction: true,
-          tag: NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG,
-        } as NotificationOptions & {
-          actions: { action: string; title: string }[];
-        })
+          tag: NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG,
+        } as NotificationOptionsExtended)
         .catch(() => {
           // noop
         });
@@ -198,12 +195,9 @@ self.addEventListener('notificationclick', (event) =>
       // eslint-disable-next-line no-console
       if (debug) console.debug('notificationclick event', action, tag);
 
-      if (tag !== NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG) return;
+      if (tag !== NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG) return;
 
-      await clearNotifications([
-        NOTIFICATION_SERVICEWORKER_INSTALL_TAG,
-        NOTIFICATION_SERVICEWORKER_ACTIVATE_TAG,
-      ]);
+      await clearNotifications([NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG]);
 
       if (action === NOTIFICATION_SERVICEWORKER_ACTIVATE_ACTION_ABORT) return;
 
