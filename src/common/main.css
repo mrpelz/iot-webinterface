@@ -4,6 +4,11 @@
 /* stylelint-disable-next-line import-notation */
 @import 'konsta/react/theme.css';
 
+/* stylelint-disable-next-line at-rule-no-unknown */
+@theme {
+  --color-brand-green: #4cd964;
+}
+
 html {
   --inset-size: env(safe-area-inset-top, 1px);
 }
