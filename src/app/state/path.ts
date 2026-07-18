@@ -9,15 +9,14 @@ import {
   goUp as goUpUtil,
 } from '../util/path.js';
 import { callbackSignal, previous, readOnly } from '../util/signal.js';
+import { isiDevice, isPWA } from '../util/useragent.js';
 import { setMenuVisible } from './menu.js';
 import { $isVisible } from './visibility.js';
 
 const TRIGGER_STATE = 'c0aab99b-77e0-45c8-ab13-7effa083bc19';
 const ROOT_PATH_DEPTH = 1;
 
-const enableBackcapture = !(
-  'standalone' in navigator && navigator['standalone' as keyof Navigator]
-);
+const enableBackcapture = !isPWA;
 
 const $setPath = signal($flags.path.value ?? '');
 $flags.path.value = null;
@@ -102,13 +101,16 @@ effect(() => {
 
   const path = amend($path.value);
 
-  if (history.state === TRIGGER_STATE || !$isRoot.peek()) {
-    history.pushState(undefined, '', path.pathname);
+  if (
+    history.state !== TRIGGER_STATE &&
+    (isPWA || isiDevice || $isRoot.peek())
+  ) {
+    history.replaceState(undefined, '', path.pathname);
 
     return;
   }
 
-  history.replaceState(undefined, '', path.pathname);
+  history.pushState(undefined, '', path.pathname);
 });
 
 const onPopstate = () => {

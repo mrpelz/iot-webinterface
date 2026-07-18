@@ -21,6 +21,7 @@ import { $theme, Theme, themes } from '../../state/theme.js';
 import { getTranslationFallback } from '../../state/translation.js';
 import { swProxy } from '../../sw.js';
 import { $flags, clear } from '../../util/flags.js';
+import { baseUrl } from '../../util/path.js';
 import { Entry, List } from '../../views/list.js';
 import { Translation } from '../../views/translation.js';
 
@@ -479,12 +480,9 @@ export const Settings: FunctionComponent = () => {
           <input
             id="apiBaseUrl"
             name="apiBaseUrl"
+            placeholder={useMemo(() => baseUrl.href, [])}
             type="url"
             value={$flags.apiBaseUrl.value || ''}
-            placeholder={useMemo(
-              () => new URL('/', self.location.href).href,
-              [],
-            )}
             onBlur={useCallback<GenericEventHandler<HTMLInputElement>>(
               ({
                 currentTarget: { value },

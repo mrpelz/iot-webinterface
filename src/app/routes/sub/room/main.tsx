@@ -34,5 +34,5 @@ export const SubPage: FunctionComponent<{
     }
   }
 
-  return object.$;
+  return null;
 };

@@ -1,7 +1,9 @@
 const relevantPathMatcher = new RegExp('/*(?<path>.*)/*');
 
+export const baseUrl = new URL('/', self.location.href);
+
 export const amend = (path: string): URL => {
-  const result = new URL(location.href);
+  const result = new URL(baseUrl);
   result.pathname = path;
 
   return result;

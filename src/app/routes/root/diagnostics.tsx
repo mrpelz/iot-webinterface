@@ -59,7 +59,14 @@ import { useBreakpoint } from '../../style/breakpoint.js';
 import { getMediaQuery } from '../../style/main.js';
 import { isPrerelease, isProd } from '../../sw.js';
 import { $flags } from '../../util/flags.js';
-import { isPWA } from '../../util/useragent.js';
+import { baseUrl } from '../../util/path.js';
+import {
+  isiDevice,
+  isiPad,
+  isiPhone,
+  isPWA,
+  isSafari,
+} from '../../util/useragent.js';
 
 const DEFAULT_PATH = ['wurstHome', 'sonninstraße16', 'firstFloor'];
 
@@ -398,8 +405,7 @@ export const Diagnostics: FunctionComponent = () => {
   const apiVersion = useFetchText(
     computed(
       () =>
-        new URL('/api/version', $flags.apiBaseUrl.value ?? self.location.href)
-          .href,
+        new URL('/api/version', $flags.apiBaseUrl.value ?? baseUrl.href).href,
     ).value,
   );
 
@@ -408,7 +414,7 @@ export const Diagnostics: FunctionComponent = () => {
       () =>
         new URL(
           '/__proxy-api-hostname',
-          $flags.apiBaseUrl.value ?? self.location.href,
+          $flags.apiBaseUrl.value ?? baseUrl.href,
         ).href,
     ).value,
   );
@@ -440,6 +446,13 @@ export const Diagnostics: FunctionComponent = () => {
 
           <tr>
             <td>
+              <b>Base-URL</b>
+            </td>
+            <td>{computed(() => JSON.stringify(baseUrl.href))}</td>
+          </tr>
+
+          <tr>
+            <td>
               <b>Instance ID</b>
             </td>
             <td>{computed(() => JSON.stringify(id))}</td>
@@ -458,6 +471,41 @@ export const Diagnostics: FunctionComponent = () => {
               <b>isPWA</b>
             </td>
             <td>{computed(() => JSON.stringify(isPWA))}</td>
+          </tr>
+
+          <tr>
+            <td>
+              <b>User Agent</b>
+            </td>
+            <td>{computed(() => JSON.stringify(navigator.userAgent))}</td>
+          </tr>
+
+          <tr>
+            <td>
+              <b>isSafari</b>
+            </td>
+            <td>{computed(() => JSON.stringify(isSafari))}</td>
+          </tr>
+
+          <tr>
+            <td>
+              <b>isiDevice</b>
+            </td>
+            <td>{computed(() => JSON.stringify(isiDevice))}</td>
+          </tr>
+
+          <tr>
+            <td>
+              <b>isiPhone</b>
+            </td>
+            <td>{computed(() => JSON.stringify(isiPhone))}</td>
+          </tr>
+
+          <tr>
+            <td>
+              <b>isiPad</b>
+            </td>
+            <td>{computed(() => JSON.stringify(isiPad))}</td>
           </tr>
 
           <tr>
