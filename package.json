@@ -18,6 +18,9 @@
     "nginx_template.conf",
     "npm-shrinkwrap.json"
   ],
+  "scripts": {
+    "postinstall": "scripts/post-install.sh"
+  },
   "overrides": {
     "copy-webpack-plugin": "14.0.0",
     "react": "npm:@preact/compat",

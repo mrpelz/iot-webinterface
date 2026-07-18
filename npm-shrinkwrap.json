@@ -7,6 +7,7 @@
     "": {
       "name": "@iot/iot-webinterface",
       "version": "2.33.0",
+      "hasInstallScript": true,
       "license": "UNLICENSED",
       "dependencies": {
         "@iot/iot-monolith": "latest",
