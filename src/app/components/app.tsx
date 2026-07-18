@@ -3,7 +3,7 @@ import { styled } from 'goober';
 import { strings } from '../style.js';
 
 export const App = styled('app' as 'main')`
-  color-scheme: ${strings.colorScheme};
   display: flow-root;
+  color-scheme: ${strings.colorScheme};
   isolation: isolate;
 `;
