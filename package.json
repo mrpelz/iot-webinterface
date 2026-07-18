@@ -18,6 +18,9 @@
     "nginx_template.conf",
     "npm-shrinkwrap.json"
   ],
+  "scripts": {
+    "postinstall": "scripts/post-install.sh"
+  },
   "overrides": {
     "copy-webpack-plugin": "14.0.0",
     "react": "npm:@preact/compat",
@@ -36,8 +39,8 @@
     "goober": "2.1.19",
     "hls.js": "1.7.1",
     "idb-keyval": "6.3.0",
-    "preact": "10.29.8",
     "konsta": "5.2.0",
+    "preact": "10.29.8",
     "proper-tags": "2.0.2",
     "resilient-websocket": "2.0.0",
     "style-vendorizer": "2.2.3",
