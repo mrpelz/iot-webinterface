@@ -5,7 +5,7 @@ import { computed } from '@preact/signals';
 import { LevelObject } from '../api.js';
 import { kitchenAdjacent$ } from '../i18n/mapping.js';
 import { api } from '../main.js';
-import { exclude, unique } from '../util/array.js';
+import { excludeById, unique } from '../util/array.js';
 import { extractKey } from '../util/oop.js';
 import { $building } from './navigation.js';
 
@@ -129,7 +129,7 @@ export const roomProperties = (room: LevelObject[Level.ROOM]) => {
   );
 
   const $rest = computed(() =>
-    exclude(
+    excludeById(
       $properties.value,
       [
         $lights.value,

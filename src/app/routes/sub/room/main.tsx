@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'preact';
 
 import { AnyObject } from '../../../api.js';
+import { BinarySensor } from './binary.js';
 import { OffTimer } from './off-timer.js';
 import { OpenSensor } from './open.js';
 
@@ -21,10 +22,17 @@ export const SubPage: FunctionComponent<{
       return <OffTimer actuator={object} />;
     }
 
+    case 'input':
+    case 'inputGrouping':
+    case 'motion':
+    case 'hmmdMotion': {
+      return <BinarySensor sensor={object} />;
+    }
+
     default: {
       break;
     }
   }
 
-  return null;
+  return object.$;
 };

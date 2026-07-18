@@ -1,11 +1,14 @@
 import { Match, TExclude } from '@iot/iot-monolith/tree';
 import { FunctionComponent } from 'preact';
+import { useCallback } from 'preact/hooks';
 
 import { TSystem } from '../../../common/types.js';
 import { serialized } from '../../api.js';
 import { Tag } from '../../components/controls.js';
+import { ForwardIcon } from '../../components/icons.js';
 import { useTypedEmitter } from '../../hooks/use-api.js';
 import { I18nKey } from '../../i18n/main.js';
+import { setSubPath } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
 import { CellWithBody } from '../main.js';
 
@@ -28,19 +31,26 @@ export const BinarySensor: FunctionComponent<{
 }> = ({ negativeKey = 'no', onClick, positiveKey = 'yes', sensor, title }) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
+  const { $id } = sensor;
+
+  const handleClick = useCallback(() => setSubPath($id), [$id]);
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const name = String(title ?? sensor.$path?.at(-1) ?? sensor.$);
 
   const value = useTypedEmitter(serialized(sensor.main)).value;
 
   return (
     <CellWithBody
+      icon={<ForwardIcon height="1em" />}
       title={
         <Translation
           capitalize={true}
           i18nKey={name}
         />
       }
-      onClick={onClick}
+      onClick={onClick ?? handleClick}
     >
       <Tag>
         {value === undefined ? (
