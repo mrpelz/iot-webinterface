@@ -13,7 +13,7 @@ import {
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
 import { useTitleOverride } from '../../../state/title.js';
-import { getTranslation } from '../../../state/translation.js';
+import { getTranslationFallback } from '../../../state/translation.js';
 import { Entry, List } from '../../../views/list.js';
 import { Translation } from '../../../views/translation.js';
 
@@ -30,7 +30,7 @@ export const BinarySensor: FunctionComponent<{
   // @ts-ignore
   const { $ } = sensor;
 
-  useTitleOverride(getTranslation(name ?? $).value);
+  useTitleOverride(getTranslationFallback(name ?? $).value);
 
   const {
     lastChange: { main: lastChange },

@@ -9,13 +9,18 @@ export const camelCaseToWords = (input: string): string[] => {
   const result: string[] = [];
 
   for (const char of input.split('')) {
-    if (result.length === 0 || char.match(/[A-Z]/)) {
-      result.push(char.toLocaleLowerCase());
+    const last = result.at(-1);
+    const isUppercase = Boolean(char.match(/[A-Z]/));
+
+    const endCharIsUppercase = Boolean((last?.at(-1) ?? '').match(/[A-Z]/));
+
+    if (result.length === 0 || (isUppercase && !endCharIsUppercase)) {
+      result.push(char);
       continue;
     }
 
-    result[result.length - 1] = result.at(-1) + char.toLocaleLowerCase();
+    result[result.length - 1] = [last, char].join('');
   }
 
-  return result;
+  return result.map((word) => word.toLocaleLowerCase());
 };

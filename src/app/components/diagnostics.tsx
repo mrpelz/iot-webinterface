@@ -14,8 +14,6 @@ export const DiagnosticsContainer = styled('diagnostics-container')`
     -webkit-tap-highlight-color: currentcolor;
     -webkit-touch-callout: none;
     user-select: text;
-    white-space: break-spaces;
-    word-break: break-all;
   }
 
   table,

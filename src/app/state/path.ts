@@ -9,7 +9,7 @@ import {
   goUp as goUpUtil,
 } from '../util/path.js';
 import { callbackSignal, previous, readOnly } from '../util/signal.js';
-import { isiDevice, isPWA } from '../util/useragent.js';
+import { isPWA } from '../util/useragent.js';
 import { setMenuVisible } from './menu.js';
 import { $isVisible } from './visibility.js';
 
@@ -46,9 +46,9 @@ export const goPrevious = (): void => {
   setPath(previousPath);
 };
 
-export const $isRoot = computed(
-  () => getSegments($path.value).length <= ROOT_PATH_DEPTH,
-);
+export const $segments = computed(() => getSegments($path.value));
+export const $pathDepth = computed(() => $segments.value.length);
+export const $isRoot = computed(() => $pathDepth.value <= ROOT_PATH_DEPTH);
 
 export const goUp = (): void => {
   if ($isRoot.value) return;
@@ -66,8 +66,8 @@ export const getSegment = callbackSignal(
 
 export const setSegment =
   (segmentNumber: number) =>
-  (input: string | undefined): void => {
-    const segments = getSegments($path.value);
+  (input?: string): void => {
+    const segments = $segments.value;
 
     if (segments.length < segmentNumber) return;
 
@@ -82,7 +82,8 @@ export const $rootPath = getSegment(0);
 export const setRootPath = setSegment(0);
 
 export const $subPath = getSegment(1);
-export const setSubPath = setSegment(1);
+export const setSubPath = (input?: string, level?: number): void =>
+  setSegment(level ?? $pathDepth.value)(input);
 
 export const goRoot = (): void => {
   if ($isRoot.value) return;
@@ -99,37 +100,25 @@ effect(() => {
 effect(() => {
   if (!$path.value) return;
 
-  const path = amend($path.value);
-
-  if (
-    history.state !== TRIGGER_STATE &&
-    (isPWA || isiDevice || $isRoot.peek())
-  ) {
-    history.replaceState(undefined, '', path.pathname);
-
-    return;
-  }
-
-  history.pushState(undefined, '', path.pathname);
+  history.replaceState(undefined, '', amend($path.value).pathname);
 });
 
-const onPopstate = () => {
+addEventListener('popstate', () => {
   if ($isRoot.value) {
-    if (enableBackcapture) setMenuVisible(true);
+    if (enableBackcapture) {
+      setMenuVisible(true);
+    }
+
+    history.replaceState(undefined, '', amend($path.value).pathname);
 
     return;
   }
 
   goUp();
-};
+});
 
-addEventListener('popstate', onPopstate);
+const initialPath = location.pathname;
+history.replaceState(TRIGGER_STATE, '', '/');
+history.pushState(undefined, '', '/');
 
-if (enableBackcapture) {
-  const path = location.pathname;
-
-  history.replaceState(TRIGGER_STATE, '', '/');
-  history.pushState(TRIGGER_STATE, '', '/');
-
-  setPath(path);
-}
+setPath(initialPath);

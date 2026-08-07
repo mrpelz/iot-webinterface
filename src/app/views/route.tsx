@@ -64,7 +64,9 @@ export const SubRoute: FunctionComponent<{
   blackOut?: boolean;
   subRoute: ComponentChildren;
 }> = ({ blackOut = true, children, subRoute }) => {
-  useBackgroundOverride(subRoute && blackOut ? noBackground : undefined);
+  useBackgroundOverride(
+    Boolean(subRoute) && blackOut ? noBackground : undefined,
+  );
   useScrollRestore(!subRoute);
 
   return (

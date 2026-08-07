@@ -12,7 +12,7 @@ const BACKGROUND_EXTENSION = '.png';
 
 const camelCase = new RegExp('[A-Z]', 'g');
 
-const $initialDelay = delayedSignal(signal(true), 1000);
+const $initialDelay = delayedSignal(signal(true), 1000, true);
 
 const $background_ = signal<string | undefined>(undefined);
 

@@ -9,7 +9,10 @@ include $(BASE_FILE)/Makefile
 STYLELINT := stylelint "src/{app,common}/**/*.{css,jsx,tsx}"
 PACKAGE_LOCK_LINT_ARGS := $(PACKAGE_LOCK_LINT_ARGS) git.i.wurstsalat.cloud
 
-MITM_TOKEN := $(shell uuidgen)
+GIT_BRANCH := $(shell git symbolic-ref --short HEAD)
+
+MITM_SLUG := $(shell echo "$(PKG_NAME)/$(GIT_BRANCH)" | sed -r -e 's#@##g' -e 's#/#-#g' 2>/dev/null)
+MITM_URL := https://$(MITM_SLUG).localhost
 
 .PHONY: .PHONY \
 	util_mitmproxy \
@@ -22,14 +25,14 @@ check_package_lock:
 	lockfile-lint --path npm-shrinkwrap.json --type npm $(PACKAGE_LOCK_LINT_ARGS)
 
 util_mitmproxy:
-	clear \
+	clear; \
 
 	@echo
-	@echo http://localhost:8081/?token=$(MITM_TOKEN)
-	@echo https://$(shell  uname -n)/
+	@echo http://localhost:8081/?token=$(MITM_SLUG)
+	@echo $(MITM_URL)
 	@echo \
 
-	mitmweb --no-web-open-browser --set termlog_verbosity=error --set web_password="$(MITM_TOKEN)" --mode "reverse:http://localhost:3000@443"
+	mitmweb --no-web-open-browser --set termlog_verbosity=error --set web_password="$(MITM_SLUG)" --mode "reverse:http://localhost:3000@443";
 
 watch_dev_proxy:
 	scripts/watch-dev-proxy.sh
