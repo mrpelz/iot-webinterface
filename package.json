@@ -30,7 +30,7 @@
     "webpack-dev-server": "6.0.0"
   },
   "dependencies": {
-    "@iot/iot-monolith": "latest",
+    "@iot/iot-monolith": "8.12.1",
     "@mrpelz/misc-utils": "7.4.4",
     "@mrpelz/modifiable-date": "7.4.4",
     "@okikio/sharedworker": "1.1.0",
@@ -49,10 +49,10 @@
     "workbox-window": "7.4.1"
   },
   "devDependencies": {
-    "@mrpelz/boilerplate-common": "16.3.0",
-    "@mrpelz/boilerplate-preact": "16.3.0",
+    "@mrpelz/boilerplate-common": "16.3.2",
+    "@mrpelz/boilerplate-preact": "16.3.2",
     "@tailwindcss/webpack": "4.3.3",
-    "@types/node": "26.1.2",
+    "@types/node": "26.2.0",
     "@types/webpack-env": "1.18.8",
     "copy-webpack-plugin": "14.0.0",
     "eslint-plugin-react": "7.37.5",

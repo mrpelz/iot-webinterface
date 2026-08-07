@@ -1,7 +1,7 @@
+import { App as AppComponent } from 'konsta/react';
 import { FunctionComponent } from 'preact';
 import { useLayoutEffect } from 'preact/hooks';
 
-import { App as AppComponent } from '../components/app.js';
 import { colors } from '../style.js';
 import { $flags } from '../util/flags.js';
 import { Background } from './background.js';
@@ -23,7 +23,10 @@ export const App: FunctionComponent = () => {
   }, [backgroundColor]);
 
   return (
-    <AppComponent>
+    <AppComponent
+      dark
+      theme="ios"
+    >
       {$flags.screensaverEnable.value ? <Screensaver /> : null}
       <Layout>
         <RootRoute />
