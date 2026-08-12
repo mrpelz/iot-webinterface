@@ -40,3 +40,5 @@ export const cssEnv = (variable: string, fallback?: string): string =>
 
 export const cssVar = (variable: string, fallback?: string): string =>
   `var(--${variable}${fallback ? `, ${fallback}` : ''})`;
+
+export const css = String.raw;
