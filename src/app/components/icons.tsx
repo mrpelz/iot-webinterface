@@ -1,11 +1,15 @@
 import { styled } from 'goober';
 import { FunctionComponent } from 'preact';
 
-import { dependentValue } from '../style/main.js';
+import { css, dependentValue } from '../style/main.js';
 
 const Svg = styled('svg')<{ color?: string; zIndex?: number }>`
-  ${({ zIndex }) => (zIndex ? `z-index: ${zIndex}` : undefined)};
-  min-width: 1rem;
+  ${({ zIndex }) =>
+    zIndex
+      ? css`
+          z-index: ${zIndex};
+        `
+      : undefined};
   color: ${({ color }) => color || 'currentColor'};
   fill: none;
   stroke: none;
