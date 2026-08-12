@@ -1,11 +1,4 @@
-import {
-  List,
-  ListButton,
-  ListInput,
-  ListItem,
-  Page,
-  Toggle,
-} from 'konsta/react';
+import { List, ListButton, ListInput, ListItem, Toggle } from 'konsta/react';
 import { FunctionComponent, GenericEventHandler, TargetedEvent } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
@@ -67,7 +60,7 @@ export const Settings: FunctionComponent = () => {
   const startPages = useMemo(() => [...staticPages, ...roomNames], [roomNames]);
 
   return (
-    <Page>
+    <>
       <List
         inset
         strong
@@ -1092,6 +1085,6 @@ export const Settings: FunctionComponent = () => {
           remove notifications
         </ListButton>
       </List>
-    </Page>
+    </>
   );
 };
