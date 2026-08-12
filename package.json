@@ -30,7 +30,7 @@
     "webpack-dev-server": "6.0.0"
   },
   "dependencies": {
-    "@iot/iot-monolith": "8.12.1",
+    "@iot/iot-monolith": "latest",
     "@mrpelz/misc-utils": "7.4.4",
     "@mrpelz/modifiable-date": "7.4.4",
     "@okikio/sharedworker": "1.1.0",
