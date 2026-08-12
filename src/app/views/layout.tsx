@@ -1,4 +1,10 @@
-import { createContext, FunctionComponent, JSX, RefObject } from 'preact';
+import { Page } from 'konsta/react';
+import {
+  createContext,
+  FunctionComponent,
+  RefObject,
+  UIEventHandler,
+} from 'preact';
 import { useContext, useLayoutEffect, useMemo, useRef } from 'preact/hooks';
 
 import { Aside, Header, Main } from '../components/layout.js';
@@ -166,7 +172,7 @@ export const Layout: FunctionComponent = ({ children }) => {
   }, [isDesktop]);
 
   const handleAsideOutsideClick = useMemo<
-    JSX.UIEventHandler<HTMLElement> | undefined
+    UIEventHandler<HTMLElement> | undefined
   >(
     () =>
       isAsideVisible
@@ -182,7 +188,6 @@ export const Layout: FunctionComponent = ({ children }) => {
     <>
       <Header isVisible={!isScreensaverActive}>
         <StatusBar />
-        <Titlebar />
       </Header>
       <Aside
         ref={menuRef}
@@ -207,7 +212,10 @@ export const Layout: FunctionComponent = ({ children }) => {
         onClickCapture={handleAsideOutsideClick}
       >
         <MainRefContext.Provider value={mainRef}>
-          {children}
+          <Page>
+            <Titlebar />
+            {children}
+          </Page>
         </MainRefContext.Provider>
         <MenuShade
           ref={menuShadeRef}
