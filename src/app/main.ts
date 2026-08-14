@@ -56,9 +56,9 @@ try {
     // // eslint-disable-next-line no-console
     // console.log(office?.devices.ceilingLight.device.host);
 
-    // // const $emitter = api.$typedEmitter(match?.main);
+    // // const emitter$ = api.typedEmitter$(match?.main);
     // // // eslint-disable-next-line no-console
-    // // effect(() => console.log(match?.$, $emitter.value));
+    // // effect(() => console.log(match?.$, emitter$.value));
   });
 } catch (error) {
   // eslint-disable-next-line no-console

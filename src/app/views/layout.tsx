@@ -3,9 +3,9 @@ import { useContext, useLayoutEffect, useMemo, useRef } from 'preact/hooks';
 
 import { Aside, Header, Main } from '../components/layout.js';
 import { MenuShade } from '../components/menu.js';
-import { $isMenuVisible, MenuVisible, setMenuVisible } from '../state/menu.js';
-import { $isRoot, goUp } from '../state/path.js';
-import { $isScreensaverActive } from '../state/screensaver.js';
+import { isMenuVisible$, MenuVisible, setMenuVisible } from '../state/menu.js';
+import { goUp, isRoot$ } from '../state/path.js';
+import { isScreensaverActive$ } from '../state/screensaver.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { getMediaQuery } from '../style/main.js';
@@ -26,8 +26,8 @@ export const useMainRef = (): RefObject<HTMLElement> =>
 export const Layout: FunctionComponent = ({ children }) => {
   const isDesktop = useBreakpoint(getMediaQuery(dimensions.breakpointDesktop));
 
-  const isAsideVisible = $isMenuVisible.value;
-  const isScreensaverActive = $isScreensaverActive.value;
+  const isAsideVisible = isMenuVisible$.value;
+  const isScreensaverActive = isScreensaverActive$.value;
 
   const menuRef = useRef<HTMLElement>(null);
   const menuShadeRef = useRef<HTMLDivElement>(null);
@@ -38,7 +38,7 @@ export const Layout: FunctionComponent = ({ children }) => {
 
   const isAsideVisibleRef = useRef<MenuVisible>(null);
 
-  const isRoot = $isRoot.value;
+  const isRoot = isRoot$.value;
 
   useLayoutEffect(() => {
     isAsideVisibleRef.current = isAsideVisible;

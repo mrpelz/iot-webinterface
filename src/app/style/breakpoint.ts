@@ -21,7 +21,7 @@ export const useBreakpoint = (breakpoint: string): boolean => {
   return matches;
 };
 
-export const $breakpoint = (
+export const breakpoint$ = (
   query: string,
   abort?: AbortController,
 ): ReadonlySignal<boolean> => {
@@ -52,13 +52,13 @@ export const useBreakpointValue = (
   return matches ? ifTrue : ifFalse;
 };
 
-export const $breakpointValue = (
+export const breakpointValue$ = (
   query: string,
   ifTrue: string,
   ifFalse: string,
   abort?: AbortController,
 ): ReadonlySignal<string> =>
-  computed(() => ($breakpoint(query, abort) ? ifTrue : ifFalse));
+  computed(() => (breakpoint$(query, abort) ? ifTrue : ifFalse));
 
 export const breakpointValue =
   (query: Value, ifTrue: Value, ifFalse: Value): (() => string) =>

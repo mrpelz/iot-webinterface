@@ -4,7 +4,7 @@ import { Workbox } from 'workbox-window';
 
 import type { SW_API } from '../common/types.js';
 import { webpackServe } from './reload.js';
-import { $flags } from './util/flags.js';
+import { flags$ } from './util/flags.js';
 
 export const isProd = location.hostname === 'iot.i.wurstsalat.cloud';
 export const isPrerelease =
@@ -35,7 +35,7 @@ export const registerServiceWorker = async (): Promise<void> => {
   effect(() => {
     const interval = setInterval(
       () => workbox?.update(),
-      $flags.updateCheckInterval.value ?? CHECK_INTERVAL,
+      flags$.updateCheckInterval.value ?? CHECK_INTERVAL,
     );
 
     return () => clearInterval(interval);

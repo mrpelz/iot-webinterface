@@ -22,19 +22,19 @@ import { useTypedEmitter } from '../hooks/use-api.js';
 import { useArray } from '../hooks/use-array-compare.js';
 import { roomSorting } from '../i18n/mapping.js';
 import { api } from '../main.js';
-import { $isMenuVisible } from '../state/menu.js';
+import { isMenuVisible$ } from '../state/menu.js';
 import {
-  $floors,
-  $room,
-  $staticPage,
+  floors$,
+  room$,
+  staticPage$,
   staticPagesBottom,
   staticPagesTop,
 } from '../state/navigation.js';
 import { goRoot, setRootPath } from '../state/path.js';
 import { flipScreensaverActive } from '../state/screensaver.js';
-import { $theme } from '../state/theme.js';
+import { theme$ } from '../state/theme.js';
 import { colors } from '../style.js';
-import { $flags } from '../util/flags.js';
+import { flags$ } from '../util/flags.js';
 import { Translation } from './translation.js';
 
 // @ts-ignore
@@ -75,8 +75,8 @@ const MenuListItem: FunctionComponent<{
   isActive: boolean;
   onClick: () => void;
 }> = ({ isActive: active, onClick, children }) => {
-  const isMenuVisible = $isMenuVisible.value;
-  const isHighContrast = $theme.value === 'highContrast';
+  const isMenuVisible = isMenuVisible$.value;
+  const isHighContrast = theme$.value === 'highContrast';
 
   const [isHovered, setHovered] = useState(false);
 
@@ -123,7 +123,7 @@ export const Floor: FunctionComponent<{
     useMemo(() => sortBy(elements, '$', roomSorting).all, [elements]),
   );
 
-  const room = $room.value;
+  const room = room$.value;
 
   return (
     <>
@@ -158,12 +158,12 @@ export const Floor: FunctionComponent<{
 };
 
 export const Menu: FunctionComponent = () => {
-  const isScreensaverEnabled = $flags.screensaverEnable.value;
+  const isScreensaverEnabled = flags$.screensaverEnable.value;
 
-  const isMenuVisible = $isMenuVisible.value;
+  const isMenuVisible = isMenuVisible$.value;
 
-  const floors = $floors.value;
-  const staticPage = $staticPage.value;
+  const floors = floors$.value;
+  const staticPage = staticPage$.value;
 
   const isVisible = useMemo(
     () => (isMenuVisible === null ? true : isMenuVisible),

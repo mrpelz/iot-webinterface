@@ -8,7 +8,7 @@ import {
   Title,
 } from '../components/controls.js';
 import { I18nKey } from '../i18n/main.js';
-import { $theme } from '../state/theme.js';
+import { theme$ } from '../state/theme.js';
 import { Actuator } from './actuators/main.js';
 import { Sensor } from './sensor/main.js';
 
@@ -27,7 +27,7 @@ export const Cell: FunctionComponent<CellProps> = ({
   title,
 }) => (
   <CellComponent
-    isHighContrast={$theme.value === 'highContrast'}
+    isHighContrast={theme$.value === 'highContrast'}
     span={span ?? 2}
     onClick={onClick}
   >

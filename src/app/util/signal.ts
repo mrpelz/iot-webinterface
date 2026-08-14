@@ -6,7 +6,7 @@ import {
   signal,
 } from '@preact/signals';
 
-import { $flags } from './flags.js';
+import { flags$ } from './flags.js';
 
 export type AnySignal<T> = Signal<T> | ReadonlySignal<T>;
 
@@ -82,11 +82,11 @@ export const callback = <
   handler: (inputs: SignalValueMap<T>, ...args: A) => R,
   signals: T,
 ): ReadonlySignal<(...args: A) => R> => {
-  const $combinedInputs = combinedSignal(signals);
+  const combinedInputs$ = combinedSignal(signals);
 
   return computed(() => {
-    const { value: debug } = $flags.debug;
-    const combinedInputs = $combinedInputs.value;
+    const { value: debug } = flags$.debug;
+    const combinedInputs = combinedInputs$.value;
 
     if (debug) {
       // eslint-disable-next-line no-console
@@ -129,14 +129,14 @@ export const previous = <T>(
   input: Signal<T> | ReadonlySignal<T>,
 ): readonly [ReadonlySignal<T | null>, ReadonlySignal<T>] => {
   let inputRef: T | null = null;
-  const $previous = signal<T | null>(null);
+  const previous$ = signal<T | null>(null);
 
   effect(() => {
-    $previous.value = inputRef;
+    previous$.value = inputRef;
     inputRef = input.value;
   });
 
-  return [readOnly($previous), readOnly(input)] as const;
+  return [readOnly(previous$), readOnly(input)] as const;
 };
 
 export const delayedSignal = <T>(
@@ -144,35 +144,35 @@ export const delayedSignal = <T>(
   delay: number,
   resetOnDelayStart = false,
 ): ReadonlySignal<T | null> => {
-  const $result = signal<T | null>(input.value);
+  const result$ = signal<T | null>(input.value);
 
   effect(() => {
     const { value: newValue } = input;
 
     if (resetOnDelayStart) {
-      $result.value = null;
+      result$.value = null;
     }
 
     const timeout = setTimeout(() => {
-      $result.value = newValue;
+      result$.value = newValue;
     }, delay);
 
     return () => clearTimeout(timeout);
   });
 
-  return computed(() => $result.value);
+  return computed(() => result$.value);
 };
 
 export const persistedSignal = <T extends string = string>(
   identifier: string,
   initialValue?: T | undefined,
 ): Signal<T | undefined> => {
-  const $signal = signal(
+  const signal$ = signal(
     (localStorage.getItem(identifier) as T) ?? initialValue ?? undefined,
   );
 
   effect(() => {
-    const { value } = $signal;
+    const { value } = signal$;
     if (value === undefined) {
       localStorage.removeItem(identifier);
       return;
@@ -181,17 +181,17 @@ export const persistedSignal = <T extends string = string>(
     localStorage.setItem(identifier, value);
   });
 
-  return $signal;
+  return signal$;
 };
 
 export const promisedSignal = <T>(
   promise: Promise<T>,
 ): ReadonlySignal<T | undefined> => {
-  const $signal = signal<T | undefined>();
+  const signal$ = signal<T | undefined>();
 
   promise.then((result) => {
-    $signal.value = result;
+    signal$.value = result;
   });
 
-  return readOnly($signal);
+  return readOnly(signal$);
 };

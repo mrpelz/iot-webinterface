@@ -1,10 +1,10 @@
 import { FunctionComponent } from 'preact';
 
-import { $subPath } from '../state/path.js';
+import { subPath$ } from '../state/path.js';
 import { HLSStream } from './hls-stream.js';
 
 export const HallwayStream: FunctionComponent = () => {
-  const subRoute = $subPath.value;
+  const subRoute = subPath$.value;
 
   return (
     <HLSStream

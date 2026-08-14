@@ -34,31 +34,31 @@ import { useFirstTruthy } from '../../hooks/use-first-truthy.js';
 import { useLocalStorage } from '../../hooks/use-local-storage.js';
 import { api, id } from '../../main.js';
 import { RECONNECT_NOTIFIER, webpackServe } from '../../reload.js';
-import { $isFocused } from '../../state/focus.js';
-import { $isMenuVisible } from '../../state/menu.js';
+import { isFocused$ } from '../../state/focus.js';
+import { isMenuVisible$ } from '../../state/menu.js';
 import {
-  $building,
-  $buildings,
-  $floors,
-  $home,
-  $homes,
-  $room,
-  $rooms,
-  $staticPage,
+  building$,
+  buildings$,
+  floors$,
+  home$,
+  homes$,
+  room$,
+  rooms$,
+  staticPage$,
   staticPagesBottom,
   staticPagesTop,
 } from '../../state/navigation.js';
-import { $isRoot, $path, $previousPath } from '../../state/path.js';
-import { $isScreensaverActive } from '../../state/screensaver.js';
-import { $theme } from '../../state/theme.js';
-import { $title } from '../../state/title.js';
-import { $i18n } from '../../state/translation.js';
-import { $isVisible } from '../../state/visibility.js';
+import { isRoot$, path$, previousPath$ } from '../../state/path.js';
+import { isScreensaverActive$ } from '../../state/screensaver.js';
+import { theme$ } from '../../state/theme.js';
+import { title$ } from '../../state/title.js';
+import { i18n$ } from '../../state/translation.js';
+import { isVisible$ } from '../../state/visibility.js';
 import { dimensions } from '../../style.js';
 import { useBreakpoint } from '../../style/breakpoint.js';
 import { getMediaQuery } from '../../style/main.js';
 import { isPrerelease, isProd } from '../../sw.js';
-import { $flags } from '../../util/flags.js';
+import { flags$ } from '../../util/flags.js';
 import { baseUrl } from '../../util/path.js';
 import {
   isiDevice,
@@ -80,7 +80,7 @@ const Flags: FunctionComponent = () => (
   <table>
     <tbody>
       {' '}
-      {Object.entries($flags).map(([key, observable]) => (
+      {Object.entries(flags$).map(([key, observable]) => (
         <tr key={key}>
           <td>{key}</td>
           <td>{JSON.stringify(observable.value)}</td>
@@ -91,19 +91,19 @@ const Flags: FunctionComponent = () => (
 );
 
 const Navigation: FunctionComponent = () => {
-  const homes = $homes.value;
-  const home = $home.value;
+  const homes = homes$.value;
+  const home = home$.value;
 
-  const buildings = $buildings.value;
-  const building = $building.value;
+  const buildings = buildings$.value;
+  const building = building$.value;
 
-  const floors = $floors.value;
-  // const floor = $floor.value;
+  const floors = floors$.value;
+  // const floor = floor$.value;
 
-  const rooms = $rooms.value;
-  const room = $room.value;
+  const rooms = rooms$.value;
+  const room = room$.value;
 
-  const staticPage = $staticPage.value;
+  const staticPage = staticPage$.value;
 
   return (
     <table>
@@ -298,7 +298,7 @@ const I18n: FunctionComponent = () => {
       translationLanguage,
       translationLocale
     }
-  } = $i18n;
+  } = i18n$;
 
   return (
     <>
@@ -405,7 +405,7 @@ export const Diagnostics: FunctionComponent = () => {
   const apiVersion = useFetchText(
     computed(
       () =>
-        new URL('/api/version', $flags.apiBaseUrl.value ?? baseUrl.href).href,
+        new URL('/api/version', flags$.apiBaseUrl.value ?? baseUrl.href).href,
     ).value,
   );
 
@@ -414,7 +414,7 @@ export const Diagnostics: FunctionComponent = () => {
       () =>
         new URL(
           '/__proxy-api-hostname',
-          $flags.apiBaseUrl.value ?? baseUrl.href,
+          flags$.apiBaseUrl.value ?? baseUrl.href,
         ).href,
     ).value,
   );
@@ -512,14 +512,14 @@ export const Diagnostics: FunctionComponent = () => {
             <td>
               <b>isVisible</b>
             </td>
-            <td>{computed(() => JSON.stringify($isVisible.value))}</td>
+            <td>{computed(() => JSON.stringify(isVisible$.value))}</td>
           </tr>
 
           <tr>
             <td>
               <b>isFocused</b>
             </td>
-            <td>{computed(() => JSON.stringify($isFocused.value))}</td>
+            <td>{computed(() => JSON.stringify(isFocused$.value))}</td>
           </tr>
 
           <tr>
@@ -527,7 +527,7 @@ export const Diagnostics: FunctionComponent = () => {
               <b>isScreensaverActive</b>
             </td>
             <td>
-              {computed(() => JSON.stringify($isScreensaverActive.value))}
+              {computed(() => JSON.stringify(isScreensaverActive$.value))}
             </td>
           </tr>
 
@@ -573,16 +573,16 @@ export const Diagnostics: FunctionComponent = () => {
                   {' '}
                   <tr>
                     <td>isRoot</td>
-                    <td>{computed(() => JSON.stringify($isRoot.value))}</td>
+                    <td>{computed(() => JSON.stringify(isRoot$.value))}</td>
                   </tr>
                   <tr>
                     <td>path</td>
-                    <td>{computed(() => JSON.stringify($path.value))}</td>
+                    <td>{computed(() => JSON.stringify(path$.value))}</td>
                   </tr>
                   <tr>
                     <td>previousPath</td>
                     <td>
-                      {computed(() => JSON.stringify($previousPath.value))}
+                      {computed(() => JSON.stringify(previousPath$.value))}
                     </td>
                   </tr>
                 </tbody>
@@ -594,7 +594,7 @@ export const Diagnostics: FunctionComponent = () => {
             <td>
               <b>theme</b>
             </td>
-            <td>{computed(() => JSON.stringify($theme.value))}</td>
+            <td>{computed(() => JSON.stringify(theme$.value))}</td>
           </tr>
 
           <tr>
@@ -650,14 +650,14 @@ export const Diagnostics: FunctionComponent = () => {
             <td>
               <b>menu visible</b>
             </td>
-            <td>{computed(() => JSON.stringify($isMenuVisible.value))}</td>
+            <td>{computed(() => JSON.stringify(isMenuVisible$.value))}</td>
           </tr>
 
           <tr>
             <td>
               <b>title</b>
             </td>
-            <td>{computed(() => JSON.stringify($title.value))}</td>
+            <td>{computed(() => JSON.stringify(title$.value))}</td>
           </tr>
         </tbody>
       </table>

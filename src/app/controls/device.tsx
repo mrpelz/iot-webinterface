@@ -15,7 +15,7 @@ import {
 import { TabularNums } from '../components/text.js';
 import { useTypedEmitter } from '../hooks/use-api.js';
 import { useTimeLabel } from '../hooks/use-time-label.js';
-import { $theme } from '../state/theme.js';
+import { theme$ } from '../state/theme.js';
 import { CellWithBody } from './main.js';
 
 // @ts-ignore
@@ -25,14 +25,14 @@ export type TSubDevice = Match<{ isSubDevice: true }, TExclude, TDevice>;
 
 export const OnlineIcon: FunctionComponent = () => (
   <CheckIcon
-    color={$theme.value === 'highContrast' ? undefined : 'rgb(4, 195, 6)'}
+    color={theme$.value === 'highContrast' ? undefined : 'rgb(4, 195, 6)'}
     height="1em"
   />
 );
 
 export const OfflineIcon: FunctionComponent = () => (
   <XIcon
-    color={$theme.value === 'highContrast' ? undefined : 'rgb(205, 3, 4)'}
+    color={theme$.value === 'highContrast' ? undefined : 'rgb(205, 3, 4)'}
     height="1em"
   />
 );

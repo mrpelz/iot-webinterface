@@ -13,7 +13,7 @@ import { Grid } from '../../components/grid.js';
 import { Device } from '../../controls/device.js';
 import { roomSorting as roomsSorting } from '../../i18n/mapping.js';
 import { api } from '../../main.js';
-import { $subPath, setSubPath } from '../../state/path.js';
+import { setSubPath, subPath$ } from '../../state/path.js';
 import { sortBy } from '../../util/sort.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
@@ -65,7 +65,7 @@ export const Devices: FunctionComponent = () => {
   const device = api
     .match(
       {
-        $id: $subPath.value,
+        $id: subPath$.value,
         level: Level.DEVICE as const,
       },
       excludePattern,

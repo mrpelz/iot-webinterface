@@ -1,4 +1,4 @@
-import { $theme, Theme } from '../state/theme.js';
+import { Theme, theme$ } from '../state/theme.js';
 
 export type Color = (a?: number) => string;
 
@@ -6,7 +6,7 @@ export const useThemedValue = <T>(
   themedColors: Record<Theme, T>,
   themeOverride?: Theme,
 ): T => {
-  const theme = $theme.value;
+  const theme = theme$.value;
 
   return themedColors[themeOverride || theme];
 };

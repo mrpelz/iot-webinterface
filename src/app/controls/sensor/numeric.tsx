@@ -12,7 +12,7 @@ import {
   defaultNumberFormat,
   measuredNumberFormats,
 } from '../../i18n/mapping.js';
-import { $i18n } from '../../state/translation.js';
+import { i18n$ } from '../../state/translation.js';
 import { Translation } from '../../views/translation.js';
 import { CellWithBody } from '../main.js';
 
@@ -42,7 +42,7 @@ export const NumericSensor: FunctionComponent<{
 }> = ({ onClick, sensor, title }) => {
   const {
     value: { translationLanguage, translationLocale },
-  } = $i18n;
+  } = i18n$;
   const effectiveLocale = useMemo(
     () => translationLocale || translationLanguage,
     [translationLanguage, translationLocale],

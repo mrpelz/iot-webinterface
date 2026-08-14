@@ -11,7 +11,7 @@ import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { useDelay } from '../../hooks/use-delay.js';
 import { I18nKey } from '../../i18n/main.js';
-import { $rootPath } from '../../state/path.js';
+import { rootPath$ } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
 import { Cell } from '../main.js';
 
@@ -62,7 +62,7 @@ export const BinaryActuator: FunctionComponent<{
     actuator.topic,
   );
 
-  const allowTransition = Boolean(useDelay($rootPath.value, 300, true));
+  const allowTransition = Boolean(useDelay(rootPath$.value, 300, true));
 
   const { value: value_ } = value;
 

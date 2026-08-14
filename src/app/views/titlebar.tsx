@@ -23,13 +23,13 @@ import { useIsWebSocketOnline } from '../hooks/use-api.js';
 import { useAwaitEvent } from '../hooks/use-await-event.js';
 import { flipMenuVisible } from '../state/menu.js';
 import {
-  $isRoot,
-  $rootPath,
   goPrevious,
   goUp,
+  isRoot$,
+  rootPath$,
   setRootPath,
 } from '../state/path.js';
-import { $capitalizedTitle } from '../state/title.js';
+import { capitalizedTitle$ } from '../state/title.js';
 import { dimensions } from '../style.js';
 import { useBreakpoint } from '../style/breakpoint.js';
 import { getMediaQuery } from '../style/main.js';
@@ -102,14 +102,14 @@ export const Titlebar: FunctionComponent = () => {
     [paddingLeft, paddingRight],
   );
 
-  const { value: title } = $capitalizedTitle;
+  const { value: title } = capitalizedTitle$;
 
   const isDesktop = useBreakpoint(getMediaQuery(dimensions.breakpointDesktop));
 
-  const rootPath = $rootPath.value;
+  const rootPath = rootPath$.value;
 
   const isMap = useMemo(() => rootPath === 'map', [rootPath]);
-  const isRoot = $isRoot.value;
+  const isRoot = isRoot$.value;
 
   const leftIcon = useMemo(() => {
     if (!isRoot) {

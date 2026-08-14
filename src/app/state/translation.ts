@@ -7,7 +7,7 @@ import {
   translations,
 } from '../i18n/main.js';
 import { universal } from '../i18n/universal.js';
-import { $flags } from '../util/flags.js';
+import { flags$ } from '../util/flags.js';
 import { getCountry, getLanguage } from '../util/locale.js';
 import { AnySignal, callbackSignal, isSignal } from '../util/signal.js';
 import {
@@ -18,8 +18,8 @@ import {
 const country = getCountry();
 const language = getLanguage();
 
-export const $i18n = computed(() => {
-  const languageOverride = $flags.language.value;
+export const i18n$ = computed(() => {
+  const languageOverride = flags$.language.value;
 
   const translationLanguage = reconcileLanguage(languageOverride || language);
 
@@ -45,7 +45,7 @@ export const $i18n = computed(() => {
 });
 
 export const getTranslation = (
-  $key:
+  key$:
     | undefined
     | keyof I18nTranslation
     | string
@@ -58,34 +58,34 @@ export const getTranslation = (
       return translation[key as unknown as keyof I18nTranslation];
     },
     {
-      i18n: $i18n,
-      key: isSignal($key) ? $key : signal($key),
+      i18n: i18n$,
+      key: isSignal(key$) ? key$ : signal(key$),
     },
   )();
 
 export const getTranslationFallback = (
-  $key:
+  key$:
     | undefined
     | keyof I18nTranslation
     | string
     | AnySignal<keyof I18nTranslation | string | undefined>,
 ): ReadonlySignal<string> => {
-  const $key_ =
-    typeof $key === 'object' && $key && 'brand' in $key ? $key : signal($key);
-  const $result = getTranslation($key);
+  const key$_ =
+    typeof key$ === 'object' && key$ && 'brand' in key$ ? key$ : signal(key$);
+  const result$ = getTranslation(key$);
 
   return computed(() => {
-    const { value } = $result;
+    const { value } = result$;
 
     if (value) return value;
-    if ($key_.value) return camelCaseToWords($key_.value).join(' ');
+    if (key$_.value) return camelCaseToWords(key$_.value).join(' ');
 
     return '<[empty]>';
   });
 };
 
 export const getCapitalization = (
-  $input: string | undefined | AnySignal<string | undefined>,
+  input$: string | undefined | AnySignal<string | undefined>,
 ): ReadonlySignal<string | undefined> =>
   callbackSignal(
     ({ i18n: { nonCapitalization }, input }) => {
@@ -101,7 +101,7 @@ export const getCapitalization = (
         .join(' ');
     },
     {
-      i18n: $i18n,
-      input: isSignal($input) ? $input : signal($input),
+      i18n: i18n$,
+      input: isSignal(input$) ? input$ : signal(input$),
     },
   )();

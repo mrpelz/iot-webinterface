@@ -3,7 +3,7 @@
 
 import { stripIndents } from 'proper-tags';
 
-import { $theme, Theme } from './state/theme.js';
+import { Theme, theme$ } from './state/theme.js';
 import { useBreakpointValue } from './style/breakpoint.js';
 import { color, useThemedValue } from './style/colors.js';
 import { add, dimension, half, subtract } from './style/dimensions.js';
@@ -12,7 +12,7 @@ import { staticStrings } from './style/strings.js';
 
 export const strings = {
   get colorScheme() {
-    return () => $theme.value;
+    return () => theme$.value;
   },
   ...staticStrings,
 };

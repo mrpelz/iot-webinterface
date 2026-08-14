@@ -1,10 +1,10 @@
 import { effect } from '@preact/signals';
 
-import { $rootPath } from './path.js';
+import { rootPath$ } from './path.js';
 
 effect(() => {
   // eslint-disable-next-line no-unused-expressions
-  $rootPath.value;
+  rootPath$.value;
 
   requestAnimationFrame(() =>
     scrollTo({

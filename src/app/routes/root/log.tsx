@@ -11,7 +11,7 @@ import { Pointer } from '../../components/text.js';
 import { useArrayStream } from '../../hooks/use-array-stream.js';
 import { useAbsoluteTimeLabel } from '../../hooks/use-time-label.js';
 import { colors } from '../../style.js';
-import { $flags } from '../../util/flags.js';
+import { flags$ } from '../../util/flags.js';
 import { baseUrl as baseUrl_ } from '../../util/path.js';
 
 export type Log = [
@@ -101,7 +101,7 @@ export const getLogCursor = (
 };
 
 const baseUrl = computed(
-  () => new URL('/api/log', $flags.apiBaseUrl.value ?? baseUrl_.href).href,
+  () => new URL('/api/log', flags$.apiBaseUrl.value ?? baseUrl_.href).href,
 );
 
 export const Log: FunctionComponent = () => {

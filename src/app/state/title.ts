@@ -1,35 +1,39 @@
 import { computed, effect, signal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 
-import { $room, $staticPage } from './navigation.js';
+import { room$, staticPage$ } from './navigation.js';
 import { getCapitalization, getTranslation } from './translation.js';
 
-const appName = document.title;
+const appName = (
+  document.querySelector(
+    'meta[name="apple-mobile-web-app-title"]',
+  ) as HTMLMetaElement
+)?.content;
 
 export const noTitle = Symbol('noTitle');
 type NoTitle = typeof noTitle;
 
-const $titleOverride = signal<string | NoTitle | undefined>(undefined);
+const titleOverride$ = signal<string | NoTitle | undefined>(undefined);
 
-const $staticPageName = getTranslation($staticPage);
-const $roomName = getTranslation(computed(() => $room.value?.$));
+const staticPageName$ = getTranslation(staticPage$);
+const roomName$ = getTranslation(computed(() => room$.value?.$));
 
-export const $title = computed(() =>
-  $titleOverride.value === noTitle
+export const title$ = computed(() =>
+  titleOverride$.value === noTitle
     ? undefined
-    : ($titleOverride.value ?? $staticPageName.value ?? $roomName.value),
+    : (titleOverride$.value ?? staticPageName$.value ?? roomName$.value),
 );
 
-export const $capitalizedTitle = getCapitalization($title);
+export const capitalizedTitle$ = getCapitalization(title$);
 
 effect(() => {
-  document.title = [$capitalizedTitle.value, appName]
+  document.title = [capitalizedTitle$.value, appName]
     .filter(Boolean)
     .join(' | ');
 });
 
 export const setTitleOverride = (title?: string | NoTitle): void => {
-  $titleOverride.value = title;
+  titleOverride$.value = title;
 };
 
 export const useTitleOverride: typeof setTitleOverride = (title) => {

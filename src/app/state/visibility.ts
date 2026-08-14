@@ -1,19 +1,19 @@
 import { computed, effect, signal } from '@preact/signals';
 
-import { $flags } from '../util/flags.js';
+import { flags$ } from '../util/flags.js';
 
 const getBrowserVisibility = () => document.visibilityState === 'visible';
 
-const $isBrowserVisible = signal(getBrowserVisibility());
+const isBrowserVisible$ = signal(getBrowserVisibility());
 document.addEventListener(
   'visibilitychange',
-  () => ($isBrowserVisible.value = getBrowserVisibility()),
+  () => (isBrowserVisible$.value = getBrowserVisibility()),
 );
 
-const $setIsInteracting = signal(true);
+const setIsInteracting$ = signal(true);
 
 effect(() => {
-  const inactivityTimeout = $flags.inactivityTimeout.value;
+  const inactivityTimeout = flags$.inactivityTimeout.value;
 
   const listenerAbort = new AbortController();
 
@@ -26,12 +26,12 @@ effect(() => {
   if (inactivityTimeout) {
     const onInactivityTimeout = (event?: Event) => {
       abortTimeout();
-      $setIsInteracting.value = true;
+      setIsInteracting$.value = true;
 
       if (event?.type === 'pointerdown') return;
 
       timeout = setTimeout(
-        () => ($setIsInteracting.value = false),
+        () => (setIsInteracting$.value = false),
         inactivityTimeout,
       );
     };
@@ -55,13 +55,13 @@ effect(() => {
     listenerAbort.abort();
     abortTimeout();
 
-    $setIsInteracting.value = true;
+    setIsInteracting$.value = true;
   };
 });
 
-export const $isVisible = computed(() => {
-  const isBrowserVisible = $isBrowserVisible.value;
-  const isInteracting = $setIsInteracting.value;
+export const isVisible$ = computed(() => {
+  const isBrowserVisible = isBrowserVisible$.value;
+  const isInteracting = setIsInteracting$.value;
 
   return isBrowserVisible && isInteracting;
 });

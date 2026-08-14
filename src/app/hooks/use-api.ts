@@ -24,7 +24,7 @@ export const useCollector = <
 >(
   object?: T | undefined,
 ): ((value: unknown) => void) =>
-  useMemo(() => api.$collector(object?.reference), [object]);
+  useMemo(() => api.collector$(object?.reference), [object]);
 
 export const useEmitter = <
   T extends InteractionReference<string, InteractionType.EMIT>,
@@ -34,9 +34,9 @@ export const useEmitter = <
   useAbortableSignalFactory<
     [Promise<T['reference']>],
     ReadonlySignal<unknown>,
-    typeof api.$emitter
+    typeof api.emitter$
   >(
-    useCallback((...args) => api.$emitter(...args), []),
+    useCallback((...args) => api.emitter$(...args), []),
     [usePromisify(object?.reference)],
   );
 
@@ -69,7 +69,7 @@ export const useMatch = <
 };
 
 export const useIsWebSocketOnline = (): ReadonlySignal<boolean> =>
-  useAbortableSignalFactory(useCallback(() => api.$isWebsocketOnline, []));
+  useAbortableSignalFactory(useCallback(() => api.isWebsocketOnline$, []));
 
 export const useTypedCollector = <
   R extends string,
@@ -79,7 +79,7 @@ export const useTypedCollector = <
   setState: S;
   valueType: T;
 }): ((value: TValueType[T]) => void) =>
-  useMemo(() => api.$typedCollector(object), [object]);
+  useMemo(() => api.typedCollector$(object), [object]);
 
 export const useTypedCollectorEmitter = <
   R extends string,
@@ -102,9 +102,9 @@ export const useTypedCollectorEmitter = <
         : Promise<Exclude<typeof object, undefined>>,
     ],
     ReadonlySignal<TValueType[T] | undefined>,
-    typeof api.$typedCollectorEmitter
+    typeof api.typedCollectorEmitter$
   >(
-    useCallback((...args) => api.$typedCollectorEmitter(...args), []),
+    useCallback((...args) => api.typedCollectorEmitter$(...args), []),
     [usePromisify(object)],
   );
 };
@@ -130,14 +130,14 @@ export const useTypedEmitter = <
         : Promise<Exclude<typeof object, undefined>>,
     ],
     ReadonlySignal<TValueType[T] | undefined>,
-    typeof api.$typedEmitter
+    typeof api.typedEmitter$
   >(
-    useCallback((...args) => api.$typedEmitter(...args), []),
+    useCallback((...args) => api.typedEmitter$(...args), []),
     [usePromisify(object)],
   );
 };
 
 export const useWebSocketCount = (): ReadonlySignal<number | undefined> =>
   useAbortableSignalFactory(
-    useCallback((...args) => api.$webSocketCount(...args), []),
+    useCallback((...args) => api.webSocketCount$(...args), []),
   );

@@ -8,7 +8,7 @@ import {
   useTimeIncrement,
 } from '../../hooks/use-time-label.js';
 import { globalProperties } from '../../state/global-properties.js';
-import { $flags } from '../../util/flags.js';
+import { flags$ } from '../../util/flags.js';
 import { HallwayStream } from '../../views/hallway-stream.js';
 import { Room } from './room.js';
 
@@ -402,8 +402,8 @@ const cheesyDevQuotes = [
 ];
 
 export const Global: FunctionComponent<{
-  $properties: ReturnType<typeof globalProperties>;
-}> = ({ $properties }) => {
+  properties$: ReturnType<typeof globalProperties>;
+}> = ({ properties$ }) => {
   const now = useTimeIncrement(nextDayIncrement);
 
   const dayInYear = useMemo(() => {
@@ -425,9 +425,9 @@ export const Global: FunctionComponent<{
   );
 
   return (
-    <Room $properties={$properties}>
+    <Room properties$={properties$}>
       <Hidden>{cheesyDevQuote}</Hidden>
-      {$flags.hallwayStreamEnable.value ? <HallwayStream /> : null}
+      {flags$.hallwayStreamEnable.value ? <HallwayStream /> : null}
     </Room>
   );
 };

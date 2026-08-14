@@ -2,13 +2,13 @@ import { styled } from 'goober';
 import { FunctionComponent } from 'preact';
 
 import { JSONViewer } from '../../components/json-viewer/main.js';
-import { $isRoot, getSegment, goRoot, setSegment } from '../../state/path.js';
+import { getSegment, goRoot, isRoot$, setSegment } from '../../state/path.js';
 import { useTitleOverride } from '../../state/title.js';
 
-const $route1 = getSegment(1);
+const route1$ = getSegment(1);
 const setRoute1 = setSegment(1);
 
-const $route2 = getSegment(2);
+const route2$ = getSegment(2);
 const setRoute2 = setSegment(2);
 
 const Margin = styled('section')`
@@ -16,10 +16,10 @@ const Margin = styled('section')`
 `;
 
 export const Test: FunctionComponent = () => {
-  const isRoot = $isRoot.value;
-  const route1 = $route1.value;
+  const isRoot = isRoot$.value;
+  const route1 = route1$.value;
 
-  const route2 = $route2.value;
+  const route2 = route2$.value;
 
   useTitleOverride(route2 || route1 || undefined);
 

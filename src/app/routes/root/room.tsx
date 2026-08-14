@@ -9,7 +9,7 @@ import { Control } from '../../controls/main.js';
 import { Sensor } from '../../controls/sensor/main.js';
 import { useMatch } from '../../hooks/use-api.js';
 import { globalProperties } from '../../state/global-properties.js';
-import { $subPath } from '../../state/path.js';
+import { subPath$ } from '../../state/path.js';
 import { roomProperties } from '../../state/room-properties.js';
 import { Category } from '../../views/category.js';
 import { SubRoute } from '../../views/route.js';
@@ -17,11 +17,11 @@ import { Translation } from '../../views/translation.js';
 import { SubPage } from '../sub/room/main.js';
 
 export const Room: FunctionComponent<{
-  $properties:
+  properties$:
     ReturnType<typeof roomProperties> | ReturnType<typeof globalProperties>;
 }> = ({
   children,
-  $properties: {
+  properties$: {
     value: { lights, properties, rest, scenes, security, sensors, timers },
   },
 }) => {
@@ -31,7 +31,7 @@ export const Room: FunctionComponent<{
     [rest],
   );
 
-  const { value: subPath } = $subPath;
+  const { value: subPath } = subPath$;
 
   const [subRouteElement] = useMatch(
     { $id: subPath },

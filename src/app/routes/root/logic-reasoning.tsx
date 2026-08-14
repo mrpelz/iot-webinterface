@@ -19,7 +19,7 @@ import { useArrayStream } from '../../hooks/use-array-stream.js';
 import { useLocalStorage } from '../../hooks/use-local-storage.js';
 import { useAbsoluteTimeLabel } from '../../hooks/use-time-label.js';
 import { colors } from '../../style.js';
-import { $flags } from '../../util/flags.js';
+import { flags$ } from '../../util/flags.js';
 import { baseUrl as baseUrl_ } from '../../util/path.js';
 import { Tokenize, Tokens } from '../../views/tokenize.js';
 import { getLogCursor, isLogs, Log, logSeparator } from './log.js';
@@ -81,7 +81,7 @@ const LogItem: FunctionComponent<{
 
 const baseUrl = computed(
   () =>
-    new URL('/api/logic-reasoning', $flags.apiBaseUrl.value ?? baseUrl_.href)
+    new URL('/api/logic-reasoning', flags$.apiBaseUrl.value ?? baseUrl_.href)
       .href,
 );
 

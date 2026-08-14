@@ -13,14 +13,14 @@ import { Settings } from '../routes/root/settings.js';
 import { Test } from '../routes/root/test-route.js';
 import { noBackground, useBackgroundOverride } from '../state/background.js';
 import { globalProperties } from '../state/global-properties.js';
-import { $room, $rooms, $staticPage } from '../state/navigation.js';
+import { room$, rooms$, staticPage$ } from '../state/navigation.js';
 import { roomProperties } from '../state/room-properties.js';
 
 export const RootRoute: FunctionComponent = () => {
-  const $globalProperties = globalProperties();
+  const globalProperties$ = globalProperties();
 
-  const $roomProperties = computed(() => {
-    const { value: rooms } = $rooms;
+  const roomProperties$ = computed(() => {
+    const { value: rooms } = rooms$;
     if (!rooms) return undefined;
 
     return Object.fromEntries(
@@ -29,9 +29,9 @@ export const RootRoute: FunctionComponent = () => {
   });
 
   return computed(() => {
-    switch ($staticPage.value) {
+    switch (staticPage$.value) {
       case 'global': {
-        return <Global $properties={$globalProperties} />;
+        return <Global properties$={globalProperties$} />;
       }
       case 'map': {
         return <Test />;
@@ -52,8 +52,8 @@ export const RootRoute: FunctionComponent = () => {
         return <Log />;
       }
       default: {
-        return $room.value && $roomProperties.value ? (
-          <Room $properties={$roomProperties.value[$room.value.$]} />
+        return room$.value && roomProperties$.value ? (
+          <Room properties$={roomProperties$.value[room$.value.$]} />
         ) : null;
       }
     }

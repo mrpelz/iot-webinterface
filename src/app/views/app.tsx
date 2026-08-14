@@ -3,7 +3,7 @@ import { useLayoutEffect } from 'preact/hooks';
 
 import { App as AppComponent } from '../components/app.js';
 import { colors } from '../style.js';
-import { $flags } from '../util/flags.js';
+import { flags$ } from '../util/flags.js';
 import { Background } from './background.js';
 import { Layout } from './layout.js';
 import { RootRoute } from './route.js';
@@ -24,7 +24,7 @@ export const App: FunctionComponent = () => {
 
   return (
     <AppComponent className="root">
-      {$flags.screensaverEnable.value ? <Screensaver /> : null}
+      {flags$.screensaverEnable.value ? <Screensaver /> : null}
       <Layout>
         <RootRoute />
         <Background />

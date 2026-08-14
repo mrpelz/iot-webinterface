@@ -49,9 +49,9 @@ export class Api {
   private readonly _stateStore = createStore('api_state', 'state');
   private readonly _valuesStore = createStore('api_values', 'values');
 
-  readonly $isInit: ReadonlySignal<boolean>;
-  readonly $isWebsocketOnline: ReadonlySignal<boolean>;
   readonly isInit: Promise<void>;
+  readonly isInit$: ReadonlySignal<boolean>;
+  readonly isWebsocketOnline$: ReadonlySignal<boolean>;
 
   constructor() {
     const workerName = SharedWorkerSupported && !isSafari ? 'api' : `api_${id}`;
@@ -79,9 +79,9 @@ export class Api {
     const { promise, resolve } = Promise.withResolvers<void>();
     this.isInit = promise;
 
-    const $isInit = signal(false);
-    this.$isInit = readOnly($isInit);
-    promise.then(() => ($isInit.value = true));
+    const isInit$ = signal(false);
+    this.isInit$ = readOnly(isInit$);
+    promise.then(() => (isInit$.value = true));
 
     this._setNotifierReaction<TSystem>(
       'hierarchy',
@@ -92,16 +92,16 @@ export class Api {
       this._stateStore,
     );
 
-    const $isWebsocketOnline = signal(false);
-    this.$isWebsocketOnline = readOnly($isWebsocketOnline);
+    const isWebsocketOnline$ = signal(false);
+    this.isWebsocketOnline$ = readOnly(isWebsocketOnline$);
     this._setNotifierReaction(
       'online',
-      () => ($isWebsocketOnline.value = true),
+      () => (isWebsocketOnline$.value = true),
       this._stateStore,
     );
     this._setNotifierReaction(
       'offline',
-      () => ($isWebsocketOnline.value = false),
+      () => (isWebsocketOnline$.value = false),
       this._stateStore,
     );
 
@@ -138,7 +138,11 @@ export class Api {
     return this._hierarchy;
   }
 
-  $collector<T>(reference?: string): (value: T) => void {
+  clearStores(): Promise<void> {
+    return this._api.clearStores();
+  }
+
+  collector$<T>(reference?: string): (value: T) => void {
     return (value) => {
       if (!reference) return;
 
@@ -146,19 +150,19 @@ export class Api {
     };
   }
 
-  $emitter<T>(
+  emitter$<T>(
     reference?: string | Promise<string>,
     abort?: AbortController,
   ): ReadonlySignal<T | undefined> {
     const reference_ = reference ? Promise.resolve(reference) : undefined;
 
-    const $signal = signal<T | undefined>(undefined);
+    const signal$ = signal<T | undefined>(undefined);
 
     if (reference_) {
       reference_.then((resolved) => {
         this._setNotifierReaction(
           resolved,
-          (value) => ($signal.value = value as T | undefined),
+          (value) => (signal$.value = value as T | undefined),
           this._valuesStore,
           abort,
           true,
@@ -166,58 +170,7 @@ export class Api {
       });
     }
 
-    return computed(() => $signal.value);
-  }
-
-  $typedCollector<
-    T extends {
-      setState: InteractionReference<string, InteractionType.COLLECT>;
-      valueType: ValueType;
-    },
-  >(object?: T | undefined): (value: TValueType[T['valueType']]) => void {
-    return this.$collector(object?.setState.reference);
-  }
-
-  $typedCollectorEmitter<
-    T extends {
-      setState: InteractionReference<string, InteractionType.COLLECT>;
-      valueType: ValueType;
-    },
-  >(
-    object?: T | Promise<T> | undefined,
-    abort?: AbortController,
-  ): ReadonlySignal<TValueType[T['valueType']] | undefined> {
-    return this.$emitter(
-      (object ? Promise.resolve(object) : undefined)?.then(
-        (resolved) => resolved.setState.reference,
-      ),
-      abort,
-    );
-  }
-
-  $typedEmitter<
-    T extends {
-      state: InteractionReference<string, InteractionType.EMIT>;
-      valueType: ValueType;
-    },
-  >(
-    object?: T | Promise<T> | undefined,
-    abort?: AbortController,
-  ): ReadonlySignal<TValueType[T['valueType']] | undefined> {
-    return this.$emitter(
-      (object ? Promise.resolve(object) : undefined)?.then(
-        (resolved) => resolved.state.reference,
-      ),
-      abort,
-    );
-  }
-
-  $webSocketCount(abort?: AbortController): ReadonlySignal<number | undefined> {
-    return this.$emitter(WEB_API_UUID, abort);
-  }
-
-  clearStores(): Promise<void> {
-    return this._api.clearStores();
+    return computed(() => signal$.value);
   }
 
   match<
@@ -232,6 +185,53 @@ export class Api {
     depth = DEFAULT_MATCH_DEPTH as D,
   ): Match<P, E, R, D>[] {
     return match(pattern, exclude, root, depth);
+  }
+
+  typedCollector$<
+    T extends {
+      setState: InteractionReference<string, InteractionType.COLLECT>;
+      valueType: ValueType;
+    },
+  >(object?: T | undefined): (value: TValueType[T['valueType']]) => void {
+    return this.collector$(object?.setState.reference);
+  }
+
+  typedCollectorEmitter$<
+    T extends {
+      setState: InteractionReference<string, InteractionType.COLLECT>;
+      valueType: ValueType;
+    },
+  >(
+    object?: T | Promise<T> | undefined,
+    abort?: AbortController,
+  ): ReadonlySignal<TValueType[T['valueType']] | undefined> {
+    return this.emitter$(
+      (object ? Promise.resolve(object) : undefined)?.then(
+        (resolved) => resolved.setState.reference,
+      ),
+      abort,
+    );
+  }
+
+  typedEmitter$<
+    T extends {
+      state: InteractionReference<string, InteractionType.EMIT>;
+      valueType: ValueType;
+    },
+  >(
+    object?: T | Promise<T> | undefined,
+    abort?: AbortController,
+  ): ReadonlySignal<TValueType[T['valueType']] | undefined> {
+    return this.emitter$(
+      (object ? Promise.resolve(object) : undefined)?.then(
+        (resolved) => resolved.state.reference,
+      ),
+      abort,
+    );
+  }
+
+  webSocketCount$(abort?: AbortController): ReadonlySignal<number | undefined> {
+    return this.emitter$(WEB_API_UUID, abort);
   }
 }
 

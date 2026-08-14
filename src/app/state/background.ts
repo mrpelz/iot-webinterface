@@ -2,7 +2,7 @@ import { computed, signal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 
 import { delayedSignal } from '../util/signal.js';
-import { $theme } from './theme.js';
+import { theme$ } from './theme.js';
 
 export const noBackground = Symbol('noBackground');
 type NoBackground = typeof noBackground;
@@ -12,24 +12,24 @@ const BACKGROUND_EXTENSION = '.png';
 
 const camelCase = new RegExp('[A-Z]', 'g');
 
-const $initialDelay = delayedSignal(signal(true), 1000, true);
+const initialDelay$ = delayedSignal(signal(true), 1000, true);
 
-const $background_ = signal<string | undefined>(undefined);
+const background$_ = signal<string | undefined>(undefined);
 
-const $backgroundOverride = signal<string | NoBackground | undefined>(
+const backgroundOverride$ = signal<string | NoBackground | undefined>(
   undefined,
 );
 
-export const $background = computed(() => {
+export const background$ = computed(() => {
   if (
-    $theme.value === 'highContrast' ||
-    !$initialDelay.value ||
-    $backgroundOverride.value === noBackground
+    theme$.value === 'highContrast' ||
+    !initialDelay$.value ||
+    backgroundOverride$.value === noBackground
   ) {
     return undefined;
   }
 
-  const identifier = $backgroundOverride.value ?? $background_.value;
+  const identifier = backgroundOverride$.value ?? background$_.value;
   if (!identifier) return undefined;
 
   const baseName = encodeURIComponent(
@@ -40,13 +40,13 @@ export const $background = computed(() => {
 });
 
 export const setBackground = (background?: string): void => {
-  $background_.value = background;
+  background$_.value = background;
 };
 
 export const setBackgroundOverride = (
   override?: string | NoBackground,
 ): void => {
-  $backgroundOverride.value = override;
+  backgroundOverride$.value = override;
 };
 
 export const useBackgroundOverride: typeof setBackgroundOverride = (

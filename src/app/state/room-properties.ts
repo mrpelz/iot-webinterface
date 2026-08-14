@@ -7,76 +7,76 @@ import { kitchenAdjacent$ } from '../i18n/mapping.js';
 import { api } from '../main.js';
 import { excludeById, unique } from '../util/array.js';
 import { extractKey } from '../util/oop.js';
-import { $building } from './navigation.js';
+import { building$ } from './navigation.js';
 
 export const roomProperties = (room: LevelObject[Level.ROOM]) => {
-  const $properties = computed(() =>
+  const properties$ = computed(() =>
     unique(
       [
         api.match({ $: anyString }, excludePattern, room, 1),
         kitchenAdjacent$.includes(room.$ as (typeof kitchenAdjacent$)[number])
           ? [
-              $building.value?.firstFloor.kitchenAdjacentBright,
-              $building.value?.firstFloor.kitchenAdjacentChillax,
-              $building.value?.firstFloor.kitchenAdjacentLights,
+              building$.value?.firstFloor.kitchenAdjacentBright,
+              building$.value?.firstFloor.kitchenAdjacentChillax,
+              building$.value?.firstFloor.kitchenAdjacentLights,
             ]
           : [],
       ].flat(),
     ),
   );
 
-  const $lights = computed(() =>
+  const lights$ = computed(() =>
     unique(
       [
         extractKey(room, 'allLights'),
         api.match(
           { $: 'outputGrouping' as const, topic: 'lighting' as const },
           excludePattern,
-          $properties.value,
+          properties$.value,
           1,
         ),
         api.match(
           { $: 'ledGrouping' as const, topic: 'lighting' as const },
           excludePattern,
-          $properties.value,
+          properties$.value,
           1,
         ),
         api.match(
           { $: 'output' as const, topic: 'lighting' as const },
           excludePattern,
-          $properties.value,
+          properties$.value,
           1,
         ),
         api.match(
           { $: 'led' as const, topic: 'lighting' as const },
           excludePattern,
-          $properties.value,
+          properties$.value,
           1,
         ),
       ].flat(),
     ),
   );
 
-  const $scenes = computed(() =>
+  const scenes$ = computed(() =>
     unique(
       [
         api.match(
           { $: 'scene' as const },
           excludePattern,
-          $properties.value,
+          properties$.value,
           1,
         ),
         api.match(
           { $: 'triggerElement' as const },
           excludePattern,
-          $properties.value,
+          properties$.value,
           1,
         ),
       ].flat(),
     ),
   );
 
-  const $security = computed(() =>
+  const security$ = computed(() =>
     unique(
       [
         extractKey(room, 'entryDoor'),
@@ -85,7 +85,7 @@ export const roomProperties = (room: LevelObject[Level.ROOM]) => {
         api.match(
           { $: 'window' as const },
           excludePattern,
-          $properties.value,
+          properties$.value,
           1,
         ),
         extractKey(room, 'motion'),
@@ -93,7 +93,7 @@ export const roomProperties = (room: LevelObject[Level.ROOM]) => {
     ),
   );
 
-  const $sensors = computed(() =>
+  const sensors$ = computed(() =>
     unique(
       [
         extractKey(room, 'temperature'),
@@ -109,45 +109,45 @@ export const roomProperties = (room: LevelObject[Level.ROOM]) => {
     ),
   );
 
-  const $timers = computed(() =>
+  const timers$ = computed(() =>
     unique(
       [
         api.match(
           { $: 'offTimer' as const },
           excludePattern,
-          $properties.value,
+          properties$.value,
           1,
         ),
         api.match(
           { $: 'automatedInputLogic' as const },
           excludePattern,
-          $properties.value,
+          properties$.value,
           1,
         ),
       ].flat(),
     ),
   );
 
-  const $rest = computed(() =>
+  const rest$ = computed(() =>
     excludeById(
-      $properties.value,
+      properties$.value,
       [
-        $lights.value,
-        $scenes.value,
-        $security.value,
-        $sensors.value,
-        $timers.value,
+        lights$.value,
+        scenes$.value,
+        security$.value,
+        sensors$.value,
+        timers$.value,
       ].flat(),
     ),
   );
 
   return computed(() => ({
-    lights: $lights.value,
-    properties: $properties.value,
-    rest: $rest.value,
-    scenes: $scenes.value,
-    security: $security.value,
-    sensors: $sensors.value,
-    timers: $timers.value,
+    lights: lights$.value,
+    properties: properties$.value,
+    rest: rest$.value,
+    scenes: scenes$.value,
+    security: security$.value,
+    sensors: sensors$.value,
+    timers: timers$.value,
   }));
 };

@@ -18,7 +18,7 @@ import {
   useTimeSpan,
 } from '../../hooks/use-time-label.js';
 import { I18nKey } from '../../i18n/main.js';
-import { $rootPath, setSubPath } from '../../state/path.js';
+import { rootPath$, setSubPath } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
 import { Cell } from '../main.js';
 
@@ -79,7 +79,7 @@ const TimerActuatorBody: FunctionComponent<{
     [activeValue, handleCancel, handleFlip],
   );
 
-  const allowTransition = Boolean(useDelay($rootPath.value, 300, true));
+  const allowTransition = Boolean(useDelay(rootPath$.value, 300, true));
 
   const label = useMemo(() => {
     if (!activeValue || !runoutTimeLabel) {

@@ -17,19 +17,19 @@ export const Translation: FunctionComponent<{
   fallback?: boolean;
   i18nKey?: keyof I18nTranslation | string;
 }> = ({ capitalize, fallback = true, i18nKey }) => {
-  const $translation = fallback
+  const translation$ = fallback
     ? getTranslationFallback(i18nKey)
     : getTranslation(i18nKey);
 
   const result = useMemo(() => {
-    const translation = $translation.value;
+    const translation = translation$.value;
 
     if (capitalize && translation) {
       return <Capitalize text={translation} />;
     }
 
-    return $translation;
-  }, [capitalize, $translation]);
+    return translation$;
+  }, [capitalize, translation$]);
 
   return <>{result}</>;
 };

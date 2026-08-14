@@ -136,7 +136,7 @@ export const NullActuatorButton: FunctionComponent<
         };
   } & ButtonHTMLAttributes
 > = ({ actuator, children, ...rest }) => {
-  const setter = api.$typedCollector(actuator.main);
+  const setter = api.typedCollector$(actuator.main);
   const handleClick = useCallback(() => setter?.(null), [setter]);
 
   return (

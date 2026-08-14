@@ -26,7 +26,7 @@ import { TSystem } from '../../../common/types.js';
 // import { useSwipe } from '../../hooks/use-swipe.js';
 // import { useWheel } from '../../hooks/use-wheel.js';
 import { I18nKey } from '../../i18n/main.js';
-// import { $rootPath } from '../../state/path.js';
+// import { rootPath$ } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
 // import { Cell } from '../main.js';
 import {
@@ -102,7 +102,7 @@ export type TRGBActuator = Match<
 //     actuator.topic,
 //   );
 
-//   const allowTransition = Boolean(useDelay($rootPath.value, 300, true));
+//   const allowTransition = Boolean(useDelay(root$path.value, 300, true));
 
 //   const label = useMemo(
 //     () => (
