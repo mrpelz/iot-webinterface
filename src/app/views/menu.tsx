@@ -4,6 +4,7 @@ import {
   Level,
   levelObjectMatch,
 } from '@iot/iot-monolith/tree';
+import { Glass, Navbar, Page } from 'konsta/react';
 import { FunctionComponent } from 'preact';
 import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 
@@ -172,78 +173,152 @@ export const Menu: FunctionComponent = () => {
 
   return (
     <MenuComponent isVisible={isVisible}>
-      <MenuContent>
-        <MenuSubdivision>
-          <MenuList>
-            {staticPagesTop.map((staticPage_, key) => {
-              const isActive = staticPage_ === staticPage;
-
-              return (
-                <MenuListItem
-                  key={key}
-                  isActive={isActive}
-                  onClick={() =>
-                    isActive ? goRoot() : setRootPath(staticPage_)
-                  }
-                >
-                  <Translation
-                    capitalize={true}
-                    i18nKey={staticPage_}
-                  />
-                </MenuListItem>
-              );
-            })}
-          </MenuList>
-        </MenuSubdivision>
-
-        <MenuSubdivision>
-          {floors?.map((floor, key) => (
-            <Floor
-              key={key}
-              floor={floor}
-            />
-          ))}
-        </MenuSubdivision>
-
-        <MenuSubdivision>
-          <MenuList>
-            {staticPagesBottom.map((staticPage_, key) => {
-              const isActive = staticPage_ === staticPage;
-
-              return (
-                <MenuListItem
-                  key={key}
-                  isActive={isActive}
-                  onClick={() =>
-                    isActive ? goRoot() : setRootPath(staticPage_)
-                  }
-                >
-                  <Translation
-                    capitalize={true}
-                    i18nKey={staticPage_}
-                  />
-                </MenuListItem>
-              );
-            })}
-          </MenuList>
-        </MenuSubdivision>
-
-        {isScreensaverEnabled ? (
+      <Glass className="w-full h-full">
+        <Page>
           <MenuSubdivision>
             <MenuList>
-              <MenuListItem
-                isActive={false}
-                onClick={flipScreensaverActive}
-              >
-                <Translation
-                  capitalize={true}
-                  i18nKey="startScreensaver"
-                />
-              </MenuListItem>
+              {staticPagesTop.map((staticPage_, key) => {
+                const isActive = staticPage_ === staticPage;
+                return (
+                  <MenuListItem
+                    key={key}
+                    isActive={isActive}
+                    onClick={() =>
+                      isActive ? goRoot() : setRootPath(staticPage_)
+                    }
+                  >
+                    <Translation
+                      capitalize={true}
+                      i18nKey={staticPage_}
+                    />
+                  </MenuListItem>
+                );
+              })}
             </MenuList>
           </MenuSubdivision>
-        ) : null}
-      </MenuContent>
+          <MenuSubdivision>
+            {floors?.map((floor, key) => (
+              <Floor
+                key={key}
+                floor={floor}
+              />
+            ))}
+          </MenuSubdivision>
+          <MenuSubdivision>
+            <MenuList>
+              {staticPagesBottom.map((staticPage_, key) => {
+                const isActive = staticPage_ === staticPage;
+                return (
+                  <MenuListItem
+                    key={key}
+                    isActive={isActive}
+                    onClick={() =>
+                      isActive ? goRoot() : setRootPath(staticPage_)
+                    }
+                  >
+                    <Translation
+                      capitalize={true}
+                      i18nKey={staticPage_}
+                    />
+                  </MenuListItem>
+                );
+              })}
+            </MenuList>
+          </MenuSubdivision>
+          {isScreensaverEnabled ? (
+            <MenuSubdivision>
+              <MenuList>
+                <MenuListItem
+                  isActive={false}
+                  onClick={flipScreensaverActive}
+                >
+                  <Translation
+                    capitalize={true}
+                    i18nKey="startScreensaver"
+                  />
+                </MenuListItem>
+              </MenuList>
+            </MenuSubdivision>
+          ) : null}
+        </Page>
+      </Glass>
     </MenuComponent>
   );
+
+  // return (
+  //   <MenuComponent isVisible={isVisible}>
+  //     <MenuContent>
+  //       <MenuSubdivision>
+  //         <MenuList>
+  //           {staticPagesTop.map((staticPage_, key) => {
+  //             const isActive = staticPage_ === staticPage;
+
+  //             return (
+  //               <MenuListItem
+  //                 key={key}
+  //                 isActive={isActive}
+  //                 onClick={() =>
+  //                   isActive ? goRoot() : setRootPath(staticPage_)
+  //                 }
+  //               >
+  //                 <Translation
+  //                   capitalize={true}
+  //                   i18nKey={staticPage_}
+  //                 />
+  //               </MenuListItem>
+  //             );
+  //           })}
+  //         </MenuList>
+  //       </MenuSubdivision>
+
+  //       <MenuSubdivision>
+  //         {floors?.map((floor, key) => (
+  //           <Floor
+  //             key={key}
+  //             floor={floor}
+  //           />
+  //         ))}
+  //       </MenuSubdivision>
+
+  //       <MenuSubdivision>
+  //         <MenuList>
+  //           {staticPagesBottom.map((staticPage_, key) => {
+  //             const isActive = staticPage_ === staticPage;
+
+  //             return (
+  //               <MenuListItem
+  //                 key={key}
+  //                 isActive={isActive}
+  //                 onClick={() =>
+  //                   isActive ? goRoot() : setRootPath(staticPage_)
+  //                 }
+  //               >
+  //                 <Translation
+  //                   capitalize={true}
+  //                   i18nKey={staticPage_}
+  //                 />
+  //               </MenuListItem>
+  //             );
+  //           })}
+  //         </MenuList>
+  //       </MenuSubdivision>
+
+  //       {isScreensaverEnabled ? (
+  //         <MenuSubdivision>
+  //           <MenuList>
+  //             <MenuListItem
+  //               isActive={false}
+  //               onClick={flipScreensaverActive}
+  //             >
+  //               <Translation
+  //                 capitalize={true}
+  //                 i18nKey="startScreensaver"
+  //               />
+  //             </MenuListItem>
+  //           </MenuList>
+  //         </MenuSubdivision>
+  //       ) : null}
+  //     </MenuContent>
+  //   </MenuComponent>
+  // );
 };
