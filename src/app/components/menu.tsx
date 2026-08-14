@@ -7,9 +7,10 @@ import { multiply } from '../style/dimensions.js';
 import { dependentValue, mediaQuery } from '../style/main.js';
 
 export const Menu = styled('nav')<{ isVisible: boolean }>`
-  background-color: ${colors.backgroundSecondary()};
+  /* background-color: ${colors.backgroundSecondary()}; */
   block-size: ${dimensions.appHeightCover};
-  border-inline-end: ${dimensions.hairline} solid ${colors.fontTertiary()};
+
+  /* border-inline-end: ${dimensions.hairline} solid ${colors.fontTertiary()}; */
   inline-size: ${dimensions.menuWidth};
   overflow-y: auto;
   overscroll-behavior-y: contain;
