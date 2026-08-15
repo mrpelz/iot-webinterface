@@ -1,17 +1,18 @@
 import { Match, TExclude } from '@iot/iot-monolith/tree';
 import { ensureKeys } from '@mrpelz/misc-utils/oop';
-import { FunctionComponent } from 'preact';
+import { FunctionComponent, MouseEventHandler } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import { TSystem } from '../../../common/types.js';
 import { serialized } from '../../api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
+import { ForwardIcon } from '../../components/icons.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { useDelay } from '../../hooks/use-delay.js';
 import { I18nKey } from '../../i18n/main.js';
-import { rootPath$ } from '../../state/path.js';
+import { rootPath$, setSubPath } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
 import { Cell } from '../main.js';
 
@@ -49,8 +50,23 @@ export const BinaryActuator: FunctionComponent<{
     loading_ ? serialized(loading_) : undefined,
   ).value;
 
+  const { $id } = serialized(actuator);
+  const handleClick = useCallback(() => setSubPath($id), [$id]);
+
   const flip = useTypedCollector(serialized(actuator.flip));
-  const handleClick = useCallback(() => flip?.(null), [flip]);
+  const handleBodyClick = useCallback<MouseEventHandler<HTMLElement>>(
+    (event) => {
+      event.stopPropagation();
+
+      if (onClick) {
+        onClick();
+        return;
+      }
+
+      flip?.(null);
+    },
+    [flip, onClick],
+  );
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -66,15 +82,18 @@ export const BinaryActuator: FunctionComponent<{
 
   const { value: value_ } = value;
 
+  const isGrouping = actuator.$ === 'outputGrouping';
+
   return (
     <Cell
+      icon={isGrouping ? <ForwardIcon height="1em" /> : undefined}
       title={
         <Translation
           capitalize={true}
           i18nKey={name}
         />
       }
-      onClick={onClick ?? handleClick}
+      onClick={isGrouping ? handleClick : handleBodyClick}
     >
       <BlendOver
         blendOver={value_ ? 1 : 0}
@@ -88,6 +107,7 @@ export const BinaryActuator: FunctionComponent<{
             </ColorBody>
           )
         }
+        onClick={isGrouping ? handleBodyClick : undefined}
       >
         <BodyLarge>
           {value_ === undefined ? (

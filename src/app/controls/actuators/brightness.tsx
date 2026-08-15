@@ -1,5 +1,5 @@
 import { Match, TExclude } from '@iot/iot-monolith/tree';
-import { FunctionComponent } from 'preact';
+import { FunctionComponent, MouseEventHandler } from 'preact';
 import {
   Dispatch,
   MutableRef,
@@ -15,6 +15,7 @@ import { TSystem } from '../../../common/types.js';
 import { serialized } from '../../api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
+import { ForwardIcon } from '../../components/icons.js';
 import { NonBreaking, TabularNums } from '../../components/text.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
@@ -22,7 +23,7 @@ import { useDelay } from '../../hooks/use-delay.js';
 import { useSwipe } from '../../hooks/use-swipe.js';
 import { useWheel } from '../../hooks/use-wheel.js';
 import { I18nKey } from '../../i18n/main.js';
-import { rootPath$ } from '../../state/path.js';
+import { rootPath$, setSubPath } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
 import { Cell } from '../main.js';
 
@@ -151,8 +152,23 @@ export const BrightnessActuator: FunctionComponent<{
     loadingRef.current = loading;
   }, [loading]);
 
+  const { $id } = serialized(actuator);
+  const handleClick = useCallback(() => setSubPath($id), [$id]);
+
   const flip = useTypedCollector(serialized(actuator.flip));
-  const handleClick = useCallback(() => flip?.(null), [flip]);
+  const handleBodyClick = useCallback<MouseEventHandler<HTMLElement>>(
+    (event) => {
+      event.stopPropagation();
+
+      if (onClick) {
+        onClick();
+        return;
+      }
+
+      flip?.(null);
+    },
+    [flip, onClick],
+  );
 
   const [isInteracting, setInteracting] = useState(false);
 
@@ -197,15 +213,18 @@ export const BrightnessActuator: FunctionComponent<{
     />
   );
 
+  const isGrouping = actuator.$ === 'ledGrouping';
+
   return (
     <Cell
+      icon={isGrouping ? <ForwardIcon height="1em" /> : undefined}
       title={
         <Translation
           capitalize={true}
           i18nKey={name}
         />
       }
-      onClick={onClick ?? handleClick}
+      onClick={isGrouping ? handleClick : handleBodyClick}
     >
       <BlendOver
         blendOver={brightness === null ? 0 : brightness}
@@ -214,6 +233,7 @@ export const BrightnessActuator: FunctionComponent<{
         transition={
           allowTransition && brightness !== null && !loading && !isInteracting
         }
+        onClick={isGrouping ? handleBodyClick : undefined}
       >
         <BodyLarge ref={refB}>{label}</BodyLarge>
       </BlendOver>

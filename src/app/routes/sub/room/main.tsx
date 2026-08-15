@@ -29,8 +29,10 @@ export const SubPage: FunctionComponent<{
       return <BinarySensor sensor={object} />;
     }
 
-    case 'inputGrouping': {
-      return <GroupChildren sensor={object} />;
+    case 'inputGrouping':
+    case 'ledGrouping':
+    case 'outputGrouping': {
+      return <GroupChildren object={object} />;
     }
 
     default: {

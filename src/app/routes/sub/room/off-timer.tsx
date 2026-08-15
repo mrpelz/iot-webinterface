@@ -12,6 +12,10 @@ import {
   useDateFromEpoch,
   useTimeLabel,
 } from '../../../hooks/use-time-label.js';
+import {
+  noBackground,
+  useBackgroundOverride,
+} from '../../../state/background.js';
 import { useTitleOverride } from '../../../state/title.js';
 import { getTranslationFallback } from '../../../state/translation.js';
 import { Entry, List } from '../../../views/list.js';
@@ -27,6 +31,7 @@ export const OffTimer: FunctionComponent<{
   const name = useMemo(() => String(actuator.$path?.at(-1) ?? ''), [actuator]);
 
   useTitleOverride(getTranslationFallback(name).value);
+  useBackgroundOverride(noBackground);
 
   const {
     active: { cancel, main: active },

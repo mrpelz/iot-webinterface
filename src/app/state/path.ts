@@ -80,14 +80,20 @@ export const setSegment =
 export const rootPath$ = getSegment(0);
 export const setRootPath = setSegment(0);
 
-export const subPath$ = getSegment(1);
-export const setSubPath = (input?: string, segmentNumber?: number): void =>
-  setSegment(segmentNumber ?? pathDepth$.value)(input);
+export const subPath$ = computed(
+  () => [pathDepth$.value, segments$.value.at(pathDepth$.value - 1)] as const,
+);
 
+const setSubPath_ = computed(() => setSegment(pathDepth$.value));
+export const setSubPath = (input?: string): void => {
+  setSubPath_.value(input);
+};
+
+const set1Path = setSegment(1);
 export const goRoot = (): void => {
   if (isRoot$.value) return;
 
-  setSubPath(undefined, 1);
+  set1Path(undefined);
 };
 
 effect(() => {

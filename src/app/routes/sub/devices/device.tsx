@@ -30,6 +30,10 @@ import {
   useDateFromEpoch,
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
+import {
+  noBackground,
+  useBackgroundOverride,
+} from '../../../state/background.js';
 import { useTitleOverride } from '../../../state/title.js';
 import { Entry, List } from '../../../views/list.js';
 
@@ -333,6 +337,7 @@ export const DeviceDetails: FunctionComponent<{
   // @ts-ignore
   const name = useMemo(() => String(device.$path.at(-2) ?? ''), [device]);
   useTitleOverride(name);
+  useBackgroundOverride(noBackground);
 
   // const { espNow: { device: espNow } = {}, wifi: { device: wifi } = {} } =
   //   useMemo(

@@ -1,39 +1,42 @@
-import { TSystem } from '@iot/iot-monolith';
-import { Match, TExclude } from '@iot/iot-monolith/tree';
+import { ensureKeys } from '@mrpelz/misc-utils/oop';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
-import { serialized } from '../../../api.js';
+import { AnyObject, serialized } from '../../../api.js';
 import { Grid } from '../../../components/grid.js';
 import { Control } from '../../../controls/main.js';
 import { useTitleOverride } from '../../../state/title.js';
 import { getTranslationFallback } from '../../../state/translation.js';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-export type TInputGroupingSensor = Match<
-  {
-    $: 'inputGrouping';
-  },
-  TExclude,
-  TSystem
->;
-
 export const GroupChildren: FunctionComponent<{
-  sensor: TInputGroupingSensor;
-}> = ({ sensor }) => {
+  object: AnyObject;
+}> = ({ object }) => {
   const name = useMemo(
-    () => String(serialized(sensor).$path?.at(-1) ?? ''),
-    [sensor],
+    () =>
+      String(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        serialized(Array.isArray(object) ? {} : object).$path?.at(-1) ?? '',
+      ),
+    [object],
   );
 
-  const { $, inputs } = sensor;
+  const { $ } = ensureKeys(object, '$');
+  const { inputs } = ensureKeys(object, 'inputs');
+  const { outputs } = ensureKeys(object, 'outputs');
+  const { lights } = ensureKeys(object, 'lights');
 
-  useTitleOverride(getTranslationFallback(name ?? $).value);
+  const children = inputs ?? outputs ?? lights;
+
+  useTitleOverride(
+    children ? getTranslationFallback(name ?? $).value : undefined,
+  );
+
+  if (!children) return null;
 
   return (
     <Grid>
-      {inputs.map((input_) => {
+      {children.map((input_) => {
         const input = serialized(input_);
 
         return (

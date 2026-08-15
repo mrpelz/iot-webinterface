@@ -31,13 +31,15 @@ export const Room: FunctionComponent<{
     [rest],
   );
 
-  const { value: subPath } = subPath$;
+  const {
+    value: [depth, tail],
+  } = subPath$;
 
   const [subRouteElement] = useMatch(
-    { $id: subPath },
+    { $id: tail },
     excludePattern,
     properties,
-    (subPath ? undefined : -1) as typeof DEFAULT_MATCH_DEPTH,
+    (tail && depth > 1 ? undefined : -1) as typeof DEFAULT_MATCH_DEPTH,
   );
 
   return (

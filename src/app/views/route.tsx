@@ -11,7 +11,6 @@ import { LogicReasoning } from '../routes/root/logic-reasoning.js';
 import { Room } from '../routes/root/room.js';
 import { Settings } from '../routes/root/settings.js';
 import { Test } from '../routes/root/test-route.js';
-import { noBackground, useBackgroundOverride } from '../state/background.js';
 import { globalProperties } from '../state/global-properties.js';
 import { room$, rooms$, staticPage$ } from '../state/navigation.js';
 import { roomProperties } from '../state/room-properties.js';
@@ -61,12 +60,8 @@ export const RootRoute: FunctionComponent = () => {
 };
 
 export const SubRoute: FunctionComponent<{
-  blackOut?: boolean;
   subRoute: ComponentChildren;
-}> = ({ blackOut = true, children, subRoute }) => {
-  useBackgroundOverride(
-    Boolean(subRoute) && blackOut ? noBackground : undefined,
-  );
+}> = ({ children, subRoute }) => {
   useScrollRestore(!subRoute);
 
   return (

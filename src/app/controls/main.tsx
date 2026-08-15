@@ -1,4 +1,4 @@
-import { ComponentChild, FunctionComponent } from 'preact';
+import { ComponentChild, FunctionComponent, MouseEventHandler } from 'preact';
 
 import { AnyObject } from '../api.js';
 import {
@@ -14,7 +14,7 @@ import { Sensor } from './sensor/main.js';
 
 export type CellProps = {
   icon?: ComponentChild;
-  onClick?: () => void;
+  onClick?: MouseEventHandler<HTMLElement>;
   span?: number;
   title: ComponentChild;
 };

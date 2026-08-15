@@ -10,6 +10,10 @@ import {
   useDateFromEpoch,
   useRelativeTimeLabel,
 } from '../../../hooks/use-time-label.js';
+import {
+  noBackground,
+  useBackgroundOverride,
+} from '../../../state/background.js';
 import { useTitleOverride } from '../../../state/title.js';
 import { getTranslationFallback } from '../../../state/translation.js';
 import { Entry, List } from '../../../views/list.js';
@@ -29,6 +33,7 @@ export const OpenSensor: FunctionComponent<{
   const { $ } = sensor;
 
   useTitleOverride(getTranslationFallback(name ?? $).value);
+  useBackgroundOverride(noBackground);
 
   const {
     open: {

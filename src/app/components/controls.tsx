@@ -9,7 +9,7 @@ import { GridCell } from './grid.js';
 
 type CellProps = {
   isHighContrast: boolean;
-  onClick?: () => void;
+  onClick?: MouseEventHandler<HTMLElement>;
   span: number;
 };
 

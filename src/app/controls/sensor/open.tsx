@@ -35,9 +35,7 @@ export const OpenSensor: FunctionComponent<{
   sensor,
   title,
 }) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const { $id } = sensor;
+  const { $id } = serialized(sensor);
 
   const handleClick = useCallback(() => setSubPath($id), [$id]);
 

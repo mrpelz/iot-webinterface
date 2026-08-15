@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
+  DEFAULT_MATCH_DEPTH,
   excludePattern,
   Level,
   levelObjectMatch,
@@ -62,13 +63,19 @@ const Room: FunctionComponent<{
 };
 
 export const Devices: FunctionComponent = () => {
+  const {
+    value: [depth, tail],
+  } = subPath$;
+
   const device = api
     .match(
       {
-        $id: subPath$.value,
+        $id: tail,
         level: Level.DEVICE as const,
       },
       excludePattern,
+      undefined,
+      (tail && depth > 1 ? undefined : -1) as typeof DEFAULT_MATCH_DEPTH,
     )
     .at(0);
 
