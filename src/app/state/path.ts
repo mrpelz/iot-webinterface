@@ -13,7 +13,6 @@ import { isPWA } from '../util/useragent.js';
 import { setMenuVisible } from './menu.js';
 import { isVisible$ } from './visibility.js';
 
-const TRIGGER_STATE = 'c0aab99b-77e0-45c8-ab13-7effa083bc19';
 const ROOT_PATH_DEPTH = 1;
 
 const enableBackcapture = !isPWA;
@@ -82,13 +81,13 @@ export const rootPath$ = getSegment(0);
 export const setRootPath = setSegment(0);
 
 export const subPath$ = getSegment(1);
-export const setSubPath = (input?: string, level?: number): void =>
-  setSegment(level ?? pathDepth$.value)(input);
+export const setSubPath = (input?: string, segmentNumber?: number): void =>
+  setSegment(segmentNumber ?? pathDepth$.value)(input);
 
 export const goRoot = (): void => {
   if (isRoot$.value) return;
 
-  setSubPath(undefined);
+  setSubPath(undefined, 1);
 };
 
 effect(() => {
@@ -103,22 +102,22 @@ effect(() => {
   history.replaceState(undefined, '', amend(path$.value).pathname);
 });
 
-addEventListener('popstate', () => {
-  if (isRoot$.value) {
+addEventListener('popstate', (event) => {
+  if (event.state?.root) {
     if (enableBackcapture) {
       setMenuVisible(true);
     }
 
-    history.replaceState(undefined, '', amend(path$.value).pathname);
-
-    return;
+    history.pushState(undefined, '', path$.value);
   }
 
   goUp();
 });
 
 const initialPath = location.pathname;
-history.replaceState(TRIGGER_STATE, '', '/');
-history.pushState(undefined, '', '/');
+history.go(-(history.length - 1));
+
+history.replaceState({ root: true }, '', '/');
+history.pushState(undefined, '', initialPath);
 
 setPath(initialPath);

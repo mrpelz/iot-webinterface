@@ -2,6 +2,7 @@ import { FunctionComponent } from 'preact';
 
 import { AnyObject } from '../../../api.js';
 import { BinarySensor } from './binary.js';
+import { GroupChildren } from './group-children.js';
 import { OffTimer } from './off-timer.js';
 import { OpenSensor } from './open.js';
 
@@ -23,10 +24,13 @@ export const SubPage: FunctionComponent<{
     }
 
     case 'input':
-    case 'inputGrouping':
     case 'motion':
     case 'hmmdMotion': {
       return <BinarySensor sensor={object} />;
+    }
+
+    case 'inputGrouping': {
+      return <GroupChildren sensor={object} />;
     }
 
     default: {

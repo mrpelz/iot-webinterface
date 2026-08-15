@@ -18,6 +18,17 @@ export const getSegments = (path: string): string[] => {
 export const getPath = (segments: string[]): string =>
   `/${segments.map((segment) => encodeURIComponent(segment)).join('/')}`;
 
+export const getSegmentsStack = (path: string): string[] => {
+  const segments = getSegments(path);
+  const result: string[] = ['/'];
+
+  for (let index = 0; index < segments.length; index += 1) {
+    result.push(getPath(segments.slice(0, index + 1)));
+  }
+
+  return result;
+};
+
 export const goDown = (basePath: string, path: string): string =>
   getPath([getSegments(basePath), getSegments(path)].flat());
 
