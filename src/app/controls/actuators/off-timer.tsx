@@ -12,6 +12,7 @@ import { TabularNums } from '../../components/text.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { useDelay } from '../../hooks/use-delay.js';
+import { useShortenedPath } from '../../hooks/use-path.js';
 import {
   useDateFromEpoch,
   useTimeLabel,
@@ -134,8 +135,8 @@ export const TimerActuator: FunctionComponent<{
     // @ts-ignore
   } = serialized(object);
 
-  // @ts-ignore
-  const name = String(title ?? $path?.at(-1));
+  const name_ = useShortenedPath($path);
+  const name = String(title ?? name_?.join(' ') ?? $path?.at(-1) ?? object.$);
 
   const handleHeaderClick = useCallback(() => {
     setSubPath($id);

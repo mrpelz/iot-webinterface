@@ -11,6 +11,7 @@ import { ForwardIcon } from '../../components/icons.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { useDelay } from '../../hooks/use-delay.js';
+import { useShortenedPath } from '../../hooks/use-path.js';
 import { I18nKey } from '../../i18n/main.js';
 import { rootPath$, setSubPath } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
@@ -38,6 +39,7 @@ export const BinaryActuator: FunctionComponent<{
   onClick,
   positiveKey = 'on',
   title,
+  // eslint-disable-next-line complexity
 }) => {
   const value = useTypedEmitter(serialized(actuator.main));
 
@@ -50,7 +52,7 @@ export const BinaryActuator: FunctionComponent<{
     loading_ ? serialized(loading_) : undefined,
   ).value;
 
-  const { $id } = serialized(actuator);
+  const { $id, $path } = serialized(actuator);
   const handleClick = useCallback(() => setSubPath($id), [$id]);
 
   const flip = useTypedCollector(serialized(actuator.flip));
@@ -68,13 +70,14 @@ export const BinaryActuator: FunctionComponent<{
     [flip, onClick],
   );
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const name = String(title ?? actuator.$path?.at(-1) ?? actuator.topic);
+  const name_ = useShortenedPath($path);
+  const name = String(
+    title ?? name_?.join(' ') ?? $path?.at(-1) ?? actuator.topic,
+  );
 
   const ColorBody = useColorBody(
     BodyLarge,
-    String(serialized(actuator).$path?.at(-1)),
+    String($path?.at(-1)),
     actuator.topic,
   );
 

@@ -11,6 +11,7 @@ import { TriggerBody } from '../../components/null-actuator.js';
 import { Overlay } from '../../components/overlay.js';
 import { useTypedCollector } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
+import { useShortenedPath } from '../../hooks/use-path.js';
 import { I18nKey } from '../../i18n/main.js';
 import { api } from '../../main.js';
 import { Translation } from '../../views/translation.js';
@@ -80,11 +81,13 @@ export const NullActuator: FunctionComponent<{
     })();
   }, [setter]);
 
+  const { $path } = serialized(actuator);
   const { topic } = ensureKeys(actuator, 'topic');
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const name = String(title ?? actuator.$path?.at(-1) ?? topic);
+  const name_ = useShortenedPath($path);
+  const name = String(
+    title ?? name_?.join(' ') ?? $path?.at(-1) ?? actuator.topic,
+  );
 
   const ColorBody = useColorBody(
     TriggerBody,

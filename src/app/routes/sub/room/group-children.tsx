@@ -1,51 +1,83 @@
-import { ensureKeys } from '@mrpelz/misc-utils/oop';
+import { ensureKeys, isPlainObject } from '@mrpelz/misc-utils/oop';
 import { FunctionComponent } from 'preact';
 import { useMemo } from 'preact/hooks';
 
 import { AnyObject, serialized } from '../../../api.js';
 import { Grid } from '../../../components/grid.js';
 import { Control } from '../../../controls/main.js';
+import { useShortenedPath } from '../../../hooks/use-path.js';
 import { useTitleOverride } from '../../../state/title.js';
 import { getTranslationFallback } from '../../../state/translation.js';
+import { Category } from '../../../views/category.js';
+import { Translation } from '../../../views/translation.js';
 
 export const GroupChildren: FunctionComponent<{
   object: AnyObject;
 }> = ({ object }) => {
-  const name = useMemo(
+  const $path = useMemo(
     () =>
-      String(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        serialized(Array.isArray(object) ? {} : object).$path?.at(-1) ?? '',
-      ),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      (isPlainObject(object) ? serialized(object).$path : undefined) as
+        (string | number)[] | undefined,
     [object],
   );
 
   const { $ } = ensureKeys(object, '$');
+  const name_ = useShortenedPath($path);
+  const name = String(name_?.join(' ') ?? $path?.at(-1) ?? $);
+
   const { inputs } = ensureKeys(object, 'inputs');
   const { outputs } = ensureKeys(object, 'outputs');
   const { lights } = ensureKeys(object, 'lights');
 
   const children = inputs ?? outputs ?? lights;
 
-  useTitleOverride(
-    children ? getTranslationFallback(name ?? $).value : undefined,
-  );
+  useTitleOverride(children ? getTranslationFallback(name).value : undefined);
 
-  if (!children) return null;
+  const categorized = useMemo(() => {
+    if (!children) return undefined;
 
-  return (
-    <Grid>
-      {children.map((input_) => {
-        const input = serialized(input_);
+    const result: Record<
+      string,
+      Exclude<typeof children, undefined>[number][]
+    > = {};
 
-        return (
-          <Control
-            key={input.$id}
-            object={input_}
-          />
-        );
-      })}
-    </Grid>
-  );
+    for (const child of children) {
+      const group = serialized(child).$path?.at(-2);
+      if (group === undefined) continue;
+
+      result[group] = result[group] ?? [];
+      result[group].push(child);
+    }
+
+    return result;
+  }, [children]);
+
+  if (!categorized) return null;
+
+  return Object.entries(categorized).map(([key, items]) => (
+    <Category
+      key={key}
+      header={
+        <Translation
+          capitalize={true}
+          i18nKey={key}
+        />
+      }
+    >
+      <Grid>
+        {items.map((item_) => {
+          const child = serialized(item_);
+
+          return (
+            <Control
+              key={child.$id}
+              object={item_}
+            />
+          );
+        })}
+      </Grid>
+    </Category>
+  ));
 };

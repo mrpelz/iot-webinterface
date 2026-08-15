@@ -8,6 +8,7 @@ import { Tag } from '../../components/controls.js';
 import { ForwardIcon } from '../../components/icons.js';
 import { TabularNums } from '../../components/text.js';
 import { useTypedEmitter } from '../../hooks/use-api.js';
+import { useShortenedPath } from '../../hooks/use-path.js';
 import { I18nKey } from '../../i18n/main.js';
 import { setSubPath } from '../../state/path.js';
 import { Translation } from '../../views/translation.js';
@@ -30,15 +31,14 @@ export const HMMDMotionSensor: FunctionComponent<{
   sensor: THMMDMotionSensor;
   title?: I18nKey;
 }> = ({ negativeKey = 'no', onClick, positiveKey = 'yes', sensor, title }) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const { $id } = sensor;
+  const { $id, $path } = serialized(sensor);
 
   const handleClick = useCallback(() => setSubPath($id), [$id]);
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const name = String(title ?? sensor.$path?.at(-1) ?? sensor.$);
+  const name_ = useShortenedPath($path);
+  const name = String(
+    title ?? name_?.join(' ') ?? $path?.at(-1) ?? sensor.topic,
+  );
 
   const value = useTypedEmitter(serialized(sensor.main)).value;
 

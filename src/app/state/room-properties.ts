@@ -13,7 +13,7 @@ export const roomProperties = (room: LevelObject[Level.ROOM]) => {
   const properties$ = computed(() =>
     unique(
       [
-        api.match({ $: anyString }, excludePattern, room, 1),
+        api.match({ $: anyString }, excludePattern, room, 2),
         kitchenAdjacent$.includes(room.$ as (typeof kitchenAdjacent$)[number])
           ? [
               building$.value?.firstFloor.kitchenAdjacentBright,

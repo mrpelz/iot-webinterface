@@ -5,6 +5,7 @@ import { serialized } from '../../../api.js';
 import { AlignRight, TabularNums } from '../../../components/text.js';
 import { TOpenSensor } from '../../../controls/sensor/open.js';
 import { useTypedEmitter } from '../../../hooks/use-api.js';
+import { useShortenedPath } from '../../../hooks/use-path.js';
 import {
   useAbsoluteTimeLabel,
   useDateFromEpoch,
@@ -24,15 +25,11 @@ export const OpenSensor: FunctionComponent<{
   // @ts-ignore
   sensor: TOpenSensor;
 }> = ({ sensor }) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const name = useMemo(() => String(sensor.$path?.at(-1) ?? ''), [sensor]);
+  const { $, $path } = serialized(sensor);
+  const name_ = useShortenedPath($path);
+  const name = String(name_?.join(' ') ?? $path?.at(-1) ?? sensor.topic ?? $);
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const { $ } = sensor;
-
-  useTitleOverride(getTranslationFallback(name ?? $).value);
+  useTitleOverride(getTranslationFallback(name).value);
   useBackgroundOverride(noBackground);
 
   const {

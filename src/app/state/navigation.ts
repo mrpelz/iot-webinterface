@@ -5,10 +5,15 @@ import {
 } from '@iot/iot-monolith/tree';
 import { computed, effect, signal } from '@preact/signals';
 
-import { LevelObject } from '../api.js';
+import { LevelObject, serialized } from '../api.js';
 import { api } from '../main.js';
 import { flags$ } from '../util/flags.js';
-import { persistedSignal, promisedSignal, TSignal } from '../util/signal.js';
+import {
+  callbackSignal,
+  persistedSignal,
+  promisedSignal,
+  TSignal,
+} from '../util/signal.js';
 import { setBackground } from './background.js';
 import { rootPath$, setRootPath } from './path.js';
 import { isVisible$ } from './visibility.js';
@@ -279,6 +284,31 @@ export const staticPage$ = computed(() => {
 
   return staticPage;
 });
+
+export const shortenedPath = callbackSignal(
+  ({ room }, path?: (string | number)[]) => {
+    const $path = serialized(room)?.$path;
+    if (!path) return undefined;
+    if (!$path) return undefined;
+
+    const result: (string | number)[] = [];
+
+    // eslint-disable-next-line unicorn/no-for-loop
+    for (let index = 0; index < path.length; index += 1) {
+      const segment = path[index];
+      if (!segment) continue;
+
+      if (segment === $path.at(index)) continue;
+
+      result.push(segment);
+    }
+
+    return result;
+  },
+  {
+    room: room$,
+  },
+);
 
 effect(() => {
   const rootPath = rootPath$.value;

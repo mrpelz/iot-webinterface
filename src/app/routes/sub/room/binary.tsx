@@ -7,6 +7,7 @@ import { AlignRight, TabularNums } from '../../../components/text.js';
 import { TBinarySensor } from '../../../controls/sensor/binary.js';
 import { THMMDMotionSensor } from '../../../controls/sensor/hmmd-motion.js';
 import { useTypedEmitter } from '../../../hooks/use-api.js';
+import { useShortenedPath } from '../../../hooks/use-path.js';
 import {
   useAbsoluteTimeLabel,
   useDateFromEpoch,
@@ -26,15 +27,11 @@ export const BinarySensor: FunctionComponent<{
   // @ts-ignore
   sensor: TBinarySensor | THMMDMotionSensor;
 }> = ({ sensor }) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const name = useMemo(() => String(sensor.$path?.at(-1) ?? ''), [sensor]);
+  const { $, $path } = serialized(sensor);
+  const name_ = useShortenedPath($path);
+  const name = String(name_?.join(' ') ?? $path?.at(-1) ?? sensor.topic ?? $);
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const { $ } = sensor;
-
-  useTitleOverride(getTranslationFallback(name ?? $).value);
+  useTitleOverride(getTranslationFallback(name).value);
   useBackgroundOverride(noBackground);
 
   const {

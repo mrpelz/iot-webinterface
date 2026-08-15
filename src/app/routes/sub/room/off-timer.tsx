@@ -8,6 +8,7 @@ import { NonBreaking } from '../../../components/text.js';
 import { NullActuatorButton } from '../../../controls/actuators/null.js';
 import { TOffTimer } from '../../../controls/actuators/off-timer.js';
 import { useTypedCollector, useTypedEmitter } from '../../../hooks/use-api.js';
+import { useShortenedPath } from '../../../hooks/use-path.js';
 import {
   useDateFromEpoch,
   useTimeLabel,
@@ -26,9 +27,9 @@ export const OffTimer: FunctionComponent<{
   // @ts-ignore
   actuator: TOffTimer;
 }> = ({ actuator }) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const name = useMemo(() => String(actuator.$path?.at(-1) ?? ''), [actuator]);
+  const { $, $path } = serialized(actuator);
+  const name_ = useShortenedPath($path);
+  const name = String(name_?.join(' ') ?? $path?.at(-1) ?? $);
 
   useTitleOverride(getTranslationFallback(name).value);
   useBackgroundOverride(noBackground);

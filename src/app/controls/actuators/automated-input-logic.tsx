@@ -11,6 +11,7 @@ import { TabularNums } from '../../components/text.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
 import { useExtractKey } from '../../hooks/use-ensure-keys.js';
+import { useShortenedPath } from '../../hooks/use-path.js';
 import { useDateFromEpoch, useTimeLabel } from '../../hooks/use-time-label.js';
 import { I18nKey } from '../../i18n/main.js';
 // import { setSubPath } from '../../state/path.js';
@@ -61,8 +62,8 @@ export const AutomatedInputLogic: FunctionComponent<{
     'scheduled',
   );
 
-  // @ts-ignore
-  const name = String(title ?? $path?.at(-1));
+  const name_ = useShortenedPath($path);
+  const name = String(title ?? name_?.join(' ') ?? $path?.at(-1) ?? object.$);
 
   const { value: isAutomationEnabledMain } = useTypedEmitter(
     serialized(automationEnableMain),
