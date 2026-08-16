@@ -50,7 +50,6 @@ export const IconContainer = styled('icon-container' as 'section', forwardRef)<{
   ${({ right }) => (right ? 'inset-inline-end' : 'inset-inline-start')}: 0;
 
   & > * {
-    min-width: auto;
     padding: ${dimensions.fontPadding};
     block-size: ${dimensions.titlebarHeight};
 
