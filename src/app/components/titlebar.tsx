@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { styled } from 'goober';
 import { forwardRef } from 'preact/compat';
 
@@ -22,8 +23,7 @@ export const Titlebar = styled('titlebar')<{ padding: number }>`
         '0px',
       )(),
       `${padding}px`,
-    )}
-    ${({ padding }) => `${padding}px`};
+    )} ${({ padding }) => `${padding}px`};
   word-break: break-all;
 `;
 
@@ -50,6 +50,7 @@ export const IconContainer = styled('icon-container' as 'section', forwardRef)<{
   ${({ right }) => (right ? 'inset-inline-end' : 'inset-inline-start')}: 0;
 
   & > * {
+    min-width: auto;
     padding: ${dimensions.fontPadding};
     block-size: ${dimensions.titlebarHeight};
 
