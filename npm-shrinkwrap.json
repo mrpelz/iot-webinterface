@@ -2800,9 +2800,9 @@
       }
     },
     "node_modules/@iot/iot-monolith": {
-      "version": "8.12.1",
-      "resolved": "https://git.i.wurstsalat.cloud/api/v4/projects/70/packages/npm/@iot/iot-monolith/-/@iot/iot-monolith-8.12.1.tgz",
-      "integrity": "sha1-rtlEVwMYd6qrCJgW10nUn8jTV9Q=",
+      "version": "8.13.0",
+      "resolved": "https://git.i.wurstsalat.cloud/api/v4/projects/70/packages/npm/@iot/iot-monolith/-/@iot/iot-monolith-8.13.0.tgz",
+      "integrity": "sha1-/RaIsgL4/ysQiAZfiBLkRzqO30M=",
       "dependencies": {
         "@mrpelz/misc-utils": "7.4.4",
         "@mrpelz/modifiable-date": "7.4.4",

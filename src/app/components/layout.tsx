@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { styled } from 'goober';
 import { forwardRef } from 'preact/compat';
 
@@ -43,7 +44,6 @@ export const Aside = styled('aside', forwardRef)<{
 
 export const Main = styled('main', forwardRef)<{
   isAsideVisible: boolean;
-  swipeCaptureWidth: number;
 }>`
   position: relative;
   z-index: 2;
@@ -51,8 +51,7 @@ export const Main = styled('main', forwardRef)<{
   background-color: ${colors.backgroundPrimary()};
   color: ${colors.fontPrimary()};
   inline-size: ${dimensions.appWidth};
-  margin-block: ${dimensions.headerHeight}
-    ${invert(strings.safeAreaInsetBottom)};
+  margin-block: ${dimensions.headerHeight} ${invert(strings.safeAreaInsetBottom)};
   margin-inline-start: ${breakpointValue(
     mediaQuery(dimensions.breakpointDesktop),
     dimensions.menuWidth,
@@ -65,18 +64,4 @@ export const Main = styled('main', forwardRef)<{
   transition:
     block-size 0.3s ease-out,
     margin-block-start 0.3s ease-out;
-
-  &::after {
-    position: absolute;
-    content: '';
-    inline-size: ${({ swipeCaptureWidth }) =>
-      breakpointValue(
-        mediaQuery(dimensions.breakpointDesktop),
-        '0',
-        `${swipeCaptureWidth}px`,
-      )()};
-    inset-block: 0;
-    inset-inline-start: 0;
-    touch-action: pan-x;
-  }
 `;

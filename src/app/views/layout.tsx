@@ -1,9 +1,14 @@
-import { createContext, FunctionComponent, JSX, RefObject } from 'preact';
+import {
+  createContext,
+  FunctionComponent,
+  RefObject,
+  UIEventHandler,
+} from 'preact';
 import { useContext, useLayoutEffect, useMemo, useRef } from 'preact/hooks';
 
 import { Aside, Header, Main } from '../components/layout.js';
 import { MenuShade } from '../components/menu.js';
-import { isMenuVisible$, MenuVisible, setMenuVisible } from '../state/menu.js';
+import { isMenuVisible$, setMenuVisible } from '../state/menu.js';
 import { goUp, isRoot$ } from '../state/path.js';
 import { isScreensaverActive$ } from '../state/screensaver.js';
 import { dimensions } from '../style.js';
@@ -23,7 +28,10 @@ const MainRefContext = createContext(
 export const useMainRef = (): RefObject<HTMLElement> =>
   useContext(MainRefContext);
 
-export const Layout: FunctionComponent = ({ children }) => {
+export const Layout: FunctionComponent<{ appRef: RefObject<HTMLElement> }> = ({
+  appRef,
+  children,
+}) => {
   const isDesktop = useBreakpoint(getMediaQuery(dimensions.breakpointDesktop));
 
   const isAsideVisible = isMenuVisible$.value;
@@ -36,16 +44,10 @@ export const Layout: FunctionComponent = ({ children }) => {
 
   const mainRef = useRef<HTMLElement>(null);
 
-  const isAsideVisibleRef = useRef<MenuVisible>(null);
-
   const isRoot = isRoot$.value;
 
   useLayoutEffect(() => {
-    isAsideVisibleRef.current = isAsideVisible;
-  }, [isAsideVisible]);
-
-  useLayoutEffect(() => {
-    const { current: mainCurrent } = mainRef;
+    const { current: mainCurrent } = appRef;
 
     if (!mainCurrent || !menuRef.current) return undefined;
 
@@ -81,7 +83,8 @@ export const Layout: FunctionComponent = ({ children }) => {
       this: HTMLElement,
       event: HTMLElementEventMap['touchstart'],
     ) => void = ({ targetTouches }) => {
-      if (isAsideVisibleRef.current) return;
+      if (isMenuVisible$.value) return;
+      if (isMenuVisible$.value === null && isRoot$.value) return;
 
       const x = targetTouches.item(0)?.pageX || 0;
 
@@ -101,7 +104,7 @@ export const Layout: FunctionComponent = ({ children }) => {
 
       const { targetTouches } = event;
 
-      if (!lastX || isAsideVisibleRef.current) return;
+      if (!lastX || isMenuVisible$.value) return;
 
       const x = targetTouches.item(0)?.pageX || 0;
 
@@ -119,7 +122,7 @@ export const Layout: FunctionComponent = ({ children }) => {
 
       const slideElement = swipeBackRef.current || menuRef.current;
 
-      if (!lastX || isAsideVisibleRef.current) return;
+      if (!lastX || isMenuVisible$.value) return;
 
       if (slideElement !== menuRef.current) {
         if (lastX >= slideElement.offsetWidth - 1) {
@@ -136,7 +139,7 @@ export const Layout: FunctionComponent = ({ children }) => {
       this: HTMLElement,
       event: HTMLElementEventMap['touchcancel'],
     ) => void = () => {
-      if (!lastX || isAsideVisibleRef.current) return;
+      if (!lastX || isMenuVisible$.value) return;
 
       setTransform(0);
     };
@@ -156,7 +159,7 @@ export const Layout: FunctionComponent = ({ children }) => {
       mainCurrent.removeEventListener('touchend', onTouchEnd);
       mainCurrent.removeEventListener('touchcancel', onTouchCancel);
     };
-  }, []);
+  }, [appRef]);
 
   useLayoutEffect(() => {
     if (!menuRef.current) return;
@@ -166,7 +169,7 @@ export const Layout: FunctionComponent = ({ children }) => {
   }, [isDesktop]);
 
   const handleAsideOutsideClick = useMemo<
-    JSX.UIEventHandler<HTMLElement> | undefined
+    UIEventHandler<HTMLElement> | undefined
   >(
     () =>
       isAsideVisible
@@ -203,7 +206,6 @@ export const Layout: FunctionComponent = ({ children }) => {
       <Main
         ref={mainRef}
         isAsideVisible={isScreensaverActive || Boolean(isAsideVisible)}
-        swipeCaptureWidth={swipeCaptureWidth}
         onClickCapture={handleAsideOutsideClick}
       >
         <MainRefContext.Provider value={mainRef}>

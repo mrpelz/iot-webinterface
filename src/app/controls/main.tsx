@@ -7,6 +7,7 @@ import {
   Header,
   Title,
 } from '../components/controls.js';
+import { Marquee } from '../components/marquee.js';
 import { I18nKey } from '../i18n/main.js';
 import { theme$ } from '../state/theme.js';
 import { Actuator } from './actuators/main.js';
@@ -32,7 +33,9 @@ export const Cell: FunctionComponent<CellProps> = ({
     onClick={onClick}
   >
     <Header>
-      <Title>{title}</Title>
+      <Title>
+        <Marquee>{title}</Marquee>
+      </Title>
       {icon ?? null}
     </Header>
     {children}

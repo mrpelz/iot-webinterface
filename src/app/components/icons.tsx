@@ -5,6 +5,7 @@ import { dependentValue } from '../style/main.js';
 
 const Svg = styled('svg')<{ color?: string; zIndex?: number }>`
   z-index: ${({ zIndex }) => zIndex};
+  min-width: max-content;
   color: ${({ color }) => color || 'currentColor'};
   fill: none;
   stroke: none;

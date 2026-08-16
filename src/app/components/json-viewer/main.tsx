@@ -2,7 +2,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { isObject } from '@mrpelz/misc-utils/oop';
-import { ComponentChild, createContext, FunctionComponent, JSX } from 'preact';
+import {
+  ClipboardEventHandler,
+  ComponentChild,
+  createContext,
+  FunctionComponent,
+} from 'preact';
 import {
   useCallback,
   useContext,
@@ -72,7 +77,7 @@ export const Key: FunctionComponent<{
   const key = path.at(-1);
   const path_ = useMemo(() => path.join('.'), [path]);
 
-  const onCopy = useCallback<JSX.ClipboardEventHandler<HTMLSpanElement>>(
+  const onCopy = useCallback<ClipboardEventHandler<HTMLSpanElement>>(
     (event) => {
       event.clipboardData?.setData('text/plain', path_);
       event.preventDefault();

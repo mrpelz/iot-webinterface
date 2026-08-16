@@ -2,7 +2,6 @@ import { computed, effect, signal } from '@preact/signals';
 
 import { flags$ } from '../util/flags.js';
 import {
-  amend,
   getPath,
   getSegments,
   goDown,
@@ -105,12 +104,13 @@ effect(() => {
 effect(() => {
   if (!path$.value) return;
 
-  history.replaceState(undefined, '', amend(path$.value).pathname);
+  history.replaceState(undefined, '', path$.value);
 });
 
+let init = false;
 addEventListener('popstate', (event) => {
   if (event.state?.root) {
-    if (enableBackcapture) {
+    if (enableBackcapture && init) {
       setMenuVisible(true);
     }
 
@@ -127,3 +127,4 @@ history.replaceState({ root: true }, '', '/');
 history.pushState(undefined, '', initialPath);
 
 setPath(initialPath);
+setTimeout(() => (init = true), 0);

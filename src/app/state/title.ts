@@ -1,6 +1,7 @@
 import { computed, effect, signal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 
+import { isPWA } from '../util/useragent.js';
 import { room$, staticPage$ } from './navigation.js';
 import { getCapitalization, getTranslation } from './translation.js';
 
@@ -27,9 +28,9 @@ export const title$ = computed(() =>
 export const capitalizedTitle$ = getCapitalization(title$);
 
 effect(() => {
-  document.title = [capitalizedTitle$.value, appName]
-    .filter(Boolean)
-    .join(' | ');
+  document.title = isPWA
+    ? (capitalizedTitle$.value ?? '')
+    : [capitalizedTitle$.value, appName].filter(Boolean).join(' | ');
 });
 
 export const setTitleOverride = (title?: string | NoTitle): void => {

@@ -6,7 +6,13 @@ import {
 } from '@iot/iot-monolith/tree-serialization';
 import { isObject, isPlainObject } from '@mrpelz/misc-utils/oop';
 import { computed } from '@preact/signals';
-import { ComponentChildren, FunctionComponent, JSX } from 'preact';
+import {
+  ComponentChildren,
+  EventHandler,
+  FunctionComponent,
+  GenericEventHandler,
+  TargetedEvent,
+} from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import { AnyObject, serialized } from '../api.js';
@@ -134,9 +140,9 @@ const Collector: FunctionComponent<{
 
   if (!objectMapped) return null;
 
-  const onChange: JSX.EventHandler<
-    JSX.TargetedEvent<HTMLInputElement, Event>
-  > = ({ currentTarget }: JSX.TargetedEvent<HTMLInputElement, Event>) => {
+  const onChange: EventHandler<TargetedEvent<HTMLInputElement, Event>> = ({
+    currentTarget,
+  }: TargetedEvent<HTMLInputElement, Event>) => {
     const { value } = currentTarget;
 
     //     if (value.length === 0) {
@@ -165,8 +171,8 @@ const Collector: FunctionComponent<{
     }
   };
 
-  const onSubmit: JSX.GenericEventHandler<HTMLFormElement> = (
-    event: JSX.TargetedEvent<HTMLFormElement, Event>,
+  const onSubmit: GenericEventHandler<HTMLFormElement> = (
+    event: TargetedEvent<HTMLFormElement, Event>,
   ) => {
     event.preventDefault();
 
