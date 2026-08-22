@@ -7,6 +7,7 @@ import { TSystem } from '../../../common/types.js';
 import { serialized } from '../../api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
+import { Haptic } from '../../components/haptic.js';
 import { ForwardIcon } from '../../components/icons.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
 import { useColorBody } from '../../hooks/use-color-body.js';
@@ -121,8 +122,10 @@ export const BinaryActuator: FunctionComponent<{
               {loading ? '…' : null}
             </>
           )}
+          {isGrouping ? <Haptic /> : null}
         </BodyLarge>
       </BlendOver>
+      {isGrouping ? null : <Haptic />}
     </Cell>
   );
 };

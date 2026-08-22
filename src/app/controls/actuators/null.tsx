@@ -6,6 +6,7 @@ import { useCallback, useRef } from 'preact/hooks';
 import { TSystem } from '../../../common/types.js';
 import { serialized } from '../../api.js';
 import { Body } from '../../components/controls.js';
+import { Haptic } from '../../components/haptic.js';
 import { Button } from '../../components/list.js';
 import { TriggerBody } from '../../components/null-actuator.js';
 import { Overlay } from '../../components/overlay.js';
@@ -120,6 +121,7 @@ export const NullActuator: FunctionComponent<{
           />
         </Body>
       </Overlay>
+      <Haptic />
     </Cell>
   );
 };

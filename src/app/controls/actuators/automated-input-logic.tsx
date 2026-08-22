@@ -6,6 +6,7 @@ import { useCallback, useMemo } from 'preact/hooks';
 import { TSystem } from '../../../common/types.js';
 import { serialized } from '../../api.js';
 import { BodyBottomBand, BodyLarge } from '../../components/controls.js';
+import { Haptic } from '../../components/haptic.js';
 // import { ForwardIcon } from '../../components/icons.js';
 import { TabularNums } from '../../components/text.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
@@ -236,6 +237,7 @@ export const AutomatedInputLogic: FunctionComponent<{
           <TabularNums>{labelSecondary}</TabularNums>
         </BodyBottomBand>
       ) : null}
+      <Haptic />
     </Cell>
   );
 };

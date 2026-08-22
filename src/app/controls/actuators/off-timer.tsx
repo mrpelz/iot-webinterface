@@ -7,6 +7,7 @@ import { TSystem } from '../../../common/types.js';
 import { serialized } from '../../api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
+import { Haptic } from '../../components/haptic.js';
 import { ForwardIcon } from '../../components/icons.js';
 import { TabularNums } from '../../components/text.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
@@ -154,6 +155,7 @@ export const TimerActuator: FunctionComponent<{
       onClick={onClick ?? handleHeaderClick}
     >
       <TimerActuatorBody object={object} />
+      <Haptic />
     </Cell>
   );
 };

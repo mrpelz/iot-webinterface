@@ -15,6 +15,7 @@ import { TSystem } from '../../../common/types.js';
 import { serialized } from '../../api.js';
 import { BlendOver } from '../../components/blend-over.js';
 import { BodyLarge } from '../../components/controls.js';
+import { Haptic } from '../../components/haptic.js';
 import { ForwardIcon } from '../../components/icons.js';
 import { NonBreaking, TabularNums } from '../../components/text.js';
 import { useTypedCollector, useTypedEmitter } from '../../hooks/use-api.js';
@@ -237,8 +238,12 @@ export const BrightnessActuator: FunctionComponent<{
         }
         onClick={isGrouping ? handleBodyClick : undefined}
       >
-        <BodyLarge ref={refB}>{label}</BodyLarge>
+        <BodyLarge ref={refB}>
+          {label}
+          {isGrouping ? <Haptic /> : null}
+        </BodyLarge>
       </BlendOver>
+      {isGrouping ? null : <Haptic />}
     </Cell>
   );
 };
