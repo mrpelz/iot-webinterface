@@ -231,8 +231,14 @@ export const BrightnessActuator: FunctionComponent<{
     >
       <BlendOver
         blendOver={brightness === null ? 0 : brightness}
-        // eslint-disable-next-line react-hooks/static-components
-        overlay={<ColorBody ref={refA}>{label}</ColorBody>}
+
+        overlay={
+          // eslint-disable-next-line react-hooks/static-components
+          <ColorBody ref={refA}>
+            {label}
+            {isGrouping ? <Haptic /> : null}
+          </ColorBody>
+        }
         transition={
           allowTransition && brightness !== null && !loading && !isInteracting
         }
