@@ -236,7 +236,7 @@ export const BrightnessActuator: FunctionComponent<{
           // eslint-disable-next-line react-hooks/static-components
           <ColorBody ref={refA}>
             {label}
-            {isGrouping ? <Haptic /> : null}
+            <Haptic />
           </ColorBody>
         }
         transition={
@@ -246,10 +246,9 @@ export const BrightnessActuator: FunctionComponent<{
       >
         <BodyLarge ref={refB}>
           {label}
-          {isGrouping ? <Haptic /> : null}
+          <Haptic />
         </BodyLarge>
       </BlendOver>
-      {isGrouping ? null : <Haptic />}
     </Cell>
   );
 };

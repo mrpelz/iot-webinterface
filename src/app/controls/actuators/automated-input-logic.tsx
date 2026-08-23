@@ -231,13 +231,13 @@ export const AutomatedInputLogic: FunctionComponent<{
         onClick={handleBodyClick}
       >
         {labelPrimary}
+        <Haptic />
       </OverlayBody>
       {labelSecondary ? (
         <BodyBottomBand>
           <TabularNums>{labelSecondary}</TabularNums>
         </BodyBottomBand>
       ) : null}
-      <Haptic />
     </Cell>
   );
 };

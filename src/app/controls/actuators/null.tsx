@@ -111,6 +111,7 @@ export const NullActuator: FunctionComponent<{
           // eslint-disable-next-line react-hooks/static-components
           <ColorBody ref={overlayRef}>
             <Translation i18nKey="triggered" />
+            <Haptic />
           </ColorBody>
         }
       >
@@ -119,9 +120,9 @@ export const NullActuator: FunctionComponent<{
             capitalize={true}
             i18nKey="trigger"
           />
+          <Haptic />
         </Body>
       </Overlay>
-      <Haptic />
     </Cell>
   );
 };

@@ -108,7 +108,7 @@ export const BinaryActuator: FunctionComponent<{
             // eslint-disable-next-line react-hooks/static-components
             <ColorBody>
               <Translation i18nKey={positiveKey} />
-              {isGrouping ? <Haptic /> : null}
+              <Haptic />
             </ColorBody>
           )
         }
@@ -123,10 +123,9 @@ export const BinaryActuator: FunctionComponent<{
               {loading ? '…' : null}
             </>
           )}
-          {isGrouping ? <Haptic /> : null}
+          <Haptic />
         </BodyLarge>
       </BlendOver>
-      {isGrouping ? null : <Haptic />}
     </Cell>
   );
 };
