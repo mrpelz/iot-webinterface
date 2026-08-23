@@ -27,14 +27,14 @@
     "webpack-dev-server": "6.0.0"
   },
   "dependencies": {
-    "@iot/iot-monolith": "latest",
-    "@mrpelz/misc-utils": "7.4.4",
-    "@mrpelz/modifiable-date": "7.4.4",
+    "@iot/iot-monolith": "8.14.2",
+    "@mrpelz/misc-utils": "7.5.0",
+    "@mrpelz/modifiable-date": "7.5.0",
     "@okikio/sharedworker": "1.1.0",
     "@preact/signals": "2.11.1",
     "comlink": "4.4.2",
     "goober": "2.1.19",
-    "hls.js": "1.7.0",
+    "hls.js": "1.7.1",
     "idb-keyval": "6.3.0",
     "preact": "10.29.8",
     "proper-tags": "2.0.2",
@@ -44,8 +44,8 @@
     "workbox-window": "7.4.1"
   },
   "devDependencies": {
-    "@mrpelz/boilerplate-common": "16.3.2",
-    "@mrpelz/boilerplate-preact": "16.3.2",
+    "@mrpelz/boilerplate-common": "16.4.0",
+    "@mrpelz/boilerplate-preact": "16.4.0",
     "@types/node": "26.2.0",
     "@types/webpack-env": "1.18.8",
     "copy-webpack-plugin": "14.0.0",
