@@ -15,14 +15,26 @@ MITM_SLUG := $(shell echo "$(PKG_NAME)/$(GIT_BRANCH)" | sed -r -e 's#@##g' -e 's
 MITM_URL := https://$(MITM_SLUG).localhost
 
 .PHONY: .PHONY \
+	check_package_json_iot_monolith_dependency \
 	util_mitmproxy \
 	watch_dev_proxy
 
 check_commit:
 	commitlint --verbose --config commitlint.config.mjs --last
 
+check_package_json_iot_monolith_dependency:
+	npm pkg get "dependencies.@iot/iot-monolith" | sed -nr '/^"([0-9]+\.[0-9]+\.[0-9]+)"$$/{q1}'
+
 check_package_lock:
 	lockfile-lint --path npm-shrinkwrap.json --type npm $(PACKAGE_LOCK_LINT_ARGS)
+
+check_package_json: \
+	util_get_package_json \
+	check_package_json_sort \
+	check_package_json_repository \
+	check_package_json_name \
+	check_package_json_version \
+	check_package_json_iot_monolith_dependency
 
 util_mitmproxy:
 	clear; \
