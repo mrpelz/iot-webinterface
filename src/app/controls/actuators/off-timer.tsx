@@ -109,7 +109,10 @@ const TimerActuatorBody: FunctionComponent<{
       overlay={
         enabledValue === null ? undefined : (
           // eslint-disable-next-line react-hooks/static-components
-          <OverlayBody>{label || <Translation i18nKey="on" />}</OverlayBody>
+          <OverlayBody>
+            {label || <Translation i18nKey="on" />}
+            <Haptic />
+          </OverlayBody>
         )
       }
       onClick={handleBodyClick}
@@ -120,6 +123,7 @@ const TimerActuatorBody: FunctionComponent<{
         ) : (
           label || <Translation i18nKey="off" />
         )}
+        <Haptic />
       </BodyLarge>
     </BlendOver>
   );
@@ -155,7 +159,6 @@ export const TimerActuator: FunctionComponent<{
       onClick={onClick ?? handleHeaderClick}
     >
       <TimerActuatorBody object={object} />
-      <Haptic />
     </Cell>
   );
 };
