@@ -9,6 +9,8 @@ import { requestNotificationPermission } from './util/notifications.js';
 import { persist } from './util/storage.js';
 import { isiPhone } from './util/useragent.js';
 
+// <ModifySourcePlugin>
+
 if (module.hot) module.hot.accept();
 
 export const id = crypto.randomUUID();
@@ -17,10 +19,9 @@ export const api = new Api();
 
 try {
   (async () => {
-    await api.isInit;
-    const { render } = await import('./root.js');
-
+    const [{ render }] = await Promise.all([import('./root.js'), api.isInit]);
     render();
+
     document.documentElement.removeAttribute('static');
   })().catch((error) => {
     throw new Error('render error', { cause: error });

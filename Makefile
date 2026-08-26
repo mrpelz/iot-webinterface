@@ -1,6 +1,5 @@
 include .env
 include .env.local
-export
 
 BASE_FILE := $(shell npm ls --parseable --silent "@mrpelz/boilerplate-preact" 2>/dev/null)
 
@@ -13,6 +12,8 @@ GIT_BRANCH := $(shell git symbolic-ref --short HEAD)
 
 MITM_SLUG := $(shell echo "$(PKG_NAME)/$(GIT_BRANCH)" | sed -r -e 's#@##g' -e 's#/#-#g' 2>/dev/null)
 MITM_URL := https://$(MITM_SLUG).localhost
+
+export
 
 .PHONY: .PHONY \
 	check_package_json_iot_monolith_dependency \

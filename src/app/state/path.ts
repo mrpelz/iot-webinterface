@@ -121,7 +121,9 @@ addEventListener('popstate', (event) => {
 });
 
 const initialPath = location.pathname;
-history.go(-(history.length - 1));
+
+const previousHistoryEntries = history.length - 1;
+if (previousHistoryEntries) history.go(-previousHistoryEntries);
 
 history.replaceState({ root: true }, '', '/');
 history.pushState(undefined, '', initialPath);

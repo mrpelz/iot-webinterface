@@ -4,6 +4,8 @@ import { precacheAndRoute } from 'workbox-precaching';
 import type { SW_API } from '../common/types.js';
 import { getFlags } from './util.js';
 
+// <ModifySourcePlugin>
+
 if (module.hot) module.hot.accept();
 
 type NotificationOptionsExtended = NotificationOptions & {

@@ -7,6 +7,8 @@ declare global {
     __webpackServe__?: boolean;
   }
   interface Window {
+    __gitBranch__?: string;
+    __pkgName__?: string;
     __version__?: string;
     __webpackServe__?: boolean;
   }

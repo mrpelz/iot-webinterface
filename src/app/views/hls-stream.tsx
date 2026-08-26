@@ -112,7 +112,7 @@ export const HLSStream: FunctionComponent<{
         ignorePlaylistParsingErrors: true,
         preferManagedMediaSource: true,
         xhrSetup: (xhr) => {
-          xhr.withCredentials = false;
+          xhr.withCredentials = true;
           xhr.timeout = 1000;
         },
       });
@@ -154,9 +154,7 @@ export const HLSStream: FunctionComponent<{
     if (!poster || !nextPosterRefresh) return undefined;
 
     (async () => {
-      const [response] = await fetchFallback(poster, undefined, {
-        credentials: 'omit',
-      });
+      const [response] = await fetchFallback(poster);
       if (!response) return;
 
       const blob = await response.blob();

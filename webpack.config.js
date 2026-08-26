@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prefer-string-raw */
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 
@@ -20,6 +19,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import {
   ConcatOperation,
   ModifySourcePlugin,
+  ReplaceOperation,
 } from 'modify-source-webpack-plugin';
 import { stripIndents } from 'proper-tags';
 import { InjectManifest } from 'workbox-webpack-plugin';
@@ -28,7 +28,11 @@ const version = execSync('npm pkg get "version" --silent', {
   encoding: 'utf8',
 }).replaceAll(/[\n"]/g, '');
 
-const apiProxy = process.env.API_PROXY;
+const {
+  API_PROXY: apiProxy,
+  GIT_BRANCH: gitBranch,
+  PKG_NAME: pkgName,
+} = process.env;
 
 // @ts-ignore
 /** @type {import('@mrpelz/boilerplate-dom/webpack.config.js').ConfigurationExtended} */
@@ -166,10 +170,21 @@ config.plugins = [
     rules: [
       {
         operations: [
-          new ConcatOperation(
-            'start',
+          ...(webpackServe
+            ? [
+                new ConcatOperation(
+                  'start',
+                  stripIndents`
+                    import 'preact/debug';
+
+                  `,
+                ),
+              ]
+            : []),
+          new ReplaceOperation(
+            'once',
+            '// <ModifySourcePlugin>\n',
             stripIndents`
-              ${webpackServe ? String.raw`import 'preact/debug';` : ''}
               ${glob
                 .sync(path.resolve(dirSrc, 'common/images/background/*'))
                 .map((path_) =>
@@ -181,9 +196,10 @@ config.plugins = [
               // @ts-ignore
               __webpack_base_uri__ = new URL('/', location.href).href;
 
+              window.__gitBranch__ = '${gitBranch}';
+              window.__pkgName__ = '${pkgName}';
               window.__version__ = '${version}';
               window.__webpackServe__ = ${webpackServe ? 'true' : 'false'};
-
             `,
           ),
         ],
@@ -191,11 +207,11 @@ config.plugins = [
       },
       {
         operations: [
-          new ConcatOperation(
-            'start',
+          new ReplaceOperation(
+            'once',
+            '// <ModifySourcePlugin>\n',
             stripIndents`
               self.__webpackServe__ = ${webpackServe ? 'true' : 'false'};
-
             `,
           ),
         ],
