@@ -425,13 +425,6 @@ export const Diagnostics: FunctionComponent = () => {
         <tbody>
           <tr>
             <td>
-              <b>git-branch</b>
-            </td>
-            <td>{computed(() => JSON.stringify(window.__gitBranch__))}</td>
-          </tr>
-
-          <tr>
-            <td>
               <b>PKG-name</b>
             </td>
             <td>{computed(() => JSON.stringify(window.__pkgName__))}</td>
@@ -439,9 +432,9 @@ export const Diagnostics: FunctionComponent = () => {
 
           <tr>
             <td>
-              <b>version</b>
+              <b>PKG-version</b>
             </td>
-            <td>{computed(() => JSON.stringify(window.__version__))}</td>
+            <td>{computed(() => JSON.stringify(window.__pkgVersion__))}</td>
           </tr>
 
           <tr>
@@ -463,6 +456,13 @@ export const Diagnostics: FunctionComponent = () => {
               <b>Base-URL</b>
             </td>
             <td>{computed(() => JSON.stringify(baseUrl.href))}</td>
+          </tr>
+
+          <tr>
+            <td>
+              <b>slug</b>
+            </td>
+            <td>{computed(() => JSON.stringify(window.__slug__))}</td>
           </tr>
 
           <tr>

@@ -11,8 +11,6 @@ import { isiPhone } from './util/useragent.js';
 
 // <ModifySourcePlugin>
 
-if (module.hot) module.hot.accept();
-
 export const id = crypto.randomUUID();
 
 export const api = new Api();

@@ -6,8 +6,6 @@ import { getFlags } from './util.js';
 
 // <ModifySourcePlugin>
 
-if (module.hot) module.hot.accept();
-
 type NotificationOptionsExtended = NotificationOptions & {
   actions: { action: string; title: string }[];
   renotify?: boolean;
