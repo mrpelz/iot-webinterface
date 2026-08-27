@@ -12,7 +12,6 @@ const defaultFlags: Flags = {
   hallwayStreamEnable: false,
   inactivityTimeout: null,
   language: null,
-  pagePersistence: true,
   path: null,
   screensaverEnable: false,
   screensaverRandomizePosition: false,
@@ -61,21 +60,27 @@ const writeIfMeaningful = (key: keyof Flags, value: unknown) => {
   }
 };
 
-for (const [key_, aSignal] of Object.entries(flags$)) {
-  const key = key_ as keyof Flags;
+export const flagsLoaded = Promise.all(
+  Object.entries(flags$).map(([key_, aSignal]) => {
+    const key = key_ as keyof Flags;
 
-  (async () => {
-    const oldValue = await get(key, store);
-    if (oldValue === undefined) return;
+    const result = (async () => {
+      const oldValue = await get(key, store);
+      if (oldValue === undefined) return;
 
-    aSignal.value = oldValue;
-  })();
+      aSignal.value = oldValue;
+    })();
 
-  writeIfMeaningful(key, aSignal.value);
-  effect(() => {
     writeIfMeaningful(key, aSignal.value);
-  });
-}
+    effect(() => {
+      writeIfMeaningful(key, aSignal.value);
+    });
+
+    return result;
+  }),
+)
+  .catch()
+  .then(() => undefined);
 
 addEventListener('hashchange', ({ newURL }) => {
   for (const [key_, payload] of new URLSearchParams(

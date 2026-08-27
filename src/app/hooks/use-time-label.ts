@@ -212,4 +212,7 @@ export const useTimeSpan = (
 };
 
 export const useDateFromEpoch = (input?: number): Date | undefined =>
-  useMemo(() => (input === undefined ? undefined : new Date(input)), [input]);
+  useMemo(
+    () => (input === undefined || input === null ? undefined : new Date(input)),
+    [input],
+  );

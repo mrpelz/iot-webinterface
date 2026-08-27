@@ -185,28 +185,6 @@ export const Settings: FunctionComponent = () => {
           </select>
         </Entry>
         <Entry
-          id="pagePersistence"
-          label={
-            <Translation
-              capitalize={true}
-              i18nKey="persistPage"
-            />
-          }
-        >
-          <input
-            checked={flags$.pagePersistence.value}
-            id="pagePersistence"
-            name="pagePersistence"
-            type="checkbox"
-            onChange={useCallback<GenericEventHandler<HTMLInputElement>>(
-              ({ currentTarget: { checked } }) => {
-                flags$.pagePersistence.value = checked;
-              },
-              [],
-            )}
-          />
-        </Entry>
-        <Entry
           id="hallwayStreamEnable"
           label={
             <Translation

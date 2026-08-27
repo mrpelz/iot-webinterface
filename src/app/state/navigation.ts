@@ -3,7 +3,7 @@ import {
   Level,
   levelObjectMatch,
 } from '@iot/iot-monolith/tree';
-import { computed, effect, signal } from '@preact/signals';
+import { computed, effect } from '@preact/signals';
 
 import { LevelObject, serialized } from '../api.js';
 import { api } from '../main.js';
@@ -239,11 +239,14 @@ const isStaticPage = (input?: string): input is StaticPage => {
   return true;
 };
 
-const setRootRoute$ = flags$.pagePersistence.value
-  ? persistedSignal('rootRoute$', rootPath$.value ?? START_PAGE)
-  : signal(rootPath$.value ?? START_PAGE);
+const setRootRoute$ = persistedSignal(
+  'rootRoute$',
+  rootPath$.value ?? START_PAGE,
+);
 
 const init = () => {
+  if (rootPath$.value) return;
+
   const startPage = flags$.startPage.value;
   if (startPage) setRootRoute$.value = startPage;
 
