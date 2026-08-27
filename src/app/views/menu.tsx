@@ -4,14 +4,13 @@ import {
   Level,
   levelObjectMatch,
 } from '@iot/iot-monolith/tree';
-import { Glass, Navbar, Page } from 'konsta/react';
+import { Glass, Page } from 'konsta/react';
 import { FunctionComponent } from 'preact';
 import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import { LevelObject, serialized, sortBy } from '../api.js';
 import {
   Menu as MenuComponent,
-  MenuContent,
   MenuIndicatorItem,
   MenuIndicatorSection,
   MenuList,
