@@ -2,7 +2,7 @@ import { Endpoint, expose } from 'comlink';
 import { precacheAndRoute } from 'workbox-precaching';
 
 import type { SW_API } from '../common/types.js';
-import { getFlags } from './util.js';
+import { getFlags, ntfyApiRequest } from './util.js';
 
 // <ModifySourcePlugin>
 
@@ -13,6 +13,7 @@ type NotificationOptionsExtended = NotificationOptions & {
 
 declare const self: ServiceWorkerGlobalScope;
 
+const TOPIC_PREFIX = 'iot-webinterface';
 const NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG =
   'notificationServiceWorkerNewVersion';
 const NOTIFICATION_SERVICEWORKER_ACTIVATE_ACTION_ABORT =
@@ -55,6 +56,54 @@ const clearNotifications = async (tags?: string[]) => {
   }
 };
 
+const pushSubscribe = async () => {
+  const { debug } = await getFlags();
+
+  const { pushManager } = self.registration;
+
+  const existingSubscription = await pushManager.getSubscription();
+
+  const applicationServerKey = existingSubscription
+    ? undefined
+    : await ntfyApiRequest('/config').then((result) =>
+        result &&
+        'web_push_public_key' in result &&
+        typeof result.web_push_public_key === 'string'
+          ? result.web_push_public_key
+          : undefined,
+      );
+
+  const pushSubscription = (
+    existingSubscription ??
+    (await pushManager.subscribe({
+      applicationServerKey,
+      userVisibleOnly: true,
+    }))
+  ).toJSON();
+
+  const result =
+    pushSubscription.keys?.auth && pushSubscription.keys.p256dh
+      ? await ntfyApiRequest('/webpush', {
+          body: JSON.stringify({
+            auth: pushSubscription.keys.auth,
+            endpoint: pushSubscription.endpoint,
+            p256dh: pushSubscription.keys.p256dh,
+            topics: [`${TOPIC_PREFIX}-update-${self.__slug__}`],
+          }),
+          method: 'POST',
+        })
+      : undefined;
+
+  if (debug) {
+    // eslint-disable-next-line no-console
+    console.debug('pushSubscribe', {
+      applicationServerKey,
+      pushSubscription,
+      result,
+    });
+  }
+};
+
 let isReloading = false;
 const reload = async () => {
   if (isReloading) return;
@@ -93,22 +142,32 @@ const removeRegistration = async () => {
     cacheNames.map((cacheName) => self.caches.delete(cacheName)),
   );
 
+  const pushSubscription =
+    await self.registration.pushManager.getSubscription();
+  await pushSubscription?.unsubscribe();
+
   await self.registration.unregister();
   await reload();
 };
 
+const showNotification: ServiceWorkerRegistration['showNotification'] = async (
+  title,
+  options,
+) => {
+  const { debug } = await getFlags();
+
+  // eslint-disable-next-line no-console
+  if (debug) console.debug('showNotification', title, options);
+
+  return self.registration.showNotification(title, options);
+};
+
 const api: SW_API = {
   clearNotifications,
+  pushSubscribe,
   reload,
   removeRegistration,
-  showNotification: async (...args) => {
-    const { debug } = await getFlags();
-
-    // eslint-disable-next-line no-console
-    if (debug) console.debug('showNotification', ...args);
-
-    return self.registration.showNotification(...args);
-  },
+  showNotification,
 };
 
 self.addEventListener('install', (event) =>
@@ -202,6 +261,38 @@ self.addEventListener('notificationclick', (event) =>
       if (action === NOTIFICATION_SERVICEWORKER_ACTIVATE_ACTION_ABORT) return;
 
       await reload();
+    })(),
+  ),
+);
+
+self.addEventListener('push', (event) =>
+  event.waitUntil(
+    (async () => {
+      const { data } = event;
+
+      const { debug } = await getFlags();
+
+      const payload = await data?.json();
+
+      // eslint-disable-next-line no-console
+      if (debug) console.debug('push event', payload);
+
+      if (
+        !payload ||
+        payload.event !== 'message' ||
+        !('message' in payload) ||
+        !('title' in payload.message) ||
+        !('message' in payload.message)
+      ) {
+        await showNotification('Empty Push', {
+          body: 'Received non-displayable push message',
+        });
+        return;
+      }
+
+      await showNotification(payload.message.title, {
+        body: payload.message.message,
+      });
     })(),
   ),
 );

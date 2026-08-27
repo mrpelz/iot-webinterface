@@ -29,6 +29,7 @@ export const registerServiceWorker = async (): Promise<void> => {
   }
 
   swProxy = workbox ? wrap(await workbox.getSW()) : undefined;
+  await workbox?.controlling;
 
   if (webpackServe) return;
 

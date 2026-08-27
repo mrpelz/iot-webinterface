@@ -231,8 +231,6 @@ config.plugins = [
             stripIndents`
               self.__slug__ = '${slug}';
               self.__webpackServe__ = ${webpackServe ? 'true' : 'false'};
-
-              ${webpackServe ? 'if (module.hot) module.hot.accept();' : ''}
             `,
           ),
         ],

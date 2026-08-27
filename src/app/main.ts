@@ -2,7 +2,7 @@ import { stripIndents } from 'proper-tags';
 
 import { Api } from './api.js';
 import { init as initReload } from './reload.js';
-import { registerServiceWorker } from './sw.js';
+import { registerServiceWorker, swProxy } from './sw.js';
 import { defer } from './util/defer.js';
 import { iOSHoverStyles, iOSScrollToTop } from './util/ios-fixes.js';
 import { requestNotificationPermission } from './util/notifications.js';
@@ -28,6 +28,7 @@ try {
   defer(async () => {
     requestNotificationPermission();
     await registerServiceWorker();
+    await swProxy?.pushSubscribe();
 
     if (isiPhone) {
       iOSHoverStyles();

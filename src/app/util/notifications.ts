@@ -1,14 +1,25 @@
+import { sleep } from '@mrpelz/misc-utils/sleep';
+import { epochs } from '@mrpelz/modifiable-date';
+
+const { promise, resolve } = Promise.withResolvers<NotificationPermission>();
+export const notificationPermission = promise;
+
 export const requestNotificationPermission = (): void => {
-  if (!('Notification' in globalThis)) return;
-  if (Notification.permission === 'granted') return;
-  if (Notification.permission === 'denied') return;
+  if (!('Notification' in globalThis)) {
+    resolve('denied');
+    return;
+  }
+
+  if (Notification.permission !== 'default') {
+    resolve(Notification.permission);
+    return;
+  }
 
   addEventListener(
     'click',
-    () => {
-      if (Notification.permission !== 'default') return;
-
-      setTimeout(() => Notification.requestPermission(), 1000);
+    async () => {
+      await sleep(epochs.second);
+      resolve(await Notification.requestPermission());
     },
     { once: true, passive: true },
   );

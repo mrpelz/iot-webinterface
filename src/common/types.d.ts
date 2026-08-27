@@ -39,6 +39,7 @@ export type Flags = {
 
 export type SW_API = {
   clearNotifications: (tags?: string[]) => Promise<void>;
+  pushSubscribe: () => Promise<void>;
   reload: () => Promise<void>;
   removeRegistration: () => Promise<void>;
   showNotification: ServiceWorkerRegistration['showNotification'];
