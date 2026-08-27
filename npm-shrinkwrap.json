@@ -7,6 +7,7 @@
     "": {
       "name": "@iot/iot-webinterface",
       "version": "2.41.1",
+      "hasInstallScript": true,
       "license": "UNLICENSED",
       "dependencies": {
         "@iot/iot-monolith": "latest",
@@ -18,7 +19,7 @@
         "goober": "2.1.19",
         "hls.js": "1.7.1",
         "idb-keyval": "6.3.0",
-        "konsta": "5.3.0",
+        "konsta": "5.4.0",
         "preact": "10.29.8",
         "proper-tags": "2.0.2",
         "resilient-websocket": "2.0.0",
@@ -30,6 +31,7 @@
       "devDependencies": {
         "@mrpelz/boilerplate-common": "16.4.0",
         "@mrpelz/boilerplate-preact": "16.4.0",
+        "@tailwindcss/webpack": "4.3.3",
         "@types/node": "26.4.0",
         "@types/semver": "7.8.0",
         "@types/webpack-env": "1.18.8",
@@ -13731,9 +13733,9 @@
       "peer": true
     },
     "node_modules/konsta": {
-      "version": "5.3.0",
-      "resolved": "https://registry.npmjs.org/konsta/-/konsta-5.3.0.tgz",
-      "integrity": "sha512-4KjAcQiczKSvbr/hgx9g0CLoJStqjE3DvAIhFJeN05WGi8lYu5b/6f2hdwnmtiq6K4QumY96usStEofH21pdbQ==",
+      "version": "5.4.0",
+      "resolved": "https://registry.npmjs.org/konsta/-/konsta-5.4.0.tgz",
+      "integrity": "sha512-/r9FTtVsax4weYmiXJbMFod9urbNTIyaBxY7F3wXwpG/QFpweoHFfgIu3mxPrkSvPMGLNSigZ0c1BjV2qnMSGQ==",
       "license": "MIT",
       "dependencies": {
         "tailwind-merge": "^3.3.1"

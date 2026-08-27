@@ -27,11 +27,7 @@ export const App: FunctionComponent = () => {
       dark
       theme="ios"
     >
-<<<<<<< HEAD
       {flags$.screensaverEnable.value ? <Screensaver /> : null}
-=======
-      {$flags.screensaverEnable.value ? <Screensaver /> : null}
->>>>>>> a19c36d (chore: upgrade deps)
       <Layout>
         <RootRoute />
         <Background />
