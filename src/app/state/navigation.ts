@@ -244,8 +244,8 @@ const setRootRoute$ = persistedSignal(
   rootPath$.value ?? START_PAGE,
 );
 
-const init = () => {
-  if (rootPath$.value) return;
+const init = (force = false) => {
+  if (!force && rootPath$.value) return;
 
   const startPage = flags$.startPage.value;
   if (startPage) setRootRoute$.value = startPage;
@@ -257,7 +257,7 @@ init();
 effect(() => {
   if (isVisible$.value) return;
 
-  init();
+  init(true);
 });
 
 export const roomName$ = computed(() => {
