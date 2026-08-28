@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-string-raw */
 import path from 'node:path';
 
 import {
@@ -21,34 +22,15 @@ import {
   ReplaceOperation,
 } from 'modify-source-webpack-plugin';
 import { stripIndents } from 'proper-tags';
-import { prerelease } from 'semver';
 import { InjectManifest } from 'workbox-webpack-plugin';
+
+import { isLocal, isPrerelease, isProd, slug } from './scripts/slug.js';
 
 const {
   API_PROXY: apiProxy,
-  GIT_BRANCH: gitBranch,
   PKG_NAME: pkgName,
   PKG_VERSION: pkgVersion,
 } = process.env;
-
-const slug = (() => {
-  if (webpackServe) {
-    if (!gitBranch || gitBranch === 'main') return 'local';
-
-    return `local-${gitBranch.replaceAll(/(?:\W|_)/g, '-')}`;
-  }
-
-  if (!pkgVersion) {
-    return undefined;
-  }
-
-  const [prereleaseName] = prerelease(pkgVersion) ?? [];
-  if (!prereleaseName) {
-    return 'prod';
-  }
-
-  return `pre-${prereleaseName}`;
-})();
 
 // @ts-ignore
 /** @type {import('@mrpelz/boilerplate-dom/webpack.config.js').ConfigurationExtended} */
@@ -186,6 +168,46 @@ config.plugins = [
     rules: [
       {
         operations: [
+          new ReplaceOperation(
+            'once',
+            '/** {isLocal} */ false',
+            `${isLocal ? 'true' : 'false'}`,
+          ),
+          new ReplaceOperation(
+            'once',
+            '/** {isPrerelease} */ false',
+            `${isPrerelease ? 'true' : 'false'}`,
+          ),
+          new ReplaceOperation(
+            'once',
+            '/** {isProd} */ false',
+            `${isProd ? 'true' : 'false'}`,
+          ),
+          new ReplaceOperation(
+            'once',
+            String.raw`/** {pkgName} */ '<pkgName>'`,
+            `'${pkgName}'`,
+          ),
+          new ReplaceOperation(
+            'once',
+            String.raw`/** {pkgVersion} */ '<pkgVersion>'`,
+            `'${pkgVersion}'`,
+          ),
+          new ReplaceOperation(
+            'once',
+            String.raw`/** {slug} */ '<slug>'`,
+            `'${slug}'`,
+          ),
+          new ReplaceOperation(
+            'once',
+            '/** {webpackServe} */ false',
+            `${webpackServe ? 'true' : 'false'}`,
+          ),
+        ],
+        test: new RegExp(`^${path.resolve(dirSrc, 'app/env.ts')}$`),
+      },
+      {
+        operations: [
           ...(webpackServe
             ? [
                 new ConcatOperation(
@@ -212,11 +234,6 @@ config.plugins = [
               // @ts-ignore
               __webpack_base_uri__ = new URL('/', location.href).href;
 
-              window.__pkgName__ = '${pkgName}';
-              window.__pkgVersion__ = '${pkgVersion}';
-              window.__slug__ = '${slug}';
-              window.__webpackServe__ = ${webpackServe ? 'true' : 'false'};
-
               ${webpackServe ? 'if (module.hot) module.hot.accept();' : ''}
             `,
           ),
@@ -227,11 +244,13 @@ config.plugins = [
         operations: [
           new ReplaceOperation(
             'once',
-            '// <ModifySourcePlugin>\n',
-            stripIndents`
-              self.__slug__ = '${slug}';
-              self.__webpackServe__ = ${webpackServe ? 'true' : 'false'};
-            `,
+            String.raw`/** {slug} */ '<slug>'`,
+            `'${slug}'`,
+          ),
+          new ReplaceOperation(
+            'once',
+            '/** {webpackServe} */ false',
+            `${webpackServe ? 'true' : 'false'}`,
           ),
         ],
         test: new RegExp(`^${path.resolve(dirSrc, 'workers/sw.ts')}$`),

@@ -1,16 +1,12 @@
+import { sleep } from '@mrpelz/misc-utils/sleep';
+import { epochs } from '@mrpelz/modifiable-date';
 import { effect } from '@preact/signals';
 import { Remote, wrap } from 'comlink';
 import { Workbox } from 'workbox-window';
 
 import type { SW_API } from '../common/types.js';
-import { webpackServe } from './reload.js';
+import { webpackServe } from './env.js';
 import { flags$ } from './util/flags.js';
-
-export const isProd = location.hostname === 'iot.i.wurstsalat.cloud';
-export const isPrerelease =
-  !isProd &&
-  (location.hostname.endsWith('rancher.lan.wurstsalat.cloud') ||
-    location.hostname.endsWith('rancher-iot.lan.wurstsalat.cloud'));
 
 export const CHECK_INTERVAL = 15_000;
 
@@ -29,7 +25,7 @@ export const registerServiceWorker = async (): Promise<void> => {
   }
 
   swProxy = workbox ? wrap(await workbox.getSW()) : undefined;
-  await workbox?.controlling;
+  await Promise.race([workbox?.controlling, sleep(epochs.second * 10)]);
 
   if (webpackServe) return;
 

@@ -4,7 +4,8 @@ import { precacheAndRoute } from 'workbox-precaching';
 import type { SW_API } from '../common/types.js';
 import { getFlags, ntfyApiRequest } from './util.js';
 
-// <ModifySourcePlugin>
+export const slug = /** {slug} */ '<slug>';
+export const webpackServe = /** {webpackServe} */ false;
 
 type NotificationOptionsExtended = NotificationOptions & {
   actions: { action: string; title: string }[];
@@ -88,7 +89,7 @@ const pushSubscribe = async () => {
             auth: pushSubscription.keys.auth,
             endpoint: pushSubscription.endpoint,
             p256dh: pushSubscription.keys.p256dh,
-            topics: [`${TOPIC_PREFIX}-update-${self.__slug__}`],
+            topics: [`${slug}-update`],
           }),
           method: 'POST',
         })
@@ -185,7 +186,7 @@ self.addEventListener('install', (event) =>
 
       await clearNotifications([NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG]);
 
-      if (!flags.updateUnattended && !self.__webpackServe__) {
+      if (!flags.updateUnattended && !webpackServe) {
         self.registration
           .showNotification('New Version Downloading', {
             body: 'A new version is pre-cached for offline-use',
@@ -214,7 +215,7 @@ self.addEventListener('activate', (event) =>
 
       await clearNotifications([NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG]);
 
-      if (self.__webpackServe__) return;
+      if (webpackServe) return;
 
       if (flags.updateUnattended) {
         await reload();

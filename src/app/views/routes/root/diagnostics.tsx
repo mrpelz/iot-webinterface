@@ -24,6 +24,15 @@ import {
 } from '../../../components/json-viewer/hierarchy-renderers.js';
 import { JSONViewer } from '../../../components/json-viewer/main.js';
 import {
+  isLocal,
+  isPrerelease,
+  isProd,
+  pkgName,
+  pkgVersion,
+  slug,
+  webpackServe,
+} from '../../../env.js';
+import {
   useIsInit,
   useIsWebSocketOnline,
   useWebSocketCount,
@@ -32,7 +41,7 @@ import { useFetchText } from '../../../hooks/use-fetch.js';
 import { useFirstTruthy } from '../../../hooks/use-first-truthy.js';
 import { useLocalStorage } from '../../../hooks/use-local-storage.js';
 import { api, id } from '../../../main.js';
-import { RECONNECT_NOTIFIER, webpackServe } from '../../../reload.js';
+import { RECONNECT_NOTIFIER } from '../../../reload.js';
 import { isFocused$ } from '../../../state/focus.js';
 import { isMenuVisible$ } from '../../../state/menu.js';
 import {
@@ -56,7 +65,6 @@ import { isVisible$ } from '../../../state/visibility.js';
 import { dimensions } from '../../../style.js';
 import { useBreakpoint } from '../../../style/breakpoint.js';
 import { getMediaQuery } from '../../../style/main.js';
-import { isPrerelease, isProd } from '../../../sw.js';
 import { flags$ } from '../../../util/flags.js';
 import { baseUrl } from '../../../util/path.js';
 import {
@@ -425,30 +433,9 @@ export const Diagnostics: FunctionComponent = () => {
         <tbody>
           <tr>
             <td>
-              <b>PKG-name</b>
+              <b>Instance ID</b>
             </td>
-            <td>{computed(() => JSON.stringify(window.__pkgName__))}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>PKG-version</b>
-            </td>
-            <td>{computed(() => JSON.stringify(window.__pkgVersion__))}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>API-version</b>
-            </td>
-            <td>{useMemo(() => JSON.stringify(apiVersion), [apiVersion])}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>API-upstream</b>
-            </td>
-            <td>{useMemo(() => JSON.stringify(apiUpstream), [apiUpstream])}</td>
+            <td>{computed(() => JSON.stringify(id))}</td>
           </tr>
 
           <tr>
@@ -459,17 +446,248 @@ export const Diagnostics: FunctionComponent = () => {
           </tr>
 
           <tr>
-            <td>
-              <b>slug</b>
+            <td colSpan={999}>
+              <b>package</b>
+              <table>
+                <tbody>
+                  {' '}
+                  <tr>
+                    <td>
+                      <b>name</b>
+                    </td>
+                    <td>{computed(() => JSON.stringify(`@${pkgName}`))}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>version</b>
+                    </td>
+                    <td>{computed(() => JSON.stringify(pkgVersion))}</td>
+                  </tr>
+                </tbody>
+              </table>{' '}
             </td>
-            <td>{computed(() => JSON.stringify(window.__slug__))}</td>
           </tr>
 
           <tr>
-            <td>
-              <b>Instance ID</b>
+            <td colSpan={999}>
+              <b>API</b>
+              <table>
+                <tbody>
+                  {' '}
+                  <tr>
+                    <td>
+                      <b>version</b>
+                    </td>
+                    <td>
+                      {useMemo(() => JSON.stringify(apiVersion), [apiVersion])}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>upstream</b>
+                    </td>
+                    <td>
+                      {useMemo(
+                        () => JSON.stringify(apiUpstream),
+                        [apiUpstream],
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>stream connected</b>
+                    </td>
+                    <td>
+                      {useMemo(
+                        () => JSON.stringify(isWebSocketOnline),
+                        [isWebSocketOnline],
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>stream client count</b>
+                    </td>
+                    <td>
+                      {useMemo(
+                        () => JSON.stringify(streamCount),
+                        [streamCount],
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>{' '}
             </td>
-            <td>{computed(() => JSON.stringify(id))}</td>
+          </tr>
+
+          <tr>
+            <td colSpan={999}>
+              <b>build environment</b>
+              <table>
+                <tbody>
+                  {' '}
+                  <tr>
+                    <td>
+                      <b>slug</b>
+                    </td>
+                    <td>{computed(() => JSON.stringify(slug))}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>isLocal</b>
+                    </td>
+                    <td>{useMemo(() => JSON.stringify(isLocal), [])}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>isPrerelease</b>
+                    </td>
+                    <td>{useMemo(() => JSON.stringify(isPrerelease), [])}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>isProd</b>
+                    </td>
+                    <td>{useMemo(() => JSON.stringify(isProd), [])}</td>
+                  </tr>
+                </tbody>
+              </table>{' '}
+            </td>
+          </tr>
+
+          <tr>
+            <td colSpan={999}>
+              <b>Webpack devServer</b>
+              <table>
+                <tbody>
+                  {' '}
+                  <tr>
+                    <td>
+                      <b>webpackServe</b>
+                    </td>
+                    <td>{useMemo(() => JSON.stringify(webpackServe), [])}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>webpackHash</b>
+                    </td>
+                    <td>
+                      {useMemo(
+                        () =>
+                          JSON.stringify(
+                            sessionStorage.getItem(RECONNECT_NOTIFIER),
+                          ),
+                        [],
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>{' '}
+            </td>
+          </tr>
+
+          <tr>
+            <td colSpan={999}>
+              <b>browser environment</b>
+              <table>
+                <tbody>
+                  {' '}
+                  <tr>
+                    <td>
+                      <b>User Agent</b>
+                    </td>
+                    <td>
+                      {computed(() => JSON.stringify(navigator.userAgent))}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>isSafari</b>
+                    </td>
+                    <td>{computed(() => JSON.stringify(isSafari))}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>isiDevice</b>
+                    </td>
+                    <td>{computed(() => JSON.stringify(isiDevice))}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>isiPhone</b>
+                    </td>
+                    <td>{computed(() => JSON.stringify(isiPhone))}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>isiPad</b>
+                    </td>
+                    <td>{computed(() => JSON.stringify(isiPad))}</td>
+                  </tr>
+                </tbody>
+              </table>{' '}
+            </td>
+          </tr>
+
+          <tr>
+            <td colSpan={999}>
+              <b>display environment</b>
+              <table>
+                <tbody>
+                  {' '}
+                  <tr>
+                    <td>
+                      <b>isPWA</b>
+                    </td>
+                    <td>{computed(() => JSON.stringify(isPWA))}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>isVisible</b>
+                    </td>
+                    <td>{computed(() => JSON.stringify(isVisible$.value))}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>isFocused</b>
+                    </td>
+                    <td>{computed(() => JSON.stringify(isFocused$.value))}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>isScreensaverActive</b>
+                    </td>
+                    <td>
+                      {computed(() =>
+                        JSON.stringify(isScreensaverActive$.value),
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>isDesktop</b>
+                    </td>
+                    <td>
+                      {useMemo(() => JSON.stringify(isDesktop), [isDesktop])}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>theme</b>
+                    </td>
+                    <td>{computed(() => JSON.stringify(theme$.value))}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>hairline</b>
+                    </td>
+                    <td>
+                      {useMemo(() => JSON.stringify(hairline), [hairline])}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>{' '}
+            </td>
           </tr>
 
           <tr>
@@ -477,105 +695,6 @@ export const Diagnostics: FunctionComponent = () => {
               <Details summary={<b>flags</b>}>
                 <Flags />
               </Details>
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>isPWA</b>
-            </td>
-            <td>{computed(() => JSON.stringify(isPWA))}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>User Agent</b>
-            </td>
-            <td>{computed(() => JSON.stringify(navigator.userAgent))}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>isSafari</b>
-            </td>
-            <td>{computed(() => JSON.stringify(isSafari))}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>isiDevice</b>
-            </td>
-            <td>{computed(() => JSON.stringify(isiDevice))}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>isiPhone</b>
-            </td>
-            <td>{computed(() => JSON.stringify(isiPhone))}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>isiPad</b>
-            </td>
-            <td>{computed(() => JSON.stringify(isiPad))}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>isVisible</b>
-            </td>
-            <td>{computed(() => JSON.stringify(isVisible$.value))}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>isFocused</b>
-            </td>
-            <td>{computed(() => JSON.stringify(isFocused$.value))}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>isScreensaverActive</b>
-            </td>
-            <td>
-              {computed(() => JSON.stringify(isScreensaverActive$.value))}
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>isProd</b>
-            </td>
-            <td>{useMemo(() => JSON.stringify(isProd), [])}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>isPrerelease</b>
-            </td>
-            <td>{useMemo(() => JSON.stringify(isPrerelease), [])}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>webpackServe</b>
-            </td>
-            <td>{useMemo(() => JSON.stringify(webpackServe), [])}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>webpackHash</b>
-            </td>
-            <td>
-              {useMemo(
-                () =>
-                  JSON.stringify(sessionStorage.getItem(RECONNECT_NOTIFIER)),
-                [],
-              )}
             </td>
           </tr>
 
@@ -602,46 +721,6 @@ export const Diagnostics: FunctionComponent = () => {
                 </tbody>
               </table>{' '}
             </td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>theme</b>
-            </td>
-            <td>{computed(() => JSON.stringify(theme$.value))}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>isDesktop</b>
-            </td>
-            <td>{useMemo(() => JSON.stringify(isDesktop), [isDesktop])}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>hairline</b>
-            </td>
-            <td>{useMemo(() => JSON.stringify(hairline), [hairline])}</td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>stream connected</b>
-            </td>
-            <td>
-              {useMemo(
-                () => JSON.stringify(isWebSocketOnline),
-                [isWebSocketOnline],
-              )}
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <b>stream client count</b>
-            </td>
-            <td>{useMemo(() => JSON.stringify(streamCount), [streamCount])}</td>
           </tr>
 
           <tr>

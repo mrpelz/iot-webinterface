@@ -4,14 +4,6 @@ import type { ElementSerialization } from '@iot/iot-monolith/tree-serialization'
 declare global {
   interface ServiceWorkerGlobalScope {
     __WB_DISABLE_DEV_LOGS?: boolean;
-    __slug__?: string;
-    __webpackServe__?: boolean;
-  }
-  interface Window {
-    __pkgName__?: string;
-    __pkgVersion__?: string;
-    __slug__?: string;
-    __webpackServe__?: boolean;
   }
 }
 
