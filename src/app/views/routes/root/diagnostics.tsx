@@ -603,7 +603,7 @@ export const Diagnostics: FunctionComponent = () => {
                   </tr>
                   <tr>
                     <td>
-                      <b>ntfy subscibe successful</b>
+                      <b>ntfy subscribe successful</b>
                     </td>
                     <td>
                       {computed(() =>

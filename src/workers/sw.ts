@@ -120,7 +120,7 @@ const pushSubscribe = async (topics_: string[] = []) => {
 };
 
 let isReloading = false;
-const reload = async () => {
+const reload = async (open?: boolean) => {
   if (isReloading) return;
   isReloading = true;
 
@@ -133,11 +133,18 @@ const reload = async () => {
 
   for (const windowClient of windowClients) {
     try {
-      windowClient.navigate(windowClient.url).catch(() => {
-        // noop
-      });
+      windowClient.navigate(windowClient.url).catch();
     } catch {
       // noop
+    }
+  }
+
+  if (open) {
+    const firstClient = windowClients.at(0);
+    if (firstClient) {
+      await firstClient.focus();
+    } else {
+      await self.clients.openWindow('/').catch();
     }
   }
 
@@ -271,7 +278,7 @@ self.addEventListener('notificationclick', (event) =>
 
       if (action === NOTIFICATION_SERVICEWORKER_ACTIVATE_ACTION_ABORT) return;
 
-      await reload();
+      await reload(true);
     })(),
   ),
 );
