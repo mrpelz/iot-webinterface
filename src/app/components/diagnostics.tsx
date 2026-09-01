@@ -29,6 +29,14 @@ export const DiagnosticsContainer = styled('diagnostics-container')`
 
   td {
     padding: 0.25rem;
+
+    &:first-of-type {
+      word-break: keep-all;
+    }
+
+    &:not(&:first-of-type) {
+      word-break: break-all;
+    }
   }
 
   thead {

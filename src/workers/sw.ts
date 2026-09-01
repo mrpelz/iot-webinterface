@@ -14,11 +14,11 @@ type NotificationOptionsExtended = NotificationOptions & {
 
 declare const self: ServiceWorkerGlobalScope;
 
-const TOPIC_PREFIX = 'iot-webinterface';
 const NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG =
   'notificationServiceWorkerNewVersion';
 const NOTIFICATION_SERVICEWORKER_ACTIVATE_ACTION_ABORT =
   'notificationServiceWorkerActivateActionAbort';
+const pushTopicSystem = `${slug}-system`;
 
 self.__WB_DISABLE_DEV_LOGS = true;
 const manifest = self.__WB_MANIFEST;
@@ -57,7 +57,7 @@ const clearNotifications = async (tags?: string[]) => {
   }
 };
 
-const pushSubscribe = async () => {
+const pushSubscribe = async (topics_: string[] = []) => {
   const { debug } = await getFlags();
 
   const { pushManager } = self.registration;
@@ -82,27 +82,41 @@ const pushSubscribe = async () => {
     }))
   ).toJSON();
 
+  const topics = [topics_, [pushTopicSystem]].flat();
+
   const result =
-    pushSubscription.keys?.auth && pushSubscription.keys.p256dh
+    pushSubscription.endpoint &&
+    pushSubscription.keys?.auth &&
+    pushSubscription.keys.p256dh
       ? await ntfyApiRequest('/webpush', {
           body: JSON.stringify({
             auth: pushSubscription.keys.auth,
             endpoint: pushSubscription.endpoint,
             p256dh: pushSubscription.keys.p256dh,
-            topics: [`${slug}-update`],
+            topics,
           }),
           method: 'POST',
         })
       : undefined;
+
+  const success = Boolean(result && 'success' in result && result.success);
 
   if (debug) {
     // eslint-disable-next-line no-console
     console.debug('pushSubscribe', {
       applicationServerKey,
       pushSubscription,
-      result,
+      success,
+      topics,
     });
   }
+
+  return {
+    applicationServerKey,
+    pushSubscription,
+    success,
+    topics,
+  };
 };
 
 let isReloading = false;
@@ -187,15 +201,13 @@ self.addEventListener('install', (event) =>
       await clearNotifications([NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG]);
 
       if (!flags.updateUnattended && !webpackServe) {
-        self.registration
-          .showNotification('New Version Downloading', {
-            body: 'A new version is pre-cached for offline-use',
-            renotify: true,
-            tag: NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG,
-          } as NotificationOptionsExtended)
-          .catch(() => {
-            // noop
-          });
+        showNotification('New Version Downloading', {
+          body: 'A new version is pre-cached for offline-use',
+          renotify: true,
+          tag: NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG,
+        } as NotificationOptionsExtended).catch(() => {
+          // noop
+        });
       }
 
       await self.skipWaiting();
@@ -206,12 +218,12 @@ self.addEventListener('install', (event) =>
 self.addEventListener('activate', (event) =>
   event.waitUntil(
     (async () => {
+      await self.clients.claim();
+
       const flags = await getFlags();
 
       // eslint-disable-next-line no-console
       if (flags.debug) console.debug('activate event');
-
-      await self.clients.claim();
 
       await clearNotifications([NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG]);
 
@@ -222,22 +234,20 @@ self.addEventListener('activate', (event) =>
         return;
       }
 
-      self.registration
-        .showNotification('Activate New Version?', {
-          actions: [
-            {
-              action: NOTIFICATION_SERVICEWORKER_ACTIVATE_ACTION_ABORT,
-              title: 'Do Not Reload',
-            },
-          ],
-          body: 'Reload all windows to make use of new version?',
-          renotify: true,
-          requireInteraction: true,
-          tag: NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG,
-        } as NotificationOptionsExtended)
-        .catch(() => {
-          // noop
-        });
+      showNotification('Activate New Version?', {
+        actions: [
+          {
+            action: NOTIFICATION_SERVICEWORKER_ACTIVATE_ACTION_ABORT,
+            title: 'Do Not Reload',
+          },
+        ],
+        body: 'Reload all windows to make use of new version?',
+        renotify: true,
+        requireInteraction: true,
+        tag: NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG,
+      } as NotificationOptionsExtended).catch(() => {
+        // noop
+      });
     })(),
   ),
 );
@@ -278,49 +288,50 @@ self.addEventListener('push', (event) =>
       // eslint-disable-next-line no-console
       if (debug) console.debug('push event', payload);
 
-      if (
-        !payload ||
-        payload.event !== 'message' ||
-        !('message' in payload) ||
-        !('title' in payload.message) ||
-        !('message' in payload.message)
-      ) {
+      if (!payload || payload.event !== 'message' || !('message' in payload)) {
         await showNotification('Empty Push', {
           body: 'Received non-displayable push message',
         });
         return;
       }
 
-      await showNotification(payload.message.title, {
-        body: payload.message.message,
+      const { message = '', tags = [], title = '' } = payload.message;
+      const tag = Array.isArray(tags) ? tags.at(0) : undefined;
+
+      if (tag === NOTIFICATION_SERVICEWORKER_NEW_VERSION_TAG) {
+        await self.registration.update();
+      }
+
+      if (tag) await clearNotifications([tag]);
+      await showNotification(title, {
+        body: message,
+        tag,
       });
     })(),
   ),
 );
 
-let clients: Client[] = [];
+let clients: readonly Client[] = [];
 
 expose(api, {
-  addEventListener(
+  addEventListener: (
     type: 'message',
-    listener: (
-      this: ServiceWorkerGlobalScope,
-      event: ExtendableMessageEvent,
-    ) => void,
-  ): void {
+    listener: (event: ExtendableMessageEvent) => void,
+  ): void => {
     self.addEventListener(type, (event) => {
       event.waitUntil(
         (async () => {
-          clients = [await self.clients.matchAll()].flat();
+          await self.clients.claim();
+          clients = await self.clients.matchAll();
 
           await listener.apply(self, [event]);
         })(),
       );
     });
   },
-  postMessage(message: unknown, transfer: Transferable[] = []): void {
+  postMessage: (message, transfer): void => {
     for (const client of clients) {
-      client.postMessage(message, transfer);
+      client.postMessage(message, transfer ?? []);
     }
   },
   removeEventListener: self.removeEventListener,

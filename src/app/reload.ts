@@ -1,7 +1,7 @@
 import { SharedWorkerSupported } from '@okikio/sharedworker';
 
 import { webpackServe } from './env.js';
-import { id } from './main.js';
+import { instanceId } from './main.js';
 import { workbox } from './sw.js';
 import { flags$ } from './util/flags.js';
 import { isSafari } from './util/useragent.js';
@@ -12,7 +12,7 @@ export const init = async (): Promise<void> => {
   if (!webpackServe) return;
 
   const workerName =
-    SharedWorkerSupported && !isSafari ? 'reload' : `reload_${id}`;
+    SharedWorkerSupported && !isSafari ? 'reload' : `reload_${instanceId}`;
 
   if (SharedWorkerSupported && !isSafari) {
     // eslint-disable-next-line no-new

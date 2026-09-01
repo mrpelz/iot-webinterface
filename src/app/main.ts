@@ -2,16 +2,21 @@ import { stripIndents } from 'proper-tags';
 
 import { Api } from './api.js';
 import { init as initReload } from './reload.js';
-import { registerServiceWorker, swProxy } from './sw.js';
+import { registerServiceWorker } from './sw.js';
 import { defer } from './util/defer.js';
 import { iOSHoverStyles, iOSScrollToTop } from './util/ios-fixes.js';
 import { requestNotificationPermission } from './util/notifications.js';
+import { persistedSignal } from './util/signal.js';
 import { persist } from './util/storage.js';
 import { isiPhone } from './util/useragent.js';
 
 // <ModifySourcePlugin>
 
-export const id = crypto.randomUUID();
+export const instanceId = crypto.randomUUID();
+export const installationId = persistedSignal(
+  'installationId$',
+  crypto.randomUUID(),
+);
 
 export const api = new Api();
 
@@ -28,7 +33,6 @@ try {
   defer(async () => {
     requestNotificationPermission();
     await registerServiceWorker();
-    await swProxy?.pushSubscribe();
   });
 
   defer(async () => {

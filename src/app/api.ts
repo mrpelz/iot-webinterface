@@ -18,7 +18,7 @@ import { Remote, wrap } from 'comlink';
 import { createStore, get, UseStore } from 'idb-keyval';
 
 import { API_WORKER_API, TSystem } from '../common/types.js';
-import { id } from './main.js';
+import { instanceId } from './main.js';
 import { readOnly } from './util/signal.js';
 import { isSafari } from './util/useragent.js';
 
@@ -54,7 +54,8 @@ export class Api {
   readonly isWebsocketOnline$: ReadonlySignal<boolean>;
 
   constructor() {
-    const workerName = SharedWorkerSupported && !isSafari ? 'api' : `api_${id}`;
+    const workerName =
+      SharedWorkerSupported && !isSafari ? 'api' : `api_${instanceId}`;
 
     this._api = wrap(
       SharedWorkerSupported && !isSafari

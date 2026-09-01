@@ -29,9 +29,16 @@ export type Flags = {
   updateUnattended: boolean;
 };
 
+export type PushSubscribeResult = {
+  applicationServerKey?: string;
+  pushSubscription: PushSubscriptionJSON;
+  success: boolean;
+  topics: string[];
+}
+
 export type SW_API = {
   clearNotifications: (tags?: string[]) => Promise<void>;
-  pushSubscribe: () => Promise<void>;
+  pushSubscribe: (topics?: string[]) => Promise<PushSubscribeResult | undefined>;
   reload: () => Promise<void>;
   removeRegistration: () => Promise<void>;
   showNotification: ServiceWorkerRegistration['showNotification'];

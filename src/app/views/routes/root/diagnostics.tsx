@@ -40,7 +40,7 @@ import {
 import { useFetchText } from '../../../hooks/use-fetch.js';
 import { useFirstTruthy } from '../../../hooks/use-first-truthy.js';
 import { useLocalStorage } from '../../../hooks/use-local-storage.js';
-import { api, id } from '../../../main.js';
+import { api, installationId, instanceId } from '../../../main.js';
 import { RECONNECT_NOTIFIER } from '../../../reload.js';
 import { isFocused$ } from '../../../state/focus.js';
 import { isMenuVisible$ } from '../../../state/menu.js';
@@ -65,6 +65,7 @@ import { isVisible$ } from '../../../state/visibility.js';
 import { dimensions } from '../../../style.js';
 import { useBreakpoint } from '../../../style/breakpoint.js';
 import { getMediaQuery } from '../../../style/main.js';
+import { pushSubscribeResult$ } from '../../../sw.js';
 import { flags$ } from '../../../util/flags.js';
 import { baseUrl } from '../../../util/path.js';
 import {
@@ -435,7 +436,14 @@ export const Diagnostics: FunctionComponent = () => {
             <td>
               <b>Instance ID</b>
             </td>
-            <td>{computed(() => JSON.stringify(id))}</td>
+            <td>{computed(() => JSON.stringify(instanceId))}</td>
+          </tr>
+
+          <tr>
+            <td>
+              <b>Installation ID</b>
+            </td>
+            <td>{computed(() => JSON.stringify(installationId))}</td>
           </tr>
 
           <tr>
@@ -513,6 +521,108 @@ export const Diagnostics: FunctionComponent = () => {
                         () => JSON.stringify(streamCount),
                         [streamCount],
                       )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>{' '}
+            </td>
+          </tr>
+
+          <tr>
+            <td colSpan={999}>
+              <b>WebPush</b>
+              <table>
+                <tbody>
+                  {' '}
+                  <tr>
+                    <td>
+                      <b>ntfy applicationServerKey</b>
+                    </td>
+                    <td>
+                      {computed(() =>
+                        JSON.stringify(
+                          pushSubscribeResult$.value?.applicationServerKey,
+                        ),
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>pushSubscription</b>
+                    </td>
+                    <td>
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td>
+                              <b>endpoint</b>
+                            </td>
+                            <td>
+                              {computed(() =>
+                                JSON.stringify(
+                                  pushSubscribeResult$.value?.pushSubscription
+                                    .endpoint,
+                                ),
+                              )}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <b>expirationTime</b>
+                            </td>
+                            <td>
+                              {computed(() => {
+                                const { expirationTime } =
+                                  pushSubscribeResult$.value
+                                    ?.pushSubscription ?? {};
+                                if (!expirationTime) return 'none';
+
+                                const date = new Date(expirationTime);
+                                return date.toLocaleTimeString();
+                              })}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <b>keys</b>
+                            </td>
+                            <td>
+                              {computed(() =>
+                                JSON.stringify(
+                                  pushSubscribeResult$.value?.pushSubscription
+                                    ?.keys,
+                                  undefined,
+                                  2,
+                                ),
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>ntfy subscibe successful</b>
+                    </td>
+                    <td>
+                      {computed(() =>
+                        JSON.stringify(pushSubscribeResult$.value?.success),
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>topics</b>
+                    </td>
+                    <td>
+                      <ul>
+                        {computed(() =>
+                          pushSubscribeResult$.value?.topics.map((topic) => (
+                            <li key={topic}>{JSON.stringify(topic)}</li>
+                          )),
+                        )}
+                      </ul>
                     </td>
                   </tr>
                 </tbody>
