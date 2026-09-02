@@ -70,6 +70,7 @@ comment deploy info:
 
 post webpush:
   stage: post
+  image: node:lts
   script:
     - |
       curl -b tmp.txt -c tmp.txt -L "https://ntfy.i.wurstsalat.cloud/${SLUG}-system/publish" \
