@@ -1,1 +1,9 @@
-// eslint-disable-next-line unicorn/no-empty-file
+declare module '*.png' {
+  const content: string;
+  export default content;
+}
+
+declare module '*.stl' {
+  const content: string;
+  export default content;
+}

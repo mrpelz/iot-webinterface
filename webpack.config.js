@@ -157,7 +157,7 @@ if (config.module) {
       use: [MiniCssExtractPlugin.loader, 'css-loader'],
     },
     {
-      test: /\.png$/i,
+      test: /\.(?:png|stl)$/i,
       type: 'asset/resource',
     },
   ];
@@ -224,7 +224,7 @@ config.plugins = [
             '// <ModifySourcePlugin>\n',
             stripIndents`
               ${glob
-                .sync(path.resolve(dirSrc, 'common/images/background/*'))
+                .sync(path.resolve(dirSrc, 'common/assets/background/*'))
                 .map((path_) =>
                   path.relative(path.resolve(dirSrc, 'app'), path_),
                 )
@@ -270,8 +270,8 @@ config.plugins = [
         to: path.resolve(dirDist, 'main.webmanifest'),
       },
       {
-        context: path.resolve(dirSrc, 'common/icons'),
-        from: path.resolve(dirSrc, 'common/icons/*'),
+        context: path.resolve(dirSrc, 'common/assets/icon'),
+        from: path.resolve(dirSrc, 'common/assets/icon/*'),
         to: path.resolve(dirDist, 'assets'),
       },
     ],

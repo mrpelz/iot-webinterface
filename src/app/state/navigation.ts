@@ -206,6 +206,7 @@ export const staticPagesBottom = [
   'diagnostics',
   'logicReasoning',
   'log',
+  'test',
 ] as const;
 
 export const staticPages = [...staticPagesTop, ...staticPagesBottom];

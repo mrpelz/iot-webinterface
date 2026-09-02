@@ -11,6 +11,7 @@ import { Diagnostics } from './routes/root/diagnostics.js';
 import { Global } from './routes/root/global.js';
 import { Log } from './routes/root/log.js';
 import { LogicReasoning } from './routes/root/logic-reasoning.js';
+import { Map } from './routes/root/map.js';
 import { Room } from './routes/root/room.js';
 import { Settings } from './routes/root/settings.js';
 import { Test } from './routes/root/test-route.js';
@@ -33,7 +34,7 @@ export const RootRoute: FunctionComponent = () => {
         return <Global properties$={globalProperties$} />;
       }
       case 'map': {
-        return <Test />;
+        return <Map />;
       }
       case 'devices': {
         return <Devices />;
@@ -49,6 +50,9 @@ export const RootRoute: FunctionComponent = () => {
       }
       case 'log': {
         return <Log />;
+      }
+      case 'test': {
+        return <Test />;
       }
       default: {
         return room$.value && roomProperties$.value ? (

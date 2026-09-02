@@ -3,7 +3,7 @@ import { useEffect } from 'preact/hooks';
 
 import { isPWA } from '../util/useragent.js';
 import { room$, staticPage$ } from './navigation.js';
-import { getCapitalization, getTranslation } from './translation.js';
+import { getCapitalization, getTranslationFallback } from './translation.js';
 
 const appName = (
   document.querySelector(
@@ -16,8 +16,8 @@ type NoTitle = typeof noTitle;
 
 const titleOverride$ = signal<string | NoTitle | undefined>(undefined);
 
-const staticPageName$ = getTranslation(staticPage$);
-const roomName$ = getTranslation(computed(() => room$.value?.$));
+const staticPageName$ = getTranslationFallback(staticPage$);
+const roomName$ = getTranslationFallback(computed(() => room$.value?.$));
 
 export const title$ = computed(() =>
   titleOverride$.value === noTitle
