@@ -19,11 +19,15 @@ const titleOverride$ = signal<string | NoTitle | undefined>(undefined);
 const staticPageName$ = getTranslationFallback(staticPage$);
 const roomName$ = getTranslationFallback(computed(() => room$.value?.$));
 
-export const title$ = computed(() =>
-  titleOverride$.value === noTitle
-    ? undefined
-    : (titleOverride$.value ?? staticPageName$.value ?? roomName$.value),
-);
+export const title$ = computed(() => {
+  if (titleOverride$.value === noTitle) return undefined;
+
+  if (staticPage$.value) {
+    return staticPageName$.value;
+  }
+
+  return roomName$.value;
+});
 
 export const capitalizedTitle$ = getCapitalization(title$);
 

@@ -16,7 +16,7 @@
         "@preact/signals": "2.11.1",
         "comlink": "4.4.2",
         "goober": "2.1.19",
-        "hls.js": "1.7.1",
+        "hls.js": "1.7.2",
         "idb-keyval": "6.3.0",
         "preact": "10.29.8",
         "proper-tags": "2.0.2",
@@ -29,7 +29,7 @@
       "devDependencies": {
         "@mrpelz/boilerplate-common": "16.4.0",
         "@mrpelz/boilerplate-preact": "16.4.0",
-        "@types/node": "26.4.0",
+        "@types/node": "26.4.1",
         "@types/semver": "7.8.0",
         "@types/three": "0.185.4",
         "@types/webpack-env": "1.18.8",
@@ -5935,9 +5935,9 @@
       "license": "MIT"
     },
     "node_modules/@types/node": {
-      "version": "26.4.0",
-      "resolved": "https://registry.npmjs.org/@types/node/-/node-26.4.0.tgz",
-      "integrity": "sha512-faiGnoIrLH/V8cibOMEAZ8pMw6oXqSukl29ra4mN8GdaB2ZewzeaLj+INpV5N+Z1eKWzY+IzaIZH2EIR6YZRNQ==",
+      "version": "26.4.1",
+      "resolved": "https://registry.npmjs.org/@types/node/-/node-26.4.1.tgz",
+      "integrity": "sha512-k97ENvZWtvA6yqz5/FS6a7duDgOPEeOQOc2iKS/nY6mX6qJUKtLnWzQS+Xj6tXweyj6ZcTAK2Qecetnvi9nCLA==",
       "dev": true,
       "license": "MIT",
       "dependencies": {
@@ -11282,9 +11282,9 @@
       }
     },
     "node_modules/hls.js": {
-      "version": "1.7.1",
-      "resolved": "https://registry.npmjs.org/hls.js/-/hls.js-1.7.1.tgz",
-      "integrity": "sha512-DlzIkeBAS9IIQ432k3BUf3HlwbsR0+trB1i2lDdN2gUkNkrehFurh0/48M5c1/EjlDkdGng1gwZIpwyPxvdZ/g==",
+      "version": "1.7.2",
+      "resolved": "https://registry.npmjs.org/hls.js/-/hls.js-1.7.2.tgz",
+      "integrity": "sha512-CW/pPvSOFIRsosbwxrYaE9ERmpTo5fbTqL7wCvuCFlqW1Bmb1K5fXsY7yiH95rmlr4rVuA7UXHbM/cIXQ6AXwg==",
       "license": "Apache-2.0"
     },
     "node_modules/hookified": {
