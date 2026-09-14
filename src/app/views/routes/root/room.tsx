@@ -11,9 +11,7 @@ import { roomProperties } from '../../../state/room-properties.js';
 import { Category } from '../../../views/category.js';
 import { SubRoute } from '../../../views/route.js';
 import { Translation } from '../../../views/translation.js';
-import { Actuator } from '../../controls/actuators/main.js';
 import { Control } from '../../controls/main.js';
-import { Sensor } from '../../controls/sensor/main.js';
 import { SubPage } from '../sub/room/main.js';
 
 export const Room: FunctionComponent<{
@@ -58,7 +56,7 @@ export const Room: FunctionComponent<{
         >
           <Grid>
             {security.map((item) => (
-              <Sensor
+              <Control
                 key={serialized(item).$id}
                 object={item}
               />
@@ -77,7 +75,7 @@ export const Room: FunctionComponent<{
         >
           <Grid>
             {sensors.map((item) => (
-              <Sensor
+              <Control
                 key={serialized(item).$id}
                 object={item}
               />
@@ -96,7 +94,7 @@ export const Room: FunctionComponent<{
         >
           <Grid>
             {lights.map((item) => (
-              <Actuator
+              <Control
                 key={serialized(item).$id}
                 object={item}
               />
@@ -115,7 +113,7 @@ export const Room: FunctionComponent<{
         >
           <Grid>
             {scenes.map((item) => (
-              <Actuator
+              <Control
                 key={serialized(item).$id}
                 object={item}
               />
@@ -134,7 +132,7 @@ export const Room: FunctionComponent<{
         >
           <Grid>
             {timers.map((item) => (
-              <Actuator
+              <Control
                 key={serialized(item).$id}
                 object={item}
               />

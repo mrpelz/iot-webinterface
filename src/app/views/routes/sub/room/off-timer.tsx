@@ -38,7 +38,7 @@ export const OffTimer: FunctionComponent<{
   useBackgroundOverride(noBackground);
 
   const {
-    active: { cancel, main: active },
+    active: { cancel, main: active, reset: start },
     flip,
     main,
     runoutTime: { main: runoutTime },
@@ -67,6 +67,11 @@ export const OffTimer: FunctionComponent<{
 
   const triggerTimeLabel = useTimeLabel(triggerTimeDate, 0);
   const runoutTimeLabel = useTimeLabel(runoutTimeDate, 0);
+
+  const setTimeValue = useMemo(
+    () => (timeValue ?? 0) / epochs.minute,
+    [timeValue],
+  );
 
   return (
     <>
@@ -133,8 +138,7 @@ export const OffTimer: FunctionComponent<{
           }
         >
           <NonBreaking>
-            {useMemo(() => (timeValue ?? 0) / epochs.minute, [timeValue])}{' '}
-            <Translation i18nKey="minutes" />
+            {setTimeValue} <Translation i18nKey="minutes" />
           </NonBreaking>
         </Entry>
         <Entry
@@ -148,8 +152,8 @@ export const OffTimer: FunctionComponent<{
           <Translation i18nKey={isChangedValue ? 'true' : 'false'} />
         </Entry>
         <EntryComponent>
-          <NullActuatorButton actuator={flip}>
-            {enabledValue ? 'disable' : 'enable'} timer
+          <NullActuatorButton actuator={start}>
+            {activeValue ? 're' : ''}start timer
           </NullActuatorButton>
         </EntryComponent>
         <EntryComponent>
@@ -158,6 +162,11 @@ export const OffTimer: FunctionComponent<{
             disabled={!activeValue}
           >
             cancel timer
+          </NullActuatorButton>
+        </EntryComponent>
+        <EntryComponent>
+          <NullActuatorButton actuator={flip}>
+            {enabledValue ? 'disable' : 'enable'} timer
           </NullActuatorButton>
         </EntryComponent>
         <Entry
@@ -175,13 +184,9 @@ export const OffTimer: FunctionComponent<{
               min="1"
               name="overrideTime"
               pattern="[0-9]*"
-              placeholder="0"
-              value=""
               onBlur={useCallback<GenericEventHandler<HTMLInputElement>>(
-                ({
-                  currentTarget: { value },
-                }: TargetedEvent<HTMLInputElement, Event>) => {
-                  const input = Number.parseInt(value.trim(), 10);
+                ({ currentTarget }: TargetedEvent<HTMLInputElement, Event>) => {
+                  const input = Number.parseInt(currentTarget.value.trim(), 10);
                   if (
                     !input ||
                     input < 1 ||
@@ -195,6 +200,7 @@ export const OffTimer: FunctionComponent<{
                   if (override === timeValue) return;
 
                   setTime(override);
+                  currentTarget.value = '';
                 },
                 [setTime, timeValue],
               )}

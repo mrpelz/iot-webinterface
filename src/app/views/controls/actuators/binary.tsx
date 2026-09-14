@@ -86,18 +86,18 @@ export const BinaryActuator: FunctionComponent<{
 
   const { value: value_ } = value;
 
-  const isGrouping = actuator.$ === 'outputGrouping';
+  const hasSubpage = actuator.$ === 'outputGrouping' || 'offTimer' in actuator;
 
   return (
     <Cell
-      icon={isGrouping ? <ForwardIcon height="1em" /> : undefined}
+      icon={hasSubpage ? <ForwardIcon height="1em" /> : undefined}
       title={
         <Translation
           capitalize={true}
           i18nKey={name}
         />
       }
-      onClick={isGrouping ? handleClick : handleBodyClick}
+      onClick={hasSubpage ? handleClick : handleBodyClick}
     >
       <BlendOver
         blendOver={value_ ? 1 : 0}
@@ -112,7 +112,7 @@ export const BinaryActuator: FunctionComponent<{
             </ColorBody>
           )
         }
-        onClick={isGrouping ? handleBodyClick : undefined}
+        onClick={hasSubpage ? handleBodyClick : undefined}
       >
         <BodyLarge>
           {value_ === undefined ? (

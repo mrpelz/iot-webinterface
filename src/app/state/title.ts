@@ -22,6 +22,10 @@ const roomName$ = getTranslationFallback(computed(() => room$.value?.$));
 export const title$ = computed(() => {
   if (titleOverride$.value === noTitle) return undefined;
 
+  if (titleOverride$.value) {
+    return titleOverride$.value;
+  }
+
   if (staticPage$.value) {
     return staticPageName$.value;
   }

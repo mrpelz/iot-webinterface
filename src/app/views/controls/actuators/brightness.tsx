@@ -216,18 +216,18 @@ export const BrightnessActuator: FunctionComponent<{
     />
   );
 
-  const isGrouping = actuator.$ === 'ledGrouping';
+  const hasSubpage = actuator.$ === 'ledGrouping' || 'offTimer' in actuator;
 
   return (
     <Cell
-      icon={isGrouping ? <ForwardIcon height="1em" /> : undefined}
+      icon={hasSubpage ? <ForwardIcon height="1em" /> : undefined}
       title={
         <Translation
           capitalize={true}
           i18nKey={name}
         />
       }
-      onClick={isGrouping ? handleClick : handleBodyClick}
+      onClick={hasSubpage ? handleClick : handleBodyClick}
     >
       <BlendOver
         blendOver={brightness === null ? 0 : brightness}
@@ -242,7 +242,7 @@ export const BrightnessActuator: FunctionComponent<{
         transition={
           allowTransition && brightness !== null && !loading && !isInteracting
         }
-        onClick={isGrouping ? handleBodyClick : undefined}
+        onClick={hasSubpage ? handleBodyClick : undefined}
       >
         <BodyLarge ref={refB}>
           {label}

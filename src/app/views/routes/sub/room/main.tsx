@@ -35,7 +35,15 @@ export const SubPage: FunctionComponent<{
       return <GroupChildren object={object} />;
     }
 
+    case 'automatedInputLogic': {
+      return <OffTimer actuator={object.timerOutput} />;
+    }
+
     default: {
+      if ('offTimer' in object) {
+        return <OffTimer actuator={object.offTimer} />;
+      }
+
       break;
     }
   }

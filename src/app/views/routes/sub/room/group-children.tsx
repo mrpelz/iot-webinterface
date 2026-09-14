@@ -27,32 +27,43 @@ export const GroupChildren: FunctionComponent<{
   const name_ = useShortenedPath($path);
   const name = String(name_?.join(' ') ?? $path?.at(-1) ?? $);
 
+  const { offTimer } = ensureKeys(object, 'offTimer');
+
   const { inputs } = ensureKeys(object, 'inputs');
   const { outputs } = ensureKeys(object, 'outputs');
   const { lights } = ensureKeys(object, 'lights');
 
   const children = inputs ?? outputs ?? lights;
 
-  useTitleOverride(children ? getTranslationFallback(name).value : undefined);
+  useTitleOverride(getTranslationFallback(name).value);
 
   const categorized = useMemo(() => {
     if (!children) return undefined;
 
     const result: Record<
       string,
-      Exclude<typeof children, undefined>[number][]
-    > = {};
+      (
+        | Exclude<typeof children, undefined>[number]
+        | Exclude<typeof offTimer, undefined>
+      )[]
+    > = offTimer
+      ? {
+          timer: [offTimer],
+        }
+      : {};
 
     for (const child of children) {
-      const group = serialized(child).$path?.at(-2);
-      if (group === undefined) continue;
+      const group =
+        'main' in child ? serialized(child.main).$path?.at(-3) : undefined;
+
+      if (!group) continue;
 
       result[group] = result[group] ?? [];
       result[group].push(child);
     }
 
     return result;
-  }, [children]);
+  }, [children, offTimer]);
 
   if (!categorized) return null;
 

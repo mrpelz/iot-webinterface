@@ -6,8 +6,7 @@ import { useCallback, useMemo } from 'preact/hooks';
 import { TSystem } from '../../../../common/types.js';
 import { serialized } from '../../../api.js';
 import { BodyBottomBand, BodyLarge } from '../../../components/controls.js';
-import { Haptic } from '../../../components/haptic.js';
-// import { ForwardIcon } from '../../../components/icons.js';
+import { ForwardIcon } from '../../../components/icons.js';
 import { TabularNums } from '../../../components/text.js';
 import { useTypedCollector, useTypedEmitter } from '../../../hooks/use-api.js';
 import { useColorBody } from '../../../hooks/use-color-body.js';
@@ -18,7 +17,7 @@ import {
   useTimeLabel,
 } from '../../../hooks/use-time-label.js';
 import { I18nKey } from '../../../i18n/main.js';
-// import { setSubPath } from '../../../state/path.js';
+import { setSubPath } from '../../../state/path.js';
 import { Translation } from '../../../views/translation.js';
 import { Cell } from '../main.js';
 
@@ -37,7 +36,7 @@ export const AutomatedInputLogic: FunctionComponent<{
   title?: I18nKey;
 }> = ({ object, title }) => {
   const {
-    // $id,
+    $id,
     $path,
     automationEnable: {
       main: automationEnableMain,
@@ -189,9 +188,9 @@ export const AutomatedInputLogic: FunctionComponent<{
     timerOutputRunoutTimeLabel,
   ]);
 
-  // const handleHeaderClick = useCallback(() => {
-  //   setSubPath($id);
-  // }, [$id]);
+  const handleHeaderClick = useCallback(() => {
+    setSubPath($id);
+  }, [$id]);
 
   const handleBodyClick = useCallback<MouseEventHandler<HTMLElement>>(
     (event) => {
@@ -219,14 +218,14 @@ export const AutomatedInputLogic: FunctionComponent<{
 
   return (
     <Cell
-      // icon={<ForwardIcon height="1em" />}
+      icon={<ForwardIcon height="1em" />}
       title={
         <Translation
           capitalize
           i18nKey={name}
         />
       }
-      // onClick={handleHeaderClick}
+      onClick={handleHeaderClick}
     >
       {/* eslint-disable-next-line react-hooks/static-components*/}
       <OverlayBody
@@ -234,7 +233,6 @@ export const AutomatedInputLogic: FunctionComponent<{
         onClick={handleBodyClick}
       >
         {labelPrimary}
-        <Haptic />
       </OverlayBody>
       {labelSecondary ? (
         <BodyBottomBand>

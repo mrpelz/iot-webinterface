@@ -64,16 +64,12 @@ export const Map: FunctionComponent = () => {
       const floorPlan = new three.Mesh(floorPlanGeometry, material);
       scene.add(floorPlan);
 
-      // const boxGeometry = new three.BoxGeometry(2, 2, 2);
-      // const cube = new three.Mesh(boxGeometry, material);
-      // scene.add(cube);
-
       const renderer = new three.WebGPURenderer({ antialias: true });
       const controls = new threeOrbitControls.OrbitControls(
         camera,
         renderer.domElement,
       );
-      controls.autoRotate = true;
+      // controls.autoRotate = true;
 
       const resize = () => {
         camera.aspect = wrapper.clientWidth / wrapper.clientHeight;
