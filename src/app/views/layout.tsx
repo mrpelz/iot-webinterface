@@ -47,22 +47,26 @@ export const Layout: FunctionComponent<{ appRef: RefObject<HTMLElement> }> = ({
   const isRoot = isRoot$.value;
 
   useLayoutEffect(() => {
-    const { current: mainCurrent } = appRef;
+    const { current: app } = appRef;
+    const { current: menu } = menuRef;
 
-    if (!mainCurrent || !menuRef.current) return undefined;
+    if (!app || !menu) return undefined;
 
     let lastX = 0;
 
     const setTransform = (input: number) => {
-      if (!menuRef.current || !menuShadeRef.current) return;
+      const { current: menuShade } = menuShadeRef;
+      const { current: swipeBack } = swipeBackRef;
+      if (!menu || !menuShade) return;
+
       if (input === lastX) return;
 
-      const slideElement = swipeBackRef.current || menuRef.current;
+      const slideElement = swipeBack || menu;
 
       lastX = input;
 
       const { style: asideStyle, offsetWidth } = slideElement;
-      const { style: shadeStyle } = menuShadeRef.current;
+      const { style: shadeStyle } = menuShade;
 
       asideStyle.transition = input ? 'none' : '';
       asideStyle.touchAction = input ? 'pan-x' : '';
@@ -144,20 +148,20 @@ export const Layout: FunctionComponent<{ appRef: RefObject<HTMLElement> }> = ({
       setTransform(0);
     };
 
-    mainCurrent.addEventListener('touchstart', onTouchStart, { passive: true });
-    mainCurrent.addEventListener('touchmove', onTouchMove, { passive: false });
-    mainCurrent.addEventListener('touchend', onTouchEnd, { passive: true });
-    mainCurrent.addEventListener('touchcancel', onTouchCancel, {
+    app.addEventListener('touchstart', onTouchStart, { passive: true });
+    app.addEventListener('touchmove', onTouchMove, { passive: false });
+    app.addEventListener('touchend', onTouchEnd, { passive: true });
+    app.addEventListener('touchcancel', onTouchCancel, {
       passive: true,
     });
 
     return () => {
       setTransform(0);
 
-      mainCurrent.removeEventListener('touchstart', onTouchStart);
-      mainCurrent.removeEventListener('touchmove', onTouchMove);
-      mainCurrent.removeEventListener('touchend', onTouchEnd);
-      mainCurrent.removeEventListener('touchcancel', onTouchCancel);
+      app.removeEventListener('touchstart', onTouchStart);
+      app.removeEventListener('touchmove', onTouchMove);
+      app.removeEventListener('touchend', onTouchEnd);
+      app.removeEventListener('touchcancel', onTouchCancel);
     };
   }, [appRef]);
 
