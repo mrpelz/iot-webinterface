@@ -1,12 +1,12 @@
 {
   "name": "@iot/iot-webinterface",
-  "version": "2.43.3",
+  "version": "2.43.4-feat-konsta-ui.0",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "@iot/iot-webinterface",
-      "version": "2.43.3",
+      "version": "2.43.4-feat-konsta-ui.0",
       "hasInstallScript": true,
       "license": "UNLICENSED",
       "dependencies": {
