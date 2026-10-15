@@ -215,6 +215,7 @@ export const useExpandingRendererUtils = <T,>(props: {
   const initiallyOpen =
     useMemo(
       () =>
+        // eslint-disable-next-line unicorn/prefer-logical-operator-over-ternary
         autoExpandPath_.length > 0
           ? path.every((key, index) => key === autoExpandPath_.at(index))
           : false,

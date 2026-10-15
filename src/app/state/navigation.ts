@@ -67,8 +67,7 @@ export const setHomeName = (input?: string): void => {
 
 effect(() => {
   const homes = homes$.value;
-  if (!homes) return;
-  if (setHomeName$.peek()) return;
+  if (!homes || setHomeName$.peek()) return;
 
   setHomeName(homes.at(0)?.$);
 });
@@ -137,8 +136,7 @@ export const setBuildingName = (input?: string): void => {
 
 effect(() => {
   const buildings = buildings$.value;
-  if (!buildings) return;
-  if (setBuildingName$.peek()) return;
+  if (!buildings || setBuildingName$.peek()) return;
 
   setBuildingName(buildings.at(0)?.$);
 });
@@ -300,9 +298,7 @@ export const shortenedPath = callbackSignal(
     // eslint-disable-next-line unicorn/no-for-loop
     for (let index = 0; index < path.length; index += 1) {
       const segment = path[index];
-      if (!segment) continue;
-
-      if (segment === $path.at(index)) continue;
+      if (!segment || segment === $path.at(index)) continue;
 
       result.push(segment);
     }

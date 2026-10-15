@@ -233,7 +233,8 @@ const DeviceHello: FunctionComponent<{ device: TMainDevice | TSubDevice }> = ({
       wifiPhyMode,
       wifiSsid,
       dieTemp,
-    ] = helloValue.split(',').map((element) => element || null);
+      // eslint-disable-next-line unicorn/prefer-default-parameters
+    ] = helloValue.split(',').map((element) => element ?? null);
 
     return (
       <>

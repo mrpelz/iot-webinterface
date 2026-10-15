@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-combined-guards */
 import {
   computed,
   effect,

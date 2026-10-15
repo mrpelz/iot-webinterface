@@ -21,22 +21,22 @@ export type CellProps = {
 };
 
 export const Cell: FunctionComponent<CellProps> = ({
-  icon,
+  icon = null,
   children,
   onClick,
-  span,
+  span = 2,
   title,
 }) => (
   <CellComponent
     isHighContrast={theme$.value === 'highContrast'}
-    span={span ?? 2}
+    span={span}
     onClick={onClick}
   >
     <Header>
       <Title>
         <Marquee>{title}</Marquee>
       </Title>
-      {icon ?? null}
+      {icon}
     </Header>
     {children}
   </CellComponent>

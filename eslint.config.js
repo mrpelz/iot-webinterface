@@ -43,6 +43,7 @@ const configDownstream = {
     ],
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
+    'unicorn/prefer-ternary': 'off',
   },
   settings: {
     react: {

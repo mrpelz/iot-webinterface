@@ -16,5 +16,5 @@ export const GridCell = styled('grid-cell')<{ span?: number }>`
   position: relative;
   display: flex;
   flex-direction: column;
-  grid-column-end: span ${({ span }) => `${span ?? 3}`};
+  grid-column-end: span ${({ span = 3 }) => `${span}`};
 `;

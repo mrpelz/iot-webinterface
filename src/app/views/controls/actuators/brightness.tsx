@@ -1,8 +1,8 @@
 import { Match, TExclude } from '@iot/iot-monolith/tree';
 import { FunctionComponent, MouseEventHandler } from 'preact';
+import { MutableRefObject } from 'preact/compat';
 import {
   Dispatch,
-  MutableRef,
   StateUpdater,
   useCallback,
   useEffect,
@@ -40,8 +40,8 @@ export type TBrightnessActuator = Match<
 >;
 
 export const useWheelBrightness = (
-  brightnessRef: MutableRef<number | undefined>,
-  loadingRef: MutableRef<boolean | undefined>,
+  brightnessRef: MutableRefObject<number | undefined>,
+  loadingRef: MutableRefObject<boolean | undefined>,
   setBrightness: (brightness: number) => void | undefined,
 ): ((delta: number) => void) =>
   useCallback(
@@ -49,8 +49,7 @@ export const useWheelBrightness = (
       const { current: currentBrightness } = brightnessRef;
       const { current: currentLoading } = loadingRef;
 
-      if (!setBrightness) return;
-      if (currentLoading) return;
+      if (!setBrightness || currentLoading) return;
 
       const newValue =
         Math.round(
@@ -67,8 +66,8 @@ export const useWheelBrightness = (
   );
 
 export const useSwipeBrightness = (
-  brightnessRef: MutableRef<number | undefined>,
-  loadingRef: MutableRef<boolean | undefined>,
+  brightnessRef: MutableRefObject<number | undefined>,
+  loadingRef: MutableRefObject<boolean | undefined>,
   setBrightness: (brightness: number) => void | undefined,
   setInteracting: Dispatch<StateUpdater<boolean>>,
 ): ((delta: number | undefined) => void) => {
@@ -79,9 +78,9 @@ export const useSwipeBrightness = (
       const { current: currentBrightness } = brightnessRef;
       const { current: currentLoading } = loadingRef;
 
-      if (currentBrightness === undefined) return;
-      if (currentLoading) return;
-      if (!setBrightness) return;
+      if (currentBrightness === undefined || currentLoading || !setBrightness) {
+        return;
+      }
 
       if (delta === 0) {
         setInteracting(true);
@@ -121,9 +120,11 @@ export const BrightnessLabel: FunctionComponent<{
   <NonBreaking>
     {useMemo(() => {
       if (value === undefined || brightness === undefined) return '?';
-      if (loading) return '…';
-
-      return <TabularNums>{Math.round(brightness * 100)}%</TabularNums>;
+      return loading ? (
+        '…'
+      ) : (
+        <TabularNums>{Math.round(brightness * 100)}%</TabularNums>
+      );
     }, [brightness, loading, value])}
   </NonBreaking>
 );

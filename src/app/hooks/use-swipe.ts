@@ -1,9 +1,10 @@
-import { MutableRef, useEffect } from 'preact/hooks';
+import { MutableRefObject } from 'preact/compat';
+import { useEffect } from 'preact/hooks';
 
 export type SwipeDirection = 'horizontal' | 'vertial';
 
 export const useSwipe = <T extends HTMLElement>(
-  ref: MutableRef<T | null>,
+  ref: MutableRefObject<T | null>,
   setter: (input: number | undefined) => void,
   throttle: number,
   direction: SwipeDirection = 'horizontal',
@@ -26,8 +27,13 @@ export const useSwipe = <T extends HTMLElement>(
       event: HTMLElementEventMap['touchstart'],
     ) => void = ({ targetTouches }) => {
       const touch = targetTouches.item(0);
-      if (!touch) return;
-      if (startMainAxis !== undefined || startCrossAxis !== undefined) return;
+      if (
+        !touch ||
+        startMainAxis !== undefined ||
+        startCrossAxis !== undefined
+      ) {
+        return;
+      }
 
       const x = touch.clientX;
       const y = touch.clientY;
@@ -47,8 +53,13 @@ export const useSwipe = <T extends HTMLElement>(
       const { targetTouches } = event;
 
       const touch = targetTouches.item(0);
-      if (!touch) return;
-      if (startMainAxis === undefined || startCrossAxis === undefined) return;
+      if (
+        !touch ||
+        startMainAxis === undefined ||
+        startCrossAxis === undefined
+      ) {
+        return;
+      }
 
       const x = touch.clientX;
       const y = touch.clientY;

@@ -37,11 +37,8 @@ export const ntfyApiRequest = async (
     }
 
     const json = await response.json().catch();
-    if (!json || !isPlainObject(json)) {
-      return undefined;
-    }
 
-    return json;
+    return !json || !isPlainObject(json) ? undefined : json;
   } catch {
     clear();
 

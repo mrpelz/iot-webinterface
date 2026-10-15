@@ -20,9 +20,9 @@ export const slug = (() => {
   if (gitBranch) {
     isLocal = true;
 
-    if (gitBranch === 'main') return `${pkgName_}-local-main`;
-
-    return `${pkgName_}-local-${gitBranch.replaceAll(/(?:\W|_)/g, '-')}`;
+    return gitBranch === 'main'
+      ? `${pkgName_}-local-main`
+      : `${pkgName_}-local-${gitBranch.replaceAll(/(?:\W|_)/g, '-')}`;
   }
 
   const [prereleaseName] = prerelease(pkgVersion) ?? [];

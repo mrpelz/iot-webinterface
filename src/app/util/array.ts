@@ -13,8 +13,7 @@ export const uniqueById = <T>(input: T[]): Exclude<T, undefined>[] => {
     if (!isObject(item) || !('$id' in item)) continue;
 
     const id = item.$id;
-    if (typeof id !== 'string') continue;
-    if (result.has(id)) continue;
+    if (typeof id !== 'string' || result.has(id)) continue;
 
     result.set(id, item);
   }
@@ -38,8 +37,7 @@ export const excludeById = <T, E>(
     if (!isObject(item) || !('$id' in item)) continue;
 
     const id = item.$id;
-    if (typeof id !== 'string') continue;
-    if (excludedIds.has(id)) continue;
+    if (typeof id !== 'string' || excludedIds.has(id)) continue;
 
     excludedIds.add(id);
   }
@@ -51,8 +49,7 @@ export const excludeById = <T, E>(
     if (!isObject(item) || !('$id' in item)) continue;
 
     const id = item.$id;
-    if (typeof id !== 'string') continue;
-    if (excludedIds.has(id)) continue;
+    if (typeof id !== 'string' || excludedIds.has(id)) continue;
 
     result.set(id, item as Exclude<T, E>);
   }

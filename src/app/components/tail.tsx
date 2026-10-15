@@ -21,8 +21,7 @@ export const Tail: FunctionComponent = ({ children }) => {
 
   useEffect(() => {
     const { current: element } = ref;
-    if (!element) return;
-    if (element.scrollTop < -5) return;
+    if (!element || element.scrollTop < -5) return;
 
     element.scrollTo({ behavior: 'smooth', top: 0 });
   }, [children]);

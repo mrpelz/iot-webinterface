@@ -62,8 +62,9 @@ export const NullActuator: FunctionComponent<{
 
     setter(null);
 
-    if (!(overlay instanceof HTMLElement)) return;
-    if (!(base instanceof HTMLElement)) return;
+    if (!(overlay instanceof HTMLElement) || !(base instanceof HTMLElement)) {
+      return;
+    }
 
     (async () => {
       const [animationBase, animationOverlay] = await Promise.all([

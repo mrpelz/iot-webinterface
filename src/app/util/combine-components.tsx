@@ -29,8 +29,7 @@ export const mergeClassNames = (
     if (!className?.length) continue;
 
     for (const singleCSSClass of className.split(' ')) {
-      if (singleCSSClass.length === 0) continue;
-      if (result.has(singleCSSClass)) continue;
+      if (singleCSSClass.length === 0 || result.has(singleCSSClass)) continue;
 
       result.add(singleCSSClass);
     }

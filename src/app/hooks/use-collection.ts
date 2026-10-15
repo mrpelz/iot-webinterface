@@ -1,12 +1,11 @@
-import {
-  MutableRef,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from 'preact/hooks';
+import { MutableRefObject } from 'preact/compat';
+import { useCallback, useMemo, useRef, useState } from 'preact/hooks';
 
-export const useMap = <K, V>(): [symbol, MutableRef<Map<K, V>>, Map<K, V>] => {
+export const useMap = <K, V>(): [
+  symbol,
+  MutableRefObject<Map<K, V>>,
+  Map<K, V>,
+] => {
   const map = useRef(new Map<K, V>());
   const [symbol, setSymbol] = useState(Symbol('useMap'));
 

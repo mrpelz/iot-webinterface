@@ -117,8 +117,7 @@ export class Api {
     callbackInit = false,
   ) {
     const handleMessage = async ({ data }: MessageEvent) => {
-      if (abort?.signal.aborted) return;
-      if (data !== key) return;
+      if (abort?.signal.aborted || data !== key) return;
 
       const value = store ? await get(key, store) : undefined;
       callback(value);
@@ -263,8 +262,7 @@ export const sortBy = <T extends object, K extends keyof Required<T>>(
     if (!(property in object)) continue;
 
     const value = object[property];
-    if (!value) continue;
-    if (list.includes(value)) continue;
+    if (!value || list.includes(value)) continue;
 
     unlistedResults.push(object);
   }

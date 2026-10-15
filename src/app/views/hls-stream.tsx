@@ -46,7 +46,9 @@ export const HLSStream: FunctionComponent<{
     import(/* webpackChunkName: "hls" */ 'hls.js'),
   )?.default;
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {

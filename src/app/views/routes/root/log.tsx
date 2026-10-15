@@ -56,8 +56,7 @@ export const isLogs = (input: unknown[]): input is Log[] => {
     if (!Array.isArray(log)) return false;
     const [key, value] = log;
 
-    if (typeof key !== 'string') return false;
-    if (typeof value !== 'object') return false;
+    if (typeof key !== 'string' || typeof value !== 'object') return false;
 
     const { body, date, head, level } = ensureKeys(
       value,

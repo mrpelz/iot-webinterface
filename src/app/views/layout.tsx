@@ -22,16 +22,15 @@ import { Titlebar } from './titlebar.js';
 export const swipeCaptureWidth = 30;
 
 const MainRefContext = createContext(
-  undefined as unknown as RefObject<HTMLElement>,
+  null as unknown as RefObject<HTMLElement | null>,
 );
 
-export const useMainRef = (): RefObject<HTMLElement> =>
+export const useMainRef = (): RefObject<HTMLElement | null> =>
   useContext(MainRefContext);
 
-export const Layout: FunctionComponent<{ appRef: RefObject<HTMLElement> }> = ({
-  appRef,
-  children,
-}) => {
+export const Layout: FunctionComponent<{
+  appRef: RefObject<HTMLElement | null>;
+}> = ({ appRef, children }) => {
   const isDesktop = useBreakpoint(getMediaQuery(dimensions.breakpointDesktop));
 
   const isAsideVisible = isMenuVisible$.value;
@@ -57,9 +56,7 @@ export const Layout: FunctionComponent<{ appRef: RefObject<HTMLElement> }> = ({
     const setTransform = (input: number) => {
       const { current: menuShade } = menuShadeRef;
       const { current: swipeBack } = swipeBackRef;
-      if (!menu || !menuShade) return;
-
-      if (input === lastX) return;
+      if (!menu || !menuShade || input === lastX) return;
 
       const slideElement = swipeBack || menu;
 
@@ -92,8 +89,7 @@ export const Layout: FunctionComponent<{ appRef: RefObject<HTMLElement> }> = ({
 
       const x = targetTouches.item(0)?.pageX || 0;
 
-      if (!x) return;
-      if (x > swipeCaptureWidth) return;
+      if (!x || x > swipeCaptureWidth) return;
 
       setTransform(x);
     };

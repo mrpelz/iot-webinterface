@@ -42,11 +42,9 @@ const AllLightState: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
   room,
 }) => {
   const { main: allLights } = 'allLights' in room ? room.allLights : {};
-  const { value: on } = useTypedEmitter(serialized(allLights));
+  const { value: on = false } = useTypedEmitter(serialized(allLights));
 
-  return (on ?? false) ? (
-    <MenuIndicatorItem color="hsl(40deg 100% 50%)" />
-  ) : null;
+  return on ? <MenuIndicatorItem color="hsl(40deg 100% 50%)" /> : null;
 };
 
 const AllWindowsState: FunctionComponent<{ room: LevelObject[Level.ROOM] }> = ({
@@ -165,10 +163,7 @@ export const Menu: FunctionComponent = () => {
   const floors = floors$.value;
   const staticPage = staticPage$.value;
 
-  const isVisible = useMemo(
-    () => (isMenuVisible === null ? true : isMenuVisible),
-    [isMenuVisible],
-  );
+  const isVisible = useMemo(() => isMenuVisible ?? true, [isMenuVisible]);
 
   return (
     <MenuComponent isVisible={isVisible}>

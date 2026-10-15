@@ -22,8 +22,7 @@ export const sortBy = <T extends object, K extends keyof Required<T>>(
     if (!(property in element)) continue;
 
     const value = element[property];
-    if (!value) continue;
-    if (list.includes(value)) continue;
+    if (!value || list.includes(value)) continue;
 
     unlistedResults.push(element);
   }

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-combined-guards */
 const userAgent = navigator.userAgent.toLowerCase();
 
 export const isSafari = (() => {

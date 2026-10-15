@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-empty-file */
 // import { FunctionComponent } from 'preact';
 // import { useCallback, useMemo } from 'preact/hooks';
 

@@ -44,9 +44,7 @@ export const Marquee: FunctionComponent<{
   useEffect(() => {
     const { current: wrapper } = wrapperRef;
     const { current: track } = trackRef;
-    if (!wrapper || !track) return;
-
-    if (track.scrollWidth <= wrapper.offsetWidth) {
+    if (!wrapper || !track || track.scrollWidth <= wrapper.offsetWidth) {
       return;
     }
 
